@@ -1,0 +1,19 @@
+#!/bin/bash
+
+current_branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
+protected_branches=( master main )
+
+for i in "${protected_branches[@]}"; do
+  if [[ $i == "$current_branch" ]]; then
+    echo '⚠️ Attention! You are pushing to a protected branch. Running checks…'
+
+    ./gradlew check
+    if [ $? -ne 0 ]; then
+      echo '✗ check failed'
+      exit 1
+    fi
+  fi
+done
+
+echo "✓ check successful"
+exit 0

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+stagedFiles=$(git diff --staged --name-only)
+
+echo "🧹 Formatting code running spotlessApply…"
+./gradlew spotlessApply
+if [ $? -ne 0 ]; then
+  echo '… ✗ formatting failed'
+  exit 1
+fi
+
+for file in $stagedFiles; do
+  if test -f "$file"; then
+    git add "$file"
+  fi
+done
+
+echo "✓ formatting successful"
+exit 0
