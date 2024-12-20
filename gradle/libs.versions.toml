@@ -1,6 +1,7 @@
 [versions]
 junitVersion = "5.11.4"
 assertjVersion = "3.27.0"
+jacksonVersion = "2.17.2"
 
 [libraries]
 asciidoctorBlockSwitch = { module = "io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch", version = "0.6.3" }
@@ -10,6 +11,7 @@ junitJupiterEngine = { module = "org.junit.jupiter:junit-jupiter-engine", versio
 junitJupiterParams = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junitVersion" }
 junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher", version = "1.11.4" }
 assertjCore = { module = "org.assertj:assertj-core", version.ref = "assertjVersion" }
+jacksonDatabind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jacksonVersion" }
 jspecify = { module = "org.jspecify:jspecify", version = "1.0.0" }
 
 [plugins]

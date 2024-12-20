@@ -6,4 +6,6 @@ include("bom")
 
 include("modules:core")
 
+include("modules:json-jackson")
+
 include("manual")
