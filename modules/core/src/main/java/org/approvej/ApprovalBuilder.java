@@ -1,34 +1,25 @@
 package org.approvej;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+public class ApprovalBuilder {
 
-public class ApprovalBuilder<T> {
+  private final String originalValue;
+  private String scrubbedValue;
 
-  private final T originalValue;
-  private final List<Scrubber<T>> scrubbers = new ArrayList<>();
-
-  public ApprovalBuilder(T originalValue) {
-    this.originalValue = originalValue;
+  public ApprovalBuilder(String originalValue) {
+    this.originalValue = originalValue.trim();
+    this.scrubbedValue = this.originalValue;
   }
 
-  public ApprovalBuilder<T> withScrubber(Scrubber<T> scrubber) {
-    scrubbers.add(scrubber);
+  public ApprovalBuilder scrubbedWith(Scrubber scrubber) {
+    this.scrubbedValue = scrubber.apply(scrubbedValue).trim();
     return this;
   }
 
-  public void verify() {
-    T scrubbedValue = originalValue;
-    for (Scrubber<T> scrubber : scrubbers) {
-      scrubbedValue = scrubber.apply(scrubbedValue);
-    }
-
-    try (var writer = new FileWriter("output.txt")) {
-      writer.write(scrubbedValue.toString());
-    } catch (IOException e) {
-      e.printStackTrace();
+  public void verify(String previouslyApprovedValue) {
+    if (!scrubbedValue.trim().equals(previouslyApprovedValue.trim())) {
+      throw new AssertionError(
+          "Approval mismatch: expected: <%s> but was: <%s>"
+              .formatted(previouslyApprovedValue.trim(), scrubbedValue.trim()));
     }
   }
 }
