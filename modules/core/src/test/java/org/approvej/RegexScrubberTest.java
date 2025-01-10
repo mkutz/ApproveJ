@@ -12,7 +12,8 @@ class RegexScrubberTest {
   @ParameterizedTest(name = "apply({0}) == {3}")
   @CsvSource({
     "'Hello World!', 'World', '%scrubbed%', 'Hello %scrubbed%!'",
-    "'Hello World!', 'l', '_', 'He__o Wor_d!'"
+    "'Hello World!', 'l', '_', 'He__o Wor_d!'",
+    "'Hello World!', '[aeiou]', '', 'Hll Wrld!'"
   })
   void apply_static_replacement(
       String unscrubbedValue, Pattern regex, String replacement, String expected) {

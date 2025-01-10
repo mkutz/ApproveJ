@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  * descriptions, like <code>[today]</code>, <code>[yesterday]</code>, <code>[2 days from now]</code>
  * .
  */
-public final class RelativeDateScrubber implements Scrubber {
+public final class RelativeDateScrubber implements Scrubber<String> {
 
   private static final LocalDate EXAMPLE_DATE = LocalDate.of(4567, 12, 30);
 

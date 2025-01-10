@@ -1,25 +1,66 @@
 package org.approvej;
 
-public class ApprovalBuilder {
+import org.jspecify.annotations.NullMarked;
 
-  private final String originalValue;
-  private String scrubbedValue;
+/**
+ * A builder to configure an approval for a given value.
+ *
+ * <p>Optionally the value can be "scrubbed" of dynamic data (like timestamps or ids).
+ *
+ * <p>The value will be printed (converted to {@link String}) using the builder's {@link Printer}.
+ * The default {@link ToStringPrinter} can be changed with the {@link #printWith(Printer)}.
+ *
+ * @param <T> the type of the value to approve
+ */
+@NullMarked
+public class ApprovalBuilder<T> {
 
-  public ApprovalBuilder(String originalValue) {
-    this.originalValue = originalValue.trim();
-    this.scrubbedValue = this.originalValue;
+  private Printer<T> printer = new ToStringPrinter<>();
+  private T scrubbedValue;
+
+  public static <T> ApprovalBuilder<T> approve(T originalValue) {
+    return new ApprovalBuilder<>(originalValue);
   }
 
-  public ApprovalBuilder scrubbedWith(Scrubber scrubber) {
-    this.scrubbedValue = scrubber.apply(scrubbedValue).trim();
+  /**
+   * Creates a new builder for the given value.
+   *
+   * @param originalValue the value to approve
+   */
+  public ApprovalBuilder(T originalValue) {
+    this.scrubbedValue = originalValue;
+  }
+
+  /**
+   * Uses the given {@link Printer} to convert the value to a {@link String}.
+   *
+   * @param printer the printer used to convert the value to a {@link String}
+   * @return this
+   */
+  public ApprovalBuilder<T> printWith(Printer<T> printer) {
+    this.printer = printer;
     return this;
   }
 
-  public void verify(String previouslyApprovedValue) {
-    if (!scrubbedValue.trim().equals(previouslyApprovedValue.trim())) {
-      throw new AssertionError(
-          "Approval mismatch: expected: <%s> but was: <%s>"
-              .formatted(previouslyApprovedValue.trim(), scrubbedValue.trim()));
-    }
+  /**
+   * Applies the given scrubber to the current value.
+   *
+   * @param scrubber the {@link Scrubber}
+   * @return this
+   */
+  public ApprovalBuilder<T> scrubbedWith(Scrubber<T> scrubber) {
+    scrubbedValue = scrubber.apply(scrubbedValue);
+    return this;
+  }
+
+  /**
+   * Uses the given {@link Verifier} to approve the {@link #scrubbedValue} printed using the {@link
+   * #printer}.
+   *
+   * @param verifier the {@link Verifier}
+   * @throws ApprovalError if the verification fails
+   */
+  public void verify(final Verifier verifier) {
+    verifier.accept(printer.apply(scrubbedValue));
   }
 }

@@ -1,6 +1,7 @@
 package org.approvej;
 
-import static org.approvej.Approvals.approve;
+import static org.approvej.ApprovalBuilder.approve;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -25,14 +26,28 @@ class ApprovalBuilderTest {
       """;
 
   @Test
-  void verify_with_scrubbers() {
-    var dates = new RelativeDateScrubber(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-    var uuids = new UuidScrubber();
-    approve(EXAMPLE_TEXT).scrubbedWith(dates).scrubbedWith(uuids).verify(SCRUBBED);
+  void verify() {
+    approve(EXAMPLE_TEXT).verify(new InplaceVerifier(EXAMPLE_TEXT));
   }
 
   @Test
-  void verify_without_scrubbers() {
-    approve(EXAMPLE_TEXT).verify(EXAMPLE_TEXT);
+  void verify_with_scrubbers() {
+    RelativeDateScrubber dates =
+        new RelativeDateScrubber(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    UuidScrubber uuids = new UuidScrubber();
+    approve(EXAMPLE_TEXT)
+        .scrubbedWith(dates)
+        .scrubbedWith(uuids)
+        .verify(new InplaceVerifier(SCRUBBED));
+  }
+
+  @Test
+  void verify_failure() {
+    assertThatExceptionOfType(AssertionError.class)
+        .isThrownBy(
+            () -> approve(EXAMPLE_TEXT).verify(new InplaceVerifier("This is not the same text.")))
+        .withMessage(
+            "Approval mismatch: expected: <This is not the same text.> but was: <%s>"
+                .formatted(EXAMPLE_TEXT));
   }
 }

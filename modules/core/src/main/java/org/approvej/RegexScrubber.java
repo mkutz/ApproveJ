@@ -12,7 +12,7 @@ import org.jspecify.annotations.NullMarked;
  * replacement {@link Function} for each finding.
  */
 @NullMarked
-public class RegexScrubber implements Scrubber {
+public class RegexScrubber implements Scrubber<String> {
 
   /**
    * Replaces each match with "[scrubbed #]" where '#' is the number of the distinct found string.
@@ -66,10 +66,5 @@ public class RegexScrubber implements Scrubber {
           return replacement.apply(findings.get(group));
         };
     return matcher.replaceAll(replacer);
-  }
-
-  @Override
-  public String toString() {
-    return "RegexScrubber[pattern=%s, replacement=%s]".formatted(pattern, replacement);
   }
 }
