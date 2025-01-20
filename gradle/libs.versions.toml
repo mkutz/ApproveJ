@@ -21,4 +21,4 @@ asciidoctor = { id = "org.asciidoctor.jvm.convert", version = "4.0.4" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version = "2.1.0" }
 nexusPublish = { id = "io.github.gradle-nexus.publish-plugin", version = "2.0.0" }
 sonar = { id = "org.sonarqube", version = "6.0.1.5171" }
-spotless = { id = "com.diffplug.spotless", version = "7.0.1" }
+spotless = { id = "com.diffplug.spotless", version = "7.0.2" }
