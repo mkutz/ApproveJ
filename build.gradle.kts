@@ -9,7 +9,7 @@ repositories { mavenCentral() }
 
 sonar {
   properties {
-    property("sonar.projectKey", "mkutz_stubit")
+    property("sonar.projectKey", "mkutz_ApproveJ")
     property("sonar.organization", "mkutz")
     property("sonar.host.url", "https://sonarcloud.io")
   }
