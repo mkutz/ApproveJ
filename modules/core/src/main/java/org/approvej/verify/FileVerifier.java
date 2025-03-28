@@ -6,13 +6,15 @@ import static java.nio.file.Files.exists;
 import static java.nio.file.Files.readString;
 import static java.nio.file.Files.writeString;
 import static java.nio.file.StandardOpenOption.CREATE;
-import static org.approvej.verify.StackTraceTestSourceFinder.currentTestSourceFile;
+import static java.util.Arrays.stream;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import org.approvej.ApprovalError;
+import org.junit.jupiter.api.Test;
 
 /**
  * {@link Verifier} that compares the received value with the approved value stored in a file. If
@@ -34,8 +36,32 @@ public class FileVerifier implements Verifier {
     this.approvedPath = filePath.getParent().resolve(approvedFileName);
   }
 
+  /** Creates a {@link FileVerifier} that will store the received/approved files next to the test */
   public FileVerifier() {
     this(currentTestSourceFile().orElse(Path.of("src/test/resources/approvej/test.txt")));
+  }
+
+  static Optional<Path> currentTestSourceFile() {
+    return stream(Thread.currentThread().getStackTrace())
+        .map(
+            element -> {
+              try {
+                return Class.forName(element.getClassName());
+              } catch (ClassNotFoundException e) {
+                return Void.class;
+              }
+            })
+        .filter(
+            elementClass ->
+                stream(elementClass.getDeclaredMethods())
+                    .anyMatch(method -> method.isAnnotationPresent(Test.class)))
+        .map(
+            clazz -> {
+              var classLocation = clazz.getName().replace('.', '/') + ".java";
+              return Path.of("src/test/java", classLocation).normalize();
+            })
+        .filter(path -> path.toFile().exists())
+        .findFirst();
   }
 
   @Override

@@ -9,7 +9,7 @@ class StackTraceTestSourceFinderTest {
 
   @Test
   void currentTestSourceFile() {
-    assertThat(StackTraceTestSourceFinder.currentTestSourceFile())
+    assertThat(FileVerifier.currentTestSourceFile())
         .isPresent()
         .get()
         .isEqualTo(

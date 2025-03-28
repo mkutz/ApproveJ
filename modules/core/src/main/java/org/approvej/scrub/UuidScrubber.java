@@ -17,7 +17,7 @@ import org.jspecify.annotations.NullMarked;
  *   }
  * </pre>
  *
- * <p>Will be scrubbed to</code>
+ * <p>Will be scrubbed to
  *
  * <pre>
  *   {
@@ -36,6 +36,12 @@ public class UuidScrubber extends RegexScrubber {
   private static final Pattern UUID_PATTERN =
       Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
 
+  /**
+   * Creates a new {@link UuidScrubber} using the given {@code replacement} function.
+   *
+   * @param replacement a custom replacement function that takes the number of the match as an
+   *     argument
+   */
   public UuidScrubber(Function<Integer, String> replacement) {
     super(UUID_PATTERN, replacement);
   }

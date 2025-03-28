@@ -22,6 +22,13 @@ public class ApprovalBuilder<T> {
   private Printer<T> printer = new ToStringPrinter<>();
   private T scrubbedValue;
 
+  /**
+   * Creates a new builder for the given value.
+   *
+   * @param originalValue the value to approve
+   * @return a new {@link ApprovalBuilder} for the given value
+   * @param <T> the type of the value to approve
+   */
   public static <T> ApprovalBuilder<T> approve(T originalValue) {
     return new ApprovalBuilder<>(originalValue);
   }
