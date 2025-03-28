@@ -1,4 +1,5 @@
 # ApproveJ
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mkutz_ApproveJ&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=mkutz_ApproveJ)
 
 A simple implementation of approval testing for the JVM
 
