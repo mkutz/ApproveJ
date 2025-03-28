@@ -1,4 +1,4 @@
-package org.approvej;
+package org.approvej.print;
 
 import java.util.function.Function;
 

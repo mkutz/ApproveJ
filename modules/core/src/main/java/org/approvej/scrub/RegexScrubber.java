@@ -1,4 +1,4 @@
-package org.approvej;
+package org.approvej.scrub;
 
 import java.util.HashMap;
 import java.util.Map;

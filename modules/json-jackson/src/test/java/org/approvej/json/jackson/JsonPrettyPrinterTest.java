@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 class JsonPrettyPrinterTest {
 
   @Test
-  void test() {
+  void apply() {
     JsonMapper jsonMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
     var jsonPrettyPrinter = new JsonPrettyPrinter<>(jsonMapper);
 

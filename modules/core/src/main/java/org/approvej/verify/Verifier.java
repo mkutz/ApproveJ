@@ -1,4 +1,4 @@
-package org.approvej;
+package org.approvej.verify;
 
 import java.util.function.Consumer;
 

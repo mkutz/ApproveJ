@@ -1,4 +1,4 @@
-package org.approvej;
+package org.approvej.print;
 
 /**
  * A {@link Printer} that simply calls {@link Object#toString()} on the value.

@@ -7,6 +7,7 @@ repositories { mavenCentral() }
 
 dependencies {
   api(libs.jspecify)
+  implementation(libs.junitJupiterApi)
 
   testImplementation(platform(libs.junitBom))
   testImplementation(libs.junitJupiterApi)

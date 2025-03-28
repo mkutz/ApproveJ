@@ -12,6 +12,6 @@ public class ApprovalError extends AssertionError {
    */
   public ApprovalError(String received, String previouslyApproved) {
     super(
-        "Approval mismatch: expected: <%s> but was: <%s>".formatted(received, previouslyApproved));
+        "Approval mismatch: expected: <%s> but was: <%s>".formatted(previouslyApproved, received));
   }
 }

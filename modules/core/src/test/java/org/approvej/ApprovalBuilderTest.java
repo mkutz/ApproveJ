@@ -6,6 +6,10 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOf
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+import org.approvej.scrub.RelativeDateScrubber;
+import org.approvej.scrub.UuidScrubber;
+import org.approvej.verify.FileVerifier;
+import org.approvej.verify.InplaceVerifier;
 import org.junit.jupiter.api.Test;
 
 class ApprovalBuilderTest {
@@ -31,6 +35,14 @@ class ApprovalBuilderTest {
   }
 
   @Test
+  void verify_file() {
+    RelativeDateScrubber dates =
+        new RelativeDateScrubber(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    UuidScrubber uuids = new UuidScrubber();
+    approve(EXAMPLE_TEXT).scrubbedWith(dates).scrubbedWith(uuids).verify(new FileVerifier());
+  }
+
+  @Test
   void verify_with_scrubbers() {
     RelativeDateScrubber dates =
         new RelativeDateScrubber(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -47,7 +59,7 @@ class ApprovalBuilderTest {
         .isThrownBy(
             () -> approve(EXAMPLE_TEXT).verify(new InplaceVerifier("This is not the same text.")))
         .withMessage(
-            "Approval mismatch: expected: <This is not the same text.> but was: <%s>"
+            "Approval mismatch: expected: <%s> but was: <This is not the same text.>"
                 .formatted(EXAMPLE_TEXT));
   }
 }

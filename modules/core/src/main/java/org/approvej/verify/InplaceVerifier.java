@@ -1,5 +1,6 @@
-package org.approvej;
+package org.approvej.verify;
 
+import org.approvej.ApprovalError;
 import org.jspecify.annotations.NullMarked;
 
 /** A verifier that checks if the received value is equal to a value given in place. */

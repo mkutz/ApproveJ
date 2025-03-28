@@ -3,7 +3,7 @@ package org.approvej.json.jackson;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import org.approvej.Printer;
+import org.approvej.print.Printer;
 
 public class JsonPrettyPrinter<T> implements Printer<T> {
 

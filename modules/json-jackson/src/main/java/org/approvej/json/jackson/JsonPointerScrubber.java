@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
-import org.approvej.Scrubber;
+import org.approvej.scrub.Scrubber;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked

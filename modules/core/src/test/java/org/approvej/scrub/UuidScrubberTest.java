@@ -1,4 +1,4 @@
-package org.approvej;
+package org.approvej.scrub;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
