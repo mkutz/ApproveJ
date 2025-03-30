@@ -6,12 +6,12 @@ import static java.nio.file.Files.exists;
 import static java.nio.file.Files.readString;
 import static java.nio.file.Files.writeString;
 import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.util.Arrays.stream;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import org.approvej.ApprovalError;
 import org.junit.jupiter.api.Test;
@@ -23,61 +23,110 @@ import org.junit.jupiter.api.Test;
  */
 public class FileVerifier implements Verifier {
 
-  private static final Pattern FILE_NAME_PATTERN = Pattern.compile("(.*)\\.(.*)$");
+  private final PathProvider pathProvider;
 
-  final Path receivedPath;
-  final Path approvedPath;
-
-  public FileVerifier(Path filePath) {
-    String fileName = filePath.getFileName().toString();
-    String approvedFileName = FILE_NAME_PATTERN.matcher(fileName).replaceFirst("$1_approved.txt");
-    String receivedFileName = FILE_NAME_PATTERN.matcher(fileName).replaceFirst("$1_received.txt");
-    this.receivedPath = filePath.getParent().resolve(receivedFileName);
-    this.approvedPath = filePath.getParent().resolve(approvedFileName);
+  public FileVerifier(PathProvider pathProvider) {
+    this.pathProvider = pathProvider;
   }
 
-  /** Creates a {@link FileVerifier} that will store the received/approved files next to the test */
+  public FileVerifier(Path basePath) {
+    this(new StaticPathProvider(basePath));
+  }
+
   public FileVerifier() {
-    this(currentTestSourceFile().orElse(Path.of("src/test/resources/approvej/test.txt")));
-  }
-
-  static Optional<Path> currentTestSourceFile() {
-    return stream(Thread.currentThread().getStackTrace())
-        .map(
-            element -> {
-              try {
-                return Class.forName(element.getClassName());
-              } catch (ClassNotFoundException e) {
-                return Void.class;
-              }
-            })
-        .filter(
-            elementClass ->
-                stream(elementClass.getDeclaredMethods())
-                    .anyMatch(method -> method.isAnnotationPresent(Test.class)))
-        .map(
-            clazz -> {
-              var classLocation = clazz.getName().replace('.', '/') + ".java";
-              return Path.of("src/test/java", classLocation).normalize();
-            })
-        .filter(path -> path.toFile().exists())
-        .findFirst();
+    this(new StackTracePathProvider());
   }
 
   @Override
   public void accept(String received) {
     try {
-      if (!exists(approvedPath)) {
-        createFile(approvedPath);
+      if (!exists(pathProvider.approvedPath())) {
+        createFile(pathProvider.approvedPath());
       }
-      String previouslyApproved = readString(approvedPath);
+      String previouslyApproved = readString(pathProvider.approvedPath());
       if (!previouslyApproved.equals(received)) {
-        writeString(receivedPath, received, CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        writeString(pathProvider.receivedPath(), received, CREATE, TRUNCATE_EXISTING);
         throw new ApprovalError(received, previouslyApproved);
       }
-      deleteIfExists(receivedPath);
+      deleteIfExists(pathProvider.receivedPath());
     } catch (IOException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  public interface PathProvider {
+    Path approvedPath();
+
+    Path receivedPath();
+  }
+
+  record StaticPathProvider(Path receivedPath, Path approvedPath) implements PathProvider {
+
+    private static final Pattern FILE_NAME_PATTERN = Pattern.compile("(.*)\\.(.*)$");
+
+    StaticPathProvider(Path basePath) {
+      this(
+          basePath
+              .getParent()
+              .resolve(
+                  FILE_NAME_PATTERN
+                      .matcher(basePath.getFileName().toString())
+                      .replaceFirst("$1_received.$2")),
+          basePath
+              .getParent()
+              .resolve(
+                  FILE_NAME_PATTERN
+                      .matcher(basePath.getFileName().toString())
+                      .replaceFirst("$1_approved.$2")));
+    }
+  }
+
+  record StackTracePathProvider(StackTraceElement[] stackTrace) implements PathProvider {
+
+    StackTracePathProvider() {
+      this(Thread.currentThread().getStackTrace());
+    }
+
+    @Override
+    public Path approvedPath() {
+      Method method = currentTestMethod();
+      return Path.of(
+          "src/test/java/"
+              + method.getDeclaringClass().getPackageName().replace(".", "/")
+              + "/"
+              + method.getDeclaringClass().getSimpleName()
+              + "_"
+              + method.getName()
+              + "_approved.txt");
+    }
+
+    @Override
+    public Path receivedPath() {
+      Method method = currentTestMethod();
+      return Path.of(
+          "src/test/java/"
+              + method.getDeclaringClass().getPackageName().replace(".", "/")
+              + "/"
+              + method.getDeclaringClass().getSimpleName()
+              + "_"
+              + method.getName()
+              + "_received.txt");
+    }
+
+    private Method currentTestMethod() {
+      return stream(stackTrace)
+          .map(
+              element -> {
+                try {
+                  return Class.forName(element.getClassName())
+                      .getDeclaredMethod(element.getMethodName());
+                } catch (ClassNotFoundException | NoSuchMethodException e) {
+                  return null;
+                }
+              })
+          .filter(method -> method != null && method.isAnnotationPresent(Test.class))
+          .findFirst()
+          .orElseThrow();
     }
   }
 }
