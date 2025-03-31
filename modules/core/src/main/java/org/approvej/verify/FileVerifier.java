@@ -46,13 +46,23 @@ public class FileVerifier implements Verifier {
     this(new StackTracePathProvider());
   }
 
+  /**
+   * Creates a new {@link FileVerifier} that uses the stack trace to determine the paths of approved
+   * and received files.
+   *
+   * @see StackTracePathProvider
+   */
+  public FileVerifier(String filenameExtension) {
+    this(new StackTracePathProvider(filenameExtension));
+  }
+
   @Override
   public void accept(String received) {
     try {
       if (!exists(pathProvider.approvedPath())) {
         createFile(pathProvider.approvedPath());
       }
-      String previouslyApproved = readString(pathProvider.approvedPath());
+      String previouslyApproved = readString(pathProvider.approvedPath()).trim();
       if (!previouslyApproved.equals(received)) {
         writeString(pathProvider.receivedPath(), received, CREATE, TRUNCATE_EXISTING);
         throw new ApprovalError(received, previouslyApproved);
@@ -77,19 +87,14 @@ public class FileVerifier implements Verifier {
     Path receivedPath();
   }
 
-  static final class StaticPathProvider implements PathProvider {
+  static final class BasePathProvider implements PathProvider {
 
     private static final Pattern FILE_NAME_PATTERN =
         Pattern.compile("(?<baseName>.*)\\.(?<extension>.*)$");
     private final Path receivedPath;
     private final Path approvedPath;
 
-    StaticPathProvider(Path receivedPath, Path approvedPath) {
-      this.receivedPath = receivedPath;
-      this.approvedPath = approvedPath;
-    }
-
-    StaticPathProvider(Path basePath) {
+    BasePathProvider(Path basePath) {
       Path parentPath = basePath.getParent();
       Matcher matcher = FILE_NAME_PATTERN.matcher(basePath.getFileName().toString());
       String baseName =
@@ -116,7 +121,8 @@ public class FileVerifier implements Verifier {
    *
    * @param stackTrace the stack trace of the current thread.
    */
-  record StackTracePathProvider(StackTraceElement[] stackTrace) implements PathProvider {
+  record StackTracePathProvider(StackTraceElement[] stackTrace, String filenameExtension)
+      implements PathProvider {
 
     /**
      * Creates a new {@link StackTracePathProvider} that uses the stack trace of the current thread.
@@ -125,29 +131,41 @@ public class FileVerifier implements Verifier {
      * @see Thread#getStackTrace()
      */
     StackTracePathProvider() {
-      this(Thread.currentThread().getStackTrace());
+      this(Thread.currentThread().getStackTrace(), "txt");
+    }
+
+    /**
+     * Creates a new {@link StackTracePathProvider} that uses the stack trace of the current thread.
+     *
+     * @see Thread#currentThread()
+     * @see Thread#getStackTrace()
+     */
+    StackTracePathProvider(String filenameExtension) {
+      this(Thread.currentThread().getStackTrace(), filenameExtension);
     }
 
     @Override
     public Path approvedPath() {
       Method method = currentTestMethod();
       return Path.of(
-          "src/test/java/%s/%s_%s_approved.txt"
+          "src/test/java/%s/%s_%s_approved.%s"
               .formatted(
                   method.getDeclaringClass().getPackageName().replace(".", "/"),
                   method.getDeclaringClass().getSimpleName(),
-                  method.getName()));
+                  method.getName(),
+                  filenameExtension));
     }
 
     @Override
     public Path receivedPath() {
       Method method = currentTestMethod();
       return Path.of(
-          "src/test/java/%s/%s_%s_received.txt"
+          "src/test/java/%s/%s-%s_received.%s"
               .formatted(
                   method.getDeclaringClass().getPackageName().replace(".", "/"),
                   method.getDeclaringClass().getSimpleName(),
-                  method.getName()));
+                  method.getName(),
+                  filenameExtension));
     }
 
     private Method currentTestMethod() {

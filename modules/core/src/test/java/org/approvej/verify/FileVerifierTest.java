@@ -15,7 +15,7 @@ class FileVerifierTest {
 
   @Test
   void accept(@TempDir Path tempDir) throws IOException {
-    var pathProvider = new FileVerifier.StaticPathProvider(tempDir.resolve("file.txt"));
+    var pathProvider = new FileVerifier.BasePathProvider(tempDir.resolve("file.txt"));
     var fileVerifier = new FileVerifier(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
 
@@ -27,7 +27,7 @@ class FileVerifierTest {
 
   @Test
   void accept_previously_accepted_differs(@TempDir Path tempDir) throws IOException {
-    var pathProvider = new FileVerifier.StaticPathProvider(tempDir.resolve("file.txt"));
+    var pathProvider = new FileVerifier.BasePathProvider(tempDir.resolve("file.txt"));
     var fileVerifier = new FileVerifier(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
 
@@ -42,7 +42,7 @@ class FileVerifierTest {
 
   @Test
   void accept_previously_received(@TempDir Path tempDir) throws IOException {
-    var pathProvider = new FileVerifier.StaticPathProvider(tempDir.resolve("file.txt"));
+    var pathProvider = new FileVerifier.BasePathProvider(tempDir.resolve("file.txt"));
     var fileVerifier = new FileVerifier(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
     writeString(pathProvider.receivedPath(), "Some received text", StandardOpenOption.CREATE);
@@ -62,7 +62,7 @@ class FileVerifierTest {
 
   @Test
   void accept_no_previously_accepted(@TempDir Path tempDir) {
-    var pathProvider = new FileVerifier.StaticPathProvider(tempDir.resolve("file.txt"));
+    var pathProvider = new FileVerifier.BasePathProvider(tempDir.resolve("file.txt"));
     var fileVerifier = new FileVerifier(pathProvider);
 
     assertThatExceptionOfType(ApprovalError.class)

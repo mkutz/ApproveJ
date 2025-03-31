@@ -1,6 +1,7 @@
 package org.approvej.json.jackson;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.approvej.print.Printer;
@@ -16,12 +17,31 @@ public class JsonPrettyPrinter<T> implements Printer<T> {
   private final ObjectWriter objectWriter;
 
   /**
-   * Creates a {@link JsonPrettyPrinter} using the given {@link JsonMapper}.
+   * Creates a {@link JsonPrettyPrinter} using the given {@link ObjectWriter}.
    *
-   * @param jsonMapper the {@link JsonMapper} used to create the {@link ObjectWriter}
+   * @param objectWriter the {@link ObjectWriter} that will be used for printing
    */
-  public JsonPrettyPrinter(JsonMapper jsonMapper) {
-    this.objectWriter = jsonMapper.writerWithDefaultPrettyPrinter();
+  public JsonPrettyPrinter(ObjectWriter objectWriter) {
+    this.objectWriter = objectWriter;
+  }
+
+  /**
+   * Creates a {@link JsonPrettyPrinter} using the given {@link ObjectMapper}.
+   *
+   * @param objectMapper the {@link ObjectMapper} used to create the {@link ObjectWriter}
+   * @see ObjectMapper#writerWithDefaultPrettyPrinter()
+   */
+  public JsonPrettyPrinter(ObjectMapper objectMapper) {
+    this(objectMapper.writerWithDefaultPrettyPrinter());
+  }
+
+  /**
+   * Creates a {@link JsonPrettyPrinter} using the default {@link ObjectMapper}.
+   *
+   * @see JsonMapper.Builder#build()
+   */
+  public JsonPrettyPrinter() {
+    this(JsonMapper.builder().build().writerWithDefaultPrettyPrinter());
   }
 
   @Override
