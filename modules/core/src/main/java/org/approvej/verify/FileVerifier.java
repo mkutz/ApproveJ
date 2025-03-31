@@ -58,14 +58,15 @@ public class FileVerifier implements Verifier {
 
   @Override
   public void accept(String received) {
+    String trimmed = received.trim();
     try {
       if (!exists(pathProvider.approvedPath())) {
         createFile(pathProvider.approvedPath());
       }
       String previouslyApproved = readString(pathProvider.approvedPath()).trim();
-      if (!previouslyApproved.equals(received)) {
-        writeString(pathProvider.receivedPath(), received, CREATE, TRUNCATE_EXISTING);
-        throw new ApprovalError(received, previouslyApproved);
+      if (!previouslyApproved.equals(trimmed)) {
+        writeString(pathProvider.receivedPath(), trimmed, CREATE, TRUNCATE_EXISTING);
+        throw new ApprovalError(trimmed, previouslyApproved);
       }
       deleteIfExists(pathProvider.receivedPath());
     } catch (IOException e) {
