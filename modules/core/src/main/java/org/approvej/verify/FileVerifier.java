@@ -12,6 +12,7 @@ import static java.util.Arrays.stream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.approvej.ApprovalError;
 import org.junit.jupiter.api.Test;
@@ -25,14 +26,22 @@ public class FileVerifier implements Verifier {
 
   private final PathProvider pathProvider;
 
+  /**
+   * Creates a new {@link FileVerifier} that uses the given {@link PathProvider} to determine the
+   * paths of approved and received files.
+   *
+   * @param pathProvider the provider for the paths of the approved and received files
+   */
   public FileVerifier(PathProvider pathProvider) {
     this.pathProvider = pathProvider;
   }
 
-  public FileVerifier(Path basePath) {
-    this(new StaticPathProvider(basePath));
-  }
-
+  /**
+   * Creates a new {@link FileVerifier} that uses the stack trace to determine the paths of approved
+   * and received files.
+   *
+   * @see StackTracePathProvider
+   */
   public FileVerifier() {
     this(new StackTracePathProvider());
   }
@@ -54,35 +63,67 @@ public class FileVerifier implements Verifier {
     }
   }
 
+  /** A provider for the paths of the approved and received files. */
   public interface PathProvider {
+
+    /**
+     * @return the path to the approved file
+     */
     Path approvedPath();
 
+    /**
+     * @return the path to the received file
+     */
     Path receivedPath();
   }
 
-  record StaticPathProvider(Path receivedPath, Path approvedPath) implements PathProvider {
+  static final class StaticPathProvider implements PathProvider {
 
-    private static final Pattern FILE_NAME_PATTERN = Pattern.compile("(.*)\\.(.*)$");
+    private static final Pattern FILE_NAME_PATTERN =
+        Pattern.compile("(?<baseName>.*)\\.(?<extension>.*)$");
+    private final Path receivedPath;
+    private final Path approvedPath;
+
+    StaticPathProvider(Path receivedPath, Path approvedPath) {
+      this.receivedPath = receivedPath;
+      this.approvedPath = approvedPath;
+    }
 
     StaticPathProvider(Path basePath) {
-      this(
-          basePath
-              .getParent()
-              .resolve(
-                  FILE_NAME_PATTERN
-                      .matcher(basePath.getFileName().toString())
-                      .replaceFirst("$1_received.$2")),
-          basePath
-              .getParent()
-              .resolve(
-                  FILE_NAME_PATTERN
-                      .matcher(basePath.getFileName().toString())
-                      .replaceFirst("$1_approved.$2")));
+      Path parentPath = basePath.getParent();
+      Matcher matcher = FILE_NAME_PATTERN.matcher(basePath.getFileName().toString());
+      String baseName =
+          matcher.matches() ? matcher.group("baseName") : basePath.getFileName().toString();
+      String extension = matcher.matches() ? matcher.group("extension") : "txt";
+      receivedPath = parentPath.resolve("%s-received.%s".formatted(baseName, extension));
+      approvedPath = parentPath.resolve("%s-approved.%s".formatted(baseName, extension));
+    }
+
+    @Override
+    public Path receivedPath() {
+      return receivedPath;
+    }
+
+    @Override
+    public Path approvedPath() {
+      return approvedPath;
     }
   }
 
+  /**
+   * A {@link PathProvider} that uses a stack trace to determine the paths of the approved and
+   * received files.
+   *
+   * @param stackTrace the stack trace of the current thread.
+   */
   record StackTracePathProvider(StackTraceElement[] stackTrace) implements PathProvider {
 
+    /**
+     * Creates a new {@link StackTracePathProvider} that uses the stack trace of the current thread.
+     *
+     * @see Thread#currentThread()
+     * @see Thread#getStackTrace()
+     */
     StackTracePathProvider() {
       this(Thread.currentThread().getStackTrace());
     }
@@ -91,26 +132,22 @@ public class FileVerifier implements Verifier {
     public Path approvedPath() {
       Method method = currentTestMethod();
       return Path.of(
-          "src/test/java/"
-              + method.getDeclaringClass().getPackageName().replace(".", "/")
-              + "/"
-              + method.getDeclaringClass().getSimpleName()
-              + "_"
-              + method.getName()
-              + "_approved.txt");
+          "src/test/java/%s/%s_%s_approved.txt"
+              .formatted(
+                  method.getDeclaringClass().getPackageName().replace(".", "/"),
+                  method.getDeclaringClass().getSimpleName(),
+                  method.getName()));
     }
 
     @Override
     public Path receivedPath() {
       Method method = currentTestMethod();
       return Path.of(
-          "src/test/java/"
-              + method.getDeclaringClass().getPackageName().replace(".", "/")
-              + "/"
-              + method.getDeclaringClass().getSimpleName()
-              + "_"
-              + method.getName()
-              + "_received.txt");
+          "src/test/java/%s/%s_%s_received.txt"
+              .formatted(
+                  method.getDeclaringClass().getPackageName().replace(".", "/"),
+                  method.getDeclaringClass().getSimpleName(),
+                  method.getName()));
     }
 
     private Method currentTestMethod() {

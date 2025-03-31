@@ -9,6 +9,11 @@ public class InplaceVerifier implements Verifier {
 
   private final String previouslyApproved;
 
+  /**
+   * Creates a new {@link InplaceVerifier} for the given previouslyApproved value.
+   *
+   * @param previouslyApproved the approved value
+   */
   public InplaceVerifier(String previouslyApproved) {
     this.previouslyApproved = previouslyApproved;
   }

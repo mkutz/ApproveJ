@@ -26,6 +26,9 @@ public class RegexScrubber implements Scrubber<String> {
   private final Function<Integer, String> replacement;
 
   /**
+   * Create a {@link RegexScrubber} that replaces all matched of the given {@link Pattern} with the
+   * result of the given replacement {@link Function}.
+   *
    * @param pattern the {@link Pattern} to be scrubbed
    * @param replacement a function that receives the finding index and returns the replacement
    *     string

@@ -3,7 +3,7 @@ package org.approvej.print;
 import java.util.function.Function;
 
 /**
- * A function that converts an object to a string.
+ * A {@link Function} that converts an object to a {@link String}.
  *
  * @param <T> the type of the object to print
  */
