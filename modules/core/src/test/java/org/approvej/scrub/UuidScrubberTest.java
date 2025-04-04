@@ -7,25 +7,38 @@ import org.junit.jupiter.api.Test;
 
 class UuidScrubberTest {
 
+  private static final String EXAMPLE =
+      """
+      {
+        "id": "123e4567-e89b-12d3-a456-426614174000",
+        "other-id": "123e4567-e89b-12d3-a456-426614174001",
+        "same-id": "123e4567-e89b-12d3-a456-426614174000"
+      }
+      """;
+
   @Test
   void apply() {
-    var unscrubbedValue =
-        """
-        {
-          "id": "123e4567-e89b-12d3-a456-426614174000",
-          "other-id": "123e4567-e89b-12d3-a456-426614174001",
-          "same-id": "123e4567-e89b-12d3-a456-426614174000"
-        }
-        """;
-    var expectedScrubbedValue =
-        """
-        {
-          "id": "[uuid 1]",
-          "other-id": "[uuid 2]",
-          "same-id": "[uuid 1]"
-        }
-        """;
+    assertThat(uuids().apply(EXAMPLE))
+        .isEqualTo(
+            """
+            {
+              "id": "[uuid 1]",
+              "other-id": "[uuid 2]",
+              "same-id": "[uuid 1]"
+            }
+            """);
+  }
 
-    assertThat(uuids().apply(unscrubbedValue)).isEqualTo(expectedScrubbedValue);
+  @Test
+  void apply_custom_replacement() {
+    assertThat(uuids("<id%d>"::formatted).apply(EXAMPLE))
+        .isEqualTo(
+            """
+            {
+              "id": "<id1>",
+              "other-id": "<id2>",
+              "same-id": "<id1>"
+            }
+            """);
   }
 }
