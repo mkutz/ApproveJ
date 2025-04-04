@@ -22,7 +22,6 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class ApprovalBuilder<T> {
 
-  private Function<T, String> printer = Object::toString;
   private T value;
 
   private ApprovalBuilder(T originalValue) {
@@ -46,9 +45,8 @@ public class ApprovalBuilder<T> {
    * @param printer the printer used to convert the value to a {@link String}
    * @return this
    */
-  public ApprovalBuilder<T> printWith(Function<T, String> printer) {
-    this.printer = printer;
-    return this;
+  public ApprovalBuilder<String> printWith(Function<T, String> printer) {
+    return new ApprovalBuilder<>(printer.apply(value));
   }
 
   /**
@@ -63,13 +61,12 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Uses the given {@link Consumer} or {@link Verifier} to approve the {@link #value} printed using
-   * the {@link #printer}.
+   * Uses the given {@link Consumer} or {@link Verifier} to approve the {@link #value}.
    *
    * @param verifier the {@link Consumer} or {@link Verifier}
    * @throws ApprovalError if the verification fails
    */
   public void verify(final Consumer<String> verifier) {
-    verifier.accept(printer.apply(value));
+    verifier.accept(value.toString());
   }
 }
