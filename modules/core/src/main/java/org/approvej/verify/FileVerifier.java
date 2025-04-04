@@ -12,6 +12,7 @@ import static java.util.Arrays.stream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.approvej.ApprovalError;
@@ -130,7 +131,8 @@ public class FileVerifier implements Verifier {
   static final class BasePathProvider implements PathProvider {
 
     private static final Pattern FILE_NAME_PATTERN =
-        Pattern.compile("(?<baseName>.*?)(?<approved>-" + APPROVED + ")?\\.(?<extension>.*)$");
+        Pattern.compile(
+            "(?<baseName>.+?)(?<approved>-" + APPROVED + ")?(?:\\.(?<extension>[^.]*))?$");
     private final Path receivedPath;
     private final Path approvedPath;
 
@@ -144,7 +146,10 @@ public class FileVerifier implements Verifier {
       Matcher matcher = FILE_NAME_PATTERN.matcher(approvedPath.getFileName().toString());
       String baseName =
           matcher.matches() ? matcher.group("baseName") : approvedPath.getFileName().toString();
-      String extension = matcher.matches() ? matcher.group("extension") : "txt";
+      String extension =
+          matcher.matches()
+              ? Objects.requireNonNullElseGet(matcher.group("extension"), () -> "txt")
+              : "txt";
       this.receivedPath = parentPath.resolve("%s-%s.%s".formatted(baseName, RECEIVED, extension));
     }
 
