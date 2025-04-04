@@ -26,36 +26,29 @@ public class RegexScrubber implements Scrubber<String> {
   private final Function<Integer, String> replacement;
 
   /**
-   * Create a {@link RegexScrubber} that replaces all matched of the given {@link Pattern} with the
-   * result of the given replacement {@link Function}.
+   * Creates a {@link RegexScrubberBuilder} with the given pattern.
    *
-   * @param pattern the {@link Pattern} to be scrubbed
-   * @param replacement a function that receives the finding index and returns the replacement
-   *     string
+   * @param pattern the {@link Pattern} matching the strings to be scrubbed
+   * @return a {@link RegexScrubberBuilder} with the given pattern
    */
-  public RegexScrubber(Pattern pattern, Function<Integer, String> replacement) {
+  public static RegexScrubberBuilder stringsMatching(Pattern pattern) {
+    return new RegexScrubberBuilder(pattern);
+  }
+
+  /**
+   * Creates a {@link RegexScrubberBuilder} with the given pattern.
+   *
+   * @param pattern the pattern matching the string to be scrubbed as {@link String}
+   * @return a {@link RegexScrubberBuilder} with the given pattern
+   * @see Pattern#compile(String)
+   */
+  public static RegexScrubberBuilder stringsMatching(String pattern) {
+    return new RegexScrubberBuilder(Pattern.compile(pattern));
+  }
+
+  private RegexScrubber(Pattern pattern, Function<Integer, String> replacement) {
     this.pattern = pattern;
     this.replacement = replacement;
-  }
-
-  /**
-   * Creates a new {@link RegexScrubber} which will replace any match of the given pattern with the
-   * given staticReplacement.
-   *
-   * @param pattern the {@link Pattern} to be scrubbed
-   * @param staticReplacement the static replacement {@link String}
-   */
-  public RegexScrubber(Pattern pattern, String staticReplacement) {
-    this(pattern, number -> staticReplacement);
-  }
-
-  /**
-   * Creates a new {@link RegexScrubber} using the {@link #NUMBERED_REPLACEMENT} .
-   *
-   * @param pattern the {@link Pattern} to be scrubbed
-   */
-  public RegexScrubber(Pattern pattern) {
-    this(pattern, NUMBERED_REPLACEMENT);
   }
 
   @Override
@@ -69,5 +62,49 @@ public class RegexScrubber implements Scrubber<String> {
           return replacement.apply(findings.get(group));
         };
     return matcher.replaceAll(replacer);
+  }
+
+  /** Builder for creating a {@link RegexScrubber}. */
+  public static class RegexScrubberBuilder {
+    private final Pattern pattern;
+
+    private RegexScrubberBuilder(Pattern pattern) {
+      this.pattern = pattern;
+    }
+
+    /**
+     * Create a {@link Scrubber} to replace any match of the {@link #pattern} with the result of the
+     * given replacement {@link Function}.
+     *
+     * @param replacement a function that receives the finding index and returns the replacement
+     *     string
+     * @return a {@link RegexScrubber} to replace any match of the {@link #pattern} with the result
+     *     of the given replacement {@link Function}.
+     */
+    public RegexScrubber with(Function<Integer, String> replacement) {
+      return new RegexScrubber(pattern, replacement);
+    }
+
+    /**
+     * Creates a new {@link Scrubber} to replace any match of the {@link #pattern} with the given
+     * static replacement.
+     *
+     * @param staticReplacement the static replacement {@link String}
+     * @return a new {@link RegexScrubber} to replace any match of the {@link #pattern} with the
+     *     given staticReplacement.
+     */
+    public RegexScrubber with(String staticReplacement) {
+      return new RegexScrubber(pattern, number -> staticReplacement);
+    }
+
+    /**
+     * Creates a new {@link Scrubber} to replace strings matching the {@link #pattern} with a
+     * numbered replacement.
+     *
+     * @return a new {@link RegexScrubber} using the {@link #NUMBERED_REPLACEMENT}.
+     */
+    public RegexScrubber withNumberedReplacement() {
+      return new RegexScrubber(pattern, NUMBERED_REPLACEMENT);
+    }
   }
 }

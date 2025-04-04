@@ -1,11 +1,13 @@
 package org.approvej.scrub;
 
+import static org.approvej.scrub.RegexScrubber.stringsMatching;
+
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * Scrubs a {@link CharSequence} by replacing all occurrences UUIDs with a numbered placeholder.
+ * Scrubs a {@link String} by replacing all occurrences UUIDs.
  *
  * <p>E.g.
  *
@@ -28,7 +30,7 @@ import org.jspecify.annotations.NullMarked;
  * </pre>
  */
 @NullMarked
-public class UuidScrubber extends RegexScrubber {
+public class UuidScrubber {
 
   /** Replaces each match with "[uuid #]" where '#' is the number of the distinct found string. */
   public static final Function<Integer, String> NUMBERED_REPLACEMENT = "[uuid %d]"::formatted;
@@ -37,17 +39,26 @@ public class UuidScrubber extends RegexScrubber {
       Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
 
   /**
-   * Creates a new {@link UuidScrubber} using the given {@code replacement} function.
+   * Creates a new {@link RegexScrubber} using the given {@code replacement} function.
    *
    * @param replacement a custom replacement function that takes the number of the match as an
    *     argument
+   * @return a RegexScrubber that replaces all UUIDs with the given replacement
    */
-  public UuidScrubber(Function<Integer, String> replacement) {
-    super(UUID_PATTERN, replacement);
+  public static RegexScrubber uuids(Function<Integer, String> replacement) {
+    return stringsMatching(UUID_PATTERN).with(replacement);
   }
 
-  /** Creates a new {@link UuidScrubber} using the {@link #NUMBERED_REPLACEMENT}. */
-  public UuidScrubber() {
-    this(NUMBERED_REPLACEMENT);
+  /**
+   * Creates a new {@link RegexScrubber} using the {@link #NUMBERED_REPLACEMENT}.
+   *
+   * @return a RegexScrubber that replaces all UUIDs with a numbered placeholder
+   */
+  public static RegexScrubber uuids() {
+    return stringsMatching(UUID_PATTERN).with(NUMBERED_REPLACEMENT);
+  }
+
+  private UuidScrubber() {
+    // Utility class
   }
 }

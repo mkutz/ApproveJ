@@ -1,15 +1,15 @@
 package org.approvej;
 
+import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.approvej.ApprovalBuilder.approve;
+import static org.approvej.scrub.RelativeDateScrubber.relativeDates;
+import static org.approvej.scrub.UuidScrubber.uuids;
+import static org.approvej.verify.FileVerifier.file;
+import static org.approvej.verify.InplaceVerifier.inplace;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
-import org.approvej.scrub.RelativeDateScrubber;
-import org.approvej.scrub.UuidScrubber;
-import org.approvej.verify.FileVerifier;
-import org.approvej.verify.InplaceVerifier;
 import org.junit.jupiter.api.Test;
 
 class ApprovalBuilderTest {
@@ -31,33 +31,29 @@ class ApprovalBuilderTest {
 
   @Test
   void verify() {
-    approve(EXAMPLE_TEXT).verify(new InplaceVerifier(EXAMPLE_TEXT));
+    approve(EXAMPLE_TEXT).verify(inplace(EXAMPLE_TEXT));
   }
 
   @Test
   void verify_file() {
-    RelativeDateScrubber dates =
-        new RelativeDateScrubber(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-    UuidScrubber uuids = new UuidScrubber();
-    approve(EXAMPLE_TEXT).scrubbedWith(dates).scrubbedWith(uuids).verify(new FileVerifier());
+    approve(EXAMPLE_TEXT)
+        .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
+        .scrubbedOf(uuids())
+        .verify(file());
   }
 
   @Test
   void verify_with_scrubbers() {
-    RelativeDateScrubber dates =
-        new RelativeDateScrubber(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-    UuidScrubber uuids = new UuidScrubber();
     approve(EXAMPLE_TEXT)
-        .scrubbedWith(dates)
-        .scrubbedWith(uuids)
-        .verify(new InplaceVerifier(SCRUBBED));
+        .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
+        .scrubbedOf(uuids())
+        .verify(inplace(SCRUBBED));
   }
 
   @Test
   void verify_failure() {
     assertThatExceptionOfType(AssertionError.class)
-        .isThrownBy(
-            () -> approve(EXAMPLE_TEXT).verify(new InplaceVerifier("This is not the same text.")))
+        .isThrownBy(() -> approve(EXAMPLE_TEXT).verify(inplace("This is not the same text.")))
         .withMessage(
             "Approval mismatch: expected: <%s> but was: <This is not the same text.>"
                 .formatted(EXAMPLE_TEXT));

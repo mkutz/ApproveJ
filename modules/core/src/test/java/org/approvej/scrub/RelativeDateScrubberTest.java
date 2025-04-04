@@ -3,6 +3,7 @@ package org.approvej.scrub;
 import static java.time.format.DateTimeFormatter.BASIC_ISO_DATE;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.time.format.DateTimeFormatter.ISO_ORDINAL_DATE;
+import static org.approvej.scrub.RelativeDateScrubber.relativeDates;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
@@ -21,7 +22,7 @@ class RelativeDateScrubberTest {
     var format = ISO_LOCAL_DATE;
     var unscrubbedValue = "It happens on %s at noon".formatted(TODAY.format(format));
     Assertions.assertEquals(
-        "It happens on [today] at noon", new RelativeDateScrubber(format).apply(unscrubbedValue));
+        "It happens on [today] at noon", relativeDates(format).apply(unscrubbedValue));
   }
 
   @Test
@@ -29,8 +30,7 @@ class RelativeDateScrubberTest {
     var format = ISO_LOCAL_DATE;
     var unscrubbedValue = "It happened on %s at noon".formatted(TODAY.minusDays(1).format(format));
     assertEquals(
-        "It happened on [yesterday] at noon",
-        new RelativeDateScrubber(format).apply(unscrubbedValue));
+        "It happened on [yesterday] at noon", relativeDates(format).apply(unscrubbedValue));
   }
 
   @Test
@@ -39,8 +39,7 @@ class RelativeDateScrubberTest {
     var unscrubbedValue =
         "It will happen on %s at noon".formatted(TODAY.plusDays(1).format(format));
     assertEquals(
-        "It will happen on [tomorrow] at noon",
-        new RelativeDateScrubber(format).apply(unscrubbedValue));
+        "It will happen on [tomorrow] at noon", relativeDates(format).apply(unscrubbedValue));
   }
 
   @ParameterizedTest
@@ -51,7 +50,7 @@ class RelativeDateScrubberTest {
         "It happened on %s at noon".formatted(TODAY.minusDays(daysAgo).format(format));
     assertEquals(
         "It happened on [" + daysAgo + " days ago] at noon",
-        new RelativeDateScrubber(format).apply(unscrubbedValue));
+        relativeDates(format).apply(unscrubbedValue));
   }
 
   @ParameterizedTest
@@ -62,27 +61,27 @@ class RelativeDateScrubberTest {
         "It happened on %s at noon".formatted(TODAY.plusDays(daysAhead).format(format));
     assertEquals(
         "It happened on [" + daysAhead + " days from now] at noon",
-        new RelativeDateScrubber(format).apply(unscrubbedValue));
+        relativeDates(format).apply(unscrubbedValue));
   }
 
   @Test
   void apply_basic_format() {
     var format = BASIC_ISO_DATE;
     var unscrubbedValue = "It happens on %s".formatted(TODAY.format(format));
-    assertEquals("It happens on [today]", new RelativeDateScrubber(format).apply(unscrubbedValue));
+    assertEquals("It happens on [today]", relativeDates(format).apply(unscrubbedValue));
   }
 
   @Test
   void apply_ISO_ordinal_format() {
     var format = ISO_ORDINAL_DATE;
     var unscrubbedValue = "It happens on %s".formatted(TODAY.format(format));
-    assertEquals("It happens on [today]", new RelativeDateScrubber(format).apply(unscrubbedValue));
+    assertEquals("It happens on [today]", relativeDates(format).apply(unscrubbedValue));
   }
 
   @Test
   void apply_RFC1123_format() {
     var format = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy");
     var unscrubbedValue = "It happens on %s".formatted(TODAY.format(format));
-    assertEquals("It happens on [today]", new RelativeDateScrubber(format).apply(unscrubbedValue));
+    assertEquals("It happens on [today]", relativeDates(format).apply(unscrubbedValue));
   }
 }

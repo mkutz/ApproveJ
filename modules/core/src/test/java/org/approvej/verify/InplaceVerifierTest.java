@@ -1,5 +1,6 @@
 package org.approvej.verify;
 
+import static org.approvej.verify.InplaceVerifier.inplace;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
@@ -11,7 +12,7 @@ class InplaceVerifierTest {
   @Test
   void accept() {
     String previouslyApproved = "Some text";
-    InplaceVerifier inplaceVerifier = new InplaceVerifier(previouslyApproved);
+    InplaceVerifier inplaceVerifier = inplace(previouslyApproved);
 
     assertThatNoException().isThrownBy(() -> inplaceVerifier.accept(previouslyApproved));
   }
@@ -19,7 +20,7 @@ class InplaceVerifierTest {
   @Test
   void accept_previously_approved_differs() {
     String previouslyApproved = "Some other text";
-    InplaceVerifier inplaceVerifier = new InplaceVerifier(previouslyApproved);
+    InplaceVerifier inplaceVerifier = inplace(previouslyApproved);
 
     assertThatExceptionOfType(ApprovalError.class)
         .isThrownBy(() -> inplaceVerifier.accept("Some text"));

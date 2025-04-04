@@ -19,11 +19,16 @@ public class RelativeDateScrubber implements Scrubber<String> {
   private final UnaryOperator<String> replacement;
 
   /**
-   * Creates a new {@link RelativeDateScrubber} with the given {@link DateTimeFormatter}.
+   * Creates {@link Scrubber} to replace date strings of the given pattern.
    *
    * @param dateFormatPattern a {@link DateTimeFormatter} to parse the dates
+   * @return a new {@link RelativeDateScrubber} with the given {@link DateTimeFormatter}.
    */
-  public RelativeDateScrubber(DateTimeFormatter dateFormatPattern) {
+  public static RelativeDateScrubber relativeDates(DateTimeFormatter dateFormatPattern) {
+    return new RelativeDateScrubber(dateFormatPattern);
+  }
+
+  private RelativeDateScrubber(DateTimeFormatter dateFormatPattern) {
     pattern =
         Pattern.compile(
             dateFormatPattern

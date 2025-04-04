@@ -1,5 +1,6 @@
 package org.approvej.scrub;
 
+import static org.approvej.scrub.UuidScrubber.uuids;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,6 @@ class UuidScrubberTest {
         }
         """;
 
-    assertThat(new UuidScrubber().apply(unscrubbedValue)).isEqualTo(expectedScrubbedValue);
+    assertThat(uuids().apply(unscrubbedValue)).isEqualTo(expectedScrubbedValue);
   }
 }

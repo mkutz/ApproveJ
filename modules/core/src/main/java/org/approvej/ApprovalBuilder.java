@@ -4,7 +4,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import org.approvej.print.Printer;
-import org.approvej.print.ToStringPrinter;
 import org.approvej.scrub.Scrubber;
 import org.approvej.verify.Verifier;
 import org.jspecify.annotations.NullMarked;
@@ -12,17 +11,18 @@ import org.jspecify.annotations.NullMarked;
 /**
  * A builder to configure an approval for a given value.
  *
- * <p>Optionally the value can be "scrubbed" of dynamic data (like timestamps or ids).
+ * <p>Optionally the value can be "scrubbed" of dynamic data (like timestamps or ID's).
  *
  * <p>The value will be printed (converted to {@link String}) using the builder's {@link Printer}.
- * The default {@link ToStringPrinter} can be changed with the {@link #printWith(Function)}.
+ * The default will simply call the value's {@link T#toString() toString method}, which can be
+ * changed with the {@link #printWith(Function)}.
  *
  * @param <T> the type of the value to approve
  */
 @NullMarked
 public class ApprovalBuilder<T> {
 
-  private Function<T, String> printer = new ToStringPrinter<>();
+  private Function<T, String> printer = Object::toString;
   private T value;
 
   private ApprovalBuilder(T originalValue) {
@@ -57,7 +57,7 @@ public class ApprovalBuilder<T> {
    * @param scrubber the {@link UnaryOperator} or {@link Scrubber}
    * @return this
    */
-  public ApprovalBuilder<T> scrubbedWith(UnaryOperator<T> scrubber) {
+  public ApprovalBuilder<T> scrubbedOf(UnaryOperator<T> scrubber) {
     value = scrubber.apply(value);
     return this;
   }

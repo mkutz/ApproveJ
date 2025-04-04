@@ -13,6 +13,21 @@ class StackTracePathProviderTest {
     assertThat(pathProvider.approvedPath())
         .isEqualTo(
             Path.of(
-                "src/test/java/org/approvej/verify/StackTracePathProviderTest_paths_approved.txt"));
+                "src/test/java/org/approvej/verify/"
+                    + "StackTracePathProviderTest"
+                    + "-paths"
+                    + "-approved.txt"));
+  }
+
+  @Test
+  void paths_more_complex_method_name() {
+    var pathProvider = new FileVerifier.StackTracePathProvider();
+    assertThat(pathProvider.approvedPath())
+        .isEqualTo(
+            Path.of(
+                "src/test/java/org/approvej/verify/"
+                    + "StackTracePathProviderTest"
+                    + "-paths_more_complex_method_name"
+                    + "-approved.txt"));
   }
 }

@@ -1,6 +1,8 @@
 package org.approvej.verify;
 
 import static java.nio.file.Files.writeString;
+import static org.approvej.verify.FileVerifier.BasePathProvider.approvedPath;
+import static org.approvej.verify.FileVerifier.file;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -13,10 +15,12 @@ import org.junit.jupiter.api.io.TempDir;
 
 class FileVerifierTest {
 
+  @TempDir private Path tempDir;
+
   @Test
-  void accept(@TempDir Path tempDir) throws IOException {
-    var pathProvider = new FileVerifier.BasePathProvider(tempDir.resolve("file.txt"));
-    var fileVerifier = new FileVerifier(pathProvider);
+  void accept() throws IOException {
+    var pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
+    var fileVerifier = file(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
 
     fileVerifier.accept("Some approved text");
@@ -26,9 +30,9 @@ class FileVerifierTest {
   }
 
   @Test
-  void accept_previously_accepted_differs(@TempDir Path tempDir) throws IOException {
-    var pathProvider = new FileVerifier.BasePathProvider(tempDir.resolve("file.txt"));
-    var fileVerifier = new FileVerifier(pathProvider);
+  void accept_previously_accepted_differs() throws IOException {
+    var pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
+    var fileVerifier = file(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
 
     assertThatExceptionOfType(ApprovalError.class)
@@ -41,9 +45,9 @@ class FileVerifierTest {
   }
 
   @Test
-  void accept_previously_received(@TempDir Path tempDir) throws IOException {
-    var pathProvider = new FileVerifier.BasePathProvider(tempDir.resolve("file.txt"));
-    var fileVerifier = new FileVerifier(pathProvider);
+  void accept_previously_received() throws IOException {
+    var pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
+    var fileVerifier = file(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
     writeString(pathProvider.receivedPath(), "Some received text", StandardOpenOption.CREATE);
 
@@ -61,9 +65,9 @@ class FileVerifierTest {
   }
 
   @Test
-  void accept_no_previously_accepted(@TempDir Path tempDir) {
-    var pathProvider = new FileVerifier.BasePathProvider(tempDir.resolve("file.txt"));
-    var fileVerifier = new FileVerifier(pathProvider);
+  void accept_no_previously_accepted() {
+    var pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
+    var fileVerifier = file(pathProvider);
 
     assertThatExceptionOfType(ApprovalError.class)
         .isThrownBy(() -> fileVerifier.accept("Some text"))
