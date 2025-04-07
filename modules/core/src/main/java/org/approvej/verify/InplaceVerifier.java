@@ -20,12 +20,12 @@ public class InplaceVerifier implements Verifier {
   }
 
   private InplaceVerifier(String previouslyApproved) {
-    this.previouslyApproved = previouslyApproved;
+    this.previouslyApproved = previouslyApproved.trim();
   }
 
   @Override
   public void accept(String received) {
-    if (!previouslyApproved.equals(received)) {
+    if (!previouslyApproved.equals(received.trim())) {
       throw new ApprovalError(received, previouslyApproved);
     }
   }
