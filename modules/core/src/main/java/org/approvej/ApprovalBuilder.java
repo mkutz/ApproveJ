@@ -1,5 +1,7 @@
 package org.approvej;
 
+import static org.approvej.print.ObjectPrinter.objectPrinter;
+
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -13,14 +15,16 @@ import org.jspecify.annotations.NullMarked;
  *
  * <p>Optionally the value can be "scrubbed" of dynamic data (like timestamps or ID's).
  *
- * <p>The value will be printed (converted to {@link String}) using the builder's {@link Printer}.
- * The default will simply call the value's {@link T#toString() toString method}, which can be
- * changed with the {@link #printWith(Function)}.
+ * <p>The value will be printed (converted to {@link String}) using a {@link Printer}. By default,
+ * the {@link org.approvej.print.ObjectPrinter} will be applied, which can be changed with the
+ * {@link #printWith(Function)}.
  *
  * @param <T> the type of the value to approve
  */
 @NullMarked
 public class ApprovalBuilder<T> {
+
+  private static final Printer<Object> DEFAULT_PRINTER = objectPrinter();
 
   private T value;
 
@@ -67,6 +71,6 @@ public class ApprovalBuilder<T> {
    * @throws ApprovalError if the verification fails
    */
   public void verify(final Consumer<String> verifier) {
-    verifier.accept(value.toString());
+    verifier.accept(DEFAULT_PRINTER.apply(value.toString()));
   }
 }

@@ -29,6 +29,14 @@ public class ObjectPrinter implements Printer<Object> {
 
   private static final String PAIR_FORMAT = "%s=%s";
 
+  private static final ObjectPrinter INSTANCE = new ObjectPrinter();
+
+  public static ObjectPrinter objectPrinter() {
+    return INSTANCE;
+  }
+
+  private ObjectPrinter() {}
+
   @Override
   public String apply(Object value) {
     return apply(value, "");

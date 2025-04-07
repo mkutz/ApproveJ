@@ -1,5 +1,6 @@
 package org.approvej.print;
 
+import static org.approvej.print.ObjectPrinter.objectPrinter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
@@ -10,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 class ObjectPrinterTest {
 
-  ObjectPrinter printer = new ObjectPrinter();
+  ObjectPrinter printer = objectPrinter();
 
   @Test
   void apply() {
