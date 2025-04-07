@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * Scrubs a {@link CharSequence} by replacing all occurrences of a pattern by applying the given
+ * Scrubs a {@link String} by replacing all occurrences of a pattern by applying the given
  * replacement {@link Function} for each finding.
  */
 @NullMarked
@@ -46,7 +46,7 @@ public class RegexScrubber implements Scrubber<String> {
     return new RegexScrubberBuilder(Pattern.compile(pattern));
   }
 
-  private RegexScrubber(Pattern pattern, Function<Integer, String> replacement) {
+  protected RegexScrubber(Pattern pattern, Function<Integer, String> replacement) {
     this.pattern = pattern;
     this.replacement = replacement;
   }

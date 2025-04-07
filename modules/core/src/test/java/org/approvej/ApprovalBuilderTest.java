@@ -2,6 +2,7 @@ package org.approvej;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.approvej.ApprovalBuilder.approve;
+import static org.approvej.scrub.DateScrubber.dates;
 import static org.approvej.scrub.RelativeDateScrubber.relativeDates;
 import static org.approvej.scrub.UuidScrubber.uuids;
 import static org.approvej.verify.FileVerifier.file;
@@ -55,7 +56,22 @@ class ApprovalBuilderTest {
     assertThatExceptionOfType(AssertionError.class)
         .isThrownBy(() -> approve(EXAMPLE_TEXT).verify(inplace("This is not the same text.")))
         .withMessage(
-            "Approval mismatch: expected: <%s> but was: <This is not the same text.>"
+            "Approval mismatch: expected: <This is not the same text.> but was: <%s>"
                 .formatted(EXAMPLE_TEXT));
+  }
+
+  @Test
+  void verify_pre_and_post_print_scrubbing() {
+    approve(new Person("Micha", LocalDate.of(1982, 2, 19)))
+        .scrubbedOf(person -> new Person("[scrubbed id]", person.name, person.birthday))
+        .printWith(Object::toString)
+        .scrubbedOf(dates(ofPattern("yyyy-MM-dd")))
+        .verify(inplace("Person[id=[scrubbed id], name=Micha, birthday=[date 1]]"));
+  }
+
+  record Person(String id, String name, LocalDate birthday) {
+    Person(String name, LocalDate birthday) {
+      this(UUID.randomUUID().toString(), name, birthday);
+    }
   }
 }

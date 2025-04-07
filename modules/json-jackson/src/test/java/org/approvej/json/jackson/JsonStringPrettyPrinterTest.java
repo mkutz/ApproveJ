@@ -4,24 +4,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
-class JsonPrettyPrinterTest {
+class JsonStringPrettyPrinterTest {
 
   @Test
   void apply() {
     var jsonMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
-    var jsonPrettyPrinter = new JsonPrettyPrinter<>(jsonMapper);
+    var jsonStringPrettyPrinter = new JsonStringPrettyPrinter(jsonMapper);
 
-    assertThat(jsonPrettyPrinter.apply(new Person("Micha", LocalDate.of(1982, 2, 19))))
+    assertThat(jsonStringPrettyPrinter.apply("{\"name\":\"Micha\",\"birthday\":\"1982-02-19\"}"))
         .isEqualTo(
             """
             {
               "name" : "Micha",
-              "birthday" : [ 1982, 2, 19 ]
+              "birthday" : "1982-02-19"
             }""");
   }
-
-  record Person(String name, LocalDate birthday) {}
 }

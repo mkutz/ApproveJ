@@ -26,7 +26,7 @@ public class InplaceVerifier implements Verifier {
   @Override
   public void accept(String received) {
     if (!previouslyApproved.equals(received)) {
-      throw new ApprovalError(previouslyApproved, received);
+      throw new ApprovalError(received, previouslyApproved);
     }
   }
 }

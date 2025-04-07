@@ -36,7 +36,7 @@ public class JsonPrettyPrinter<T> implements Printer<T> {
   }
 
   /**
-   * Creates a {@link JsonPrettyPrinter} using the default {@link ObjectMapper}.
+   * Creates a {@link JsonPrettyPrinter} using the default {@link JsonMapper}.
    *
    * @see JsonMapper.Builder#build()
    */
@@ -49,7 +49,7 @@ public class JsonPrettyPrinter<T> implements Printer<T> {
     try {
       return objectWriter.writeValueAsString(value);
     } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+      throw new JsonPrettyPrinterException(value, e);
     }
   }
 }

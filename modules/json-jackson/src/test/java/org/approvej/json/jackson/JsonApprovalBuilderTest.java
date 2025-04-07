@@ -65,7 +65,7 @@ class JsonApprovalBuilderTest {
     assertThatExceptionOfType(AssertionError.class)
         .isThrownBy(() -> approve(EXAMPLE_JSON).verify(inplace("This is not the same text.")))
         .withMessage(
-            "Approval mismatch: expected: <%s> but was: <This is not the same text.>"
+            "Approval mismatch: expected: <This is not the same text.> but was: <%s>"
                 .formatted(EXAMPLE_JSON));
   }
 }
