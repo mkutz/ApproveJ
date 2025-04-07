@@ -29,10 +29,13 @@ public class ObjectPrinter implements Printer<Object> {
 
   private static final String PAIR_FORMAT = "%s=%s";
 
-  private static final ObjectPrinter INSTANCE = new ObjectPrinter();
-
+  /**
+   * Creates a new {@link ObjectPrinter} instance.
+   *
+   * @return a new {@link ObjectPrinter} instance
+   */
   public static ObjectPrinter objectPrinter() {
-    return INSTANCE;
+    return new ObjectPrinter();
   }
 
   private ObjectPrinter() {}
