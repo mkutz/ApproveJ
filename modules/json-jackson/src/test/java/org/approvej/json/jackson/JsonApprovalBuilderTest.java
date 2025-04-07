@@ -29,9 +29,9 @@ class JsonApprovalBuilderTest {
   private static final String SCRUBBED_JSON =
       """
       {
-        "date": "[today]",
-        "id": "[uuid 1]",
-        "timestamp": "[today]T11:22:33"
+        "date" : "[today]",
+        "id" : "[uuid 1]",
+        "timestamp" : "[today]T11:22:33"
       }
       """
           .trim()
@@ -47,6 +47,7 @@ class JsonApprovalBuilderTest {
   @Test
   void verify_file() {
     approve(EXAMPLE_JSON)
+        .printWith(new JsonStringPrettyPrinter())
         .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
         .scrubbedOf(uuids())
         .verify(file("json"));
@@ -55,6 +56,7 @@ class JsonApprovalBuilderTest {
   @Test
   void verify_with_scrubbers() {
     approve(EXAMPLE_JSON)
+        .printWith(new JsonStringPrettyPrinter())
         .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
         .scrubbedOf(uuids())
         .verify(inplace(SCRUBBED_JSON));
