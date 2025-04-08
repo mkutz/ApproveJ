@@ -35,3 +35,10 @@ jobs:
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
           JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_USERNAME }}
           JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.JRELEASER_MAVENCENTRAL_PASSWORD }}
+
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: jreleaser-problem-report
+          path: build/reports/problems/problems-report.html
+          if-no-files-found: ignore
