@@ -1,26 +1,35 @@
 plugins {
   base
+  alias(libs.plugins.jreleaser)
   alias(libs.plugins.sonar)
-  alias(libs.plugins.nexusPublish)
   alias(libs.plugins.spotless)
 }
 
 repositories { mavenCentral() }
+
+jreleaser {
+  signing {
+    active = org.jreleaser.model.Active.ALWAYS
+    armored = true
+    mode = org.jreleaser.model.Signing.Mode.MEMORY
+  }
+  deploy {
+    maven {
+      mavenCentral {
+        create("sonatype") {
+          url = "https://central.sonatype.com/api/v1/publisher"
+          stagingRepository("build/pre-deploy")
+        }
+      }
+    }
+  }
+}
 
 sonar {
   properties {
     property("sonar.projectKey", "mkutz_ApproveJ")
     property("sonar.organization", "mkutz")
     property("sonar.host.url", "https://sonarcloud.io")
-  }
-}
-
-nexusPublishing {
-  repositories {
-    sonatype {
-      nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-      snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-    }
   }
 }
 
