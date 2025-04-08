@@ -17,7 +17,9 @@ jreleaser {
     maven {
       mavenCentral {
         create("sonatype") {
+          active = org.jreleaser.model.Active.ALWAYS
           url = "https://central.sonatype.com/api/v1/publisher"
+          applyMavenCentralRules = true
           stagingRepository("build/pre-deploy")
         }
       }
