@@ -46,6 +46,14 @@ public class RegexScrubber implements Scrubber<String> {
     return new RegexScrubberBuilder(Pattern.compile(pattern));
   }
 
+  /**
+   * Creates a {@link RegexScrubberBuilder} with the given pattern and replacement {@link Function}.
+   *
+   * @param pattern the pattern matching the string to be scrubbed as {@link String}
+   * @param replacement a function that receives the finding index and returns the replacement
+   *     string
+   * @see Pattern#compile(String)
+   */
   protected RegexScrubber(Pattern pattern, Function<Integer, String> replacement) {
     this.pattern = pattern;
     this.replacement = replacement;
