@@ -26,19 +26,11 @@ jobs:
           java-version: 21
           distribution: temurin
 
-      - run: ./gradlew assemble
-
-      - run: ./gradlew jreleaserDeploy --info -Pversion=${{ github.event.inputs.version }} -PdryRun=false
+      - run: ./gradlew jreleaserConfig publish jreleaserFullRelease -Pversion=${{ github.event.inputs.version }}
         env:
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
           JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
           JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_USERNAME }}
           JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.JRELEASER_MAVENCENTRAL_PASSWORD }}
-
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: jreleaser-problem-report
-          path: build/reports/problems/problems-report.html
-          if-no-files-found: ignore
