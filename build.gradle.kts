@@ -14,6 +14,7 @@ jreleaser {
     mode = org.jreleaser.model.Signing.Mode.MEMORY
   }
   deploy {
+    gitRootSearch = true
     maven {
       mavenCentral {
         create("sonatype") {
