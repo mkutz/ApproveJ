@@ -1,6 +1,6 @@
 = ApproveJ
 Michael Kutz <mail@michael-kutz.de>
-:favicon: https://stubit.org/img/favicon.png
+:favicon: https://approvej.org/img/favicon.png
 :toc: left
 :icons: font
 :sectlinks:
