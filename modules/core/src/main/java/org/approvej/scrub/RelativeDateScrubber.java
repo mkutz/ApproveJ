@@ -7,9 +7,9 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
 /**
- * Scrubs a {@link CharSequence} by replacing all occurrences of a date pattern with relative
+ * Scrubs a {@link String} by replacing all occurrences of a date pattern with relative
  * descriptions, like <code>[today]</code>, <code>[yesterday]</code>, <code>[2 days from now]</code>
- * .
+ * , <code>[21 days ago]</code> .
  */
 public class RelativeDateScrubber implements Scrubber<String> {
 

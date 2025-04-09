@@ -1,0 +1,15 @@
+= ApproveJ
+Michael Kutz <mail@michael-kutz.de>
+:favicon: https://stubit.org/img/favicon.png
+:toc: left
+:icons: font
+:sectlinks:
+:sectanchors:
+:source-highlighter: highlight.js
+:highlightjs-languages: java, kotlin, xml, properties
+:hide-uri-scheme:
+:javadoc-url: javadoc
+
+include::chapters/00-introduction.adoc[leveloffset=1]
+include::chapters/01-getting-started.adoc[leveloffset=1]
+include::chapters/02-basics.adoc[leveloffset=1]

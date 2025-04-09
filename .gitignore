@@ -8,3 +8,5 @@ gradle-app.setting
 !.idea/icon.png
 docs/**
 .jqwik-database
+*.key
+pages

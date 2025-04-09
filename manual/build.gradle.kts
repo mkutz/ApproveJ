@@ -2,16 +2,17 @@ plugins {
   alias(libs.plugins.asciidoctor)
   java
   alias(libs.plugins.kotlinJvm)
+  `java-test-fixtures`
 }
 
 repositories { mavenCentral() }
 
-val asciidoctorExt by configurations.creating
+val asciidoctorExt: Configuration by configurations.creating
 
 dependencies {
   asciidoctorExt(libs.asciidoctorBlockSwitch)
 
-  // testImplementation(project(":modules:core"))
+  testImplementation(project(":modules:core"))
 
   testImplementation(platform(libs.junitBom))
   testImplementation(libs.junitJupiterApi)
@@ -22,7 +23,7 @@ dependencies {
   testRuntimeOnly(libs.junitJupiterEngine)
 }
 
-java { toolchain { languageVersion.set(JavaLanguageVersion.of(17)) } }
+java { toolchain { languageVersion.set(JavaLanguageVersion.of(21)) } }
 
 tasks.withType<Test> { useJUnitPlatform() }
 

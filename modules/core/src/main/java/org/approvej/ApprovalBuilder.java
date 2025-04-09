@@ -1,6 +1,6 @@
 package org.approvej;
 
-import static org.approvej.print.ObjectPrinter.objectPrinter;
+import static org.approvej.verify.FileVerifier.file;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -24,7 +24,8 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class ApprovalBuilder<T> {
 
-  private static final Printer<Object> DEFAULT_PRINTER = objectPrinter();
+  /** The default {@link Printer} used to print the value. */
+  public static final Printer<Object> DEFAULT_PRINTER = Object::toString;
 
   private T value;
 
@@ -65,12 +66,25 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Uses the given {@link Consumer} or {@link Verifier} to approve the {@link #value}.
+   * Uses the given {@link Consumer} or {@link Verifier} to approve the printed {@link #value}.
    *
    * @param verifier the {@link Consumer} or {@link Verifier}
    * @throws ApprovalError if the verification fails
    */
   public void verify(final Consumer<String> verifier) {
-    verifier.accept(DEFAULT_PRINTER.apply(value.toString()));
+    if (value instanceof String printedValue) {
+      verifier.accept(printedValue);
+    } else {
+      verifier.accept(DEFAULT_PRINTER.apply(value));
+    }
+  }
+
+  /**
+   * Uses the DEFAULT_VERIFIER to approve the printed {@link #value}.
+   *
+   * @throws ApprovalError if the verification fails
+   */
+  public void verify() {
+    verify(file());
   }
 }

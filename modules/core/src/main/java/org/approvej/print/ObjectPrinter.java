@@ -12,20 +12,29 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 import org.jspecify.annotations.NullMarked;
 
 /**
  * A generic printer for Java {@link Object}s that prints their properties and values one per line.
+ *
+ * @param <T> the type of the object to be printed
  */
 @NullMarked
-public class ObjectPrinter implements Printer<Object> {
+public class ObjectPrinter<T> implements Printer<T> {
 
   /** A {@link Set} of methods that won't be regarded as property getters. */
   public static final Set<String> EXCLUDED_METHODS = Set.of("hashCode", "toString", "hash");
 
   /** A {@link Set} of classes that will be printed directly. */
   public static final Set<Class<?>> SIMPLE_TYPES =
-      Set.of(Boolean.class, CharSequence.class, Number.class, Temporal.class, TemporalAmount.class);
+      Set.of(
+          Boolean.class,
+          CharSequence.class,
+          Number.class,
+          UUID.class,
+          Temporal.class,
+          TemporalAmount.class);
 
   private static final String PAIR_FORMAT = "%s=%s";
 
@@ -33,9 +42,10 @@ public class ObjectPrinter implements Printer<Object> {
    * Creates a new {@link ObjectPrinter} instance.
    *
    * @return a new {@link ObjectPrinter} instance
+   * @param <T> the type of the object to be printed
    */
-  public static ObjectPrinter objectPrinter() {
-    return new ObjectPrinter();
+  public static <T> ObjectPrinter<T> objectPrinter() {
+    return new ObjectPrinter<>();
   }
 
   private ObjectPrinter() {}
@@ -84,7 +94,8 @@ public class ObjectPrinter implements Printer<Object> {
     }
     return stream(object.getClass().getDeclaredMethods())
         .filter(method -> !EXCLUDED_METHODS.contains(method.getName()))
-        .filter(method -> method.getParameterCount() == 0 && method.getReturnType() != Void.class)
+        .filter(method -> method.getParameterCount() == 0)
+        .filter(method -> Void.class != method.getReturnType())
         .sorted(Comparator.comparing(Method::getName))
         .map(
             method -> {

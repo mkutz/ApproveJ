@@ -15,6 +15,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.approvej.ApprovalError;
 import org.junit.jupiter.api.Test;
 
@@ -128,7 +129,7 @@ public class FileVerifier implements Verifier {
    * <p>Note that the {@code approved} infix is not enforced on the given approved file path. It is
    * also not necessary for the approved file to exist.
    */
-  static final class BasePathProvider implements PathProvider {
+  public static final class BasePathProvider implements PathProvider {
 
     private static final Pattern FILE_NAME_PATTERN =
         Pattern.compile(
@@ -136,6 +137,12 @@ public class FileVerifier implements Verifier {
     private final Path receivedPath;
     private final Path approvedPath;
 
+    /**
+     * Creates a new {@link BasePathProvider} that uses the given approved path.
+     *
+     * @param approvedPath the {@link Path} to the approved file
+     * @return a new {@link BasePathProvider}
+     */
     public static BasePathProvider approvedPath(Path approvedPath) {
       return new BasePathProvider(approvedPath);
     }
@@ -168,7 +175,7 @@ public class FileVerifier implements Verifier {
    * A {@link PathProvider} that uses a stack trace to determine the paths of the approved and
    * received files.
    */
-  static final class StackTracePathProvider implements PathProvider {
+  public static final class StackTracePathProvider implements PathProvider {
 
     private final Path receivedPath;
     private final Path approvedPath;
@@ -182,9 +189,15 @@ public class FileVerifier implements Verifier {
     StackTracePathProvider(String filenameExtension) {
       Method method = currentTestMethod();
       Path basePath =
-          Path.of(
-              "src/test/java/%s"
-                  .formatted(method.getDeclaringClass().getPackageName().replace(".", "/")));
+          Stream.of("src/test/java/%s", "src/test/kotlin/%s", "src/test/groovy/%s")
+              .map(
+                  format ->
+                      Path.of(
+                          format.formatted(
+                              method.getDeclaringClass().getPackageName().replace(".", "/"))))
+              .filter(path -> path.toFile().exists())
+              .findFirst()
+              .orElseThrow(() -> new FileVerifierError("No attempted base path exists"));
       String fileNamePattern =
           "%s-%s-%%s.%s"
               .formatted(
@@ -231,6 +244,10 @@ public class FileVerifier implements Verifier {
   }
 
   static class FileVerifierError extends RuntimeException {
+    public FileVerifierError(String message) {
+      super(message);
+    }
+
     public FileVerifierError(Throwable cause) {
       super("Failed to verify file", cause);
     }

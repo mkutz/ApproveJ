@@ -1,0 +1,31 @@
+= Getting Started
+
+== Requirements
+
+In oder to use ApproveJ you need a JDK 21 or higher.
+
+
+== Dependencies
+
+To use ApproveJ in your own project, you need to add it as a dependency to your project.
+
+.Gradle
+[source,groovy,subs=attributes+,role="primary"]
+----
+testImplementation 'org.approvej:core:{revnumber}'
+----
+.Gradle.kts
+[source,kotlin,subs=attributes+,role="secondary"]
+----
+testImplementation("org.approvej:core:{revnumber}")
+----
+.Maven
+[source,xml,subs=attributes+,role="secondary"]
+----
+<dependency>
+  <groupId>org.approvej</groupId>
+  <artifactId>core</artifactId>
+  <version>{revnumber}</version>
+  <scope>test</scope>
+</dependency>
+----

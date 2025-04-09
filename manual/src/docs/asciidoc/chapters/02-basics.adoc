@@ -1,0 +1,256 @@
+= Basics
+
+The general entry point to start an approval is the static initializer `approve` of the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`].
+It takes the object which you want to approve an argument and returns a builder to configure the approval with a fluent API.
+
+
+[id="approve_strings"]
+== Approve Strings
+
+If you have anything that returns an arbitrary string, you can simply build an approval like this
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicExamples.java[tag=approve_strings]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=approve_strings]
+----
+<1> creates an `ApprovalBuilder<String>`
+<2> compares result to a previously approved value stored in a file next to the test and fails the test if the result differs
+
+[source,text]
+.Approved file
+----
+include::../../../test/java/examples/java/BasicExamples-approve_strings-approved.txt[]
+----
+
+
+[id="approve_pojos"]
+== Approve POJOs
+
+Of course, you might want to approve more complex objects than just strings.
+By default, ApproveJ will simply call the object's `toString` method to turn the object into a string.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicExamples.java[tag=approve_pojos]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=approve_pojos]
+----
+<1> creates an `ApprovalBuilder<Person>` approve the result
+<2> compares printed result to the given string and fails if they are not equal
+
+[source,text]
+.Approved file
+----
+include::../../../test/java/examples/java/BasicExamples-approve_pojos-approved.txt[]
+----
+
+See <<printing>> if need a more sophisticated way of printing.
+
+
+[id="printing"]
+== Printing -- customize how values are turned into Strings
+
+While some `toString` implementations already are quite good, they typically return a one-liner.
+This is fine as long as you only have a few properties.
+However, if you have a lot of properties, it is much easier to read the result if it is formatted nicely.
+
+
+=== Generic Object Printer
+
+ApproveJ provides a generic link:{javadoc-url}/core/org/approvej/print/ObjectPrinter.html[`ObjectPrinter`] that will print the object with each of its properties on a new line to make comparing the result easier.
+You can use this printer by calling the `printWith` method on the builder.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicExamples.java[tag=object_printer]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=object_printer]
+----
+<1> creates an `ApprovalBuilder<Person>` approve the result
+<2> applies the `ObjectPrinter` and returns a new `ApprovalBuilder<String>`
+
+[source,text]
+.Approved file
+----
+include::../../../test/java/examples/java/BasicExamples-object_printer-approved.txt[]
+----
+
+
+=== Custom Printer
+
+You can also provide a custom link:{javadoc-url}/core/org/approvej/print/Printer.html[`Printer`]/`Function<T, String>` implementation to the builder's `printWith` method.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicExamples.java[tag=custom_printer]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=custom_printer]
+----
+<1> creates an `ApprovalBuilder<Person>` approve the result
+<2> applies the given `Printer` and returns a new `ApprovalBuilder<String>`
+
+[source]
+.Approved file
+----
+include::../../../test/java/examples/java/BasicExamples-custom_printer-approved.txt[]
+----
+
+
+[id=scrubbing]
+== Scrubbing -- make random parts static
+
+Sometimes you might not be able to control the exact output of the object you want to approve.
+For example, if the result object contains a timestamp or a generated ID, you might want to ignore these for the approval.
+
+You can do this by using the `scrub` method of the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`] and provide a link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber`]/`UnaryOperator<T>`.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicExamples.java[tag=scrubbing]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=scrubbing]
+----
+<1> replaces the published date with a numbered placeholder
+<2> replaces the id UUID with a numbered placeholder
+<3> so that the verified result looks like this
+
+Generally a built-in `Scrubber` uses a replacement function that replaces all matches with a numbered placeholder in the form of `[<what-has-been-replaced> <counter>]` (e.g. `[uuid 1]`, `[uuid 2]`, …).
+Note that two matches of the same (e.g. the same UUID in two places) will be replaced with the same placeholder, so you can still see that two scrubbed values were equal.
+
+
+=== Custom `Scrubber`
+
+The `RegexScrubber` already allows for a lot of special custom cases.
+In case this isn't enough, you can also provide a custom `Scrubber<T>`/`UnaryOperator<T>` implementation to the builder's `scrub` method.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicExamples.java[tag=custom_scrubbing]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=custom_scrubbing]
+----
+<1> this custom `Scrubber` specifically the number property of the `Contact` with a constant
+<2> so that the verified result looks like this
+
+[source]
+.Approved file
+----
+include::../../../test/java/examples/java/BasicExamples-custom_scrubbing-approved.txt[]
+----
+
+Note that this `Scrubber` is a `Scrubber<Contact>` and not a `Scrubber<String>`.
+Hence, it is necessary to apply it before the `Printer` is applied.
+
+Of course the `Scrubber` can also be defined in a separate class, instead of a lambda.
+
+
+=== Built-In Scrubbers
+
+==== Scrub IDs
+
+* link:{javadoc-url}/core/org/approvej/scrub/UuidScrubber.html[`UuidScrubber`]
+
+
+==== Scrub Date/Time
+
+* link:{javadoc-url}/core/org/approvej/scrub/DateScrubber.html[`DateScrubber`]
+* link:{javadoc-url}/core/org/approvej/scrub/InstantScrubber.html[`InstantScrubber`]
+* link:{javadoc-url}/core/org/approvej/scrub/RelativeDateScrubber.html[`RelativeDateScrubber`]
+
+
+==== Scrub Regular Expression Matches
+
+* link:{javadoc-url}/core/org/approvej/scrub/RegexScrubber.html[`RegexScrubber`]
+
+
+[id=verifying]
+== Verifying -- adjust the verification
+
+=== `InplaceVerifier`
+
+The link:{javadoc-url}/core/org/approvej/verify/InplaceVerifier.html[`InplaceVerifier`] will verify the result with a directly provided previously approved value.
+That way, the approved value is plainly visible in the test code.
+However, this might not be practical for large objects.
+It also does not allow to use a diff tool to compare the result with the previously approved value.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicExamples.java[tag=verify_inplace]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=verify_inplace]
+----
+
+
+=== `FileVerifier`
+
+The link:{javadoc-url}/core/org/approvej/verify/FileVerifier.html[`FileVerifier`] will verify the result with a previously approved value stored in a file.
+It is used in most of the examples above.
+
+If no approved file exists, it will be created as an empty _approved_ file.
+The received value will be written to another _received_ file.
+
+If the approved file exists, it will be compared with the received value.
+If they are equal, the test will pass.
+Any existing received file will be deleted automatically in that case.
+
+If the files are not equal, the test will fail.
+The received value will be persisted in a received file.
+Any existing received value will be overwritten by this.
+
+You can use a diff tool of your choice to compare the two files and merge values that you want to approve.
+
+
+==== `BasePathProvider`
+
+It is possible to use a link:{javadoc-url}/core/org/approvej/verify/FileVerifier.PathProvider.html[`PathProvider`] to configure where the files are stored.
+The default `StackTracePathProvider` will analyze the stack trace of the test method and create a path based on the class name and method of the executed test.
+
+Alternatively, you can use a `BasePathProvider` to specify the path of the approved file.
+The received file will be put next to the approved file and the filename will contain the word `received`.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicExamples.java[tag=verify_file_base_path]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=verify_file_base_path]
+----
+<1> this will expect the approved file at this path, the received file will be created next to it at `src/test/resources/BasicExamples-verify_file_base_path-reveived.yaml`
+
+
+==== Customer `PathProvider`
+
+You can also define your own link:{javadoc-url}/core/org/approvej/verify/FileVerifier.PathProvider.html[`PathProvider`].
