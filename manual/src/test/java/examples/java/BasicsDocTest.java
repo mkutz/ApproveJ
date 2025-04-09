@@ -15,7 +15,7 @@ import examples.ExampleClass.Contact;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
-class BasicExamples {
+class BasicsDocTest {
 
   ExampleClass exampleObject = new ExampleClass();
 

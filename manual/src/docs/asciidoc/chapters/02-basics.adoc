@@ -12,12 +12,12 @@ If you have anything that returns an arbitrary string, you can simply build an a
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicExamples.java[tag=approve_strings]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_strings]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=approve_strings]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_strings]
 ----
 <1> creates an `ApprovalBuilder<String>`
 <2> compares result to a previously approved value stored in a file next to the test and fails the test if the result differs
@@ -25,7 +25,7 @@ include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=approve_strin
 [source,text]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicExamples-approve_strings-approved.txt[]
+include::../../../test/java/examples/java/BasicsDocTest-approve_strings-approved.txt[]
 ----
 
 
@@ -38,12 +38,12 @@ By default, ApproveJ will simply call the object's `toString` method to turn the
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicExamples.java[tag=approve_pojos]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_pojos]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=approve_pojos]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_pojos]
 ----
 <1> creates an `ApprovalBuilder<Person>` approve the result
 <2> compares printed result to the given string and fails if they are not equal
@@ -51,7 +51,7 @@ include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=approve_pojos
 [source,text]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicExamples-approve_pojos-approved.txt[]
+include::../../../test/java/examples/java/BasicsDocTest-approve_pojos-approved.txt[]
 ----
 
 See <<printing>> if need a more sophisticated way of printing.
@@ -73,12 +73,12 @@ You can use this printer by calling the `printWith` method on the builder.
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicExamples.java[tag=object_printer]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=object_printer]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=object_printer]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=object_printer]
 ----
 <1> creates an `ApprovalBuilder<Person>` approve the result
 <2> applies the `ObjectPrinter` and returns a new `ApprovalBuilder<String>`
@@ -86,7 +86,7 @@ include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=object_printe
 [source,text]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicExamples-object_printer-approved.txt[]
+include::../../../test/java/examples/java/BasicsDocTest-object_printer-approved.txt[]
 ----
 
 
@@ -97,12 +97,12 @@ You can also provide a custom link:{javadoc-url}/core/org/approvej/print/Printer
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicExamples.java[tag=custom_printer]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=custom_printer]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=custom_printer]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=custom_printer]
 ----
 <1> creates an `ApprovalBuilder<Person>` approve the result
 <2> applies the given `Printer` and returns a new `ApprovalBuilder<String>`
@@ -110,7 +110,7 @@ include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=custom_printe
 [source]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicExamples-custom_printer-approved.txt[]
+include::../../../test/java/examples/java/BasicsDocTest-custom_printer-approved.txt[]
 ----
 
 
@@ -125,12 +125,12 @@ You can do this by using the `scrub` method of the link:{javadoc-url}/core/org/a
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicExamples.java[tag=scrubbing]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=scrubbing]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=scrubbing]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=scrubbing]
 ----
 <1> replaces the published date with a numbered placeholder
 <2> replaces the id UUID with a numbered placeholder
@@ -148,12 +148,12 @@ In case this isn't enough, you can also provide a custom `Scrubber<T>`/`UnaryOpe
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicExamples.java[tag=custom_scrubbing]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=custom_scrubbing]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=custom_scrubbing]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=custom_scrubbing]
 ----
 <1> this custom `Scrubber` specifically the number property of the `Contact` with a constant
 <2> so that the verified result looks like this
@@ -161,7 +161,7 @@ include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=custom_scrubb
 [source]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicExamples-custom_scrubbing-approved.txt[]
+include::../../../test/java/examples/java/BasicsDocTest-custom_scrubbing-approved.txt[]
 ----
 
 Note that this `Scrubber` is a `Scrubber<Contact>` and not a `Scrubber<String>`.
@@ -202,12 +202,12 @@ It also does not allow to use a diff tool to compare the result with the previou
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicExamples.java[tag=verify_inplace]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=verify_inplace]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=verify_inplace]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_inplace]
 ----
 
 
@@ -241,14 +241,14 @@ The received file will be put next to the approved file and the filename will co
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicExamples.java[tag=verify_file_base_path]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=verify_file_base_path]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicExamples.kt[tag=verify_file_base_path]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_base_path]
 ----
-<1> this will expect the approved file at this path, the received file will be created next to it at `src/test/resources/BasicExamples-verify_file_base_path-reveived.yaml`
+<1> this will expect the approved file at this path, the received file will be created next to it at `src/test/resources/BasicsDocTest-verify_file_base_path-reveived.yaml`
 
 
 ==== Customer `PathProvider`
