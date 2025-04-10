@@ -1,6 +1,6 @@
 package org.approvej.scrub;
 
-import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static org.approvej.scrub.InstantScrubber.instants;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -10,8 +10,8 @@ class InstantScrubberTest {
 
   @Test
   void apply() {
-    var scrubber = instants(ISO_LOCAL_DATE_TIME);
-    assertThat(scrubber.apply("datetime: 2023-10-01T12:00:00.000000"))
+    var scrubber = instants(ISO_INSTANT);
+    assertThat(scrubber.apply("datetime: 2025-04-10T11:48:04.459229Z"))
         .isEqualTo("datetime: [instant 1]");
   }
 }
