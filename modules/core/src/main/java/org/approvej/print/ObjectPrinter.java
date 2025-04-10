@@ -30,6 +30,7 @@ public class ObjectPrinter<T> implements Printer<T> {
   public static final Set<Class<?>> SIMPLE_TYPES =
       Set.of(
           Boolean.class,
+          Character.class,
           CharSequence.class,
           Number.class,
           UUID.class,

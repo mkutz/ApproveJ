@@ -4,14 +4,44 @@ import static org.approvej.print.ObjectPrinter.objectPrinter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class ObjectPrinterTest {
 
-  ObjectPrinter printer = objectPrinter();
+  ObjectPrinter<?> printer = objectPrinter();
+
+  @ParameterizedTest(name = "{displayName}({arguments})")
+  @MethodSource("applySimpleArguments")
+  void apply_simple(Object value) {
+    assertThat(printer.apply(value)).isEqualTo("%s".formatted(value));
+  }
+
+  static Stream<Object> applySimpleArguments() {
+    return Stream.of(
+        true,
+        "string",
+        'a',
+        1,
+        1L,
+        1.23f,
+        1.23d,
+        (byte) 1,
+        (short) 1,
+        UUID.randomUUID(),
+        Instant.now(),
+        LocalDateTime.now(),
+        ZonedDateTime.now(),
+        Duration.ofDays(1).plusHours(2).plusMinutes(3).plusSeconds(4));
+  }
 
   @Test
   void apply() {
@@ -149,19 +179,6 @@ class ObjectPrinterTest {
                   field3=false
                 ]
               ]
-            ]""");
-  }
-
-  @Test
-  void apply_temporal() {
-    var value = List.of(LocalDateTime.of(2345, 6, 7, 8, 9, 10), Duration.ofHours(1));
-
-    assertThat(printer.apply(value))
-        .isEqualTo(
-            """
-            [
-              2345-06-07T08:09:10,
-              PT1H
             ]""");
   }
 }
