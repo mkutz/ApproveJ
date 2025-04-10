@@ -28,6 +28,8 @@ jobs:
           java-version: 21
           distribution: temurin
 
+      - uses: gradle/actions/setup-gradle@v4
+
       - run: ./gradlew jreleaserConfig publish jreleaserFullRelease -Pversion=${{ github.event.inputs.version }}
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
