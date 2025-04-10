@@ -8,13 +8,13 @@ plugins {
 repositories { mavenCentral() }
 
 jreleaser {
+  gitRootSearch = true
   signing {
     active = org.jreleaser.model.Active.ALWAYS
     armored = true
     mode = org.jreleaser.model.Signing.Mode.MEMORY
   }
   deploy {
-    gitRootSearch = true
     maven {
       mavenCentral {
         create("sonatype") {
