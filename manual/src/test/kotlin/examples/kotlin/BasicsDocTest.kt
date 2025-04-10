@@ -49,7 +49,7 @@ class BasicsDocTest {
   fun custom_printer() {
     // tag::custom_printer[]
     approve(exampleObject.createSomePerson()) // <1>
-      .printWith({ person -> "%s, born %s".format(person.name, person.birthDate) }) // <2>
+      .printWith { person -> "%s, born %s".format(person.name, person.birthDate) } // <2>
       .verify()
     // end::custom_printer[]
   }
