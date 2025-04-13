@@ -42,3 +42,9 @@ jobs:
       - run: ./gradlew publish -Pversion=${{ github.event.inputs.version }}
       - run: ./gradlew jreleaserSign -Pversion=${{ github.event.inputs.version }} --git-root-search
       - run: ./gradlew jreleaserFullRelease -Pversion=${{ github.event.inputs.version }} --git-root-search
+
+  update-pages:
+    needs: publish
+    uses: ./.github/workflows/update-pages.yml
+    with:
+      version: ${{ github.event.inputs.version }}
