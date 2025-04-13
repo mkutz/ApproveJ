@@ -14,10 +14,10 @@ subprojects {
       publishing {
         publications {
           create<MavenPublication>(name) {
-            from(components["java"])
+            components.findByName("java") ?: components.getByName("javaPlatform")
             pom {
-              name = "${rootProject.name}-${project.name}"
-              description = "Core components ${rootProject.name}"
+              project.properties["mavenPomName"]?.let { name = "$it" }
+              project.properties["mavenPomDescription"]?.let { description = "$it" }
               url = "https://approvej.org"
               inceptionYear = "2025"
               licenses {
