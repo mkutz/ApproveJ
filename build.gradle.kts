@@ -14,7 +14,7 @@ subprojects {
       publishing {
         publications {
           create<MavenPublication>(name) {
-            components.findByName("java") ?: components.getByName("javaPlatform")
+            from(components.findByName("java") ?: components.getByName("javaPlatform"))
             pom {
               project.properties["mavenPomName"]?.let { name = "$it" }
               project.properties["mavenPomDescription"]?.let { description = "$it" }
