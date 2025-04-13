@@ -2,6 +2,7 @@
 
 plugins {
   `java-library`
+  jacoco
   `jvm-test-suite`
   `maven-publish`
   alias(libs.plugins.jreleaser)

@@ -2,6 +2,8 @@
 
 plugins {
   `java-library`
+  jacoco
+  `jvm-test-suite`
   `maven-publish`
   alias(libs.plugins.jreleaser)
 }
@@ -15,10 +17,10 @@ java {
 repositories { mavenCentral() }
 
 dependencies {
+  api(project(":modules:core"))
   api(libs.jspecify)
   api(libs.jacksonDatabind)
   api(libs.jsonpath)
-  api(project(":modules:core"))
 }
 
 testing {
