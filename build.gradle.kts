@@ -1,5 +1,6 @@
 plugins {
   base
+  `maven-publish`
   alias(libs.plugins.jreleaser)
   alias(libs.plugins.sonar)
   alias(libs.plugins.spotless)
@@ -8,11 +9,9 @@ plugins {
 repositories { mavenCentral() }
 
 jreleaser {
-  gitRootSearch = true
   signing {
     active = org.jreleaser.model.Active.ALWAYS
     armored = true
-    mode = org.jreleaser.model.Signing.Mode.MEMORY
   }
   deploy {
     maven {
@@ -20,9 +19,46 @@ jreleaser {
         create("sonatype") {
           active = org.jreleaser.model.Active.ALWAYS
           url = "https://central.sonatype.com/api/v1/publisher"
-          applyMavenCentralRules = true
-          stagingRepository("build/pre-deploy")
+          stagingRepository("build/staging-deploy")
         }
+      }
+    }
+  }
+}
+
+subprojects {
+  afterEvaluate {
+    if (plugins.hasPlugin("maven-publish")) {
+      publishing {
+        publications {
+          create<MavenPublication>(name) {
+            from(components["java"])
+            pom {
+              name = "${rootProject.name}-${project.name}"
+              description = "Core components ${rootProject.name}"
+              url = "https://approvej.org"
+              inceptionYear = "2025"
+              licenses {
+                license {
+                  name = "Apache-2.0"
+                  url = "https://spdx.org/licenses/Apache-2.0.html"
+                }
+              }
+              developers {
+                developer {
+                  id = "mkutz"
+                  name = "Michael Kutz"
+                }
+              }
+              scm {
+                connection = "scm:git:https://github.com/mkutz/approvej.git"
+                developerConnection = "scm:git:ssh://github.com/mkutz/approvej.git"
+                url = "https://github.com/mkutz/approvej"
+              }
+            }
+          }
+        }
+        repositories { maven { url = uri(layout.buildDirectory.dir("staging-deploy")) } }
       }
     }
   }
