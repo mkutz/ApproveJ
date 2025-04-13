@@ -1,14 +1,39 @@
+@file:Suppress("UnstableApiUsage", "unused")
+
+plugins {
+  `java-library`
+  `jvm-test-suite`
+  `maven-publish`
+  alias(libs.plugins.jreleaser)
+}
+
+java {
+  withJavadocJar()
+  withSourcesJar()
+  toolchain { languageVersion.set(JavaLanguageVersion.of(21)) }
+}
+
 repositories { mavenCentral() }
 
 dependencies {
   api(libs.jspecify)
   implementation(libs.junitJupiterApi)
+}
 
-  testImplementation(platform(libs.junitBom))
-  testImplementation(libs.junitJupiterApi)
-  testImplementation(libs.junitJupiterParams)
-  testImplementation(libs.assertjCore)
+testing {
+  suites {
+    val test by
+      getting(JvmTestSuite::class) {
+        useJUnitJupiter()
+        dependencies {
+          implementation(platform(libs.junitBom))
+          implementation(libs.junitJupiterApi)
+          implementation(libs.junitJupiterParams)
+          implementation(libs.assertjCore)
 
-  testRuntimeOnly(libs.junitPlatformLauncher)
-  testRuntimeOnly(libs.junitJupiterEngine)
+          runtimeOnly(libs.junitPlatformLauncher)
+          runtimeOnly(libs.junitJupiterEngine)
+        }
+      }
+  }
 }

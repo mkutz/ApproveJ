@@ -1,35 +1,42 @@
+@file:Suppress("UnstableApiUsage", "unused")
+
 plugins {
-  alias(libs.plugins.asciidoctor)
   java
-  alias(libs.plugins.kotlinJvm)
   `java-test-fixtures`
+  `jvm-test-suite`
+  alias(libs.plugins.kotlinJvm)
+  alias(libs.plugins.asciidoctor)
 }
+
+java { toolchain { languageVersion.set(JavaLanguageVersion.of(21)) } }
 
 repositories { mavenCentral() }
 
 val asciidoctorExt: Configuration by configurations.creating
 
-dependencies {
-  asciidoctorExt(libs.asciidoctorBlockSwitch)
+dependencies { asciidoctorExt(libs.asciidoctorBlockSwitch) }
 
-  testImplementation(project(":modules:core"))
+testing {
+  suites {
+    val test by
+      getting(JvmTestSuite::class) {
+        useJUnitJupiter("5.10.0")
+        dependencies {
+          implementation(project(":modules:core"))
 
-  testImplementation(platform(libs.junitBom))
-  testImplementation(libs.junitJupiterApi)
-  testImplementation(libs.junitJupiterParams)
-  testImplementation(libs.assertjCore)
+          implementation(platform(libs.junitBom))
+          implementation(libs.junitJupiterApi)
+          implementation(libs.junitJupiterParams)
+          implementation(libs.assertjCore)
 
-  testRuntimeOnly(libs.junitPlatformLauncher)
-  testRuntimeOnly(libs.junitJupiterEngine)
+          runtimeOnly(libs.junitPlatformLauncher)
+          runtimeOnly(libs.junitJupiterEngine)
+        }
+      }
+  }
 }
-
-java { toolchain { languageVersion.set(JavaLanguageVersion.of(21)) } }
-
-tasks.withType<Test> { useJUnitPlatform() }
 
 tasks.withType<org.asciidoctor.gradle.jvm.AsciidoctorTask> {
   baseDirFollowsSourceFile()
   configurations("asciidoctorExt")
 }
-
-asciidoctorj { modules { diagram.use() } }
