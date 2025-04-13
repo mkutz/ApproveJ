@@ -41,3 +41,5 @@ testing {
       }
   }
 }
+
+tasks.jacocoTestReport { reports { xml.required = true } }
