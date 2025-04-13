@@ -40,7 +40,6 @@ jobs:
 
       - run: ./gradlew jreleaserConfig -Pversion=${{ github.event.inputs.version }} --git-root-search
       - run: ./gradlew publish -Pversion=${{ github.event.inputs.version }}
-      - run: ./gradlew jreleaserSign -Pversion=${{ github.event.inputs.version }} --git-root-search
       - run: ./gradlew jreleaserFullRelease -Pversion=${{ github.event.inputs.version }} --git-root-search
 
   update-pages:
