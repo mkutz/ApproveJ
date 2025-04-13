@@ -11,24 +11,6 @@ repositories { mavenCentral() }
 subprojects {
   afterEvaluate {
     if (plugins.hasPlugin("maven-publish")) {
-      jreleaser {
-        signing {
-          active = org.jreleaser.model.Active.ALWAYS
-          armored = true
-        }
-        deploy {
-          maven {
-            mavenCentral {
-              create("sonatype") {
-                active = org.jreleaser.model.Active.ALWAYS
-                url = "https://central.sonatype.com/api/v1/publisher"
-                stagingRepository("build/staging-deploy")
-              }
-            }
-          }
-        }
-      }
-
       publishing {
         publications {
           create<MavenPublication>(name) {
@@ -59,6 +41,27 @@ subprojects {
           }
         }
         repositories { maven { url = uri(layout.buildDirectory.dir("staging-deploy")) } }
+      }
+    }
+  }
+}
+
+jreleaser {
+  signing {
+    active = org.jreleaser.model.Active.ALWAYS
+    armored = true
+  }
+  deploy {
+    maven {
+      mavenCentral {
+        create("sonatype") {
+          active = org.jreleaser.model.Active.ALWAYS
+          maxRetries = 60
+          retryDelay = 30
+          stagingRepository("modules/core/build/staging-deploy")
+          stagingRepository("modules/json-jackson/build/staging-deploy")
+          url = "https://central.sonatype.com/api/v1/publisher"
+        }
       }
     }
   }
