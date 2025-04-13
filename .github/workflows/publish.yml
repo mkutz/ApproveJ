@@ -17,6 +17,14 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      - JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
+      - JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
+      - JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
+      - JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_USERNAME }}
+      - JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.JRELEASER_MAVENCENTRAL_PASSWORD }}
+
     steps:
 
       - uses: actions/checkout@v4
@@ -30,11 +38,6 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - run: ./gradlew jreleaserConfig publish jreleaserFullRelease -Pversion=${{ github.event.inputs.version }} --git-root-search
-        env:
-          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
-          JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
-          JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
-          JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_USERNAME }}
-          JRELEASER_MAVENCENTRAL_PASSWORD: ${{ secrets.JRELEASER_MAVENCENTRAL_PASSWORD }}
+      - run: ./gradlew jreleaserConfig -Pversion=${{ github.event.inputs.version }} --git-root-search
+      - run: ./gradlew publish -Pversion=${{ github.event.inputs.version }}
+      - run: ./gradlew jreleaserFullRelease -Pversion=${{ github.event.inputs.version }} --git-root-search
