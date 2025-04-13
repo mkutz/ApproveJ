@@ -8,27 +8,27 @@ plugins {
 
 repositories { mavenCentral() }
 
-jreleaser {
-  signing {
-    active = org.jreleaser.model.Active.ALWAYS
-    armored = true
-  }
-  deploy {
-    maven {
-      mavenCentral {
-        create("sonatype") {
-          active = org.jreleaser.model.Active.ALWAYS
-          url = "https://central.sonatype.com/api/v1/publisher"
-          stagingRepository("build/staging-deploy")
-        }
-      }
-    }
-  }
-}
-
 subprojects {
   afterEvaluate {
     if (plugins.hasPlugin("maven-publish")) {
+      jreleaser {
+        signing {
+          active = org.jreleaser.model.Active.ALWAYS
+          armored = true
+        }
+        deploy {
+          maven {
+            mavenCentral {
+              create("sonatype") {
+                active = org.jreleaser.model.Active.ALWAYS
+                url = "https://central.sonatype.com/api/v1/publisher"
+                stagingRepository("build/staging-deploy")
+              }
+            }
+          }
+        }
+      }
+
       publishing {
         publications {
           create<MavenPublication>(name) {
