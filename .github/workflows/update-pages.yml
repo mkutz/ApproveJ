@@ -2,6 +2,10 @@ name: Update Pages
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish'
+        required: true
   workflow_call:
     inputs:
       version:
