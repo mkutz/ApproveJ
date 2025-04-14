@@ -59,7 +59,7 @@ jreleaser {
           maxRetries = 60
           retryDelay = 30
           stagingRepository("modules/core/build/staging-deploy")
-          stagingRepository("modules/core/build/staging-deploy")
+          stagingRepository("modules/json-jackson/build/staging-deploy")
           stagingRepository("bom/build/staging-deploy")
           url = "https://central.sonatype.com/api/v1/publisher"
         }
