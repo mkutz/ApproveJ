@@ -66,7 +66,12 @@ jreleaser {
       }
     }
   }
-  release { github { update { enabled = true } } }
+  release {
+    github {
+      overwrite = true
+      update { enabled = true }
+    }
+  }
 }
 
 sonar {
