@@ -147,6 +147,16 @@ public class FileVerifier implements Verifier {
       return new BasePathProvider(approvedPath);
     }
 
+    /**
+     * Creates a new {@link BasePathProvider} that uses the given approved path.
+     *
+     * @param approvedPath the path to the approved file
+     * @return a new {@link BasePathProvider}
+     */
+    public static BasePathProvider approvedPath(String approvedPath) {
+      return approvedPath(Path.of(approvedPath));
+    }
+
     private BasePathProvider(Path approvedPath) {
       this.approvedPath = approvedPath;
       Path parentPath = approvedPath.getParent();

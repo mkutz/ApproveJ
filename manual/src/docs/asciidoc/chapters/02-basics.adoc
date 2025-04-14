@@ -22,18 +22,38 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_strin
 <1> creates an `ApprovalBuilder<String>`
 <2> compares result to a previously approved value stored in a file next to the test and fails the test if the result differs
 
+Executing such a test, will create two files next to the test code file named like `<TestClass>-<testMethod>-received.txt` and `<TestClass>-<testMethod>-approved.txt`.
+
+The received file will always contain a string representation of the object you want to approve at the last execution.
+
+The approved file will be empty at first.
+You can use a diff tool of your choice to compare the two files and merge values that you want to approve.
+If the received value equals the content of the approved file, the received file will be deleted automatically.
+
 [source,text]
 .Approved file
 ----
 include::../../../test/java/examples/java/BasicsDocTest-approve_strings-approved.txt[]
 ----
 
+You can adjust various details of this process or use no file at all.
+See <<verifying>> for more details on how to do that.
+
 
 [id="approve_pojos"]
 == Approve POJOs
 
 Of course, you might want to approve more complex objects than just strings.
-By default, ApproveJ will simply call the object's `toString` method to turn the object into a string.
+
+For example a simple POJO like this
+
+[source,java,indent=0,role="primary"]
+.Person POJO
+----
+include::../../../testFixtures/java/examples/ExampleClass.java[tag=person_pojo]
+----
+
+By default, ApproveJ will simply call the object's `toString` method to turn the object into a string just before verifying.
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -45,8 +65,8 @@ include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_pojos]
 ----
 include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_pojos]
 ----
-<1> creates an `ApprovalBuilder<Person>` approve the result
-<2> compares printed result to the given string and fails if they are not equal
+<1> creates an `ApprovalBuilder<Person>` approve the person
+<2> compares the `person.toString()` to a previously approved version and fails if they are not equal
 
 [source,text]
 .Approved file
@@ -80,8 +100,9 @@ include::../../../test/java/examples/java/BasicsDocTest.java[tag=object_printer]
 ----
 include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=object_printer]
 ----
-<1> creates an `ApprovalBuilder<Person>` approve the result
-<2> applies the `ObjectPrinter` and returns a new `ApprovalBuilder<String>`
+<1> applies the `ObjectPrinter` and returns a new `ApprovalBuilder<String>`
+
+Now the approved file will look like this
 
 [source,text]
 .Approved file
@@ -104,8 +125,7 @@ include::../../../test/java/examples/java/BasicsDocTest.java[tag=custom_printer]
 ----
 include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=custom_printer]
 ----
-<1> creates an `ApprovalBuilder<Person>` approve the result
-<2> applies the given `Printer` and returns a new `ApprovalBuilder<String>`
+<1> applies the given `Printer` and returns a new `ApprovalBuilder<String>`
 
 [source]
 .Approved file
@@ -120,7 +140,20 @@ include::../../../test/java/examples/java/BasicsDocTest-custom_printer-approved.
 Sometimes you might not be able to control the exact output of the object you want to approve.
 For example, if the result object contains a timestamp or a generated ID, you might want to ignore these for the approval.
 
-You can do this by using the `scrub` method of the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`] and provide a link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber`]/`UnaryOperator<T>`.
+You can do this by using the `scrubbedOf` method of the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`] and provide a link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber`]/`UnaryOperator<T>` implementation.
+
+For instance, in the following `BlogPost` POJO there are two generated fields:
+
+- the `id` is a UUID that's being generated randomly, and
+- the `published` is a `LocalDateTime` set to now.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../testFixtures/java/examples/ExampleClass.java[tag=blog_post_pojo]
+----
+
+In the flowing example, the two dynamic properties are scrubbed with the built-in link:{javadoc-url}/core/org/approvej/scrub/UuidScrubber.html[`UuidScrubber`] and link:{javadoc-url}/core/org/approvej/scrub/InstantScrubber.html[`InstantScrubber`].
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -136,14 +169,20 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=scrubbing]
 <2> replaces the id UUID with a numbered placeholder
 <3> so that the verified result looks like this
 
+[source]
+.Approved file
+----
+include::../../../test/java/examples/java/BasicsDocTest-scrubbing-approved.txt[]
+----
+
 Generally a built-in `Scrubber` uses a replacement function that replaces all matches with a numbered placeholder in the form of `[<what-has-been-replaced> <counter>]` (e.g. `[uuid 1]`, `[uuid 2]`, …).
 Note that two matches of the same (e.g. the same UUID in two places) will be replaced with the same placeholder, so you can still see that two scrubbed values were equal.
 
 
 === Custom `Scrubber`
 
-The `RegexScrubber` already allows for a lot of special custom cases.
-In case this isn't enough, you can also provide a custom `Scrubber<T>`/`UnaryOperator<T>` implementation to the builder's `scrub` method.
+The link:{javadoc-url}/core/org/approvej/scrub/RegexScrubber.html[`RegexScrubber`] already allows for a lot of special custom cases.
+In case this isn't enough, you can also provide a custom `Scrubber<T>`/`UnaryOperator<T>` implementation to the builder's `scrubbedOf` method.
 
 [source,java,indent=0,role="primary"]
 .Java

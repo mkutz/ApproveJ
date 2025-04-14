@@ -11,15 +11,18 @@ import java.util.function.Function;
 
 public class ExampleClass {
 
-  public String createSomeSimpleString() {
-    return "This is a simple string";
+  public static String hello(String greeting) {
+    return "Hello, %s!".formatted(greeting);
   }
 
-  public Person createSomePerson() {
-    return new Person("John Doe", LocalDate.of(1990, 1, 1));
+  public static Person createPerson(String name, LocalDate birthDate) {
+    return new Person(name, birthDate);
   }
 
+  // tag::person_pojo[]
   public record Person(String name, LocalDate birthDate) {}
+
+  // end::person_pojo[]
 
   public static Function<Person, String> personYamlPrinter() {
     return person ->
@@ -31,17 +34,51 @@ public class ExampleClass {
             .formatted(person.name(), person.birthDate());
   }
 
-  public BlogPost createSomeBlogPost(String title, String content) {
+  public static BlogPost createBlogPost(String title, String content) {
     return new BlogPost(title, content);
   }
 
-  public record BlogPost(String title, String content, LocalDateTime published, UUID id) {
+  public static
+  // tag::blog_post_pojo[]
+  class BlogPost {
+    private final UUID id;
+    private final String title;
+    private final String content;
+    private final LocalDateTime published;
+
     public BlogPost(String title, String content) {
-      this(title, content, LocalDateTime.now(), UUID.randomUUID());
+      this.title = title;
+      this.content = content;
+      this.id = UUID.randomUUID();
+      this.published = LocalDateTime.now();
+    }
+
+    public String title() {
+      return title;
+    }
+
+    public String content() {
+      return content;
+    }
+
+    public LocalDateTime published() {
+      return published;
+    }
+
+    public UUID id() {
+      return id;
+    }
+
+    @Override
+    public String toString() {
+      return "BlogPost[title=%s, content=%s, published=%s, id=%s]"
+          .formatted(title, content, published, id);
     }
   }
 
-  public Contact createContact(String name, String email, String phoneNumber) {
+  // end::blog_post_pojo[]
+
+  public static Contact createContact(String name, String email, String phoneNumber) {
     return new Contact(name, email, phoneNumber);
   }
 
@@ -53,7 +90,7 @@ public class ExampleClass {
     }
   }
 
-  public String createSomeTaggedBlogPost(String title, String content, List<Tag> tagIds) {
+  public static String createTaggedBlogPost(String title, String content, List<Tag> tagIds) {
     var published = Instant.now();
     var id = UUID.randomUUID();
     return """

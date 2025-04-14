@@ -1,5 +1,9 @@
 package examples.java;
 
+import static examples.ExampleClass.createBlogPost;
+import static examples.ExampleClass.createContact;
+import static examples.ExampleClass.createPerson;
+import static examples.ExampleClass.hello;
 import static examples.ExampleClass.personYamlPrinter;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static org.approvej.ApprovalBuilder.approve;
@@ -10,19 +14,19 @@ import static org.approvej.verify.FileVerifier.BasePathProvider.approvedPath;
 import static org.approvej.verify.FileVerifier.file;
 import static org.approvej.verify.InplaceVerifier.inplace;
 
-import examples.ExampleClass;
+import examples.ExampleClass.BlogPost;
 import examples.ExampleClass.Contact;
-import java.nio.file.Path;
+import examples.ExampleClass.Person;
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 class BasicsDocTest {
 
-  ExampleClass exampleObject = new ExampleClass();
-
   @Test
   void approve_strings() {
     // tag::approve_strings[]
-    String result = exampleObject.createSomeSimpleString();
+    String result = hello("World");
+
     approve(result) // <1>
         .verify(); // <2>
     // end::approve_strings[]
@@ -31,7 +35,9 @@ class BasicsDocTest {
   @Test
   void approve_pojos() {
     // tag::approve_pojos[]
-    approve(exampleObject.createSomePerson()) // <1>
+    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+
+    approve(person) // <1>
         .verify(); // <2>
     // end::approve_pojos[]
   }
@@ -39,8 +45,10 @@ class BasicsDocTest {
   @Test
   void object_printer() {
     // tag::object_printer[]
-    approve(exampleObject.createSomePerson()) // <1>
-        .printWith(objectPrinter()) // <2>
+    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+
+    approve(person)
+        .printWith(objectPrinter()) // <1>
         .verify();
     // end::object_printer[]
   }
@@ -48,8 +56,10 @@ class BasicsDocTest {
   @Test
   void custom_printer() {
     // tag::custom_printer[]
-    approve(exampleObject.createSomePerson()) // <1>
-        .printWith(person -> String.format("%s, born %s", person.name(), person.birthDate())) // <2>
+    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+
+    approve(person)
+        .printWith(it -> String.format("%s, born %s", it.name(), it.birthDate())) // <1>
         .verify();
     // end::custom_printer[]
   }
@@ -57,9 +67,10 @@ class BasicsDocTest {
   @Test
   void scrubbing() {
     // tag::scrubbing[]
-    approve(
-            exampleObject.createSomeBlogPost(
-                "Latest News", "Lorem ipsum dolor sit amet, consectetur adipiscing elit."))
+    BlogPost blogPost =
+        createBlogPost("Latest News", "Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
+
+    approve(blogPost)
         .printWith(objectPrinter())
         .scrubbedOf(instants(ISO_LOCAL_DATE_TIME)) // <1>
         .scrubbedOf(uuids()) // <2>
@@ -70,10 +81,9 @@ class BasicsDocTest {
   @Test
   void custom_scrubbing() {
     // tag::custom_scrubbing[]
-    approve(exampleObject.createContact("Jane Doe", "jane@approvej.org", "+1 123 456 7890"))
-        .scrubbedOf(
-            contact ->
-                new Contact(-1, contact.name(), contact.email(), contact.phoneNumber())) // <1>
+    Contact contact = createContact("Jane Doe", "jane@approvej.org", "+1 123 456 7890");
+    approve(contact)
+        .scrubbedOf(it -> new Contact(-1, it.name(), it.email(), it.phoneNumber())) // <1>
         .printWith(objectPrinter())
         .verify(); // <2>
     // end::custom_scrubbing[]
@@ -82,7 +92,9 @@ class BasicsDocTest {
   @Test
   void verify_inplace() {
     // tag::verify_inplace[]
-    approve(exampleObject.createSomePerson()) // <1>
+    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+
+    approve(person) // <1>
         .verify(inplace("Person[name=John Doe, birthDate=1990-01-01]")); // <2>
     // end::verify_inplace[]
   }
@@ -90,13 +102,14 @@ class BasicsDocTest {
   @Test
   void verify_file_base_path() {
     // tag::verify_file_base_path[]
-    approve(exampleObject.createSomePerson())
+    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+
+    approve(person)
         .printWith(personYamlPrinter())
         .verify(
             file(
                 approvedPath(
-                    Path.of(
-                        "src/test/resources/BasicExamples-verify_file_base_path.yaml")))); // <1>
+                    "src/test/resources/BasicExamples-verify_file_base_path.yaml"))); // <1>
     // end::verify_file_base_path[]
   }
 }

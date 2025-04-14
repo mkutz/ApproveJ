@@ -2,11 +2,11 @@
 
 == Approval Testing
 
-Approval testing is a testing technique that allows you to compare the output of your code with a known good/previously approved output.
+Approval testing is a technique that allows you to compare the output of your code with a known good/previously approved output.
 
 An approval test case will only succeed, if the actually received output is not equal to the previously approved output.
 
-If the received output is different from the approved output, the test will fail and leave it to the developer to decide whether the received output is actually correct or not.
+If the received output is different from the approved output, the test will fail and leave it to human reviewer to approve received output or to fix the code.
 
 Approval testing is especially useful for testing complex objects or large data sets, where it is impractical to write individual assertions for each property.
 

@@ -1,7 +1,10 @@
 package examples.kotlin
 
-import examples.ExampleClass
 import examples.ExampleClass.Contact
+import examples.ExampleClass.createBlogPost
+import examples.ExampleClass.createContact
+import examples.ExampleClass.createPerson
+import examples.ExampleClass.hello
 import examples.ExampleClass.personYamlPrinter
 import org.approvej.ApprovalBuilder.approve
 import org.approvej.print.ObjectPrinter.objectPrinter
@@ -11,17 +14,15 @@ import org.approvej.verify.FileVerifier.BasePathProvider.approvedPath
 import org.approvej.verify.FileVerifier.file
 import org.approvej.verify.InplaceVerifier.inplace
 import org.junit.jupiter.api.Test
-import java.nio.file.Path
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
 class BasicsDocTest {
 
-  val exampleObject = ExampleClass()
-
   @Test
   fun approve_strings() {
     // tag::approve_strings[]
-    val result = exampleObject.createSomeSimpleString()
+    val result = hello("World")
 
     approve(result) // <1>
       .verify() // <2>
@@ -31,7 +32,9 @@ class BasicsDocTest {
   @Test
   fun approve_pojos() {
     // tag::approve_pojos[]
-    approve(exampleObject.createSomePerson()) // <1>
+    val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
+
+    approve(person) // <1>
       .verify() // <2>
     // end::approve_pojos[]
   }
@@ -39,8 +42,10 @@ class BasicsDocTest {
   @Test
   fun object_printer() {
     // tag::object_printer[]
-    approve(exampleObject.createSomePerson()) // <1>
-      .printWith(objectPrinter()) // <2>
+    val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
+
+    approve(person)
+      .printWith(objectPrinter()) // <1>
       .verify()
     // end::object_printer[]
   }
@@ -48,8 +53,10 @@ class BasicsDocTest {
   @Test
   fun custom_printer() {
     // tag::custom_printer[]
-    approve(exampleObject.createSomePerson()) // <1>
-      .printWith { person -> "%s, born %s".format(person.name, person.birthDate) } // <2>
+    val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
+
+    approve(person)
+      .printWith { "%s, born %s".format(it.name, it.birthDate) } // <1>
       .verify()
     // end::custom_printer[]
   }
@@ -57,7 +64,9 @@ class BasicsDocTest {
   @Test
   fun scrubbing() {
     // tag::scrubbing[]
-    approve(exampleObject.createSomeBlogPost("Latest News", "Lorem ipsum dolor sit amet, consectetur adipiscing elit."))
+    val blogPost = createBlogPost("Latest News", "Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
+
+    approve(blogPost)
       .printWith(objectPrinter())
       .scrubbedOf(instants(ISO_LOCAL_DATE_TIME)) // <1>
       .scrubbedOf(uuids()) // <2>
@@ -68,7 +77,9 @@ class BasicsDocTest {
   @Test
   fun custom_scrubbing() {
     // tag::custom_scrubbing[]
-    approve(exampleObject.createContact("Jane Doe", "jane@approvej.org", "+1 123 456 7890"))
+    val contact = createContact("Jane Doe", "jane@approvej.org", "+1 123 456 7890")
+
+    approve(contact)
       .scrubbedOf { Contact(-1, it.name, it.email, it.phoneNumber) } // <1>
       .printWith(objectPrinter())
       .verify() // <2>
@@ -78,7 +89,9 @@ class BasicsDocTest {
   @Test
   fun verifyInplace() {
     // tag::verify_inplace[]
-    approve(exampleObject.createSomePerson())
+    val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
+
+    approve(person)
       .verify(inplace("Person[name=John Doe, birthDate=1990-01-01]"))
     // end::verify_inplace[]
   }
@@ -86,17 +99,11 @@ class BasicsDocTest {
   @Test
   fun verify_file_base_path() {
     // tag::verify_file_base_path[]
-    approve(exampleObject.createSomePerson())
+    val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
+
+    approve(person)
       .printWith(personYamlPrinter())
-      .verify(
-        file(
-          approvedPath(
-            Path.of(
-              "src/test/resources/BasicExamples-verify_file_base_path.yaml" // <1>
-            )
-          )
-        )
-      )
+      .verify(file(approvedPath("src/test/resources/BasicExamples-verify_file_base_path.yaml"))) // <1>
     // end::verify_file_base_path[]
   }
 }
