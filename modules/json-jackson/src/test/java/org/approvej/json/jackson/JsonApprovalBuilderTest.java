@@ -3,6 +3,7 @@ package org.approvej.json.jackson;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter;
+import static org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter;
 import static org.approvej.scrub.RelativeDateScrubber.relativeDates;
 import static org.approvej.scrub.UuidScrubber.uuids;
 import static org.approvej.verify.FileVerifier.file;
@@ -48,7 +49,7 @@ class JsonApprovalBuilderTest {
   @Test
   void verify_file() {
     approve(EXAMPLE_JSON)
-        .printWith(new JsonStringPrettyPrinter())
+        .printWith(jsonStringPrettyPrinter())
         .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
         .scrubbedOf(uuids())
         .verify(file("json"));
@@ -57,7 +58,7 @@ class JsonApprovalBuilderTest {
   @Test
   void verify_with_scrubbers() {
     approve(EXAMPLE_JSON)
-        .printWith(new JsonStringPrettyPrinter())
+        .printWith(jsonStringPrettyPrinter())
         .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
         .scrubbedOf(uuids())
         .verify(inplace(SCRUBBED_JSON));

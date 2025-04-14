@@ -84,3 +84,29 @@ Now the approved file is much more readable.
 ----
 include::../../../test/java/examples/java/JsonJacksonDocTest-pretty_print_json-approved.json[]
 ----
+
+
+== Pretty Print JSON Strings
+
+Sometimes you might not need/want to parse a received JSON string into a `JsonNode` object.
+In this case, you can use the `JsonStringPrettyPrinter` to pretty print a JSON string directly.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/JsonJacksonDocTest.java[tag=pretty_print_json_string]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/JsonJacksonDocTest.kt[tag=pretty_print_json_string]
+----
+<1> applies the `JsonPrettyPrinter` to convert the `JsonNode` object to a string
+
+[source,json]
+.Approved file
+----
+include::../../../test/java/examples/java/JsonJacksonDocTest-pretty_print_json_string-approved.json[]
+----
+
+Note that the applied scrubbers also replaced the tag IDs.

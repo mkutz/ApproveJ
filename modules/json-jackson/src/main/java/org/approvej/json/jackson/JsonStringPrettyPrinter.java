@@ -20,17 +20,27 @@ public class JsonStringPrettyPrinter implements Printer<String> {
    *
    * @param objectMapper the {@link ObjectMapper} used to create the {@link ObjectReader} and {@link
    *     ObjectWriter}.
+   * @return a {@link JsonStringPrettyPrinter} using the given {@link ObjectMapper}
    * @see ObjectMapper#reader()
    * @see ObjectMapper#writerWithDefaultPrettyPrinter()
    */
-  public JsonStringPrettyPrinter(ObjectMapper objectMapper) {
-    this.objectReader = objectMapper.reader();
-    this.objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
+  public static JsonStringPrettyPrinter jsonStringPrettyPrinter(ObjectMapper objectMapper) {
+    return new JsonStringPrettyPrinter(
+        objectMapper.reader(), objectMapper.writerWithDefaultPrettyPrinter());
   }
 
-  /** Creates a {@link JsonStringPrettyPrinter} using the default {@link JsonMapper}. */
-  public JsonStringPrettyPrinter() {
-    this(JsonMapper.builder().build());
+  /**
+   * Creates a {@link JsonStringPrettyPrinter} using the default {@link JsonMapper}.
+   *
+   * @return a {@link JsonStringPrettyPrinter} using the default {@link JsonMapper}.
+   */
+  public static JsonStringPrettyPrinter jsonStringPrettyPrinter() {
+    return jsonStringPrettyPrinter(JsonMapper.builder().build());
+  }
+
+  private JsonStringPrettyPrinter(ObjectReader objectReader, ObjectWriter objectWriter) {
+    this.objectReader = objectReader;
+    this.objectWriter = objectWriter;
   }
 
   @Override

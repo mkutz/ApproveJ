@@ -5,12 +5,16 @@ import static examples.ExampleClass.Tag.NEWS;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.json.jackson.JsonPointerScrubber.jsonPointer;
 import static org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter;
+import static org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter;
+import static org.approvej.scrub.InstantScrubber.instants;
+import static org.approvej.scrub.UuidScrubber.uuids;
 import static org.approvej.verify.FileVerifier.file;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import examples.ExampleClass;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -51,5 +55,22 @@ class JsonJacksonDocTest {
         .printWith(jsonPrettyPrinter()) // <1>
         .verify(file("json"));
     // end::pretty_print_json[]
+  }
+
+  @Test
+  void pretty_print_json_string() {
+    // tag::pretty_print_json_string[]
+    String createdBlogPostJson =
+        exampleObject.createSomeTaggedBlogPost(
+            "Latest News",
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            List.of(NEWS, ENTERTAINMENT));
+
+    approve(createdBlogPostJson)
+        .scrubbedOf(uuids())
+        .scrubbedOf(instants(DateTimeFormatter.ISO_INSTANT))
+        .printWith(jsonStringPrettyPrinter()) // <1>
+        .verify(file("json"));
+    // end::pretty_print_json_string[]
   }
 }
