@@ -29,3 +29,47 @@ testImplementation("org.approvej:core:{revnumber}")
   <scope>test</scope>
 </dependency>
 ----
+
+
+=== Bill of Materials (BOM)
+
+If you want to use more than one module in the same project, you can use ApproveJ's bill of materials (BOM) and omit the explicit version for the other modules.
+
+.Gradle
+[source,groovy,subs=attributes+,role="primary"]
+----
+implementation platform('org.approvej:bom:{revnumber}')
+implementation 'org.approvej:json-jackson'
+----
+.Gradle.kts
+[source,kotlin,subs=attributes+,role="secondary"]
+----
+implementation(platform("org.approvej:bom:{revnumber}"))
+implementation("org.approvej:json-jackson")
+----
+.Maven
+[source,xml,subs=attributes+,role="secondary"]
+----
+<project>
+  <!--…-->
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.approvej</groupId>
+        <artifactId>bom</artifactId>
+        <version>{revnumber}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <!-- … -->
+  <dependencies>
+    <dependency>
+      <groupId>org.approvej</groupId>
+      <artifactId>json-jackson</artifactId>
+    </dependency>
+  </dependencies>
+  <!-- … -->
+</project>
+----
