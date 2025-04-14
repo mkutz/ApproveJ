@@ -1,5 +1,6 @@
 package org.approvej.json.jackson;
 
+import static org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -12,7 +13,7 @@ class JsonPrettyPrinterTest {
   @Test
   void apply() {
     var jsonMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
-    var jsonPrettyPrinter = new JsonPrettyPrinter<>(jsonMapper);
+    var jsonPrettyPrinter = jsonPrettyPrinter(jsonMapper);
 
     assertThat(jsonPrettyPrinter.apply(new Person("Micha", LocalDate.of(1982, 2, 19))))
         .isEqualTo(

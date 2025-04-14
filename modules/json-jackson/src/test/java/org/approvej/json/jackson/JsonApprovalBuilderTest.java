@@ -2,6 +2,7 @@ package org.approvej.json.jackson;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.approvej.ApprovalBuilder.approve;
+import static org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter;
 import static org.approvej.scrub.RelativeDateScrubber.relativeDates;
 import static org.approvej.scrub.UuidScrubber.uuids;
 import static org.approvej.verify.FileVerifier.file;
@@ -40,7 +41,7 @@ class JsonApprovalBuilderTest {
   @Test
   void verify_list() {
     approve(List.of("a", "b", "c"))
-        .printWith(new JsonPrettyPrinter<>())
+        .printWith(jsonPrettyPrinter())
         .verify(inplace("[ \"a\", \"b\", \"c\" ]"));
   }
 

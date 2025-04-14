@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.approvej.print.Printer;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A {@link Printer} that uses {@link ObjectWriter#writeValueAsString(Object)} to print a value as
@@ -12,6 +13,7 @@ import org.approvej.print.Printer;
  *
  * @param <T> the type of value to print
  */
+@NullMarked
 public class JsonPrettyPrinter<T> implements Printer<T> {
 
   private final ObjectWriter objectWriter;
@@ -20,28 +22,38 @@ public class JsonPrettyPrinter<T> implements Printer<T> {
    * Creates a {@link JsonPrettyPrinter} using the given {@link ObjectWriter}.
    *
    * @param objectWriter the {@link ObjectWriter} that will be used for printing
+   * @param <T> the type of value to print
+   * @return a new {@link JsonPrettyPrinter} instance
    */
-  public JsonPrettyPrinter(ObjectWriter objectWriter) {
-    this.objectWriter = objectWriter;
+  public static <T> JsonPrettyPrinter<T> jsonPrettyPrinter(ObjectWriter objectWriter) {
+    return new JsonPrettyPrinter<>(objectWriter);
   }
 
   /**
    * Creates a {@link JsonPrettyPrinter} using the given {@link ObjectMapper}.
    *
    * @param objectMapper the {@link ObjectMapper} used to create the {@link ObjectWriter}
+   * @param <T> the type of value to print
+   * @return a new {@link JsonPrettyPrinter} instance
    * @see ObjectMapper#writerWithDefaultPrettyPrinter()
    */
-  public JsonPrettyPrinter(ObjectMapper objectMapper) {
-    this(objectMapper.writerWithDefaultPrettyPrinter());
+  public static <T> JsonPrettyPrinter<T> jsonPrettyPrinter(ObjectMapper objectMapper) {
+    return new JsonPrettyPrinter<>(objectMapper.writerWithDefaultPrettyPrinter());
   }
 
   /**
    * Creates a {@link JsonPrettyPrinter} using the default {@link JsonMapper}.
    *
+   * @return a new {@link JsonPrettyPrinter} instance
+   * @param <T> the type of value to print
    * @see JsonMapper.Builder#build()
    */
-  public JsonPrettyPrinter() {
-    this(JsonMapper.builder().build().writerWithDefaultPrettyPrinter());
+  public static <T> JsonPrettyPrinter<T> jsonPrettyPrinter() {
+    return new JsonPrettyPrinter<>(JsonMapper.builder().build().writerWithDefaultPrettyPrinter());
+  }
+
+  private JsonPrettyPrinter(ObjectWriter objectWriter) {
+    this.objectWriter = objectWriter;
   }
 
   @Override

@@ -6,8 +6,10 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.approvej.print.Printer;
+import org.jspecify.annotations.NullMarked;
 
 /** A {@link Printer} for JSON strings that should be pretty-printed. */
+@NullMarked
 public class JsonStringPrettyPrinter implements Printer<String> {
 
   private final ObjectReader objectReader;

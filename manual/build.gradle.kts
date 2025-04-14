@@ -20,9 +20,10 @@ testing {
   suites {
     val test by
       getting(JvmTestSuite::class) {
-        useJUnitJupiter("5.10.0")
+        useJUnitJupiter()
         dependencies {
           implementation(project(":modules:core"))
+          implementation(project(":modules:json-jackson"))
 
           implementation(platform(libs.junitBom))
           implementation(libs.junitJupiterApi)

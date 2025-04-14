@@ -1,5 +1,8 @@
 package org.approvej.scrub;
 
+import static org.approvej.scrub.Replacements.numbered;
+import static org.approvej.scrub.Replacements.string;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -14,16 +17,8 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class RegexScrubber implements Scrubber<String> {
 
-  /**
-   * Replaces each match with "[scrubbed #]" where '#' is the number of the distinct found string.
-   *
-   * <p>E.g. <code>Hello World!</code> with a pattern of <code>[aeiou]</code> will result in <code>
-   * "H[scrubbed 1]ll[scrubbed 2] W[scrubbed 2]rld!"</code>
-   */
-  public static final Function<Integer, String> NUMBERED_REPLACEMENT = "[scrubbed %d]"::formatted;
-
   private final Pattern pattern;
-  private final Function<Integer, String> replacement;
+  private final Function<Integer, Object> replacement;
 
   /**
    * Creates a {@link RegexScrubberBuilder} with the given pattern.
@@ -54,7 +49,7 @@ public class RegexScrubber implements Scrubber<String> {
    *     string
    * @see Pattern#compile(String)
    */
-  protected RegexScrubber(Pattern pattern, Function<Integer, String> replacement) {
+  protected RegexScrubber(Pattern pattern, Function<Integer, Object> replacement) {
     this.pattern = pattern;
     this.replacement = replacement;
   }
@@ -67,7 +62,7 @@ public class RegexScrubber implements Scrubber<String> {
         result -> {
           String group = result.group();
           findings.putIfAbsent(group, findings.size() + 1);
-          return replacement.apply(findings.get(group));
+          return replacement.apply(findings.get(group)).toString();
         };
     return matcher.replaceAll(replacer);
   }
@@ -89,7 +84,7 @@ public class RegexScrubber implements Scrubber<String> {
      * @return a {@link RegexScrubber} to replace any match of the {@link #pattern} with the result
      *     of the given replacement {@link Function}.
      */
-    public RegexScrubber with(Function<Integer, String> replacement) {
+    public RegexScrubber with(Function<Integer, Object> replacement) {
       return new RegexScrubber(pattern, replacement);
     }
 
@@ -102,17 +97,17 @@ public class RegexScrubber implements Scrubber<String> {
      *     given staticReplacement.
      */
     public RegexScrubber with(String staticReplacement) {
-      return new RegexScrubber(pattern, number -> staticReplacement);
+      return new RegexScrubber(pattern, string(staticReplacement));
     }
 
     /**
      * Creates a new {@link Scrubber} to replace strings matching the {@link #pattern} with a
      * numbered replacement.
      *
-     * @return a new {@link RegexScrubber} using the {@link #NUMBERED_REPLACEMENT}.
+     * @return a new {@link RegexScrubber} using the {@link Replacements#numbered()}.
      */
     public RegexScrubber withNumberedReplacement() {
-      return new RegexScrubber(pattern, NUMBERED_REPLACEMENT);
+      return new RegexScrubber(pattern, numbered());
     }
   }
 }
