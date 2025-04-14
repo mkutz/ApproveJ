@@ -13,3 +13,4 @@ Michael Kutz <mail@michael-kutz.de>
 include::chapters/00-introduction.adoc[leveloffset=1]
 include::chapters/01-getting-started.adoc[leveloffset=1]
 include::chapters/02-basics.adoc[leveloffset=1]
+include::chapters/03-json-jackson.adoc[leveloffset=1]
