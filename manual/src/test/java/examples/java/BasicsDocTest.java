@@ -116,9 +116,7 @@ class BasicsDocTest {
     // tag::verify_file_directory_next_to_test_as[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
-    approve(person)
-        .printWith(personYamlPrinter()) // <1>
-        .verify(inFile(directoryNextToTestAs("yaml"))); // <2>
+    approve(person).printWith(personYamlPrinter()).verify(inFile(directoryNextToTestAs("yaml")));
     // end::verify_file_directory_next_to_test_as[]
   }
 
@@ -127,8 +125,7 @@ class BasicsDocTest {
     // tag::verify_inplace[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
-    approve(person) // <1>
-        .verify(inplace("Person[name=John Doe, birthDate=1990-01-01]")); // <2>
+    approve(person).verify(inplace("Person[name=John Doe, birthDate=1990-01-01]"));
     // end::verify_inplace[]
   }
 

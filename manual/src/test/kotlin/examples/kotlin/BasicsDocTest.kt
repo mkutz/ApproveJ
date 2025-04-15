@@ -115,8 +115,8 @@ class BasicsDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printWith(personYamlPrinter()) // <1>
-      .verify(inFile(directoryNextToTestAs("yaml"))) // <2>
+      .printWith(personYamlPrinter())
+      .verify(inFile(directoryNextToTestAs("yaml")))
     // end::verify_file_directory_next_to_test_as[]
   }
 

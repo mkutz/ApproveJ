@@ -49,8 +49,8 @@ public class ExampleClass {
     public BlogPost(String title, String content) {
       this.title = title;
       this.content = content;
-      this.id = UUID.randomUUID();
-      this.published = LocalDateTime.now();
+      this.id = UUID.randomUUID(); // <1>
+      this.published = LocalDateTime.now(); // <2>
     }
 
     public String title() {
