@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [[ -z "$1" ]]; then
+  echo "Version input is required."
+  exit 1
+fi
+
+VERSION="$1"
+
+rm -rf pages/$VERSION
+mkdir -p pages/$VERSION
+./gradlew asciidoc -Pversion=$VERSION
+mv manual/build/docs/asciidoc/* pages/
+
+rm -rf pages/javadoc
+mkdir pages/javadoc
+./gradlew javadoc -Pversion=$VERSION
+mv modules/core/build/docs/javadoc pages/javadoc/core
+mv modules/json-jackson/build/docs/javadoc pages/javadoc/json-jackson

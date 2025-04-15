@@ -45,17 +45,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Update AsciiDoc
-        run: |
-          ./gradlew asciidoc -Pversion=${{ github.event.inputs.version }}
-          mv manual/build/docs/asciidoc/* pages/
-
-      - name: Update JavaDoc
-        run: |
-          ./gradlew javadoc -Pversion=${{ github.event.inputs.version }}
-          rm -rf pages/javadoc
-          mkdir pages/javadoc
-          mv modules/core/build/docs/javadoc pages/javadoc/core
-          mv modules/json-jackson/build/docs/javadoc pages/javadoc/json-jackson
+        run: ./update-pages "${{ github.event.inputs.version }}"
 
       - uses: actions/configure-pages@v5
 
