@@ -7,8 +7,8 @@ import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.json.jackson.JsonPointerScrubber.jsonPointer;
 import static org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter;
 import static org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter;
-import static org.approvej.scrub.InstantScrubber.instants;
-import static org.approvej.scrub.UuidScrubber.uuids;
+import static org.approvej.scrub.Scrubbers.instants;
+import static org.approvej.scrub.Scrubbers.uuids;
 import static org.approvej.verify.FileVerifier.inFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;

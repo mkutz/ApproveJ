@@ -8,19 +8,17 @@ import java.util.function.Function;
  */
 public class Replacements {
 
-  private Replacements() {
-    // Utility class
-  }
+  private Replacements() {}
 
   /**
-   * Replaces with "<code>[name #]</code>" where <code>name</code> is the given name and '#' is the
-   * number of the distinct replacement.
+   * Replaces with "<code>[label #]</code>" where <code>label</code> is the given label and '#' is
+   * the number of the distinct replacement.
    *
-   * @param name a String used to identify the replacement
-   * @return a replacement function that replaces with "[name #]"
+   * @param label a String used to identify the replacement
+   * @return a replacement function that replaces with "[label #]"
    */
-  public static Function<Integer, Object> numbered(String name) {
-    return number -> String.format("[%s %d]", name, number);
+  public static Function<Integer, Object> numbered(String label) {
+    return number -> String.format("[%s %d]", label, number);
   }
 
   /**
@@ -29,7 +27,7 @@ public class Replacements {
    * @return a replacement function that replaces with "[scrubbed #]"
    */
   public static Function<Integer, Object> numbered() {
-    return number -> String.format("[scrubbed %d]", number);
+    return numbered("scrubbed");
   }
 
   /**

@@ -9,8 +9,8 @@ import org.approvej.ApprovalBuilder.approve
 import org.approvej.json.jackson.JsonPointerScrubber.jsonPointer
 import org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter
 import org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter
-import org.approvej.scrub.InstantScrubber.instants
-import org.approvej.scrub.UuidScrubber.uuids
+import org.approvej.scrub.Scrubbers.instants
+import org.approvej.scrub.Scrubbers.uuids
 import org.approvej.verify.FileVerifier.inFile
 import org.junit.jupiter.api.Test
 import java.time.format.DateTimeFormatter

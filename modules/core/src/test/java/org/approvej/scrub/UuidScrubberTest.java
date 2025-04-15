@@ -1,6 +1,6 @@
 package org.approvej.scrub;
 
-import static org.approvej.scrub.UuidScrubber.uuids;
+import static org.approvej.scrub.Scrubbers.uuids;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ class UuidScrubberTest {
 
   @Test
   void apply_custom_replacement() {
-    assertThat(uuids("<id%d>"::formatted).apply(EXAMPLE))
+    assertThat(uuids().replacement("<id%d>"::formatted).apply(EXAMPLE))
         .isEqualTo(
             """
             {

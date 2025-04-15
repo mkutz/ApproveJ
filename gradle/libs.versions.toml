@@ -13,6 +13,8 @@ junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher",
 assertjCore = { module = "org.assertj:assertj-core", version.ref = "assertjVersion" }
 jacksonDatabind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jacksonVersion" }
 jacksonJsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jacksonVersion" }
+javaDiffUtils = { module = "io.github.java-diff-utils:java-diff-utils", version = "4.9" }
+
 jsonpath = { module = "com.jayway.jsonpath:json-path" , version = "2.9.0" }
 jspecify = { module = "org.jspecify:jspecify", version = "1.0.0" }
 

@@ -1,7 +1,7 @@
 package org.approvej.scrub;
 
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
-import static org.approvej.scrub.InstantScrubber.instants;
+import static org.approvej.scrub.Scrubbers.instants;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;

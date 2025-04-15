@@ -1,6 +1,6 @@
 package org.approvej.scrub;
 
-import static org.approvej.scrub.RegexScrubber.stringsMatching;
+import static org.approvej.scrub.Scrubbers.stringsMatching;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.regex.Pattern;
@@ -18,7 +18,7 @@ class RegexScrubberTest {
   })
   void apply_static_replacement(
       String unscrubbedValue, Pattern regex, String replacement, String expected) {
-    var scrubbedValue = stringsMatching(regex).with(replacement).apply(unscrubbedValue);
+    var scrubbedValue = stringsMatching(regex).replacement(replacement).apply(unscrubbedValue);
 
     assertThat(scrubbedValue).isEqualTo(expected);
   }
@@ -34,7 +34,7 @@ class RegexScrubberTest {
 
   @Test
   void apply_custom_replacement() {
-    var scrubber = stringsMatching("[aeiou]").with("<vowel%d>"::formatted);
+    var scrubber = stringsMatching("[aeiou]").replacement("<vowel%d>"::formatted);
 
     assertThat(scrubber.apply("Hello World!")).isEqualTo("H<vowel1>ll<vowel2> W<vowel2>rld!");
   }

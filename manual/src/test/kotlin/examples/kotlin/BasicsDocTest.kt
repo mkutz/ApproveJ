@@ -8,8 +8,8 @@ import examples.ExampleClass.hello
 import examples.ExampleClass.personYamlPrinter
 import org.approvej.ApprovalBuilder.approve
 import org.approvej.print.ObjectPrinter.objectPrinter
-import org.approvej.scrub.InstantScrubber.instants
-import org.approvej.scrub.UuidScrubber.uuids
+import org.approvej.scrub.Scrubbers.instants
+import org.approvej.scrub.Scrubbers.uuids
 import org.approvej.verify.BasePathProvider.approvedPath
 import org.approvej.verify.DirectoryNextToTestPathProvider.directoryNextToTestAs
 import org.approvej.verify.FileVerifier.inFile

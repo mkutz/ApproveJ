@@ -3,12 +3,11 @@ package org.approvej.scrub;
 import static java.time.format.DateTimeFormatter.BASIC_ISO_DATE;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.time.format.DateTimeFormatter.ISO_ORDINAL_DATE;
-import static org.approvej.scrub.RelativeDateScrubber.relativeDates;
+import static org.approvej.scrub.Scrubbers.relativeDates;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -21,8 +20,7 @@ class RelativeDateScrubberTest {
   void apply_today() {
     var format = ISO_LOCAL_DATE;
     var unscrubbedValue = "It happens on %s at noon".formatted(TODAY.format(format));
-    Assertions.assertEquals(
-        "It happens on [today] at noon", relativeDates(format).apply(unscrubbedValue));
+    assertEquals("It happens on [today] at noon", relativeDates(format).apply(unscrubbedValue));
   }
 
   @Test

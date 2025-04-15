@@ -1,7 +1,7 @@
 package org.approvej.scrub;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
-import static org.approvej.scrub.DateScrubber.dates;
+import static org.approvej.scrub.Scrubbers.dates;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;

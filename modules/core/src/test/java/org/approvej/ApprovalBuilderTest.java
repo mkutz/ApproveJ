@@ -2,9 +2,9 @@ package org.approvej;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.approvej.ApprovalBuilder.approve;
-import static org.approvej.scrub.DateScrubber.dates;
-import static org.approvej.scrub.RelativeDateScrubber.relativeDates;
-import static org.approvej.scrub.UuidScrubber.uuids;
+import static org.approvej.scrub.Scrubbers.dates;
+import static org.approvej.scrub.Scrubbers.relativeDates;
+import static org.approvej.scrub.Scrubbers.uuids;
 import static org.approvej.verify.FileVerifier.inFile;
 import static org.approvej.verify.InplaceVerifier.inplace;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
