@@ -5,12 +5,12 @@ import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.scrub.DateScrubber.dates;
 import static org.approvej.scrub.RelativeDateScrubber.relativeDates;
 import static org.approvej.scrub.UuidScrubber.uuids;
+import static org.approvej.verify.FileVerifier.inFile;
 import static org.approvej.verify.InplaceVerifier.inplace;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 import java.time.LocalDate;
 import java.util.UUID;
-import org.approvej.verify.FileVerifier;
 import org.junit.jupiter.api.Test;
 
 class ApprovalBuilderTest {
@@ -31,16 +31,16 @@ class ApprovalBuilderTest {
       """;
 
   @Test
-  void verify() {
+  void verify_string_inplace() {
     approve(EXAMPLE_TEXT).verify(inplace(EXAMPLE_TEXT));
   }
 
   @Test
-  void verify_file() {
+  void verify_string_in_file() {
     approve(EXAMPLE_TEXT)
         .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
         .scrubbedOf(uuids())
-        .verify(FileVerifier.inFile());
+        .verify(inFile());
   }
 
   @Test
@@ -66,7 +66,13 @@ class ApprovalBuilderTest {
         .scrubbedOf(person -> new Person("[scrubbed id]", person.name, person.birthday))
         .printWith(Object::toString)
         .scrubbedOf(dates(ofPattern("yyyy-MM-dd")))
-        .verify(inplace("Person[id=[scrubbed id], name=Micha, birthday=[date 1]]"));
+        .verify();
+  }
+
+  @Test
+  void verify_default_printer() {
+    approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
+        .verify(inplace("Person[id=000000-0000-0000-00000001, name=Micha, birthday=1982-02-19]"));
   }
 
   record Person(String id, String name, LocalDate birthday) {
