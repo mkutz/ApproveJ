@@ -5,7 +5,7 @@ stagedFiles=$(git diff --staged --name-only)
 echo "🧹 Formatting code running spotlessApply…"
 ./gradlew spotlessApply
 if [ $? -ne 0 ]; then
-  echo '… ✗ formatting failed'
+  echo '✗ formatting failed'
   exit 1
 fi
 
