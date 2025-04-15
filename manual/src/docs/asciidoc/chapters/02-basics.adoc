@@ -152,7 +152,7 @@ include::../../../testFixtures/java/examples/ExampleClass.java[tag=blog_post_poj
 <1> the `id` is a UUID that's being generated randomly, and
 <2> the `published` is a `LocalDateTime` set to now.
 
-In the flowing example, the two dynamic properties are scrubbed with the built-in link:{javadoc-url}/core/org/approvej/scrub/UuidScrubber.html[`UuidScrubber`] and link:{javadoc-url}/core/org/approvej/scrub/InstantScrubber.html[`InstantScrubber`].
+In the flowing example, the two dynamic properties are scrubbed with the built-in Scrubbers for link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html#uuids()[`uuids`] and link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html#instants(java.time.format.DateTimeFormatter)[`instants`].
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -174,7 +174,7 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=scrubbing]
 include::../../../test/java/examples/java/BasicsDocTest-scrubbing-approved.txt[]
 ----
 
-Generally a built-in `Scrubber` uses a replacement function that replaces all matches with a numbered placeholder in the form of `[<what-has-been-replaced> <counter>]` (e.g. `[uuid 1]`, `[uuid 2]`, …).
+Generally a built-in `Scrubber` uses a replacement function that replaces all matches with a numbered placeholder in the form of `[<label> <counter>]` (e.g. `[uuid 1]`, `[date 2]`, …).
 Note that two matches of the same (e.g. the same UUID in two places) will be replaced with the same placeholder, so you can still see that two scrubbed values were equal.
 
 
@@ -210,21 +210,7 @@ Of course the `Scrubber` can also be defined in a separate class, instead of a l
 
 === Built-In Scrubbers
 
-==== Scrub IDs
-
-* link:{javadoc-url}/core/org/approvej/scrub/UuidScrubber.html[`UuidScrubber`]
-
-
-==== Scrub Date/Time
-
-* link:{javadoc-url}/core/org/approvej/scrub/DateScrubber.html[`DateScrubber`]
-* link:{javadoc-url}/core/org/approvej/scrub/InstantScrubber.html[`InstantScrubber`]
-* link:{javadoc-url}/core/org/approvej/scrub/RelativeDateScrubber.html[`RelativeDateScrubber`]
-
-
-==== Scrub Regular Expression Matches
-
-* link:{javadoc-url}/core/org/approvej/scrub/RegexScrubber.html[`RegexScrubber`]
+All built-in `Scrubber` implementations are available via the  link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html[Scrubbers] utility class.
 
 
 [id=verifying]

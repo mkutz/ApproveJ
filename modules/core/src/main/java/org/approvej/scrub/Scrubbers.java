@@ -36,10 +36,11 @@ public class Scrubbers {
   }
 
   /**
-   * Creates {@link RegexScrubber} to replace date strings of the given pattern.
+   * Creates {@link RegexScrubberBuilder} to replace date strings of the given pattern.
    *
    * @param dateFormatPattern a {@link DateTimeFormatter} to parse the dates
-   * @return a new {@link DateScrubber} with the given {@link DateTimeFormatter}.
+   * @return a new {@link RegexScrubberBuilder} with the given {@link DateTimeFormatter} turned into
+   *     a {@link Pattern}
    */
   public static RegexScrubberBuilder dates(DateTimeFormatter dateFormatPattern) {
     return stringsMatching(
@@ -57,7 +58,8 @@ public class Scrubbers {
    * {@link RegexScrubberBuilder} that replaces instant strings of the given pattern.
    *
    * @param dateFormatPattern a {@link DateTimeFormatter} to parse the dates
-   * @return a new {@link InstantScrubber} with the given {@link DateTimeFormatter}.
+   * @return a new {@link RegexScrubberBuilder} with the given {@link DateTimeFormatter} turned into
+   *     a {@link Pattern}
    */
   public static RegexScrubberBuilder instants(DateTimeFormatter dateFormatPattern) {
     return stringsMatching(
