@@ -1,12 +1,11 @@
 package org.approvej;
 
-import static org.approvej.verify.FileVerifier.file;
-
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import org.approvej.print.Printer;
 import org.approvej.scrub.Scrubber;
+import org.approvej.verify.FileVerifier;
 import org.approvej.verify.Verifier;
 import org.jspecify.annotations.NullMarked;
 
@@ -85,6 +84,6 @@ public class ApprovalBuilder<T> {
    * @throws ApprovalError if the verification fails
    */
   public void verify() {
-    verify(file());
+    verify(FileVerifier.inFile());
   }
 }

@@ -5,12 +5,12 @@ import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.scrub.DateScrubber.dates;
 import static org.approvej.scrub.RelativeDateScrubber.relativeDates;
 import static org.approvej.scrub.UuidScrubber.uuids;
-import static org.approvej.verify.FileVerifier.file;
 import static org.approvej.verify.InplaceVerifier.inplace;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 import java.time.LocalDate;
 import java.util.UUID;
+import org.approvej.verify.FileVerifier;
 import org.junit.jupiter.api.Test;
 
 class ApprovalBuilderTest {
@@ -40,7 +40,7 @@ class ApprovalBuilderTest {
     approve(EXAMPLE_TEXT)
         .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
         .scrubbedOf(uuids())
-        .verify(file());
+        .verify(FileVerifier.inFile());
   }
 
   @Test

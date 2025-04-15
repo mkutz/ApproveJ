@@ -1,8 +1,7 @@
 package org.approvej.verify;
 
 import static java.nio.file.Files.writeString;
-import static org.approvej.verify.FileVerifier.BasePathProvider.approvedPath;
-import static org.approvej.verify.FileVerifier.file;
+import static org.approvej.verify.BasePathProvider.approvedPath;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -20,7 +19,7 @@ class FileVerifierTest {
   @Test
   void accept() throws IOException {
     var pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
-    var fileVerifier = file(pathProvider);
+    var fileVerifier = FileVerifier.inFile(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
 
     fileVerifier.accept("Some approved text");
@@ -32,7 +31,7 @@ class FileVerifierTest {
   @Test
   void accept_previously_accepted_differs() throws IOException {
     var pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
-    var fileVerifier = file(pathProvider);
+    var fileVerifier = FileVerifier.inFile(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
 
     assertThatExceptionOfType(ApprovalError.class)
@@ -47,7 +46,7 @@ class FileVerifierTest {
   @Test
   void accept_previously_received() throws IOException {
     var pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
-    var fileVerifier = file(pathProvider);
+    var fileVerifier = FileVerifier.inFile(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
     writeString(pathProvider.receivedPath(), "Some received text", StandardOpenOption.CREATE);
 
@@ -67,7 +66,7 @@ class FileVerifierTest {
   @Test
   void accept_no_previously_accepted() {
     var pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
-    var fileVerifier = file(pathProvider);
+    var fileVerifier = FileVerifier.inFile(pathProvider);
 
     assertThatExceptionOfType(ApprovalError.class)
         .isThrownBy(() -> fileVerifier.accept("Some text"))

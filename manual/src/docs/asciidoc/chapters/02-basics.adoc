@@ -269,10 +269,63 @@ Any existing received value will be overwritten by this.
 You can use a diff tool of your choice to compare the two files and merge values that you want to approve.
 
 
+==== `NextToTestPathProvider`
+
+By default, the `FileVerifier` will use a link:{javadoc-url}/core/org/approvej/verify/NextToTestPathProvider.html[`NextToTestPathProvider`], which will put the received and approved files next to the test class and name them like the test case method.
+
+You can make this explicit by using the `inFile` method.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=verify_file_next_to_test]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_next_to_test]
+----
+<1> defines the `NextToTestPathProvider` explicitly, same as just calling `verify()`
+
+The `nextToTestAs` method gives you the opportunity to use a different file extension for the approved and received files.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=verify_file_next_to_test_as]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_next_to_test_as]
+----
+<1> this printer will create a YAML version of the object
+<2> so it makes sense to change the filename extension, so your IDE will apply appropriate syntax highlighting
+
+
+==== `DirectoryNextToTestPathProvider`
+
+If you have test classes with a lot of approval tests, there a quite a lot of files created next to the test class.
+In that case, you might want to use a link:{javadoc-url}/core/org/approvej/verify/DirectoryNextToTestPathProvider.html[`DirectoryNextToTestPathProvider`], which will create a directory next to the test class and put the approved and received files in there.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=verify_file_directory_next_to_test_as]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_directory_next_to_test_as]
+----
+<1> so it makes sense to change the filename extension, so your IDE will apply appropriate syntax highlighting
+
+
+
 ==== `BasePathProvider`
 
-It is possible to use a link:{javadoc-url}/core/org/approvej/verify/FileVerifier.PathProvider.html[`PathProvider`] to configure where the files are stored.
-The default `StackTracePathProvider` will analyze the stack trace of the test method and create a path based on the class name and method of the executed test.
+It is possible to use a link:{javadoc-url}/core/org/approvej/verify/PathProvider.html[`PathProvider`] to configure where the files are stored.
+The default `NextToTestPathProvider` will analyze the stack trace of the test method and create a path based on the class name and method of the executed test.
 
 Alternatively, you can use a `BasePathProvider` to specify the path of the approved file.
 The received file will be put next to the approved file and the filename will contain the word `received`.

@@ -10,9 +10,11 @@ import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.print.ObjectPrinter.objectPrinter;
 import static org.approvej.scrub.InstantScrubber.instants;
 import static org.approvej.scrub.UuidScrubber.uuids;
-import static org.approvej.verify.FileVerifier.BasePathProvider.approvedPath;
-import static org.approvej.verify.FileVerifier.file;
+import static org.approvej.verify.BasePathProvider.approvedPath;
+import static org.approvej.verify.DirectoryNextToTestPathProvider.directoryNextToTestAs;
+import static org.approvej.verify.FileVerifier.inFile;
 import static org.approvej.verify.InplaceVerifier.inplace;
+import static org.approvej.verify.NextToTestPathProvider.nextToTestAs;
 
 import examples.ExampleClass.BlogPost;
 import examples.ExampleClass.Contact;
@@ -90,6 +92,37 @@ class BasicsDocTest {
   }
 
   @Test
+  void verify_file_next_to_test() {
+    // tag::verify_file_next_to_test[]
+    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+
+    approve(person).verify(inFile()); // <1>
+    // end::verify_file_next_to_test[]
+  }
+
+  @Test
+  void verify_file_next_to_test_as() {
+    // tag::verify_file_next_to_test_as[]
+    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+
+    approve(person)
+        .printWith(personYamlPrinter()) // <1>
+        .verify(inFile(nextToTestAs("yaml"))); // <2>
+    // end::verify_file_next_to_test_as[]
+  }
+
+  @Test
+  void verify_file_directory_next_to_test_as() {
+    // tag::verify_file_directory_next_to_test_as[]
+    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+
+    approve(person)
+        .printWith(personYamlPrinter()) // <1>
+        .verify(inFile(directoryNextToTestAs("yaml"))); // <2>
+    // end::verify_file_directory_next_to_test_as[]
+  }
+
+  @Test
   void verify_inplace() {
     // tag::verify_inplace[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
@@ -107,7 +140,7 @@ class BasicsDocTest {
     approve(person)
         .printWith(personYamlPrinter())
         .verify(
-            file(
+            inFile(
                 approvedPath(
                     "src/test/resources/BasicExamples-verify_file_base_path.yaml"))); // <1>
     // end::verify_file_base_path[]

@@ -6,7 +6,7 @@ import static org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter;
 import static org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter;
 import static org.approvej.scrub.RelativeDateScrubber.relativeDates;
 import static org.approvej.scrub.UuidScrubber.uuids;
-import static org.approvej.verify.FileVerifier.file;
+import static org.approvej.verify.FileVerifier.inFile;
 import static org.approvej.verify.InplaceVerifier.inplace;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
@@ -52,7 +52,7 @@ class JsonApprovalBuilderTest {
         .printWith(jsonStringPrettyPrinter())
         .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
         .scrubbedOf(uuids())
-        .verify(file("json"));
+        .verify(inFile("json"));
   }
 
   @Test

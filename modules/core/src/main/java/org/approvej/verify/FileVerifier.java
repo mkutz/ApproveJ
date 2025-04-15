@@ -7,17 +7,11 @@ import static java.nio.file.Files.readString;
 import static java.nio.file.Files.writeString;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
-import static java.util.Arrays.stream;
+import static org.approvej.verify.NextToTestPathProvider.nextToTest;
+import static org.approvej.verify.NextToTestPathProvider.nextToTestAs;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.nio.file.Path;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
 import org.approvej.ApprovalError;
-import org.junit.jupiter.api.Test;
 
 /**
  * {@link Verifier} that compares the received value with the approved value stored in a file. If
@@ -35,7 +29,7 @@ public class FileVerifier implements Verifier {
    * @param pathProvider the provider for the paths of the approved and received files
    * @return a new {@link FileVerifier} that uses the given {@link PathProvider}
    */
-  public static FileVerifier file(PathProvider pathProvider) {
+  public static FileVerifier inFile(PathProvider pathProvider) {
     return new FileVerifier(pathProvider);
   }
 
@@ -43,11 +37,11 @@ public class FileVerifier implements Verifier {
    * Creates a new {@link Verifier} that uses the stack trace to determine the paths of approved and
    * received files.
    *
-   * @return a new {@link FileVerifier} that uses a {@link StackTracePathProvider} to determine the
+   * @return a new {@link FileVerifier} that uses a {@link NextToTestPathProvider} to determine the
    *     paths
    */
-  public static FileVerifier file() {
-    return new FileVerifier(new StackTracePathProvider());
+  public static FileVerifier inFile() {
+    return new FileVerifier(nextToTest());
   }
 
   /**
@@ -55,12 +49,12 @@ public class FileVerifier implements Verifier {
    * received files.
    *
    * @param filenameExtension the file extension to use for the approved and received files
-   * @return a new {@link FileVerifier} that uses a {@link StackTracePathProvider} to determine the
+   * @return a new {@link FileVerifier} that uses a {@link NextToTestPathProvider} to determine the
    *     paths
-   * @see StackTracePathProvider
+   * @see NextToTestPathProvider
    */
-  public static FileVerifier file(String filenameExtension) {
-    return new FileVerifier(new StackTracePathProvider(filenameExtension));
+  public static FileVerifier inFile(String filenameExtension) {
+    return new FileVerifier(nextToTestAs(filenameExtension));
   }
 
   private FileVerifier(PathProvider pathProvider) {
@@ -82,184 +76,6 @@ public class FileVerifier implements Verifier {
       deleteIfExists(pathProvider.receivedPath());
     } catch (IOException e) {
       throw new FileVerifierError(e);
-    }
-  }
-
-  /** A provider for the paths of the approved and received files. */
-  public interface PathProvider {
-
-    /**
-     * The infix of the file containing the latest received value that didn't match the previously
-     * approved.
-     */
-    String RECEIVED = "received";
-
-    /** The infix of the file containing a previously approved value. */
-    String APPROVED = "approved";
-
-    /**
-     * The path of the file containing the latest received value that didn't match the previously
-     * approved.
-     *
-     * @return the {@link Path} to the received file
-     */
-    Path receivedPath();
-
-    /**
-     * The path of the file containing a previously approved value.
-     *
-     * @return the {@link Path} to the approved file
-     */
-    Path approvedPath();
-  }
-
-  /**
-   * A {@link PathProvider} that uses the path of a previously approved file to determine the path
-   * the received file and the filename extension.
-   *
-   * <p>For example,
-   *
-   * <ol>
-   *   <li>if the given approved path is {@code /path/to/file-approved.json}, the {@link
-   *       #receivedPath} will be {@code /path/to/file-received.json}
-   *   <li>if the given approved path is {@code /path/to/file.txt}, the {@link #receivedPath} will
-   *       be {@code /path/to/file-received.txt}
-   * </ol>
-   *
-   * <p>Note that the {@code approved} infix is not enforced on the given approved file path. It is
-   * also not necessary for the approved file to exist.
-   */
-  public static final class BasePathProvider implements PathProvider {
-
-    private static final Pattern FILE_NAME_PATTERN =
-        Pattern.compile(
-            "(?<baseName>.+?)(?<approved>-" + APPROVED + ")?(?:\\.(?<extension>[^.]*))?$");
-    private final Path receivedPath;
-    private final Path approvedPath;
-
-    /**
-     * Creates a new {@link BasePathProvider} that uses the given approved path.
-     *
-     * @param approvedPath the {@link Path} to the approved file
-     * @return a new {@link BasePathProvider}
-     */
-    public static BasePathProvider approvedPath(Path approvedPath) {
-      return new BasePathProvider(approvedPath);
-    }
-
-    /**
-     * Creates a new {@link BasePathProvider} that uses the given approved path.
-     *
-     * @param approvedPath the path to the approved file
-     * @return a new {@link BasePathProvider}
-     */
-    public static BasePathProvider approvedPath(String approvedPath) {
-      return approvedPath(Path.of(approvedPath));
-    }
-
-    private BasePathProvider(Path approvedPath) {
-      this.approvedPath = approvedPath;
-      Path parentPath = approvedPath.getParent();
-      Matcher matcher = FILE_NAME_PATTERN.matcher(approvedPath.getFileName().toString());
-      String baseName =
-          matcher.matches() ? matcher.group("baseName") : approvedPath.getFileName().toString();
-      String extension =
-          matcher.matches()
-              ? Objects.requireNonNullElseGet(matcher.group("extension"), () -> "txt")
-              : "txt";
-      this.receivedPath = parentPath.resolve("%s-%s.%s".formatted(baseName, RECEIVED, extension));
-    }
-
-    @Override
-    public Path receivedPath() {
-      return receivedPath;
-    }
-
-    @Override
-    public Path approvedPath() {
-      return approvedPath;
-    }
-  }
-
-  /**
-   * A {@link PathProvider} that uses a stack trace to determine the paths of the approved and
-   * received files.
-   */
-  public static final class StackTracePathProvider implements PathProvider {
-
-    private final Path receivedPath;
-    private final Path approvedPath;
-
-    /**
-     * Creates a new {@link StackTracePathProvider} that uses the stack trace of the current thread.
-     *
-     * @see Thread#currentThread()
-     * @see Thread#getStackTrace()
-     */
-    StackTracePathProvider(String filenameExtension) {
-      Method method = currentTestMethod();
-      Path basePath =
-          Stream.of("src/test/java/%s", "src/test/kotlin/%s", "src/test/groovy/%s")
-              .map(
-                  format ->
-                      Path.of(
-                          format.formatted(
-                              method.getDeclaringClass().getPackageName().replace(".", "/"))))
-              .filter(path -> path.toFile().exists())
-              .findFirst()
-              .orElseThrow(() -> new FileVerifierError("No attempted base path exists"));
-      String fileNamePattern =
-          "%s-%s-%%s.%s"
-              .formatted(
-                  method.getDeclaringClass().getSimpleName(), method.getName(), filenameExtension);
-      receivedPath = basePath.resolve(fileNamePattern.formatted(RECEIVED));
-      approvedPath = basePath.resolve(fileNamePattern.formatted(APPROVED));
-    }
-
-    /**
-     * Creates a new {@link StackTracePathProvider} that uses the stack trace of the current thread.
-     *
-     * @see Thread#currentThread()
-     * @see Thread#getStackTrace()
-     */
-    StackTracePathProvider() {
-      this("txt");
-    }
-
-    @Override
-    public Path approvedPath() {
-      return approvedPath;
-    }
-
-    @Override
-    public Path receivedPath() {
-      return receivedPath;
-    }
-
-    private Method currentTestMethod() {
-      return stream(Thread.currentThread().getStackTrace())
-          .map(
-              element -> {
-                try {
-                  return Class.forName(element.getClassName())
-                      .getDeclaredMethod(element.getMethodName());
-                } catch (ClassNotFoundException | NoSuchMethodException e) {
-                  return null;
-                }
-              })
-          .filter(method -> method != null && method.isAnnotationPresent(Test.class))
-          .findFirst()
-          .orElseThrow();
-    }
-  }
-
-  static class FileVerifierError extends RuntimeException {
-    public FileVerifierError(String message) {
-      super(message);
-    }
-
-    public FileVerifierError(Throwable cause) {
-      super("Failed to verify file", cause);
     }
   }
 }
