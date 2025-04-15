@@ -47,6 +47,7 @@ jobs:
         if: always()
 
   update-pages:
+    needs: publish
     uses: ./.github/workflows/update-pages.yml
     with:
       version: ${{ github.event.inputs.version }}
