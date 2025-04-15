@@ -5,7 +5,6 @@ plugins {
   jacoco
   `jvm-test-suite`
   `maven-publish`
-  alias(libs.plugins.jreleaser)
 }
 
 java {

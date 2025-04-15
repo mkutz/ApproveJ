@@ -1,7 +1,6 @@
 plugins {
   `java-platform`
   `maven-publish`
-  alias(libs.plugins.jreleaser)
 }
 
 repositories { mavenCentral() }
