@@ -16,69 +16,105 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class NextToTestPathProvider implements PathProvider {
 
-  /** Default filename extension for the approved and received files. */
-  public static final String DEFAULT_FILENAME_EXTENSION = "txt";
-
-  private final Path receivedPath;
-  private final Path approvedPath;
+  private final Path directory;
+  private final String fileNamePattern;
 
   /**
-   * Creates a {@link NextToTestPathProvider} with the default filename extension of {@value
-   * #DEFAULT_FILENAME_EXTENSION}.
-   *
-   * @return a new {@link NextToTestPathProvider}
-   */
-  public static NextToTestPathProvider nextToTest() {
-    return new NextToTestPathProvider(DEFAULT_FILENAME_EXTENSION);
-  }
-
-  /**
-   * Creates a {@link NextToTestPathProvider} with the given filename extension.
+   * Creates a new {@link NextToTestPathProvider} that uses the {@link StackTraceTestFinderUtil} to
+   * determine the paths of the approved and received files.
    *
    * @param filenameExtension the filename extension for the approved and received files
-   * @return a new {@link NextToTestPathProvider}
+   * @param subdirectory whether to create a subdirectory for the approved and received files
    */
-  public static NextToTestPathProvider nextToTestAs(String filenameExtension) {
-    return new NextToTestPathProvider(filenameExtension);
+  NextToTestPathProvider(String filenameExtension, boolean subdirectory) {
+    Method testMethod = currentTestMethod();
+    Path testSourcePath = findTestSourcePath(testMethod);
+
+    directory =
+        subdirectory
+            ? testSourcePath.getParent().resolve(testMethod.getDeclaringClass().getSimpleName())
+            : testSourcePath.getParent();
+    fileNamePattern =
+        subdirectory
+            ? "%s-%%s.%s".formatted(testMethod.getName(), filenameExtension)
+            : "%s-%s-%%s.%s"
+                .formatted(
+                    testMethod.getDeclaringClass().getSimpleName(),
+                    testMethod.getName(),
+                    filenameExtension);
   }
 
-  private NextToTestPathProvider(String filenameExtension) {
-    Method method = currentTestMethod();
-
-    String packagePath = method.getDeclaringClass().getPackageName().replace(".", "/");
+  private Path findTestSourcePath(Method testMethod) {
+    String packagePath = testMethod.getDeclaringClass().getPackageName().replace(".", "/");
     String pathRegex =
         ".*%s/%s\\.(java|kt|groovy)$"
-            .formatted(packagePath, method.getDeclaringClass().getSimpleName());
+            .formatted(packagePath, testMethod.getDeclaringClass().getSimpleName());
     try (Stream<Path> pathStream =
         Files.find(
             Path.of("."),
             10,
             (path, attributes) ->
                 attributes.isRegularFile() && path.toString().matches(pathRegex))) {
-      Path testSourcePath =
-          pathStream
-              .findFirst()
-              .orElseThrow(() -> new FileVerifierError("Could not locate test source file"));
-      String fileNamePattern =
-          "%s-%s-%%s.%s"
-              .formatted(
-                  method.getDeclaringClass().getSimpleName(), method.getName(), filenameExtension);
-      this.receivedPath =
-          testSourcePath.getParent().resolve(fileNamePattern.formatted(PathProvider.RECEIVED));
-      this.approvedPath =
-          testSourcePath.getParent().resolve(fileNamePattern.formatted(PathProvider.APPROVED));
+      return pathStream
+          .findFirst()
+          .orElseThrow(() -> new FileVerifierError("Could not locate test source file"));
     } catch (IOException e) {
       throw new FileVerifierError(e);
     }
   }
 
   @Override
-  public Path approvedPath() {
-    return approvedPath;
+  public Path directory() {
+    return directory;
   }
 
   @Override
   public Path receivedPath() {
-    return receivedPath;
+    return directory.resolve(fileNamePattern.formatted(RECEIVED));
+  }
+
+  @Override
+  public Path approvedPath() {
+    return directory.resolve(fileNamePattern.formatted(APPROVED));
+  }
+
+  /** Builder for creating a {@link NextToTestPathProvider}. */
+  public static class NextToTestPathProviderBuilder implements PathProviderBuilder {
+
+    private String filenameExtension = PathProvider.DEFAULT_FILENAME_EXTENSION;
+    private boolean subdirectory = false;
+
+    /**
+     * Creates a new {@link NextToTestPathProviderBuilder}.
+     *
+     * <p>Use {@link PathProviders#nextToTest()} to create an instance of this builder.
+     */
+    NextToTestPathProviderBuilder() {}
+
+    /**
+     * Sets the filename extension for the approved and received files.
+     *
+     * @param filenameExtension a filename extension (e.g. "json", "txt", "xml", "yaml")
+     * @return this
+     */
+    public NextToTestPathProviderBuilder filenameExtension(String filenameExtension) {
+      this.filenameExtension = filenameExtension;
+      return this;
+    }
+
+    /**
+     * Sets whether to create a subdirectory for the approved and received files.
+     *
+     * @return this
+     */
+    public NextToTestPathProviderBuilder inSubdirectory() {
+      this.subdirectory = true;
+      return this;
+    }
+
+    @Override
+    public PathProvider build() {
+      return new NextToTestPathProvider(filenameExtension, subdirectory);
+    }
   }
 }

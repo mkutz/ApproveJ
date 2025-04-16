@@ -13,13 +13,8 @@ public class InplaceVerifier implements Verifier {
    * Creates a {@link Verifier} using the given previouslyApproved value.
    *
    * @param previouslyApproved the approved value
-   * @return a new {@link InplaceVerifier} for the given previouslyApproved value.
    */
-  public static InplaceVerifier inplace(String previouslyApproved) {
-    return new InplaceVerifier(previouslyApproved);
-  }
-
-  private InplaceVerifier(String previouslyApproved) {
+  InplaceVerifier(String previouslyApproved) {
     this.previouslyApproved = previouslyApproved.trim();
   }
 

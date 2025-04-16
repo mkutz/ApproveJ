@@ -41,3 +41,5 @@ tasks.withType<org.asciidoctor.gradle.jvm.AsciidoctorTask> {
   baseDirFollowsSourceFile()
   configurations("asciidoctorExt")
 }
+
+asciidoctorj { modules { diagram.use() } }

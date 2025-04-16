@@ -11,7 +11,7 @@ class InstantScrubberTest {
 
   @Test
   void apply() {
-    var scrubber = instants(ISO_INSTANT);
+    RegexScrubber scrubber = instants(ISO_INSTANT).build();
     assertThat(scrubber.apply("datetime: %s".formatted(Instant.now())))
         .isEqualTo("datetime: [instant 1]");
   }

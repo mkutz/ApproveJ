@@ -45,7 +45,7 @@ class ObjectPrinterTest {
 
   @Test
   void apply() {
-    var exampleObject = new SimpleExampleClass("value1", 42, true);
+    SimpleExampleClass exampleObject = new SimpleExampleClass("value1", 42, true);
 
     assertThat(printer.apply(exampleObject))
         .isEqualTo(
@@ -61,7 +61,7 @@ class ObjectPrinterTest {
 
   @Test
   void apply_complex_property() {
-    var exampleObject =
+    ComplexExampleClass exampleObject =
         new ComplexExampleClass("value1", 42, true, new SimpleExampleClass("value2", 24, false));
 
     assertThat(printer.apply(exampleObject))
@@ -141,7 +141,8 @@ class ObjectPrinterTest {
 
   @Test
   void apply_collection_property() {
-    var value = new ComplexExampleCollectionClass("value1", List.of("a", "b", "c"));
+    ComplexExampleCollectionClass value =
+        new ComplexExampleCollectionClass("value1", List.of("a", "b", "c"));
 
     assertThat(printer.apply(value))
         .isEqualTo(
@@ -160,7 +161,7 @@ class ObjectPrinterTest {
 
   @Test
   void apply_collection_of_complex() {
-    var value =
+    List<ComplexExampleClass> value =
         List.of(
             new ComplexExampleClass(
                 "value1", 42, true, new SimpleExampleClass("value2", 24, false)));

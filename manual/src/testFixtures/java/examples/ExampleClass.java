@@ -47,9 +47,9 @@ public class ExampleClass {
     private final LocalDateTime published;
 
     public BlogPost(String title, String content) {
+      this.id = UUID.randomUUID(); // <1>
       this.title = title;
       this.content = content;
-      this.id = UUID.randomUUID(); // <1>
       this.published = LocalDateTime.now(); // <2>
     }
 
@@ -91,8 +91,8 @@ public class ExampleClass {
   }
 
   public static String createTaggedBlogPost(String title, String content, List<Tag> tagIds) {
-    var published = Instant.now();
-    var id = UUID.randomUUID();
+    Instant published = Instant.now();
+    UUID id = UUID.randomUUID();
     return """
            {
              "id": "%s",

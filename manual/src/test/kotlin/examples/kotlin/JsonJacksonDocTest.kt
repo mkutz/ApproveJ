@@ -11,7 +11,8 @@ import org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter
 import org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter
 import org.approvej.scrub.Scrubbers.instants
 import org.approvej.scrub.Scrubbers.uuids
-import org.approvej.verify.FileVerifier.inFile
+import org.approvej.verify.PathProviders.nextToTest
+import org.approvej.verify.Verifiers.inFile
 import org.junit.jupiter.api.Test
 import java.time.format.DateTimeFormatter
 
@@ -30,9 +31,9 @@ class JsonJacksonDocTest {
     )
 
     approve(jsonMapper.readTree(createdBlogPostJson))
-      .scrubbedOf(jsonPointer("/id").with("[scrubbed id]")) // <1>
-      .scrubbedOf(jsonPointer("/published").with("[scrubbed published]")) // <2>
-      .verify(inFile("json")) // <3>
+      .scrubbedOf(jsonPointer("/id").replacement("[scrubbed id]")) // <1>
+      .scrubbedOf(jsonPointer("/published").replacement("[scrubbed published]")) // <2>
+      .verify(inFile(nextToTest().filenameExtension("json"))) // <3>
     // end::scrub_json_pointer[]
   }
 
@@ -47,10 +48,10 @@ class JsonJacksonDocTest {
     )
 
     approve(jsonMapper.readTree(createdBlogPostJson))
-      .scrubbedOf(jsonPointer("/id").with("[scrubbed id]"))
-      .scrubbedOf(jsonPointer("/published").with("[scrubbed published]"))
+      .scrubbedOf(jsonPointer("/id").replacement("[scrubbed id]"))
+      .scrubbedOf(jsonPointer("/published").replacement("[scrubbed published]"))
       .printWith(jsonPrettyPrinter()) // <1>
-      .verify(inFile("json"))
+      .verify(inFile(nextToTest().filenameExtension("json")))
     // end::pretty_print_json[]
   }
 
@@ -67,7 +68,7 @@ class JsonJacksonDocTest {
       .scrubbedOf(uuids())
       .scrubbedOf(instants(DateTimeFormatter.ISO_INSTANT))
       .printWith(jsonStringPrettyPrinter()) // <1>
-      .verify(inFile("json"))
+      .verify(inFile(nextToTest().filenameExtension("json")))
     // end::pretty_print_json_string[]
   }
 }

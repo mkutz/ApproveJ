@@ -1,11 +1,13 @@
 package org.approvej.scrub;
 
 import java.util.function.Function;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Collection of replacement functions ({@link Function}s that take an {@link Integer} and return an
  * {@link Object}) for use with {@link Scrubber}s.
  */
+@NullMarked
 public class Replacements {
 
   private Replacements() {}

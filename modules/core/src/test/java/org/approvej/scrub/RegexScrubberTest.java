@@ -18,7 +18,7 @@ class RegexScrubberTest {
   })
   void apply_static_replacement(
       String unscrubbedValue, Pattern regex, String replacement, String expected) {
-    var scrubbedValue = stringsMatching(regex).replacement(replacement).apply(unscrubbedValue);
+    String scrubbedValue = stringsMatching(regex).replacement(replacement).apply(unscrubbedValue);
 
     assertThat(scrubbedValue).isEqualTo(expected);
   }
@@ -26,7 +26,7 @@ class RegexScrubberTest {
   @ParameterizedTest(name = "apply({0}) == {0}")
   @CsvSource({"'Hello World!', 'Foobar'", "'Hello World!', 'X'"})
   void apply_unmatched(String unscrubbedValue, Pattern notMatchingRegex) {
-    var scrubbedValue =
+    String scrubbedValue =
         stringsMatching(notMatchingRegex).withNumberedReplacement().apply(unscrubbedValue);
 
     assertThat(scrubbedValue).isEqualTo(unscrubbedValue);
@@ -34,14 +34,14 @@ class RegexScrubberTest {
 
   @Test
   void apply_custom_replacement() {
-    var scrubber = stringsMatching("[aeiou]").replacement("<vowel%d>"::formatted);
+    RegexScrubber scrubber = stringsMatching("[aeiou]").replacement("<vowel%d>"::formatted).build();
 
     assertThat(scrubber.apply("Hello World!")).isEqualTo("H<vowel1>ll<vowel2> W<vowel2>rld!");
   }
 
   @Test
   void apply_default_replacement() {
-    var scrubbedValue = stringsMatching("World").withNumberedReplacement().apply("Hello World!");
+    String scrubbedValue = stringsMatching("World").withNumberedReplacement().apply("Hello World!");
 
     assertThat(scrubbedValue).isEqualTo("Hello [scrubbed 1]!");
   }

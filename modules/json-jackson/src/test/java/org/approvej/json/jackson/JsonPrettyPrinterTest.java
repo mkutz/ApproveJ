@@ -12,8 +12,8 @@ class JsonPrettyPrinterTest {
 
   @Test
   void apply() {
-    var jsonMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
-    var jsonPrettyPrinter = jsonPrettyPrinter(jsonMapper);
+    JsonMapper jsonMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
+    JsonPrettyPrinter<Object> jsonPrettyPrinter = jsonPrettyPrinter(jsonMapper);
 
     assertThat(jsonPrettyPrinter.apply(new Person("Micha", LocalDate.of(1982, 2, 19))))
         .isEqualTo(

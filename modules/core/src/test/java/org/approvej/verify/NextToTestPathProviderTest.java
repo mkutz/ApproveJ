@@ -1,7 +1,6 @@
 package org.approvej.verify;
 
-import static org.approvej.verify.NextToTestPathProvider.nextToTest;
-import static org.approvej.verify.NextToTestPathProvider.nextToTestAs;
+import static org.approvej.verify.PathProviders.nextToTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;
@@ -11,7 +10,7 @@ class NextToTestPathProviderTest {
 
   @Test
   void paths() {
-    var pathProvider = nextToTest();
+    PathProvider pathProvider = nextToTest().build();
     assertThat(pathProvider.approvedPath())
         .isEqualTo(
             Path.of(
@@ -29,21 +28,40 @@ class NextToTestPathProviderTest {
   }
 
   @Test
-  void paths_more_complex_method_name() {
-    var pathProvider = nextToTestAs("json");
+  void paths_filenameExtension() {
+    PathProvider pathProvider = nextToTest().filenameExtension("json").build();
     assertThat(pathProvider.approvedPath())
         .isEqualTo(
             Path.of(
                 "./src/test/java/org/approvej/verify/"
                     + "NextToTestPathProviderTest"
-                    + "-paths_more_complex_method_name"
+                    + "-paths_filenameExtension"
                     + "-approved.json"));
     assertThat(pathProvider.receivedPath())
         .isEqualTo(
             Path.of(
                 "./src/test/java/org/approvej/verify/"
                     + "NextToTestPathProviderTest"
-                    + "-paths_more_complex_method_name"
+                    + "-paths_filenameExtension"
+                    + "-received.json"));
+  }
+
+  @Test
+  void paths_inSubdirectory() {
+    PathProvider pathProvider = nextToTest().inSubdirectory().filenameExtension("json").build();
+    assertThat(pathProvider.approvedPath())
+        .isEqualTo(
+            Path.of(
+                "./src/test/java/org/approvej/verify/"
+                    + "NextToTestPathProviderTest/"
+                    + "paths_inSubdirectory"
+                    + "-approved.json"));
+    assertThat(pathProvider.receivedPath())
+        .isEqualTo(
+            Path.of(
+                "./src/test/java/org/approvej/verify/"
+                    + "NextToTestPathProviderTest/"
+                    + "paths_inSubdirectory"
                     + "-received.json"));
   }
 }

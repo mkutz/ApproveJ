@@ -1,11 +1,14 @@
 package org.approvej;
 
+import static org.approvej.verify.Verifiers.inFile;
+import static org.approvej.verify.Verifiers.inplace;
+
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import org.approvej.print.Printer;
 import org.approvej.scrub.Scrubber;
-import org.approvej.verify.FileVerifier;
+import org.approvej.verify.InplaceVerifier;
 import org.approvej.verify.Verifier;
 import org.jspecify.annotations.NullMarked;
 
@@ -54,7 +57,7 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Applies the given scrubber to the current value.
+   * Applies the given scrubber to the current {@link #value}.
    *
    * @param scrubber the {@link UnaryOperator} or {@link Scrubber}
    * @return this
@@ -79,11 +82,21 @@ public class ApprovalBuilder<T> {
   }
 
   /**
+   * Verifies that the given previouslyApproved value equals the {@link #value} using an {@link
+   * InplaceVerifier}.
+   *
+   * @param previouslyApproved the approved value
+   */
+  public void verify(final String previouslyApproved) {
+    verify(inplace(previouslyApproved));
+  }
+
+  /**
    * Uses the DEFAULT_VERIFIER to approve the printed {@link #value}.
    *
    * @throws ApprovalError if the verification fails
    */
   public void verify() {
-    verify(FileVerifier.inFile());
+    verify(inFile());
   }
 }

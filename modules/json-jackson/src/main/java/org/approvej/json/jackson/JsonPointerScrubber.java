@@ -1,7 +1,5 @@
 package org.approvej.json.jackson;
 
-import static org.approvej.scrub.Replacements.numbered;
-
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -9,6 +7,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import java.util.function.Function;
 import org.approvej.scrub.Replacements;
 import org.approvej.scrub.Scrubber;
+import org.approvej.scrub.ScrubberBuilder;
 import org.jspecify.annotations.NullMarked;
 
 /** A {@link Scrubber} that scrubs a JSON node at a specific {@link JsonPointer} by replacing its */
@@ -37,9 +36,9 @@ public class JsonPointerScrubber implements Scrubber<JsonNode> {
 
   @Override
   public JsonNode apply(JsonNode unscrubbedJsonNode) {
-    var scrubbedJsonNode = unscrubbedJsonNode.deepCopy();
-    var parentPointer = JsonPointer.compile("");
-    var parentNode = (ObjectNode) scrubbedJsonNode.at(parentPointer);
+    JsonNode scrubbedJsonNode = unscrubbedJsonNode.deepCopy();
+    JsonPointer parentPointer = JsonPointer.compile("");
+    ObjectNode parentNode = (ObjectNode) scrubbedJsonNode.at(parentPointer);
 
     if (!parentNode.at(jsonPointer.last()).isMissingNode()) {
       parentNode.replace(
@@ -51,8 +50,10 @@ public class JsonPointerScrubber implements Scrubber<JsonNode> {
   }
 
   /** Builder for creating a {@link JsonPointerScrubber}. */
-  public static class JsonPointerScrubberBuilder {
+  public static class JsonPointerScrubberBuilder implements ScrubberBuilder<JsonNode> {
+
     private final JsonPointer jsonPointer;
+    private Function<Integer, Object> replacement = Replacements.string("[scrubbed]");
 
     private JsonPointerScrubberBuilder(JsonPointer jsonPointer) {
       this.jsonPointer = jsonPointer;
@@ -67,8 +68,9 @@ public class JsonPointerScrubber implements Scrubber<JsonNode> {
      * @return a {@link JsonPointerScrubber} to replace any match of the {@link #jsonPointer} with
      *     the result of the given replacement {@link Function}.
      */
-    public JsonPointerScrubber with(Function<Integer, Object> replacement) {
-      return new JsonPointerScrubber(jsonPointer, replacement);
+    public JsonPointerScrubberBuilder replacement(Function<Integer, Object> replacement) {
+      this.replacement = replacement;
+      return this;
     }
 
     /**
@@ -79,18 +81,14 @@ public class JsonPointerScrubber implements Scrubber<JsonNode> {
      * @return a new {@link JsonPointerScrubber} to replace any match of the {@link #jsonPointer}
      *     with the given staticReplacement.
      */
-    public JsonPointerScrubber with(String staticReplacement) {
-      return new JsonPointerScrubber(jsonPointer, number -> staticReplacement);
+    public JsonPointerScrubberBuilder replacement(String staticReplacement) {
+      this.replacement = number -> staticReplacement;
+      return this;
     }
 
-    /**
-     * Creates a new {@link Scrubber} to replace strings matching the {@link #jsonPointer} with a
-     * numbered replacement.
-     *
-     * @return a new {@link JsonPointerScrubber} using the {@link Replacements#numbered()}.
-     */
-    public JsonPointerScrubber withNumberedReplacement() {
-      return new JsonPointerScrubber(jsonPointer, numbered());
+    @Override
+    public Scrubber<JsonNode> build() {
+      return new JsonPointerScrubber(jsonPointer, replacement);
     }
   }
 }

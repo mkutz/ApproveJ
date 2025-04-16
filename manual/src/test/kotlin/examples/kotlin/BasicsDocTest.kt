@@ -10,11 +10,8 @@ import org.approvej.ApprovalBuilder.approve
 import org.approvej.print.ObjectPrinter.objectPrinter
 import org.approvej.scrub.Scrubbers.instants
 import org.approvej.scrub.Scrubbers.uuids
-import org.approvej.verify.BasePathProvider.approvedPath
-import org.approvej.verify.DirectoryNextToTestPathProvider.directoryNextToTestAs
-import org.approvej.verify.FileVerifier.inFile
-import org.approvej.verify.InplaceVerifier.inplace
-import org.approvej.verify.NextToTestPathProvider.nextToTestAs
+import org.approvej.verify.PathProviders.nextToTest
+import org.approvej.verify.Verifiers.inFile
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
@@ -105,7 +102,7 @@ class BasicsDocTest {
 
     approve(person)
       .printWith(personYamlPrinter()) // <1>
-      .verify(inFile(nextToTestAs("yaml"))) // <2>
+      .verify(inFile(nextToTest().filenameExtension("yaml"))) // <2>
     // end::verify_file_next_to_test_as[]
   }
 
@@ -116,7 +113,7 @@ class BasicsDocTest {
 
     approve(person)
       .printWith(personYamlPrinter())
-      .verify(inFile(directoryNextToTestAs("yaml")))
+      .verify(inFile(nextToTest().inSubdirectory().filenameExtension("yaml")))
     // end::verify_file_directory_next_to_test_as[]
   }
 
@@ -126,18 +123,18 @@ class BasicsDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .verify(inplace("Person[name=John Doe, birthDate=1990-01-01]"))
+      .verify("Person[name=John Doe, birthDate=1990-01-01]")
     // end::verify_inplace[]
   }
 
   @Test
-  fun verify_file_base_path() {
-    // tag::verify_file_base_path[]
+  fun verify_file_approved_path() {
+    // tag::verify_file_approved_path[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
       .printWith(personYamlPrinter())
-      .verify(inFile(approvedPath("src/test/resources/BasicExamples-verify_file_base_path.yaml"))) // <1>
-    // end::verify_file_base_path[]
+      .verify(inFile("src/test/resources/BasicExamples-verify_file_approved_path.yaml")) // <1>
+    // end::verify_file_approved_path[]
   }
 }

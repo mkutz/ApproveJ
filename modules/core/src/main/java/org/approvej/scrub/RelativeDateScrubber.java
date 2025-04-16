@@ -5,12 +5,14 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Scrubs a {@link String} by replacing all occurrences of a date pattern with relative
  * descriptions, like <code>[today]</code>, <code>[yesterday]</code>, <code>[2 days from now]</code>
  * , <code>[21 days ago]</code> .
  */
+@NullMarked
 public class RelativeDateScrubber implements Scrubber<String> {
 
   private static final LocalDate EXAMPLE_DATE = LocalDate.of(4567, 12, 30);
@@ -27,8 +29,8 @@ public class RelativeDateScrubber implements Scrubber<String> {
                 .replaceAll("\\d", "\\\\d"));
     replacement =
         (String finding) -> {
-          var parsed = dateFormatPattern.parse(finding, LocalDate::from);
-          var days =
+          LocalDate parsed = dateFormatPattern.parse(finding, LocalDate::from);
+          long days =
               Duration.between(LocalDate.now().atStartOfDay(), parsed.atStartOfDay()).toDays();
           if (days == 0) return "[today]";
           else if (days == 1) return "[tomorrow]";

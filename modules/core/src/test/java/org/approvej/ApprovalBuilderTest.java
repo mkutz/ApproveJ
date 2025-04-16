@@ -5,8 +5,7 @@ import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.scrub.Scrubbers.dates;
 import static org.approvej.scrub.Scrubbers.relativeDates;
 import static org.approvej.scrub.Scrubbers.uuids;
-import static org.approvej.verify.FileVerifier.inFile;
-import static org.approvej.verify.InplaceVerifier.inplace;
+import static org.approvej.verify.Verifiers.inFile;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 import java.time.LocalDate;
@@ -32,7 +31,7 @@ class ApprovalBuilderTest {
 
   @Test
   void verify_string_inplace() {
-    approve(EXAMPLE_TEXT).verify(inplace(EXAMPLE_TEXT));
+    approve(EXAMPLE_TEXT).verify(EXAMPLE_TEXT);
   }
 
   @Test
@@ -48,13 +47,13 @@ class ApprovalBuilderTest {
     approve(EXAMPLE_TEXT)
         .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
         .scrubbedOf(uuids())
-        .verify(inplace(SCRUBBED));
+        .verify(SCRUBBED);
   }
 
   @Test
   void verify_failure() {
     assertThatExceptionOfType(AssertionError.class)
-        .isThrownBy(() -> approve(EXAMPLE_TEXT).verify(inplace("This is not the same text.")))
+        .isThrownBy(() -> approve(EXAMPLE_TEXT).verify("This is not the same text."))
         .withMessage(
             "Approval mismatch: expected: <This is not the same text.> but was: <%s>"
                 .formatted(EXAMPLE_TEXT));
@@ -72,7 +71,7 @@ class ApprovalBuilderTest {
   @Test
   void verify_default_printer() {
     approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
-        .verify(inplace("Person[id=000000-0000-0000-00000001, name=Micha, birthday=1982-02-19]"));
+        .verify("Person[id=000000-0000-0000-00000001, name=Micha, birthday=1982-02-19]");
   }
 
   record Person(String id, String name, LocalDate birthday) {

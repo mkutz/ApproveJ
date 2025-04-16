@@ -208,7 +208,7 @@ Hence, it is necessary to apply it before the `Printer` is applied.
 Of course the `Scrubber` can also be defined in a separate class, instead of a lambda.
 
 
-=== Built-In Scrubbers
+=== Built-In `Scrubbers`
 
 All built-in `Scrubber` implementations are available via the  link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html[Scrubbers] utility class.
 
@@ -254,7 +254,7 @@ Any existing received value will be overwritten by this.
 You can use a diff tool of your choice to compare the two files and merge values that you want to approve.
 
 
-==== `NextToTestPathProvider`
+==== Next to Test
 
 By default, the `FileVerifier` will use a link:{javadoc-url}/core/org/approvej/verify/NextToTestPathProvider.html[`NextToTestPathProvider`], which will put the received and approved files next to the test class and name them like the test case method.
 
@@ -272,7 +272,19 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_n
 ----
 <1> defines the `NextToTestPathProvider` explicitly, same as just calling `verify()`
 
-The `nextToTestAs` method gives you the opportunity to use a different file extension for the approved and received files.
+
+.File structure
+----
+.
+└── 📁src/test/java/…
+    ├── 📄 <TestClass>.java
+    ├── 📄 <TestClass>-<testMethod>-approved.txt
+    └── 📄 <TestClass>-<testMethod>-received.txt
+----
+
+==== Custom Filename Extension
+
+The `filenameExtension` method gives you the opportunity to use a different file extension for the approved and received files.
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -287,11 +299,20 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_n
 <1> this printer will create a YAML version of the object
 <2> so it makes sense to change the filename extension, so your IDE will apply appropriate syntax highlighting
 
+.File structure with custom filename extension
+----
+.
+└── 📁src/test/java/…
+    ├── 📄 <TestClass>.java
+    ├── 📄 <TestClass>-<testMethod>-approved.<filenameExtension>
+    └── 📄 <TestClass>-<testMethod>-received.<filenameExtension>
+----
 
-==== `DirectoryNextToTestPathProvider`
+
+==== In a Subdirectory
 
 If you have test classes with a lot of approval tests, there a quite a lot of files created next to the test class.
-In that case, you might want to use a link:{javadoc-url}/core/org/approvej/verify/DirectoryNextToTestPathProvider.html[`DirectoryNextToTestPathProvider`], which will create a directory next to the test class and put the approved and received files in there.
+In that case, you can use the `inSubdirectory` to instruct the link:{javadoc-url}/core/org/approvej/verify/NextToTestPathProvider.html[`NextToTestPathProvider`], which will create a directory next to the test class and put the approved and received files in there.
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -304,28 +325,58 @@ include::../../../test/java/examples/java/BasicsDocTest.java[tag=verify_file_dir
 include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_directory_next_to_test_as]
 ----
 
+.File structure with subdirectory
+----
+.
+└── 📁src/test/java/…
+    ├── 📁 <TestClass>
+    │   ├── 📄 <testMethod>-approved.<filenameExtension>
+    │   └── 📄 <testMethod>-received.<filenameExtension>
+    └── 📄 <TestClass>.java
+----
 
-==== `BasePathProvider`
 
-It is possible to use a link:{javadoc-url}/core/org/approvej/verify/PathProvider.html[`PathProvider`] to configure where the files are stored.
-The default `NextToTestPathProvider` will analyze the stack trace of the test method and create a path based on the class name and method of the executed test.
+==== Given Path
 
-Alternatively, you can use a `BasePathProvider` to specify the path of the approved file.
-The received file will be put next to the approved file and the filename will contain the word `received`.
+Alternatively, you can simply specify the path of the approved file.
+If the given approved file path contains the word `approved` just before the filename extension, it will be replaced with `received` in the to determine the received file path.
+Otherwise, the word `received` will be added at the end of the filename.
+
+For example
+
+- `src/test/resources/BasicsDocTest-verify_file_approved_path-approved.yaml` ->
+  `src/test/resources/BasicsDocTest-verify_file_approved_path-received.yaml`
+- `src/test/resources/BasicsDocTest-verify_file_approved_path.yaml` ->
+  `src/test/resources/BasicsDocTest-verify_file_approved_path-received.yaml`.
 
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=verify_file_base_path]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=verify_file_approved_path]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_base_path]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_approved_path]
 ----
-<1> this will expect the approved file at this path, the received file will be created next to it at `src/test/resources/BasicsDocTest-verify_file_base_path-reveived.yaml`
+<1> this will expect the approved file at this path, the received file will be created next to it at `src/test/resources/BasicsDocTest-verify_file_approved_path-reveived.yaml`
+
+.File structure with given path
+----
+.
+└── 📁src/test/java/…
+│   └── 📄 <TestClass>.java
+└── 📁src/test/resources
+    ├── 📄 src/test/resources/BasicExamples-verify_file_approved_path.yaml
+    └── 📄 src/test/resources/BasicExamples-verify_file_approved_path-received.yaml
+----
 
 
-==== Customer `PathProvider`
+==== Custom `PathProvider`
 
 You can also define your own link:{javadoc-url}/core/org/approvej/verify/FileVerifier.PathProvider.html[`PathProvider`].
+
+
+=== Built-In `Verifiers` and `PathProviders`
+
+All built-in `Verifier` and `PathProvider` implementations are available via the  link:{javadoc-url}/core/org/approvej/verify/Verifiers.html[`Verifiers`] and link:{javadoc-url}/core/org/approvej/verify/PathProviders.html[`PathProviders`] utility classes.

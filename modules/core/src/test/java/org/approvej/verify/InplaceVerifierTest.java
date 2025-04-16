@@ -1,6 +1,6 @@
 package org.approvej.verify;
 
-import static org.approvej.verify.InplaceVerifier.inplace;
+import static org.approvej.verify.Verifiers.inplace;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 

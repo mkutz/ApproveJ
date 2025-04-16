@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.NullMarked;
 
@@ -35,7 +36,7 @@ public class RegexScrubber implements Scrubber<String> {
 
   @Override
   public String apply(String unscrubbedValue) {
-    var matcher = pattern.matcher(unscrubbedValue);
+    Matcher matcher = pattern.matcher(unscrubbedValue);
     Map<String, Integer> findings = new HashMap<>();
     Function<MatchResult, String> replacer =
         result -> {

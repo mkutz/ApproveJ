@@ -5,8 +5,10 @@ import static org.approvej.json.jackson.JsonPointerScrubber.jsonPointer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.time.LocalDateTime;
+import org.approvej.scrub.Scrubber;
 import org.junit.jupiter.api.Test;
 
 class JsonPointerScrubberTest {
@@ -25,22 +27,34 @@ class JsonPointerScrubberTest {
 
   @Test
   void apply() throws JsonProcessingException {
-    var jsonMapper = JsonMapper.builder().build();
-    var jsonNode = jsonMapper.readTree(EXAMPLE_JSON);
-    var idScrubber = jsonPointer("/id").with("[scrubbed]");
-    var scrubbedJsonNode = idScrubber.apply(jsonNode);
+    JsonMapper jsonMapper = JsonMapper.builder().build();
+    JsonNode jsonNode = jsonMapper.readTree(EXAMPLE_JSON);
+    Scrubber<JsonNode> idScrubber = jsonPointer("/id").build();
+    JsonNode scrubbedJsonNode = idScrubber.apply(jsonNode);
 
     assertThat(scrubbedJsonNode.at("/id").textValue()).isEqualTo("[scrubbed]");
   }
 
   @Test
-  void apply_custom_replacement() throws JsonProcessingException {
-    var jsonNode = JSON_MAPPER.readTree(EXAMPLE_JSON);
-    var enrollmentDateScrubber = jsonPointer("/enrollmentDate").with("[scrubbed enrollment date]");
+  void apply_custom_static_replacement() throws JsonProcessingException {
+    JsonNode jsonNode = JSON_MAPPER.readTree(EXAMPLE_JSON);
+    Scrubber<JsonNode> enrollmentDateScrubber =
+        jsonPointer("/enrollmentDate").replacement("[scrubbed enrollment date]").build();
 
-    var scrubbedJsonNode = enrollmentDateScrubber.apply(jsonNode);
+    JsonNode scrubbedJsonNode = enrollmentDateScrubber.apply(jsonNode);
 
     assertThat(scrubbedJsonNode.at("/enrollmentDate").textValue())
         .isEqualTo("[scrubbed enrollment date]");
+  }
+
+  @Test
+  void apply_custom_replacement() throws JsonProcessingException {
+    JsonNode jsonNode = JSON_MAPPER.readTree(EXAMPLE_JSON);
+    Scrubber<JsonNode> enrollmentDateScrubber =
+        jsonPointer("/enrollmentDate").replacement("<enrollmentDate>"::formatted).build();
+
+    JsonNode scrubbedJsonNode = enrollmentDateScrubber.apply(jsonNode);
+
+    assertThat(scrubbedJsonNode.at("/enrollmentDate").textValue()).isEqualTo("<enrollmentDate>");
   }
 }

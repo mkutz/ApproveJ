@@ -7,7 +7,12 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 import org.approvej.scrub.RegexScrubber.RegexScrubberBuilder;
+import org.jspecify.annotations.NullMarked;
 
+/**
+ * Collection of static methods to create {@link Scrubber} and {@link ScrubberBuilder} instances.
+ */
+@NullMarked
 public class Scrubbers {
 
   private Scrubbers() {}
