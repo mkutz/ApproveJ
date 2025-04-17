@@ -19,7 +19,6 @@ dependencies {
   api(project(":modules:core"))
   api(libs.jspecify)
   api(libs.jacksonDatabind)
-  api(libs.jsonpath)
 }
 
 testing {
