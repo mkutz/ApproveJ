@@ -1,5 +1,7 @@
 package org.approvej;
 
+import static org.approvej.verify.PathProvider.DEFAULT_FILENAME_EXTENSION;
+import static org.approvej.verify.PathProviders.nextToTest;
 import static org.approvej.verify.Verifiers.inFile;
 import static org.approvej.verify.Verifiers.inplace;
 
@@ -30,9 +32,11 @@ public class ApprovalBuilder<T> {
   public static final Printer<Object> DEFAULT_PRINTER = Object::toString;
 
   private T value;
+  private final String filenameExtension;
 
-  private ApprovalBuilder(T originalValue) {
+  private ApprovalBuilder(T originalValue, String filenameExtension) {
     this.value = originalValue;
+    this.filenameExtension = filenameExtension;
   }
 
   /**
@@ -43,17 +47,27 @@ public class ApprovalBuilder<T> {
    * @param <T> the type of the value to approve
    */
   public static <T> ApprovalBuilder<T> approve(T originalValue) {
-    return new ApprovalBuilder<>(originalValue);
+    return new ApprovalBuilder<>(originalValue, DEFAULT_FILENAME_EXTENSION);
   }
 
   /**
-   * Uses the given {@link Printer} to convert the value to a {@link String}.
+   * Uses the given {@link Function} to convert the {@link #value} to a {@link String}.
+   *
+   * @param printer the {@link Function} used to convert the {@link #value} to a {@link String}
+   * @return this
+   */
+  public ApprovalBuilder<String> printWith(Function<T, String> printer) {
+    return new ApprovalBuilder<>(printer.apply(value), DEFAULT_FILENAME_EXTENSION);
+  }
+
+  /**
+   * Uses the given {@link Printer} to convert the {@link #value} to a {@link String}.
    *
    * @param printer the printer used to convert the value to a {@link String}
    * @return this
    */
-  public ApprovalBuilder<String> printWith(Function<T, String> printer) {
-    return new ApprovalBuilder<>(printer.apply(value));
+  public ApprovalBuilder<String> printWith(Printer<T> printer) {
+    return new ApprovalBuilder<>(printer.apply(value), printer.filenameExtension());
   }
 
   /**
@@ -97,6 +111,6 @@ public class ApprovalBuilder<T> {
    * @throws ApprovalError if the verification fails
    */
   public void verify() {
-    verify(inFile());
+    verify(inFile(nextToTest().filenameExtension(filenameExtension)));
   }
 }

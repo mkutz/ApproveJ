@@ -29,7 +29,7 @@ class JsonPointerScrubberTest {
   void apply() throws JsonProcessingException {
     JsonMapper jsonMapper = JsonMapper.builder().build();
     JsonNode jsonNode = jsonMapper.readTree(EXAMPLE_JSON);
-    Scrubber<JsonNode> idScrubber = jsonPointer("/id").build();
+    Scrubber<JsonNode> idScrubber = jsonPointer("/id");
     JsonNode scrubbedJsonNode = idScrubber.apply(jsonNode);
 
     assertThat(scrubbedJsonNode.at("/id").textValue()).isEqualTo("[scrubbed]");
@@ -39,7 +39,7 @@ class JsonPointerScrubberTest {
   void apply_custom_static_replacement() throws JsonProcessingException {
     JsonNode jsonNode = JSON_MAPPER.readTree(EXAMPLE_JSON);
     Scrubber<JsonNode> enrollmentDateScrubber =
-        jsonPointer("/enrollmentDate").replacement("[scrubbed enrollment date]").build();
+        jsonPointer("/enrollmentDate").replacement("[scrubbed enrollment date]");
 
     JsonNode scrubbedJsonNode = enrollmentDateScrubber.apply(jsonNode);
 
@@ -51,7 +51,7 @@ class JsonPointerScrubberTest {
   void apply_custom_replacement() throws JsonProcessingException {
     JsonNode jsonNode = JSON_MAPPER.readTree(EXAMPLE_JSON);
     Scrubber<JsonNode> enrollmentDateScrubber =
-        jsonPointer("/enrollmentDate").replacement("<enrollmentDate>"::formatted).build();
+        jsonPointer("/enrollmentDate").replacement("<enrollmentDate>"::formatted);
 
     JsonNode scrubbedJsonNode = enrollmentDateScrubber.apply(jsonNode);
 

@@ -32,4 +32,9 @@ class JsonStringPrettyPrinterTest {
     assertThatExceptionOfType(JsonPrettyPrinterException.class)
         .isThrownBy(() -> jsonStringPrettyPrinter.apply("{"));
   }
+
+  @Test
+  void filenameExtension() {
+    assertThat(jsonStringPrettyPrinter().filenameExtension()).isEqualTo("json");
+  }
 }

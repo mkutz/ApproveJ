@@ -10,7 +10,7 @@ import org.jspecify.annotations.NullMarked;
 
 /** A {@link Printer} for JSON strings that should be pretty-printed. */
 @NullMarked
-public class JsonStringPrettyPrinter implements Printer<String> {
+public class JsonStringPrettyPrinter implements JsonPrinter<String> {
 
   private final ObjectReader objectReader;
   private final ObjectWriter objectWriter;

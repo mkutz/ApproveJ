@@ -26,22 +26,21 @@ class RegexScrubberTest {
   @ParameterizedTest(name = "apply({0}) == {0}")
   @CsvSource({"'Hello World!', 'Foobar'", "'Hello World!', 'X'"})
   void apply_unmatched(String unscrubbedValue, Pattern notMatchingRegex) {
-    String scrubbedValue =
-        stringsMatching(notMatchingRegex).withNumberedReplacement().apply(unscrubbedValue);
+    String scrubbedValue = stringsMatching(notMatchingRegex).apply(unscrubbedValue);
 
     assertThat(scrubbedValue).isEqualTo(unscrubbedValue);
   }
 
   @Test
   void apply_custom_replacement() {
-    RegexScrubber scrubber = stringsMatching("[aeiou]").replacement("<vowel%d>"::formatted).build();
+    RegexScrubber scrubber = stringsMatching("[aeiou]").replacement("<vowel%d>"::formatted);
 
     assertThat(scrubber.apply("Hello World!")).isEqualTo("H<vowel1>ll<vowel2> W<vowel2>rld!");
   }
 
   @Test
   void apply_default_replacement() {
-    String scrubbedValue = stringsMatching("World").withNumberedReplacement().apply("Hello World!");
+    String scrubbedValue = stringsMatching("World").apply("Hello World!");
 
     assertThat(scrubbedValue).isEqualTo("Hello [scrubbed 1]!");
   }

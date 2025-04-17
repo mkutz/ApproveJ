@@ -11,12 +11,14 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 
 import java.io.IOException;
 import org.approvej.ApprovalError;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * {@link Verifier} that compares the received value with the approved value stored in a file. If
  * the values differ, it creates a new file with the received value and throws an {@link
  * ApprovalError}.
  */
+@NullMarked
 public class FileVerifier implements Verifier {
 
   private final PathProvider pathProvider;

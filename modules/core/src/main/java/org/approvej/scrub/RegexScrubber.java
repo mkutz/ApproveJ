@@ -1,6 +1,5 @@
 package org.approvej.scrub;
 
-import static org.approvej.scrub.Replacements.numbered;
 import static org.approvej.scrub.Replacements.string;
 
 import java.util.HashMap;
@@ -19,10 +18,10 @@ import org.jspecify.annotations.NullMarked;
 public class RegexScrubber implements Scrubber<String> {
 
   private final Pattern pattern;
-  private final Function<Integer, Object> replacement;
+  private Function<Integer, Object> replacement;
 
   /**
-   * Creates a {@link RegexScrubberBuilder} with the given pattern and replacement {@link Function}.
+   * Creates a {@link RegexScrubber} with the given pattern and replacement {@link Function}.
    *
    * @param pattern the pattern matching the string to be scrubbed as {@link String}
    * @param replacement a function that receives the finding index and returns the replacement
@@ -47,51 +46,26 @@ public class RegexScrubber implements Scrubber<String> {
     return matcher.replaceAll(replacer);
   }
 
-  /** Builder for creating a {@link RegexScrubber}. */
-  public static class RegexScrubberBuilder implements ScrubberBuilder<String> {
+  /**
+   * Set the replacement {@link Function} to be used.
+   *
+   * @param replacement a {@link Function} that receives the finding index and returns the
+   *     replacement string
+   * @return this
+   */
+  public RegexScrubber replacement(Function<Integer, Object> replacement) {
+    this.replacement = replacement;
+    return this;
+  }
 
-    private final Pattern pattern;
-    private Function<Integer, Object> replacement = Replacements.numbered();
-
-    RegexScrubberBuilder(Pattern pattern) {
-      this.pattern = pattern;
-    }
-
-    /**
-     * Set the replacement {@link Function} to be used.
-     *
-     * @param replacement a {@link Function} that receives the finding index and returns the
-     *     replacement string
-     * @return this
-     */
-    public RegexScrubberBuilder replacement(Function<Integer, Object> replacement) {
-      this.replacement = replacement;
-      return this;
-    }
-
-    /**
-     * Set the replacement {@link Function} always returning the given staticReplacement.
-     *
-     * @param staticReplacement the static replacement {@link String}
-     * @return this
-     */
-    public RegexScrubber replacement(String staticReplacement) {
-      return new RegexScrubber(pattern, string(staticReplacement));
-    }
-
-    /**
-     * Creates a new {@link Scrubber} to replace strings matching the {@link #pattern} with a
-     * numbered replacement.
-     *
-     * @return a new {@link RegexScrubber} using the {@link Replacements#numbered()}.
-     */
-    public RegexScrubber withNumberedReplacement() {
-      return new RegexScrubber(pattern, numbered());
-    }
-
-    @Override
-    public RegexScrubber build() {
-      return new RegexScrubber(pattern, replacement);
-    }
+  /**
+   * Set the replacement {@link Function} always returning the given staticReplacement.
+   *
+   * @param staticReplacement the static replacement {@link String}
+   * @return this
+   */
+  public RegexScrubber replacement(String staticReplacement) {
+    this.replacement = string(staticReplacement);
+    return this;
   }
 }

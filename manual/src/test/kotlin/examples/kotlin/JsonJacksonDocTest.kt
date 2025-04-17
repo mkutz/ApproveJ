@@ -51,7 +51,7 @@ class JsonJacksonDocTest {
       .scrubbedOf(jsonPointer("/id").replacement("[scrubbed id]"))
       .scrubbedOf(jsonPointer("/published").replacement("[scrubbed published]"))
       .printWith(jsonPrettyPrinter()) // <1>
-      .verify(inFile(nextToTest().filenameExtension("json")))
+      .verify()
     // end::pretty_print_json[]
   }
 
@@ -68,7 +68,7 @@ class JsonJacksonDocTest {
       .scrubbedOf(uuids())
       .scrubbedOf(instants(DateTimeFormatter.ISO_INSTANT))
       .printWith(jsonStringPrettyPrinter()) // <1>
-      .verify(inFile(nextToTest().filenameExtension("json")))
+      .verify()
     // end::pretty_print_json_string[]
   }
 }

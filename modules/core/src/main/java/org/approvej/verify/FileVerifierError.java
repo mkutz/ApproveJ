@@ -1,5 +1,8 @@
 package org.approvej.verify;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 class FileVerifierError extends RuntimeException {
   public FileVerifierError(String message) {
     super(message);

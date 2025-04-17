@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A {@link PathProvider} that uses the path of a previously approved file to determine the path the
@@ -21,6 +22,7 @@ import java.util.regex.Pattern;
  * <p>Note that the {@code approved} infix is not enforced on the given approved file path. It is
  * also not necessary for the approved file to exist.
  */
+@NullMarked
 public class ApprovedPathProvider implements PathProvider {
 
   private static final Pattern FILE_NAME_PATTERN =

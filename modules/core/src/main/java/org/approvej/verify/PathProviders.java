@@ -2,11 +2,13 @@ package org.approvej.verify;
 
 import java.nio.file.Path;
 import org.approvej.verify.NextToTestPathProvider.NextToTestPathProviderBuilder;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Collection of static methods to create {@link PathProviders} and {@link PathProviderBuilder}
  * instances.
  */
+@NullMarked
 public class PathProviders {
 
   private PathProviders() {}

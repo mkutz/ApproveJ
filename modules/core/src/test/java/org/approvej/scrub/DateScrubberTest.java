@@ -10,7 +10,7 @@ class DateScrubberTest {
 
   @Test
   void apply() {
-    RegexScrubber scrubber = dates(ISO_LOCAL_DATE).build();
+    RegexScrubber scrubber = dates(ISO_LOCAL_DATE);
     assertThat(scrubber.apply("datetime: 2023-10-01T12:00:00.000000"))
         .isEqualTo("datetime: [date 1]T12:00:00.000000");
   }

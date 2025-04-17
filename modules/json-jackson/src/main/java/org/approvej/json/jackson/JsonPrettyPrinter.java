@@ -14,7 +14,7 @@ import org.jspecify.annotations.NullMarked;
  * @param <T> the type of value to print
  */
 @NullMarked
-public class JsonPrettyPrinter<T> implements Printer<T> {
+public class JsonPrettyPrinter<T> implements JsonPrinter<T> {
 
   private final ObjectWriter objectWriter;
 

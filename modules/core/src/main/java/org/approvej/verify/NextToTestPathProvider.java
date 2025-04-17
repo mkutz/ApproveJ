@@ -1,12 +1,10 @@
 package org.approvej.verify;
 
 import static org.approvej.verify.StackTraceTestFinderUtil.currentTestMethod;
+import static org.approvej.verify.StackTraceTestFinderUtil.findTestSourcePath;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.stream.Stream;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -42,25 +40,6 @@ public class NextToTestPathProvider implements PathProvider {
                     testMethod.getDeclaringClass().getSimpleName(),
                     testMethod.getName(),
                     filenameExtension);
-  }
-
-  private Path findTestSourcePath(Method testMethod) {
-    String packagePath = testMethod.getDeclaringClass().getPackageName().replace(".", "/");
-    String pathRegex =
-        ".*%s/%s\\.(java|kt|groovy)$"
-            .formatted(packagePath, testMethod.getDeclaringClass().getSimpleName());
-    try (Stream<Path> pathStream =
-        Files.find(
-            Path.of("."),
-            10,
-            (path, attributes) ->
-                attributes.isRegularFile() && path.toString().matches(pathRegex))) {
-      return pathStream
-          .findFirst()
-          .orElseThrow(() -> new FileVerifierError("Could not locate test source file"));
-    } catch (IOException e) {
-      throw new FileVerifierError(e);
-    }
   }
 
   @Override

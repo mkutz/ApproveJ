@@ -4,8 +4,10 @@ import static org.approvej.verify.PathProviders.approvedPath;
 import static org.approvej.verify.PathProviders.nextToTest;
 
 import java.nio.file.Path;
+import org.jspecify.annotations.NullMarked;
 
 /** Collection of static methods to create {@link Verifier} instances. */
+@NullMarked
 public class Verifiers {
 
   private Verifiers() {}
