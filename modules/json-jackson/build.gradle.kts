@@ -20,7 +20,6 @@ dependencies {
   api(libs.jspecify)
   api(libs.jacksonDatabind)
   api(libs.jacksonJsr310)
-  api(libs.jsonpath)
 }
 
 testing {

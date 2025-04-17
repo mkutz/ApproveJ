@@ -37,8 +37,10 @@ class FileApproverTest {
 
     assertThatExceptionOfType(ApprovalError.class)
         .isThrownBy(() -> fileVerifier.accept("Some other text"))
-        .withMessage(
-            "Approval mismatch: expected: <Some approved text> but was: <Some other text>");
+        .withMessageStartingWith(
+            "Approval mismatch: "
+                + "previously approved: <Some approved text>, "
+                + "received: <Some other text>");
 
     assertThat(pathProvider.receivedPath()).exists().content().isEqualTo("Some other text");
     assertThat(pathProvider.approvedPath()).exists().content().isEqualTo("Some approved text");
@@ -53,9 +55,10 @@ class FileApproverTest {
 
     assertThatExceptionOfType(ApprovalError.class)
         .isThrownBy(() -> fileVerifier.accept("Some newly received text"))
-        .withMessage(
-            "Approval mismatch: expected: <Some approved text> but was: <Some newly received"
-                + " text>");
+        .withMessageStartingWith(
+            "Approval mismatch: "
+                + "previously approved: <Some approved text>, "
+                + "received: <Some newly received text>");
 
     assertThat(pathProvider.receivedPath())
         .exists()
@@ -71,7 +74,7 @@ class FileApproverTest {
 
     assertThatExceptionOfType(ApprovalError.class)
         .isThrownBy(() -> fileVerifier.accept("Some text"))
-        .withMessage("Approval mismatch: expected: <> but was: <Some text>");
+        .withMessage("Approval mismatch: " + "previously approved: <>, " + "received: <Some text>");
 
     assertThat(pathProvider.receivedPath()).exists().content().isEqualTo("Some text");
     assertThat(pathProvider.approvedPath()).exists().content().isEmpty();

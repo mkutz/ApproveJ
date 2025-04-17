@@ -18,6 +18,7 @@ repositories { mavenCentral() }
 dependencies {
   api(libs.jspecify)
   implementation(libs.junitJupiterApi)
+  implementation(libs.diffUtils)
 }
 
 testing {
