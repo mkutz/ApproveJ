@@ -84,6 +84,7 @@ While some `toString` implementations already are quite good, they typically ret
 This is fine as long as you only have a few properties.
 However, if you have a lot of properties, it is much easier to read the result if it is formatted nicely.
 
+In order to change the way objects are being transformed to strings, you can use the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`]'s `printWith` method.
 
 === Generic Object Printer
 
@@ -132,6 +133,10 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=custom_printe
 ----
 include::../../../test/java/examples/java/BasicsDocTest-custom_printer-approved.txt[]
 ----
+
+Additionally, a custom `Printer` can override the `filenameExtension` method.
+If you use a link:{javadoc-url}/core/org/approvej/verify/FileVerifier.html[`FileVerifier`] (see <<verifying>>), the returned `String` is used as the files' filename extension.
+This is useful, if your `Printer` creates a certain format (e.g. JSON, XML, YAML, …).
 
 
 [id=scrubbing]
