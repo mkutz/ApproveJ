@@ -19,8 +19,8 @@ dependencies {
   api(project(":modules:core"))
   api(libs.jspecify)
   api(libs.jacksonDatabind)
+  api(libs.jacksonDatafromatYaml)
   api(libs.jacksonJsr310)
-  api(libs.jsonpath)
 }
 
 testing {
@@ -29,7 +29,6 @@ testing {
       getting(JvmTestSuite::class) {
         useJUnitJupiter()
         dependencies {
-          implementation(libs.jacksonJsr310)
           implementation(platform(libs.junitBom))
           implementation(libs.junitJupiterApi)
           implementation(libs.junitJupiterParams)
