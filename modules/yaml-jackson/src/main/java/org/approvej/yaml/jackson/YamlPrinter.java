@@ -1,65 +1,61 @@
-package org.approvej.json.jackson;
+package org.approvej.yaml.jackson;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.approvej.print.Printer;
 import org.jspecify.annotations.NullMarked;
 
 /**
  * A {@link Printer} that uses {@link ObjectWriter#writeValueAsString(Object)} to print a value as
- * JSON.
+ * YAML.
  *
  * @param <T> the type of value to print
  */
 @NullMarked
-public class JsonPrettyPrinter<T> implements JsonPrinter<T> {
+public class YamlPrinter<T> implements Printer<T> {
 
   private final ObjectWriter objectWriter;
 
   /**
-   * Creates a {@link JsonPrettyPrinter} using the given {@link ObjectWriter}.
+   * Creates a {@link YamlPrinter} using the given {@link ObjectWriter}.
    *
    * @param objectWriter the {@link ObjectWriter} that will be used for printing
    * @param <T> the type of value to print
-   * @return a new {@link JsonPrettyPrinter} instance
+   * @return a new {@link YamlPrinter} instance
    */
-  public static <T> JsonPrettyPrinter<T> jsonPrettyPrinter(ObjectWriter objectWriter) {
-    return new JsonPrettyPrinter<>(objectWriter);
+  public static <T> YamlPrinter<T> yamlPrinter(ObjectWriter objectWriter) {
+    return new YamlPrinter<>(objectWriter);
   }
 
   /**
-   * Creates a {@link JsonPrettyPrinter} using the given {@link ObjectMapper}.
+   * Creates a {@link YamlPrinter} using the given {@link ObjectMapper}.
    *
    * @param objectMapper the {@link ObjectMapper} used to create the {@link ObjectWriter}
    * @param <T> the type of value to print
-   * @return a new {@link JsonPrettyPrinter} instance
+   * @return a new {@link YamlPrinter} instance
    * @see ObjectMapper#writerWithDefaultPrettyPrinter()
    */
-  public static <T> JsonPrettyPrinter<T> jsonPrettyPrinter(ObjectMapper objectMapper) {
-    return new JsonPrettyPrinter<>(objectMapper.writerWithDefaultPrettyPrinter());
+  public static <T> YamlPrinter<T> yamlPrinter(ObjectMapper objectMapper) {
+    return yamlPrinter(objectMapper.writer());
   }
 
   /**
-   * Creates a {@link JsonPrettyPrinter} using the default {@link JsonMapper}.
+   * Creates a {@link YamlPrinter} using the default {@link YAMLMapper}.
    *
-   * @return a new {@link JsonPrettyPrinter} instance
+   * @return a new {@link YamlPrinter} instance
    * @param <T> the type of value to print
-   * @see JsonMapper.Builder#build()
+   * @see YAMLMapper.Builder#build()
    */
-  public static <T> JsonPrettyPrinter<T> jsonPrettyPrinter() {
-    return new JsonPrettyPrinter<>(
-        JsonMapper.builder()
-            .addModule(new JavaTimeModule())
-            .build()
-            .writerWithDefaultPrettyPrinter());
+  public static <T> YamlPrinter<T> yamlPrinter() {
+    return yamlPrinter(YAMLMapper.builder().addModule(new JavaTimeModule()).build().writer());
   }
 
-  private JsonPrettyPrinter(ObjectWriter objectWriter) {
+  private YamlPrinter(ObjectWriter objectWriter) {
     this.objectWriter = objectWriter.without(WRITE_DATES_AS_TIMESTAMPS);
   }
 
@@ -68,7 +64,12 @@ public class JsonPrettyPrinter<T> implements JsonPrinter<T> {
     try {
       return objectWriter.writeValueAsString(value);
     } catch (JsonProcessingException e) {
-      throw new JsonPrettyPrinterException(value, e);
+      throw new YamlPrinterException(e);
     }
+  }
+
+  @Override
+  public String filenameExtension() {
+    return "yaml";
   }
 }

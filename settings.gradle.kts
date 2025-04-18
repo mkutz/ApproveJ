@@ -8,4 +8,6 @@ include("modules:core")
 
 include("modules:json-jackson")
 
+include("modules:yaml-jackson")
+
 include("manual")

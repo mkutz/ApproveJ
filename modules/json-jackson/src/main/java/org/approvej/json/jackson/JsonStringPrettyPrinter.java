@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.approvej.print.Printer;
 import org.jspecify.annotations.NullMarked;
 
@@ -35,7 +36,7 @@ public class JsonStringPrettyPrinter implements JsonPrinter<String> {
    * @return a {@link JsonStringPrettyPrinter} using the default {@link JsonMapper}.
    */
   public static JsonStringPrettyPrinter jsonStringPrettyPrinter() {
-    return jsonStringPrettyPrinter(JsonMapper.builder().build());
+    return jsonStringPrettyPrinter(JsonMapper.builder().addModule(new JavaTimeModule()).build());
   }
 
   private JsonStringPrettyPrinter(ObjectReader objectReader, ObjectWriter objectWriter) {
