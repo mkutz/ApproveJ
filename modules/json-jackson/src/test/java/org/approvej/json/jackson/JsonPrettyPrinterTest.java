@@ -21,7 +21,7 @@ class JsonPrettyPrinterTest {
             """
             {
               "name" : "Micha",
-              "birthday" : [ 1982, 2, 19 ]
+              "birthday" : "1982-02-19"
             }""");
   }
 

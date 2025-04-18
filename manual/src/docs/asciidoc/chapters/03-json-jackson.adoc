@@ -1,6 +1,6 @@
 = JSON with Jackson
 
-The `json-jackson` module provides several JSON-related features impelemented with https://github.com/FasterXML/jackson[Jackson].
+The `json-jackson` module provides several JSON-related features implemented with https://github.com/FasterXML/jackson[Jackson].
 
 To use it, you need to add it as a dependency to your project.
 

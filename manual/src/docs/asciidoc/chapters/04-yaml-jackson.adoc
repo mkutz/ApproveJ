@@ -1,0 +1,56 @@
+= JSON with Jackson
+
+The `yaml-jackson` module provides several YAML-related features implemented with https://github.com/FasterXML/jackson[Jackson].
+
+To use it, you need to add it as a dependency to your project.
+
+.Gradle
+[source,groovy,subs=attributes+,role="primary"]
+----
+implementation 'org.approvej:yaml-jackson:{revnumber}'
+----
+.Gradle.kts
+[source,kotlin,subs=attributes+,role="secondary"]
+----
+implementation("org.approvej:yaml-jackson:{revnumber}")
+----
+.Maven
+[source,xml,subs=attributes+,role="secondary"]
+----
+<project>
+  <!-- … -->
+  <dependencies>
+    <dependency>
+      <groupId>org.approvej</groupId>
+      <artifactId>yaml-jackson</artifactId>
+      <version>{revnumber}</version>
+    </dependency>
+  </dependencies>
+  <!-- … -->
+</project>
+----
+
+
+== Pretty YAML
+
+The link:{javadoc-url}/json-jackson/org/approvej/yaml-jackson/YamlPrinter.html.html[`YamlPrinter`].
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/YamlJacksonDocTest.java[tag=print_yaml]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/YamlJacksonDocTest.kt[tag=print_yaml]
+----
+<1> applies the `YamlPrinter` to convert the `Person` object to a string
+
+Now the approved file is much more readable.
+
+[source,json]
+.Approved file
+----
+include::../../../test/java/examples/java/YamlJacksonDocTest-print_yaml-approved.yaml[]
+----

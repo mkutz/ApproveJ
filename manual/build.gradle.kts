@@ -24,6 +24,7 @@ testing {
         dependencies {
           implementation(project(":modules:core"))
           implementation(project(":modules:json-jackson"))
+          implementation(project(":modules:yaml-jackson"))
 
           implementation(platform(libs.junitBom))
           implementation(libs.junitJupiterApi)
