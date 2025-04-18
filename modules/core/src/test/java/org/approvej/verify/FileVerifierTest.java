@@ -76,4 +76,13 @@ class FileVerifierTest {
     assertThat(pathProvider.receivedPath()).exists().content().isEqualTo("Some text");
     assertThat(pathProvider.approvedPath()).exists().content().isEmpty();
   }
+
+  @Test
+  void accept_no_write_access() {
+    FileVerifier fileVerifier = inFile("/does/not/exist.txt");
+
+    assertThatExceptionOfType(FileVerifierError.class)
+        .isThrownBy(() -> fileVerifier.accept("Some text"))
+        .withMessage("Failed to create directories /does/not");
+  }
 }

@@ -10,6 +10,8 @@ import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.concurrent.Callable;
 import org.approvej.ApprovalError;
 import org.jspecify.annotations.NullMarked;
 
@@ -37,19 +39,37 @@ public class FileVerifier implements Verifier {
   @Override
   public void accept(String received) {
     String trimmed = received.trim();
-    try {
-      createDirectories(pathProvider.directory());
-      if (notExists(pathProvider.approvedPath())) {
-        createFile(pathProvider.approvedPath());
-      }
-      String previouslyApproved = readString(pathProvider.approvedPath()).trim();
-      if (!previouslyApproved.equals(trimmed)) {
-        writeString(pathProvider.receivedPath(), trimmed, CREATE, TRUNCATE_EXISTING);
-        throw new ApprovalError(trimmed, previouslyApproved);
-      }
-      deleteIfExists(pathProvider.receivedPath());
-    } catch (IOException e) {
-      throw new FileVerifierError(e);
+    doIoOp(
+        "create directories %s".formatted(pathProvider.directory()),
+        () -> createDirectories(pathProvider.directory()));
+    Path approvedPath = pathProvider.approvedPath();
+    if (notExists(approvedPath)) {
+      doIoOp("create approved file %s".formatted(approvedPath), () -> createFile(approvedPath));
     }
+    String previouslyApproved =
+        doIoOp(
+            "read approved file %s".formatted(approvedPath), () -> readString(approvedPath).trim());
+    Path receivedPath = pathProvider.receivedPath();
+    if (!previouslyApproved.equals(trimmed)) {
+      doIoOp(
+          "write received to %s".formatted(receivedPath),
+          () -> writeString(receivedPath, trimmed, CREATE, TRUNCATE_EXISTING));
+      throw new ApprovalError(trimmed, previouslyApproved);
+    }
+    doIoOp("delete received file %s".formatted(receivedPath), () -> deleteIfExists(receivedPath));
+  }
+
+  private static <T> T doIoOp(String description, IoOp<T> op) {
+    try {
+      return op.call();
+    } catch (IOException e) {
+      throw new FileVerifierError("Failed to %s".formatted(description), e);
+    }
+  }
+
+  @FunctionalInterface
+  private interface IoOp<T> extends Callable<T> {
+    @Override
+    T call() throws IOException;
   }
 }
