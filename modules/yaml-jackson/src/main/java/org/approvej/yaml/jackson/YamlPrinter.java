@@ -64,7 +64,7 @@ public class YamlPrinter<T> implements Printer<T> {
     try {
       return objectWriter.writeValueAsString(value);
     } catch (JsonProcessingException e) {
-      throw new YamlPrinterException(e);
+      throw new YamlPrinterException(value, e);
     }
   }
 
