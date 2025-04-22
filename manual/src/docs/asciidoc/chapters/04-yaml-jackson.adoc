@@ -1,4 +1,4 @@
-= JSON with Jackson
+= YAML with Jackson
 
 The `yaml-jackson` module provides several YAML-related features implemented with https://github.com/FasterXML/jackson[Jackson].
 
