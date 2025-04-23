@@ -11,7 +11,7 @@ import org.approvej.print.ObjectPrinter.objectPrinter
 import org.approvej.scrub.Scrubbers.instants
 import org.approvej.scrub.Scrubbers.uuids
 import org.approvej.verify.PathProviders.nextToTest
-import org.approvej.verify.Verifiers.inFile
+import org.approvej.verify.Verifiers.file
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
@@ -24,7 +24,7 @@ class BasicsDocTest {
     val result = hello("World")
 
     approve(result) // <1>
-      .verify() // <2>
+      .byFile() // <2>
     // end::approve_strings[]
   }
 
@@ -34,7 +34,7 @@ class BasicsDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person) // <1>
-      .verify() // <2>
+      .byFile() // <2>
     // end::approve_pojos[]
   }
 
@@ -45,7 +45,7 @@ class BasicsDocTest {
 
     approve(person)
       .printWith(objectPrinter()) // <1>
-      .verify()
+      .byFile()
     // end::object_printer[]
   }
 
@@ -56,7 +56,7 @@ class BasicsDocTest {
 
     approve(person)
       .printWith { "%s, born %s".format(it.name, it.birthDate) } // <1>
-      .verify()
+      .byFile()
     // end::custom_printer[]
   }
 
@@ -69,7 +69,7 @@ class BasicsDocTest {
       .printWith(objectPrinter())
       .scrubbedOf(instants(ISO_LOCAL_DATE_TIME)) // <1>
       .scrubbedOf(uuids()) // <2>
-      .verify()
+      .byFile()
     // end::scrubbing[]
   }
 
@@ -81,7 +81,7 @@ class BasicsDocTest {
     approve(contact)
       .scrubbedOf { Contact(-1, it.name, it.email, it.phoneNumber) } // <1>
       .printWith(objectPrinter())
-      .verify() // <2>
+      .byFile() // <2>
     // end::custom_scrubbing[]
   }
 
@@ -91,7 +91,7 @@ class BasicsDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .verify(inFile()) // <1>
+      .by(file()) // <1>
     // end::verify_file_next_to_test[]
   }
 
@@ -102,7 +102,7 @@ class BasicsDocTest {
 
     approve(person)
       .printWith(personYamlPrinter()) // <1>
-      .verify(inFile(nextToTest().filenameExtension("yaml"))) // <2>
+      .by(file(nextToTest().filenameExtension("yaml"))) // <2>
     // end::verify_file_next_to_test_as[]
   }
 
@@ -113,7 +113,7 @@ class BasicsDocTest {
 
     approve(person)
       .printWith(personYamlPrinter())
-      .verify(inFile(nextToTest().inSubdirectory().filenameExtension("yaml")))
+      .by(file(nextToTest().inSubdirectory().filenameExtension("yaml")))
     // end::verify_file_directory_next_to_test_as[]
   }
 
@@ -123,7 +123,7 @@ class BasicsDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .verify("Person[name=John Doe, birthDate=1990-01-01]")
+      .byValue("Person[name=John Doe, birthDate=1990-01-01]")
     // end::verify_inplace[]
   }
 
@@ -134,7 +134,7 @@ class BasicsDocTest {
 
     approve(person)
       .printWith(personYamlPrinter())
-      .verify(inFile("src/test/resources/BasicExamples-verify_file_approved_path.yaml")) // <1>
+      .by(file("src/test/resources/BasicExamples-verify_file_approved_path.yaml")) // <1>
     // end::verify_file_approved_path[]
   }
 }

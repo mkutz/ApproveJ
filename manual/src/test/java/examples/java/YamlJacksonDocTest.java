@@ -17,7 +17,7 @@ class YamlJacksonDocTest {
 
     approve(person)
         .printWith(yamlPrinter()) // <1>
-        .verify();
+        .byFile();
     // end::print_yaml[]
   }
 }

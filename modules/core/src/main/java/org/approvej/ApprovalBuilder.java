@@ -2,8 +2,8 @@ package org.approvej;
 
 import static org.approvej.verify.PathProvider.DEFAULT_FILENAME_EXTENSION;
 import static org.approvej.verify.PathProviders.nextToTest;
-import static org.approvej.verify.Verifiers.inFile;
-import static org.approvej.verify.Verifiers.inplace;
+import static org.approvej.verify.Verifiers.file;
+import static org.approvej.verify.Verifiers.value;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -31,11 +31,11 @@ public class ApprovalBuilder<T> {
   /** The default {@link Printer} used to print the value. */
   public static final Printer<Object> DEFAULT_PRINTER = Object::toString;
 
-  private T value;
+  private T receivedValue;
   private final String filenameExtension;
 
   private ApprovalBuilder(T originalValue, String filenameExtension) {
-    this.value = originalValue;
+    this.receivedValue = originalValue;
     this.filenameExtension = filenameExtension;
   }
 
@@ -51,66 +51,68 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Uses the given {@link Function} to convert the {@link #value} to a {@link String}.
+   * Uses the given {@link Function} to convert the {@link #receivedValue} to a {@link String}.
    *
-   * @param printer the {@link Function} used to convert the {@link #value} to a {@link String}
+   * @param printer the {@link Function} used to convert the {@link #receivedValue} to a {@link
+   *     String}
    * @return this
    */
   public ApprovalBuilder<String> printWith(Function<T, String> printer) {
-    return new ApprovalBuilder<>(printer.apply(value), DEFAULT_FILENAME_EXTENSION);
+    return new ApprovalBuilder<>(printer.apply(receivedValue), DEFAULT_FILENAME_EXTENSION);
   }
 
   /**
-   * Uses the given {@link Printer} to convert the {@link #value} to a {@link String}.
+   * Uses the given {@link Printer} to convert the {@link #receivedValue} to a {@link String}.
    *
    * @param printer the printer used to convert the value to a {@link String}
    * @return this
    */
   public ApprovalBuilder<String> printWith(Printer<T> printer) {
-    return new ApprovalBuilder<>(printer.apply(value), printer.filenameExtension());
+    return new ApprovalBuilder<>(printer.apply(receivedValue), printer.filenameExtension());
   }
 
   /**
-   * Applies the given scrubber to the current {@link #value}.
+   * Applies the given scrubber to the current {@link #receivedValue}.
    *
    * @param scrubber the {@link UnaryOperator} or {@link Scrubber}
    * @return this
    */
   public ApprovalBuilder<T> scrubbedOf(UnaryOperator<T> scrubber) {
-    value = scrubber.apply(value);
+    receivedValue = scrubber.apply(receivedValue);
     return this;
   }
 
   /**
-   * Uses the given {@link Consumer} or {@link Verifier} to approve the printed {@link #value}.
+   * Uses the given {@link Consumer} or {@link Verifier} to approve the printed {@link
+   * #receivedValue}.
    *
    * @param verifier the {@link Consumer} or {@link Verifier}
    * @throws ApprovalError if the verification fails
    */
-  public void verify(final Consumer<String> verifier) {
-    if (value instanceof String printedValue) {
+  public void by(final Consumer<String> verifier) {
+    if (receivedValue instanceof String printedValue) {
       verifier.accept(printedValue);
     } else {
-      verifier.accept(DEFAULT_PRINTER.apply(value));
+      verifier.accept(DEFAULT_PRINTER.apply(receivedValue));
     }
   }
 
   /**
-   * Verifies that the given previouslyApproved value equals the {@link #value} using an {@link
-   * InplaceVerifier}.
+   * Verifies that the given previouslyApproved value equals the {@link #receivedValue} using an
+   * {@link InplaceVerifier}.
    *
    * @param previouslyApproved the approved value
    */
-  public void verify(final String previouslyApproved) {
-    verify(inplace(previouslyApproved));
+  public void byValue(final String previouslyApproved) {
+    by(value(previouslyApproved));
   }
 
   /**
-   * Uses the DEFAULT_VERIFIER to approve the printed {@link #value}.
+   * Uses a {@link org.approvej.verify.FileVerifier} to approve the printed {@link #receivedValue}.
    *
    * @throws ApprovalError if the verification fails
    */
-  public void verify() {
-    verify(inFile(nextToTest().filenameExtension(filenameExtension)));
+  public void byFile() {
+    by(file(nextToTest().filenameExtension(filenameExtension)));
   }
 }

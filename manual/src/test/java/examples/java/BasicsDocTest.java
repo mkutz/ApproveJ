@@ -11,7 +11,7 @@ import static org.approvej.print.ObjectPrinter.objectPrinter;
 import static org.approvej.scrub.Scrubbers.instants;
 import static org.approvej.scrub.Scrubbers.uuids;
 import static org.approvej.verify.PathProviders.nextToTest;
-import static org.approvej.verify.Verifiers.inFile;
+import static org.approvej.verify.Verifiers.file;
 
 import examples.ExampleClass.BlogPost;
 import examples.ExampleClass.Contact;
@@ -27,7 +27,7 @@ class BasicsDocTest {
     String result = hello("World");
 
     approve(result) // <1>
-        .verify(); // <2>
+        .byFile(); // <2>
     // end::approve_strings[]
   }
 
@@ -37,7 +37,7 @@ class BasicsDocTest {
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
     approve(person) // <1>
-        .verify(); // <2>
+        .byFile(); // <2>
     // end::approve_pojos[]
   }
 
@@ -48,7 +48,7 @@ class BasicsDocTest {
 
     approve(person)
         .printWith(objectPrinter()) // <1>
-        .verify();
+        .byFile();
     // end::object_printer[]
   }
 
@@ -59,7 +59,7 @@ class BasicsDocTest {
 
     approve(person)
         .printWith(it -> String.format("%s, born %s", it.name(), it.birthDate())) // <1>
-        .verify();
+        .byFile();
     // end::custom_printer[]
   }
 
@@ -73,7 +73,7 @@ class BasicsDocTest {
         .printWith(objectPrinter())
         .scrubbedOf(instants(ISO_LOCAL_DATE_TIME)) // <1>
         .scrubbedOf(uuids()) // <2>
-        .verify(); // <3>
+        .byFile(); // <3>
     // end::scrubbing[]
   }
 
@@ -84,7 +84,7 @@ class BasicsDocTest {
     approve(contact)
         .scrubbedOf(it -> new Contact(-1, it.name(), it.email(), it.phoneNumber())) // <1>
         .printWith(objectPrinter())
-        .verify(); // <2>
+        .byFile(); // <2>
     // end::custom_scrubbing[]
   }
 
@@ -93,7 +93,7 @@ class BasicsDocTest {
     // tag::verify_file_next_to_test[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
-    approve(person).verify(inFile()); // <1>
+    approve(person).by(file()); // <1>
     // end::verify_file_next_to_test[]
   }
 
@@ -104,7 +104,7 @@ class BasicsDocTest {
 
     approve(person)
         .printWith(personYamlPrinter()) // <1>
-        .verify(inFile(nextToTest().filenameExtension("yaml"))); // <2>
+        .by(file(nextToTest().filenameExtension("yaml"))); // <2>
     // end::verify_file_next_to_test_as[]
   }
 
@@ -115,7 +115,7 @@ class BasicsDocTest {
 
     approve(person)
         .printWith(personYamlPrinter())
-        .verify(inFile(nextToTest().inSubdirectory().filenameExtension("yaml")));
+        .by(file(nextToTest().inSubdirectory().filenameExtension("yaml")));
     // end::verify_file_directory_next_to_test_as[]
   }
 
@@ -124,7 +124,7 @@ class BasicsDocTest {
     // tag::verify_inplace[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
-    approve(person).verify("Person[name=John Doe, birthDate=1990-01-01]");
+    approve(person).byValue("Person[name=John Doe, birthDate=1990-01-01]");
     // end::verify_inplace[]
   }
 
@@ -135,7 +135,7 @@ class BasicsDocTest {
 
     approve(person)
         .printWith(personYamlPrinter())
-        .verify(inFile("src/test/resources/BasicExamples-verify_file_approved_path.yaml")); // <1>
+        .by(file("src/test/resources/BasicExamples-verify_file_approved_path.yaml")); // <1>
     // end::verify_file_approved_path[]
   }
 }

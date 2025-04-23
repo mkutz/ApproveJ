@@ -18,7 +18,7 @@ public class Verifiers {
    * @param previouslyApproved the approved value
    * @return a new {@link InplaceVerifier} for the given previouslyApproved value.
    */
-  public static InplaceVerifier inplace(String previouslyApproved) {
+  public static InplaceVerifier value(String previouslyApproved) {
     return new InplaceVerifier(previouslyApproved);
   }
 
@@ -29,7 +29,7 @@ public class Verifiers {
    * @param pathProvider the provider for the paths of the approved and received files
    * @return a new {@link FileVerifier} that uses the given {@link PathProvider}
    */
-  public static FileVerifier inFile(PathProvider pathProvider) {
+  public static FileVerifier file(PathProvider pathProvider) {
     return new FileVerifier(pathProvider);
   }
 
@@ -38,10 +38,10 @@ public class Verifiers {
    *
    * @param pathProviderBuilder the {@link PathProviderBuilder}
    * @return a new {@link FileVerifier} that uses the given {@link PathProvider}
-   * @see #inFile(PathProviderBuilder)
+   * @see #file(PathProviderBuilder)
    */
-  public static FileVerifier inFile(PathProviderBuilder pathProviderBuilder) {
-    return inFile(pathProviderBuilder.build());
+  public static FileVerifier file(PathProviderBuilder pathProviderBuilder) {
+    return file(pathProviderBuilder.build());
   }
 
   /**
@@ -51,8 +51,8 @@ public class Verifiers {
    * @return a new {@link FileVerifier} that uses a {@link NextToTestPathProvider} to determine the
    *     paths
    */
-  public static FileVerifier inFile() {
-    return inFile(nextToTest());
+  public static FileVerifier file() {
+    return file(nextToTest());
   }
 
   /**
@@ -63,8 +63,8 @@ public class Verifiers {
    * @return a new {@link FileVerifier} that uses an {@link ApprovedPathProvider}
    * @see ApprovedPathProvider
    */
-  public static FileVerifier inFile(Path approvedPath) {
-    return inFile(approvedPath(approvedPath));
+  public static FileVerifier file(Path approvedPath) {
+    return file(approvedPath(approvedPath));
   }
 
   /**
@@ -75,7 +75,7 @@ public class Verifiers {
    * @return a new {@link FileVerifier} that uses an {@link ApprovedPathProvider}
    * @see ApprovedPathProvider
    */
-  public static FileVerifier inFile(String approvedPath) {
-    return inFile(Path.of(approvedPath));
+  public static FileVerifier file(String approvedPath) {
+    return file(Path.of(approvedPath));
   }
 }
