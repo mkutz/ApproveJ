@@ -73,6 +73,17 @@ public class Scrubbers {
         .replacement(numbered("instant"));
   }
 
+  public static RegexScrubber dateTimeFormat(String dateTimeFormat) {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dateTimeFormat);
+    return stringsMatching(
+            Pattern.compile(
+                formatter
+                    .format(EXAMPLE_INSTANT)
+                    .replaceAll("G+", "\\\\p{L}+")
+                    .replaceAll("\\d", "\\\\d")))
+        .replacement(numbered("datetime"));
+  }
+
   /**
    * {@link RegexScrubber} for UUIDs.
    *
