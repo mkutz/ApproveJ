@@ -14,11 +14,7 @@ repositories { mavenCentral() }
 
 val asciidoctorExt: Configuration by configurations.creating
 
-dependencies {
-  asciidoctorExt(libs.asciidoctorBlockSwitch)
-
-  testFixturesImplementation(project(":modules:core"))
-}
+dependencies { asciidoctorExt(libs.asciidoctorBlockSwitch) }
 
 testing {
   suites {
