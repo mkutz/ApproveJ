@@ -11,11 +11,12 @@ public class ApprovalError extends AssertionError {
 
   private static final DiffRowGenerator diffRowGenerator =
       DiffRowGenerator.create()
+          .lineNormalizer(line -> line)
           .showInlineDiffs(true)
           .mergeOriginalRevised(true)
-          .inlineDiffByWord(true)
-          .oldTag(f -> f ? "\u001B[32m" : "\u001B[0m")
-          .newTag(f -> f ? "\u001B[34m" : "\u001B[0m")
+          .inlineDiffByWord(false)
+          .oldTag(f -> f ? "\u001B[9;2m" : "\u001B[0m")
+          .newTag(f -> f ? "\u001B[1m" : "\u001B[0m")
           .build();
 
   private static final String shortMessageFormat =
@@ -26,8 +27,9 @@ public class ApprovalError extends AssertionError {
   private static final String coloredDiffMessageFormat =
       """
       Approval mismatch: \
-      previously approved: <\u001B[32m%s\u001B[0m>, \
-      received: <\u001B[34m%s\u001B[0m>
+      previously approved: <%s>, \
+      received: <%s>
+
       %s""";
 
   /** The received value */
@@ -44,24 +46,16 @@ public class ApprovalError extends AssertionError {
    * @param previouslyApproved the previously approved value
    */
   public ApprovalError(String received, String previouslyApproved) {
-    super(shortMessageFormat.formatted(previouslyApproved, received));
+    super(
+        coloredDiffMessageFormat.formatted(
+            previouslyApproved,
+            received,
+            diffRowGenerator
+                .generateDiffRows(previouslyApproved.lines().toList(), received.lines().toList())
+                .stream()
+                .map(DiffRow::getOldLine)
+                .collect(Collectors.joining("\n"))));
     this.received = received;
     this.previouslyApproved = previouslyApproved;
-  }
-
-  /**
-   * Creates and retunes a colored message including a diff.
-   *
-   * @return a colored message with diff
-   */
-  public String getColoredDiffMessage() {
-    return coloredDiffMessageFormat.formatted(
-        previouslyApproved,
-        received,
-        diffRowGenerator
-            .generateDiffRows(previouslyApproved.lines().toList(), received.lines().toList())
-            .stream()
-            .map(DiffRow::getOldLine)
-            .collect(Collectors.joining("\n")));
   }
 }
