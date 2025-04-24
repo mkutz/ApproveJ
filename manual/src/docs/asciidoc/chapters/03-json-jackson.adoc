@@ -63,7 +63,7 @@ include::../../../test/java/examples/java/JsonJacksonDocTest-scrub_json_pointer-
 
 In the example above, the JSON persisted in a one-liner.
 Even for the simple example, this is not very readable, let alone easily comparable to a slightly different JSON.
-To improve this, you can use the link:{javadoc-url}/json-jackson/org/approvej/json/jackson/JsonPrettyPrinter.html.html[`JsonPrettyPrinter`].
+To improve this, you can use the link:{javadoc-url}/json-jackson/org/approvej/json/jackson/JsonPrettyPrinter.html[`JsonPrettyPrinter`].
 
 [source,java,indent=0,role="primary"]
 .Java
