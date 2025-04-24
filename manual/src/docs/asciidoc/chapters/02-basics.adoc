@@ -1,7 +1,7 @@
 = Basics
 
 The general entry point to start an approval is the static initializer `approve` of the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`].
-It takes the object which you want to approve an argument and returns a builder to configure the approval with a fluent API.
+It takes the object which you want to approve as an argument and returns a builder to configure the approval with a fluent API.
 
 
 [id="approve_strings"]
@@ -36,8 +36,11 @@ If the received value equals the content of the approved file, the received file
 include::../../../test/java/examples/java/BasicsDocTest-approve_strings-approved.txt[]
 ----
 
-You can adjust various details of this process or use no file at all.
-See <<verifying>> for more details on how to do that.
+You can adjust various details of this process:
+
+- <<printing>>
+- <<scrubbing>>
+- <<approving>>
 
 
 [id="approve_pojos"]
@@ -47,13 +50,13 @@ Of course, you might want to approve more complex objects than just strings.
 
 For example a simple POJO like this
 
-[source,java,indent=0,role="primary"]
+[source,java,indent=0]
 .Person POJO
 ----
 include::../../../testFixtures/java/examples/ExampleClass.java[tag=person_pojo]
 ----
 
-By default, ApproveJ will simply call the object's `toString` method to turn the object into a string just before verifying.
+By default, ApproveJ will simply call the object's `toString` method to turn the object into a string just before approving it.
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -66,7 +69,8 @@ include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_pojos]
 include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_pojos]
 ----
 <1> creates an `ApprovalBuilder<Person>` approve the person
-<2> compares the `person.toString()` to a previously approved version and fails if they are not equal
+
+Will approve the following value:
 
 [source,text]
 .Approved file
@@ -84,7 +88,8 @@ While some `toString` implementations already are quite good, they typically ret
 This is fine as long as you only have a few properties.
 However, if you have a lot of properties, it is much easier to read the result if it is formatted nicely.
 
-In order to change the way objects are being transformed to strings, you can use the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`]'s `printWith` method.
+In order to change the way objects are being transformed to strings, you can use the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`]'s `printWith` method and provide a link:{javadoc-url}/core/org/approvej/print/Printer.html[`Printer`]/`Function<T, String>` instance as an argument.
+
 
 === Generic Object Printer
 
@@ -112,31 +117,61 @@ include::../../../test/java/examples/java/BasicsDocTest-object_printer-approved.
 ----
 
 
-=== Custom Printer
+[id=custom_printer_function]
+=== Custom Printer Function
 
-You can also provide a custom link:{javadoc-url}/core/org/approvej/print/Printer.html[`Printer`]/`Function<T, String>` implementation to the builder's `printWith` method.
+You can provide a custom `Function<T, String>` to the builder's `printWith` method.
 
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=custom_printer]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=custom_printer_function]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=custom_printer]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=custom_printer_function]
 ----
-<1> applies the given `Printer` and returns a new `ApprovalBuilder<String>`
+<1> applies the given `Function` and returns a new `ApprovalBuilder<String>`
+
+So the content of the approved file will look like this
 
 [source]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicsDocTest-custom_printer-approved.txt[]
+include::../../../test/java/examples/java/BasicsDocTest-custom_printer_function-approved.txt[]
 ----
 
-Additionally, a custom `Printer` can override the `filenameExtension` method.
-If you use a link:{javadoc-url}/core/org/approvej/verify/FileVerifier.html[`FileVerifier`] (see <<verifying>>), the returned `String` is used as the files' filename extension.
+
+[id=custom_printer_implementation]
+=== Custom Printer Implementation
+
+For more complex cases, you can implement your own link:{javadoc-url}/core/org/approvej/print/Printer.html[`Printer`].
+
+This will allow you to also override the `filenameExtension` method.
+If you use a link:{javadoc-url}/core/org/approvej/approve/FileApprover.html[`FileApprover`] (see <<approving>>), it will be used to determine the files' filename extension.
 This is useful, if your `Printer` creates a certain format (e.g. JSON, XML, YAML, …).
+
+E.g. the following implementation will print a `Person` as a YAML string.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=person_yaml_printer]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=person_yaml_printer]
+----
+
+The resulting file will look like this
+
+[source,yaml]
+.Approved file
+----
+include::../../../test/java/examples/java/BasicsDocTest-custom_printer-approved.yaml[]
+----
 
 
 [id=scrubbing]
@@ -186,7 +221,7 @@ Note that two matches of the same (e.g. the same UUID in two places) will be rep
 === Custom `Scrubber`
 
 The link:{javadoc-url}/core/org/approvej/scrub/RegexScrubber.html[`RegexScrubber`] already allows for a lot of special custom cases.
-In case this isn't enough, you can also provide a custom `Scrubber<T>`/`UnaryOperator<T>` implementation to the builder's `scrubbedOf` method.
+In case this isn't enough, you can also provide a custom link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber<T>`]/`UnaryOperator<T>` implementation to the builder's `scrubbedOf` method.
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -198,8 +233,7 @@ include::../../../test/java/examples/java/BasicsDocTest.java[tag=custom_scrubbin
 ----
 include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=custom_scrubbing]
 ----
-<1> this custom `Scrubber` specifically the number property of the `Contact` with a constant
-<2> so that the verified result looks like this
+<1> this custom `Scrubber` specifically replaces the number property of the `Contact` with a constant
 
 [source]
 .Approved file
@@ -208,22 +242,25 @@ include::../../../test/java/examples/java/BasicsDocTest-custom_scrubbing-approve
 ----
 
 Note that this `Scrubber` is a `Scrubber<Contact>` and not a `Scrubber<String>`.
-Hence, it is necessary to apply it before the `Printer` is applied.
+Hence, it is necessary to apply it _before_ the `Printer` is applied.
 
-Of course the `Scrubber` can also be defined in a separate class, instead of a lambda.
+In case you want to reuse the `Scrubber`, you can also define in a separate class implementing the link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber<T>`] interface.
 
 
 === Built-In `Scrubbers`
 
-All built-in `Scrubber` implementations are available via the  link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html[Scrubbers] utility class.
+All built-in `Scrubber` implementations are available via the link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html[Scrubbers] utility class.
 
 
-[id=verifying]
-== Verifying -- adjust the verification
+[id=approving]
+== Approving -- adjust the verification
 
-=== `InplaceVerifier`
+You conclude the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`] by specifying `by` which link:{javadoc-url}/core/org/approvej/approve/Approver.html[`Approver`] the received value should be approved.
 
-The link:{javadoc-url}/core/org/approvej/verify/InplaceVerifier.html[`InplaceVerifier`] will verify the result with a directly provided previously approved value.
+
+=== Approve by Value
+
+The link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byValue(java.lang.String)[`ApprovalBuilder.byValue()`] method will use an link:{javadoc-url}/core/org/approvej/approve/InplaceApprover.html[`InplaceApprover`] to approve the received value by comparison with a directly provided previously approved value.
 That way, the approved value is plainly visible in the test code.
 However, this might not be practical for large objects.
 It also does not allow to use a diff tool to compare the result with the previously approved value.
@@ -231,18 +268,18 @@ It also does not allow to use a diff tool to compare the result with the previou
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=verify_inplace]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_inplace]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_inplace]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_inplace]
 ----
 
 
-=== `FileVerifier`
+=== Approve by File
 
-The link:{javadoc-url}/core/org/approvej/verify/FileVerifier.html[`FileVerifier`] will verify the result with a previously approved value stored in a file.
+The link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byFile()[`ApprovalBuilder.byFile()`] method will use a link:{javadoc-url}/core/org/approvej/approve/FileApprover.html[`FileApprover`] to approve the received value by comparison a previously approved value stored in a file.
 It is used in most of the examples above.
 
 If no approved file exists, it will be created as an empty _approved_ file.
@@ -261,21 +298,21 @@ You can use a diff tool of your choice to compare the two files and merge values
 
 ==== Next to Test
 
-By default, the `FileVerifier` will use a link:{javadoc-url}/core/org/approvej/verify/NextToTestPathProvider.html[`NextToTestPathProvider`], which will put the received and approved files next to the test class and name them like the test case method.
+By default, the `FileApprover` will use a link:{javadoc-url}/core/org/approvej/approve/NextToTestPathProvider.html[`NextToTestPathProvider`], which will put the received and approved files next to the test class and name them like the test case method.
 
-You can make this explicit by using the `inFile` method.
+You can make this explicit by using the `nextToFile` method.
 
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=verify_file_next_to_test]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_file_next_to_test]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_next_to_test]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_next_to_test]
 ----
-<1> defines the `NextToTestPathProvider` explicitly, same as just calling `verify()`
+<1> defines the `NextToTestPathProvider` explicitly, same as just calling `byFile()`
 
 
 .File structure
@@ -289,17 +326,20 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_n
 
 ==== Custom Filename Extension
 
-The `filenameExtension` method gives you the opportunity to use a different file extension for the approved and received files.
+The link:{javadoc-url}/core/org/approvej/approve/NextToTestPathProvider.html#filenameExtension(java.lang.String)[`NextToTestPathProvider.filenameExtension`] method gives you the opportunity to use a different file extension for the approved and received files.
+
+NOTE:: most of the time you probably want to do this because you're using a special printer that creates a specific format (e.g. JSON, XML, YAML, …).
+In that case, you might want to provide a <<custom_printer_implementation>> and override the `filenameExtension` method of the `Printer` instead of changing the filename extension here.
 
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=verify_file_next_to_test_as]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_file_custom_extension]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_next_to_test_as]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_custom_extension]
 ----
 <1> this printer will create a YAML version of the object
 <2> so it makes sense to change the filename extension, so your IDE will apply appropriate syntax highlighting
@@ -317,17 +357,17 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_n
 ==== In a Subdirectory
 
 If you have test classes with a lot of approval tests, there a quite a lot of files created next to the test class.
-In that case, you can use the `inSubdirectory` to instruct the link:{javadoc-url}/core/org/approvej/verify/NextToTestPathProvider.html[`NextToTestPathProvider`], which will create a directory next to the test class and put the approved and received files in there.
+In that case, you can use the link:{javadoc-url}/core/org/approvej/approve/NextToTestPathProvider.html#inSubdirectory()[`NextToTestPathProvider.inSubdirectory`] method to instruct the link:{javadoc-url}/core/org/approvej/approve/NextToTestPathProvider.html[`NextToTestPathProvider`] to put all the files in a subdirectory named after the test class.
 
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=verify_file_directory_next_to_test_as]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_file_nextToTest_inSubdirectory]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_directory_next_to_test_as]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_nextToTest_inSubdirectory]
 ----
 
 .File structure with subdirectory
@@ -335,8 +375,8 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_d
 .
 └── 📁src/test/java/…
     ├── 📁 <TestClass>
-    │   ├── 📄 <testMethod>-approved.<filenameExtension>
-    │   └── 📄 <testMethod>-received.<filenameExtension>
+    │   ├── 📄 <testMethod>-approved.txt
+    │   └── 📄 <testMethod>-received.txt
     └── 📄 <TestClass>.java
 ----
 
@@ -349,22 +389,22 @@ Otherwise, the word `received` will be added at the end of the filename.
 
 For example
 
-- `src/test/resources/BasicsDocTest-verify_file_approved_path-approved.yaml` ->
-  `src/test/resources/BasicsDocTest-verify_file_approved_path-received.yaml`
-- `src/test/resources/BasicsDocTest-verify_file_approved_path.yaml` ->
-  `src/test/resources/BasicsDocTest-verify_file_approved_path-received.yaml`.
+- `src/test/resources/BasicsDocTest-approve_file_approved_path-approved.yaml` ->
+  `src/test/resources/BasicsDocTest-approve_file_approved_path-received.yaml`
+- `src/test/resources/BasicsDocTest-approve_file_approved_path.yaml` ->
+  `src/test/resources/BasicsDocTest-approve_file_approved_path-received.yaml`.
 
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=verify_file_approved_path]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_file_approved_path]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_approved_path]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_approved_path]
 ----
-<1> this will expect the approved file at this path, the received file will be created next to it at `src/test/resources/BasicsDocTest-verify_file_approved_path-reveived.yaml`
+<1> this will expect the approved file at this path, the received file will be created next to it at `src/test/resources/BasicsDocTest-approve_file_approved_path-reveived.yaml`
 
 .File structure with given path
 ----
@@ -372,16 +412,18 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=verify_file_a
 └── 📁src/test/java/…
 │   └── 📄 <TestClass>.java
 └── 📁src/test/resources
-    ├── 📄 src/test/resources/BasicExamples-verify_file_approved_path.yaml
-    └── 📄 src/test/resources/BasicExamples-verify_file_approved_path-received.yaml
+    ├── 📄 src/test/resources/BasicExamples-approve_file_approved_path.yaml
+    └── 📄 src/test/resources/BasicExamples-approve_file_approved_path-received.yaml
 ----
 
 
 ==== Custom `PathProvider`
 
-You can also define your own link:{javadoc-url}/core/org/approvej/verify/FileVerifier.PathProvider.html[`PathProvider`].
+You can also define your own link:{javadoc-url}/core/org/approvej/approve/FileApprover.PathProvider.html[`PathProvider`] and pass it to the `byFile` method.
+
+In that case, you might want to take advantage of the link:{javadoc-url}/core/org/approvej/approve/StackTraceTestFinderUtil.html[`StackTraceTestFinderUtil`] class to find the test source path or the current test method based on the current stack trace.
 
 
-=== Built-In `Verifiers` and `PathProviders`
+=== Built-In `PathProviders`
 
-All built-in `Verifier` and `PathProvider` implementations are available via the  link:{javadoc-url}/core/org/approvej/verify/Verifiers.html[`Verifiers`] and link:{javadoc-url}/core/org/approvej/verify/PathProviders.html[`PathProviders`] utility classes.
+All built-in link:{javadoc-url}/core/org/approvej/approve/PathProvider.html[`PathProvider`] implementations are available via the link:{javadoc-url}/core/org/approvej/approve/PathProviders.html[`PathProviders`] utility class.

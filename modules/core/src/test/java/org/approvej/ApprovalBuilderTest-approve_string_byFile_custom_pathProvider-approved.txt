@@ -1,0 +1,3 @@
+This is my example text with a date: [today].
+There is also a UUID here: [uuid 1].
+Also here's a timestamp: [today]T11:22:33, which will be partially scrubbed.

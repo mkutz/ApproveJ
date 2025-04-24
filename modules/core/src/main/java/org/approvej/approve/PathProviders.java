@@ -1,13 +1,9 @@
-package org.approvej.verify;
+package org.approvej.approve;
 
 import java.nio.file.Path;
-import org.approvej.verify.NextToTestPathProvider.NextToTestPathProviderBuilder;
 import org.jspecify.annotations.NullMarked;
 
-/**
- * Collection of static methods to create {@link PathProviders} and {@link PathProviderBuilder}
- * instances.
- */
+/** Collection of static methods to create {@link PathProviders} instances. */
 @NullMarked
 public class PathProviders {
 
@@ -34,11 +30,11 @@ public class PathProviders {
   }
 
   /**
-   * Creates a {@link NextToTestPathProviderBuilder}.
+   * Creates a {@link NextToTestPathProvider}.
    *
-   * @return a new {@link NextToTestPathProviderBuilder}
+   * @return a new {@link NextToTestPathProvider}
    */
-  public static NextToTestPathProviderBuilder nextToTest() {
-    return new NextToTestPathProviderBuilder();
+  public static NextToTestPathProvider nextToTest() {
+    return new NextToTestPathProvider();
   }
 }

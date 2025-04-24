@@ -4,13 +4,13 @@ import static examples.ExampleClass.Tag.ENTERTAINMENT;
 import static examples.ExampleClass.Tag.NEWS;
 import static examples.ExampleClass.createTaggedBlogPost;
 import static org.approvej.ApprovalBuilder.approve;
+import static org.approvej.approve.PathProviders.nextToTest;
+import static org.approvej.approve.Verifiers.file;
 import static org.approvej.json.jackson.JsonPointerScrubber.jsonPointer;
 import static org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter;
 import static org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter;
 import static org.approvej.scrub.Scrubbers.instants;
 import static org.approvej.scrub.Scrubbers.uuids;
-import static org.approvej.verify.PathProviders.nextToTest;
-import static org.approvej.verify.Verifiers.file;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,4 +1,4 @@
-package org.approvej.verify;
+package org.approvej.approve;
 
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.createFile;
@@ -16,23 +16,23 @@ import org.approvej.ApprovalError;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * {@link Verifier} that compares the received value with the approved value stored in a file. If
+ * {@link Approver} that compares the received value with the approved value stored in a file. If
  * the values differ, it creates a new file with the received value and throws an {@link
  * ApprovalError}.
  */
 @NullMarked
-public class FileVerifier implements Verifier {
+public class FileApprover implements Approver {
 
   private final PathProvider pathProvider;
 
   /**
-   * Creates a new {@link FileVerifier} that uses the given {@link PathProvider} to determine the
+   * Creates a new {@link FileApprover} that uses the given {@link PathProvider} to determine the
    * paths of the approved and received files.
    *
    * @param pathProvider a {@link PathProvider} to determine the paths of the approved and received
    *     files
    */
-  FileVerifier(PathProvider pathProvider) {
+  FileApprover(PathProvider pathProvider) {
     this.pathProvider = pathProvider;
   }
 

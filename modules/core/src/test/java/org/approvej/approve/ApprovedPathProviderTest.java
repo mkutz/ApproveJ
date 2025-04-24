@@ -1,6 +1,6 @@
-package org.approvej.verify;
+package org.approvej.approve;
 
-import static org.approvej.verify.PathProviders.approvedPath;
+import static org.approvej.approve.PathProviders.approvedPath;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;

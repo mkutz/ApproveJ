@@ -1,27 +1,55 @@
 package org.approvej;
 
-import static org.approvej.verify.PathProvider.DEFAULT_FILENAME_EXTENSION;
-import static org.approvej.verify.PathProviders.nextToTest;
-import static org.approvej.verify.Verifiers.file;
-import static org.approvej.verify.Verifiers.value;
+import static org.approvej.approve.PathProvider.DEFAULT_FILENAME_EXTENSION;
+import static org.approvej.approve.PathProviders.approvedPath;
+import static org.approvej.approve.PathProviders.nextToTest;
+import static org.approvej.approve.Verifiers.file;
+import static org.approvej.approve.Verifiers.value;
 
+import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.approvej.approve.ApprovedPathProvider;
+import org.approvej.approve.Approver;
+import org.approvej.approve.FileApprover;
+import org.approvej.approve.InplaceApprover;
+import org.approvej.approve.PathProvider;
 import org.approvej.print.Printer;
 import org.approvej.scrub.Scrubber;
-import org.approvej.verify.InplaceVerifier;
-import org.approvej.verify.Verifier;
 import org.jspecify.annotations.NullMarked;
 
 /**
  * A builder to configure an approval for a given value.
  *
- * <p>Optionally the value can be "scrubbed" of dynamic data (like timestamps or ID's).
+ * <p>E.g. {@code approve(result).byFile();} will approve the result with the content of a file next
+ * to the test.
  *
- * <p>The value will be printed (converted to {@link String}) using a {@link Printer}. By default,
- * the {@link org.approvej.print.ObjectPrinter} will be applied, which can be changed with the
- * {@link #printWith(Function)}.
+ * <h2>Printing</h2>
+ *
+ * <p>Before approval, the value needs to be printed (turned into a {@link String}). You can use the
+ * method {@link #printWith(Printer)} to customize that. By default, the value's {@link
+ * Object#toString() toString method} will be called.
+ *
+ * <p>E.g. {@code approve(result).printWith(objectPrinter()).byFile();} prints the given object
+ * using the given {@link org.approvej.print.ObjectPrinter}.
+ *
+ * <h2>Scrubbing</h2>
+ *
+ * <p>The value can also be {@link #scrubbedOf(UnaryOperator) scrubbed of} dynamic data (like
+ * timestamps or ID's).
+ *
+ * <p>E.g. {@code approve(result).scrubbedOf(uuids()).byFile();} will replace all UUID's in the
+ * result before approval.
+ *
+ * <h2>Approving</h2>
+ *
+ * <p>The builder is concluded by specifying an approver to approve the value {@link #by(Consumer)
+ * by} ( {@link #byFile()} and {@link #byValue(String)}).
+ *
+ * <p>E.g. {@code approve(result).byFile();} approves the result with the content of a file next to
+ * the test, while {@code approve(result).byValue(approved);} approves the result with the given
+ * approved value.
  *
  * @param <T> the type of the value to approve
  */
@@ -83,23 +111,23 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Uses the given {@link Consumer} or {@link Verifier} to approve the printed {@link
-   * #receivedValue}.
+   * Approves the {@link #receivedValue} by the given approver.
    *
-   * @param verifier the {@link Consumer} or {@link Verifier}
-   * @throws ApprovalError if the verification fails
+   * <p>If necessary the {@link #receivedValue} is printed using the {@link #DEFAULT_PRINTER}.
+   *
+   * @param approver a {@link Consumer} or an {@link Approver} implementation
+   * @throws ApprovalError if the approval fails
    */
-  public void by(final Consumer<String> verifier) {
+  public void by(final Consumer<String> approver) {
     if (receivedValue instanceof String printedValue) {
-      verifier.accept(printedValue);
+      approver.accept(printedValue);
     } else {
-      verifier.accept(DEFAULT_PRINTER.apply(receivedValue));
+      approver.accept(DEFAULT_PRINTER.apply(receivedValue));
     }
   }
 
   /**
-   * Verifies that the given previouslyApproved value equals the {@link #receivedValue} using an
-   * {@link InplaceVerifier}.
+   * Approves the value by an {@link InplaceApprover} with the given previouslyApproved value.
    *
    * @param previouslyApproved the approved value
    */
@@ -108,11 +136,44 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Uses a {@link org.approvej.verify.FileVerifier} to approve the printed {@link #receivedValue}.
+   * Approves the receivedValue by a {@link FileApprover}, a {@link
+   * org.approvej.approve.NextToTestPathProvider}, and the {@link Printer#filenameExtension()}.
    *
-   * @throws ApprovalError if the verification fails
+   * @throws ApprovalError if the approval fails
    */
   public void byFile() {
     by(file(nextToTest().filenameExtension(filenameExtension)));
+  }
+
+  /**
+   * Approves the receivedValue by a {@link FileApprover} with the given {@link PathProvider}.
+   *
+   * @param pathProvider the provider for the paths of the approved and received files
+   * @throws ApprovalError if the approval fails
+   */
+  public void byFile(PathProvider pathProvider) {
+    by(file(pathProvider));
+  }
+
+  /**
+   * Approves the receivedValue by a {@link FileApprover} with an {@link ApprovedPathProvider} and
+   * the given {@link Path} to the approved file.
+   *
+   * @param approvedPath the {@link Path} to the approved file
+   * @throws ApprovalError if the approval fails
+   */
+  public void byFile(Path approvedPath) {
+    by(file(approvedPath(approvedPath)));
+  }
+
+  /**
+   * Approves the receivedValue by a {@link FileApprover} with an {@link ApprovedPathProvider} and
+   * the given path to the approved file.
+   *
+   * @param approvedPath the path to the approved file
+   * @throws ApprovalError if the approval fails
+   */
+  public void byFile(String approvedPath) {
+    by(file(approvedPath(Path.of(approvedPath))));
   }
 }

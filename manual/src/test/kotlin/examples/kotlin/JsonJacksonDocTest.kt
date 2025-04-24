@@ -11,8 +11,8 @@ import org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter
 import org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter
 import org.approvej.scrub.Scrubbers.instants
 import org.approvej.scrub.Scrubbers.uuids
-import org.approvej.verify.PathProviders.nextToTest
-import org.approvej.verify.Verifiers.file
+import org.approvej.approve.PathProviders.nextToTest
+import org.approvej.approve.Verifiers.file
 import org.junit.jupiter.api.Test
 import java.time.format.DateTimeFormatter
 
