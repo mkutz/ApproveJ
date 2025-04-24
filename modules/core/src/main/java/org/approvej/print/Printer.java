@@ -1,6 +1,6 @@
 package org.approvej.print;
 
-import static org.approvej.verify.PathProvider.DEFAULT_FILENAME_EXTENSION;
+import static org.approvej.approve.PathProvider.DEFAULT_FILENAME_EXTENSION;
 
 import java.util.function.Function;
 

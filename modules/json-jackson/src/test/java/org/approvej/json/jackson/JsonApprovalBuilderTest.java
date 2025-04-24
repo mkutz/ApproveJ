@@ -6,7 +6,6 @@ import static org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter;
 import static org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter;
 import static org.approvej.scrub.Scrubbers.relativeDates;
 import static org.approvej.scrub.Scrubbers.uuids;
-import static org.approvej.verify.Verifiers.inplace;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 import java.time.LocalDate;
@@ -42,7 +41,7 @@ class JsonApprovalBuilderTest {
   void verify_list() {
     approve(List.of("a", "b", "c"))
         .printWith(jsonPrettyPrinter())
-        .verify(inplace("[ \"a\", \"b\", \"c\" ]"));
+        .byValue("[ \"a\", \"b\", \"c\" ]");
   }
 
   @Test
@@ -51,7 +50,7 @@ class JsonApprovalBuilderTest {
         .printWith(jsonStringPrettyPrinter())
         .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
         .scrubbedOf(uuids())
-        .verify();
+        .byFile();
   }
 
   @Test
@@ -60,13 +59,13 @@ class JsonApprovalBuilderTest {
         .printWith(jsonStringPrettyPrinter())
         .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
         .scrubbedOf(uuids())
-        .verify(inplace(SCRUBBED_JSON));
+        .byValue(SCRUBBED_JSON);
   }
 
   @Test
   void verify_failure() {
     assertThatExceptionOfType(AssertionError.class)
-        .isThrownBy(() -> approve(EXAMPLE_JSON).verify(inplace("This is not the same text.")))
+        .isThrownBy(() -> approve(EXAMPLE_JSON).byValue("This is not the same text."))
         .withMessage(
             "Approval mismatch: expected: <This is not the same text.> but was: <%s>"
                 .formatted(EXAMPLE_JSON));

@@ -1,4 +1,4 @@
-package org.approvej.verify;
+package org.approvej.approve;
 
 import static java.util.Arrays.stream;
 
@@ -23,7 +23,7 @@ public class StackTraceTestFinderUtil {
    *
    * @return the currently executing test {@link Method}
    */
-  static Method currentTestMethod() {
+  public static Method currentTestMethod() {
     return stream(Thread.currentThread().getStackTrace())
         .map(
             element -> {

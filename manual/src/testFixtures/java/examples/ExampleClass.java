@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Function;
 
 public class ExampleClass {
 
@@ -23,16 +22,6 @@ public class ExampleClass {
   public record Person(String name, LocalDate birthDate) {}
 
   // end::person_pojo[]
-
-  public static Function<Person, String> personYamlPrinter() {
-    return person ->
-        """
-        person:
-          name: %s
-          birthDate: %s
-        """
-            .formatted(person.name(), person.birthDate());
-  }
 
   public static BlogPost createBlogPost(String title, String content) {
     return new BlogPost(title, content);

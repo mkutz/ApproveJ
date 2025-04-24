@@ -2,14 +2,18 @@ package org.approvej;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.approvej.ApprovalBuilder.approve;
+import static org.approvej.approve.PathProviders.nextToTest;
+import static org.approvej.approve.Verifiers.file;
+import static org.approvej.print.ObjectPrinter.objectPrinter;
 import static org.approvej.scrub.Scrubbers.dates;
 import static org.approvej.scrub.Scrubbers.relativeDates;
 import static org.approvej.scrub.Scrubbers.uuids;
-import static org.approvej.verify.Verifiers.inFile;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.UUID;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 
 class ApprovalBuilderTest {
@@ -30,48 +34,113 @@ class ApprovalBuilderTest {
       """;
 
   @Test
-  void verify_string_inplace() {
-    approve(EXAMPLE_TEXT).verify(EXAMPLE_TEXT);
+  void approve_string_inplace() {
+    approve(EXAMPLE_TEXT).byValue(EXAMPLE_TEXT);
   }
 
   @Test
-  void verify_string_in_file() {
+  void approve_string_by_approver() {
     approve(EXAMPLE_TEXT)
         .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
         .scrubbedOf(uuids())
-        .verify(inFile());
+        .by(file(nextToTest()));
   }
 
   @Test
-  void verify_with_scrubbers() {
+  void approve_string_byFile() {
     approve(EXAMPLE_TEXT)
         .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
         .scrubbedOf(uuids())
-        .verify(SCRUBBED);
+        .byFile();
   }
 
   @Test
-  void verify_failure() {
+  void approve_string_byFile_custom_pathProvider() {
+    approve(EXAMPLE_TEXT)
+        .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
+        .scrubbedOf(uuids())
+        .byFile(nextToTest());
+  }
+
+  @Test
+  void approve_string_byFile_custom_pathProviderBuilder() {
+    approve(EXAMPLE_TEXT)
+        .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
+        .scrubbedOf(uuids())
+        .byFile(nextToTest());
+  }
+
+  @Test
+  void approve_string_byFile_custom_pathProviderBuilder_path() {
+    approve(EXAMPLE_TEXT)
+        .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
+        .scrubbedOf(uuids())
+        .byFile(
+            Path.of(
+                "src/test/resources/approve_string_byFile_custom_pathProviderBuilder-approved.txt"));
+  }
+
+  @Test
+  void approve_string_byFile_custom_pathProviderBuilder_path_string() {
+    approve(EXAMPLE_TEXT)
+        .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
+        .scrubbedOf(uuids())
+        .byFile(
+            "src/test/resources/approve_string_byFile_custom_pathProviderBuilder_path_string-approved.txt");
+  }
+
+  @Test
+  void approve_string_byValue() {
+    approve(EXAMPLE_TEXT)
+        .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
+        .scrubbedOf(uuids())
+        .byValue(SCRUBBED);
+  }
+
+  @Test
+  void approve_string_mismatch() {
     assertThatExceptionOfType(AssertionError.class)
-        .isThrownBy(() -> approve(EXAMPLE_TEXT).verify("This is not the same text."))
+        .isThrownBy(() -> approve(EXAMPLE_TEXT).byValue("This is not the same text."))
         .withMessage(
             "Approval mismatch: expected: <This is not the same text.> but was: <%s>"
                 .formatted(EXAMPLE_TEXT));
   }
 
   @Test
-  void verify_pre_and_post_print_scrubbing() {
+  void approve_pojo_default_printer() {
+    approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
+        .byValue("Person[id=000000-0000-0000-00000001, name=Micha, birthday=1982-02-19]");
+  }
+
+  @Test
+  void approve_pojo_printWith_function() {
+    Function<Person, String> personPrinter =
+        person -> "id=%s%nname=%s%nbirthday=%s".formatted(person.id, person.name, person.birthday);
+    approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
+        .printWith(personPrinter)
+        .byValue("id=000000-0000-0000-00000001\nname=Micha\nbirthday=1982-02-19");
+  }
+
+  @Test
+  void approve_pojo_printWith_printer() {
+    approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
+        .printWith(objectPrinter())
+        .byValue(
+            """
+            Person [
+              birthday=<inaccessible>,
+              id=<inaccessible>,
+              name=<inaccessible>
+            ]""");
+  }
+
+  @Test
+  void approve_pojo_byFile_pre_and_post_print_scrubbing() {
     approve(new Person("Micha", LocalDate.of(1982, 2, 19)))
         .scrubbedOf(person -> new Person("[scrubbed id]", person.name, person.birthday))
         .printWith(Object::toString)
         .scrubbedOf(dates(ofPattern("yyyy-MM-dd")))
-        .verify();
-  }
-
-  @Test
-  void verify_default_printer() {
-    approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
-        .verify("Person[id=000000-0000-0000-00000001, name=Micha, birthday=1982-02-19]");
+        .byFile();
   }
 
   record Person(String id, String name, LocalDate birthday) {

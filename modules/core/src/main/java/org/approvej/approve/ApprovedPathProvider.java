@@ -1,4 +1,4 @@
-package org.approvej.verify;
+package org.approvej.approve;
 
 import java.nio.file.Path;
 import java.util.Objects;

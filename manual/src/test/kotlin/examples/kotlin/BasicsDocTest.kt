@@ -1,17 +1,17 @@
 package examples.kotlin
 
 import examples.ExampleClass.Contact
+import examples.ExampleClass.Person
 import examples.ExampleClass.createBlogPost
 import examples.ExampleClass.createContact
 import examples.ExampleClass.createPerson
 import examples.ExampleClass.hello
-import examples.ExampleClass.personYamlPrinter
 import org.approvej.ApprovalBuilder.approve
+import org.approvej.approve.PathProviders.nextToTest
 import org.approvej.print.ObjectPrinter.objectPrinter
+import org.approvej.print.Printer
 import org.approvej.scrub.Scrubbers.instants
 import org.approvej.scrub.Scrubbers.uuids
-import org.approvej.verify.PathProviders.nextToTest
-import org.approvej.verify.Verifiers.inFile
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
@@ -24,7 +24,7 @@ class BasicsDocTest {
     val result = hello("World")
 
     approve(result) // <1>
-      .verify() // <2>
+      .byFile() // <2>
     // end::approve_strings[]
   }
 
@@ -34,7 +34,7 @@ class BasicsDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person) // <1>
-      .verify() // <2>
+      .byFile()
     // end::approve_pojos[]
   }
 
@@ -45,8 +45,19 @@ class BasicsDocTest {
 
     approve(person)
       .printWith(objectPrinter()) // <1>
-      .verify()
+      .byFile()
     // end::object_printer[]
+  }
+
+  @Test
+  fun custom_printer_function() {
+    // tag::custom_printer_function[]
+    val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
+
+    approve(person)
+      .printWith { "%s, born %s".format(it.name, it.birthDate) } // <1>
+      .byFile()
+    // end::custom_printer_function[]
   }
 
   @Test
@@ -55,8 +66,8 @@ class BasicsDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printWith { "%s, born %s".format(it.name, it.birthDate) } // <1>
-      .verify()
+      .printWith(PersonYamlPrinter()) // <1>
+      .byFile()
     // end::custom_printer[]
   }
 
@@ -69,7 +80,7 @@ class BasicsDocTest {
       .printWith(objectPrinter())
       .scrubbedOf(instants(ISO_LOCAL_DATE_TIME)) // <1>
       .scrubbedOf(uuids()) // <2>
-      .verify()
+      .byFile()
     // end::scrubbing[]
   }
 
@@ -81,60 +92,72 @@ class BasicsDocTest {
     approve(contact)
       .scrubbedOf { Contact(-1, it.name, it.email, it.phoneNumber) } // <1>
       .printWith(objectPrinter())
-      .verify() // <2>
+      .byFile()
     // end::custom_scrubbing[]
   }
 
   @Test
-  fun verify_file_next_to_test() {
-    // tag::verify_file_next_to_test[]
+  fun approve_file_next_to_test() {
+    // tag::approve_file_next_to_test[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .verify(inFile()) // <1>
-    // end::verify_file_next_to_test[]
+      .byFile(nextToTest()) // <1>
+    // end::approve_file_next_to_test[]
   }
 
   @Test
-  fun verify_file_next_to_test_as() {
-    // tag::verify_file_next_to_test_as[]
+  fun approve_file_custom_extension() {
+    // tag::approve_file_custom_extension[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printWith(personYamlPrinter()) // <1>
-      .verify(inFile(nextToTest().filenameExtension("yaml"))) // <2>
-    // end::verify_file_next_to_test_as[]
+      .printWith(PersonYamlPrinter()) // <1>
+      .byFile(nextToTest().filenameExtension("yml")) // <2>
+    // end::approve_file_custom_extension[]
   }
 
   @Test
-  fun verify_file_directory_next_to_test_as() {
-    // tag::verify_file_directory_next_to_test_as[]
+  fun approve_file_nextToTest_inSubdirectory() {
+    // tag::approve_file_nextToTest_inSubdirectory[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printWith(personYamlPrinter())
-      .verify(inFile(nextToTest().inSubdirectory().filenameExtension("yaml")))
-    // end::verify_file_directory_next_to_test_as[]
+      .printWith(PersonYamlPrinter())
+      .byFile(nextToTest().inSubdirectory().filenameExtension("yaml"))
+    // end::approve_file_nextToTest_inSubdirectory[]
   }
 
   @Test
-  fun verify_inplace() {
-    // tag::verify_inplace[]
+  fun approve_inplace() {
+    // tag::approve_inplace[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .verify("Person[name=John Doe, birthDate=1990-01-01]")
-    // end::verify_inplace[]
+      .byValue("Person[name=John Doe, birthDate=1990-01-01]")
+    // end::approve_inplace[]
   }
 
   @Test
-  fun verify_file_approved_path() {
-    // tag::verify_file_approved_path[]
+  fun approve_file_approved_path() {
+    // tag::approve_file_approved_path[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printWith(personYamlPrinter())
-      .verify(inFile("src/test/resources/BasicExamples-verify_file_approved_path.yaml")) // <1>
-    // end::verify_file_approved_path[]
+      .printWith(PersonYamlPrinter())
+      .byFile("src/test/resources/BasicExamples-approve_file_approved_path.yaml") // <1>
+    // end::approve_file_approved_path[]
   }
+
+  // tag::person_yaml_printer[]
+  class PersonYamlPrinter : Printer<Person> {
+    override fun apply(person: Person) = """
+        person:
+          name: "${person.name}"
+          birthDate: "${person.birthDate}"
+        """.trimIndent()
+
+    override fun filenameExtension() = "yaml"
+  }
+  // end::person_yaml_printer[]
 }

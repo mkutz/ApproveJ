@@ -1,27 +1,55 @@
 package org.approvej;
 
-import static org.approvej.verify.PathProvider.DEFAULT_FILENAME_EXTENSION;
-import static org.approvej.verify.PathProviders.nextToTest;
-import static org.approvej.verify.Verifiers.inFile;
-import static org.approvej.verify.Verifiers.inplace;
+import static org.approvej.approve.PathProvider.DEFAULT_FILENAME_EXTENSION;
+import static org.approvej.approve.PathProviders.approvedPath;
+import static org.approvej.approve.PathProviders.nextToTest;
+import static org.approvej.approve.Verifiers.file;
+import static org.approvej.approve.Verifiers.value;
 
+import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.approvej.approve.ApprovedPathProvider;
+import org.approvej.approve.Approver;
+import org.approvej.approve.FileApprover;
+import org.approvej.approve.InplaceApprover;
+import org.approvej.approve.PathProvider;
 import org.approvej.print.Printer;
 import org.approvej.scrub.Scrubber;
-import org.approvej.verify.InplaceVerifier;
-import org.approvej.verify.Verifier;
 import org.jspecify.annotations.NullMarked;
 
 /**
  * A builder to configure an approval for a given value.
  *
- * <p>Optionally the value can be "scrubbed" of dynamic data (like timestamps or ID's).
+ * <p>E.g. {@code approve(result).byFile();} will approve the result with the content of a file next
+ * to the test.
  *
- * <p>The value will be printed (converted to {@link String}) using a {@link Printer}. By default,
- * the {@link org.approvej.print.ObjectPrinter} will be applied, which can be changed with the
- * {@link #printWith(Function)}.
+ * <h2>Printing</h2>
+ *
+ * <p>Before approval, the value needs to be printed (turned into a {@link String}). You can use the
+ * method {@link #printWith(Printer)} to customize that. By default, the value's {@link
+ * Object#toString() toString method} will be called.
+ *
+ * <p>E.g. {@code approve(result).printWith(objectPrinter()).byFile();} prints the given object
+ * using the given {@link org.approvej.print.ObjectPrinter}.
+ *
+ * <h2>Scrubbing</h2>
+ *
+ * <p>The value can also be {@link #scrubbedOf(UnaryOperator) scrubbed of} dynamic data (like
+ * timestamps or ID's).
+ *
+ * <p>E.g. {@code approve(result).scrubbedOf(uuids()).byFile();} will replace all UUID's in the
+ * result before approval.
+ *
+ * <h2>Approving</h2>
+ *
+ * <p>The builder is concluded by specifying an approver to approve the value {@link #by(Consumer)
+ * by} ( {@link #byFile()} and {@link #byValue(String)}).
+ *
+ * <p>E.g. {@code approve(result).byFile();} approves the result with the content of a file next to
+ * the test, while {@code approve(result).byValue(approved);} approves the result with the given
+ * approved value.
  *
  * @param <T> the type of the value to approve
  */
@@ -31,11 +59,11 @@ public class ApprovalBuilder<T> {
   /** The default {@link Printer} used to print the value. */
   public static final Printer<Object> DEFAULT_PRINTER = Object::toString;
 
-  private T value;
+  private T receivedValue;
   private final String filenameExtension;
 
   private ApprovalBuilder(T originalValue, String filenameExtension) {
-    this.value = originalValue;
+    this.receivedValue = originalValue;
     this.filenameExtension = filenameExtension;
   }
 
@@ -51,66 +79,101 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Uses the given {@link Function} to convert the {@link #value} to a {@link String}.
+   * Uses the given {@link Function} to convert the {@link #receivedValue} to a {@link String}.
    *
-   * @param printer the {@link Function} used to convert the {@link #value} to a {@link String}
+   * @param printer the {@link Function} used to convert the {@link #receivedValue} to a {@link
+   *     String}
    * @return this
    */
   public ApprovalBuilder<String> printWith(Function<T, String> printer) {
-    return new ApprovalBuilder<>(printer.apply(value), DEFAULT_FILENAME_EXTENSION);
+    return new ApprovalBuilder<>(printer.apply(receivedValue), DEFAULT_FILENAME_EXTENSION);
   }
 
   /**
-   * Uses the given {@link Printer} to convert the {@link #value} to a {@link String}.
+   * Uses the given {@link Printer} to convert the {@link #receivedValue} to a {@link String}.
    *
    * @param printer the printer used to convert the value to a {@link String}
    * @return this
    */
   public ApprovalBuilder<String> printWith(Printer<T> printer) {
-    return new ApprovalBuilder<>(printer.apply(value), printer.filenameExtension());
+    return new ApprovalBuilder<>(printer.apply(receivedValue), printer.filenameExtension());
   }
 
   /**
-   * Applies the given scrubber to the current {@link #value}.
+   * Applies the given scrubber to the current {@link #receivedValue}.
    *
    * @param scrubber the {@link UnaryOperator} or {@link Scrubber}
    * @return this
    */
   public ApprovalBuilder<T> scrubbedOf(UnaryOperator<T> scrubber) {
-    value = scrubber.apply(value);
+    receivedValue = scrubber.apply(receivedValue);
     return this;
   }
 
   /**
-   * Uses the given {@link Consumer} or {@link Verifier} to approve the printed {@link #value}.
+   * Approves the {@link #receivedValue} by the given approver.
    *
-   * @param verifier the {@link Consumer} or {@link Verifier}
-   * @throws ApprovalError if the verification fails
+   * <p>If necessary the {@link #receivedValue} is printed using the {@link #DEFAULT_PRINTER}.
+   *
+   * @param approver a {@link Consumer} or an {@link Approver} implementation
+   * @throws ApprovalError if the approval fails
    */
-  public void verify(final Consumer<String> verifier) {
-    if (value instanceof String printedValue) {
-      verifier.accept(printedValue);
+  public void by(final Consumer<String> approver) {
+    if (receivedValue instanceof String printedValue) {
+      approver.accept(printedValue);
     } else {
-      verifier.accept(DEFAULT_PRINTER.apply(value));
+      approver.accept(DEFAULT_PRINTER.apply(receivedValue));
     }
   }
 
   /**
-   * Verifies that the given previouslyApproved value equals the {@link #value} using an {@link
-   * InplaceVerifier}.
+   * Approves the value by an {@link InplaceApprover} with the given previouslyApproved value.
    *
    * @param previouslyApproved the approved value
    */
-  public void verify(final String previouslyApproved) {
-    verify(inplace(previouslyApproved));
+  public void byValue(final String previouslyApproved) {
+    by(value(previouslyApproved));
   }
 
   /**
-   * Uses the DEFAULT_VERIFIER to approve the printed {@link #value}.
+   * Approves the receivedValue by a {@link FileApprover}, a {@link
+   * org.approvej.approve.NextToTestPathProvider}, and the {@link Printer#filenameExtension()}.
    *
-   * @throws ApprovalError if the verification fails
+   * @throws ApprovalError if the approval fails
    */
-  public void verify() {
-    verify(inFile(nextToTest().filenameExtension(filenameExtension)));
+  public void byFile() {
+    by(file(nextToTest().filenameExtension(filenameExtension)));
+  }
+
+  /**
+   * Approves the receivedValue by a {@link FileApprover} with the given {@link PathProvider}.
+   *
+   * @param pathProvider the provider for the paths of the approved and received files
+   * @throws ApprovalError if the approval fails
+   */
+  public void byFile(PathProvider pathProvider) {
+    by(file(pathProvider));
+  }
+
+  /**
+   * Approves the receivedValue by a {@link FileApprover} with an {@link ApprovedPathProvider} and
+   * the given {@link Path} to the approved file.
+   *
+   * @param approvedPath the {@link Path} to the approved file
+   * @throws ApprovalError if the approval fails
+   */
+  public void byFile(Path approvedPath) {
+    by(file(approvedPath(approvedPath)));
+  }
+
+  /**
+   * Approves the receivedValue by a {@link FileApprover} with an {@link ApprovedPathProvider} and
+   * the given path to the approved file.
+   *
+   * @param approvedPath the path to the approved file
+   * @throws ApprovalError if the approval fails
+   */
+  public void byFile(String approvedPath) {
+    by(file(approvedPath(Path.of(approvedPath))));
   }
 }

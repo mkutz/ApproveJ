@@ -1,8 +1,8 @@
-package org.approvej.verify;
+package org.approvej.approve;
 
 import static java.nio.file.Files.writeString;
-import static org.approvej.verify.PathProviders.approvedPath;
-import static org.approvej.verify.Verifiers.inFile;
+import static org.approvej.approve.PathProviders.approvedPath;
+import static org.approvej.approve.Verifiers.file;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -13,14 +13,14 @@ import org.approvej.ApprovalError;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class FileVerifierTest {
+class FileApproverTest {
 
   @TempDir private Path tempDir;
 
   @Test
   void accept() throws IOException {
     ApprovedPathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
-    FileVerifier fileVerifier = inFile(pathProvider);
+    FileApprover fileVerifier = file(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
 
     fileVerifier.accept("Some approved text");
@@ -32,7 +32,7 @@ class FileVerifierTest {
   @Test
   void accept_previously_accepted_differs() throws IOException {
     ApprovedPathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
-    FileVerifier fileVerifier = inFile(pathProvider);
+    FileApprover fileVerifier = file(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
 
     assertThatExceptionOfType(ApprovalError.class)
@@ -47,7 +47,7 @@ class FileVerifierTest {
   @Test
   void accept_previously_received() throws IOException {
     ApprovedPathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
-    FileVerifier fileVerifier = inFile(pathProvider);
+    FileApprover fileVerifier = file(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
     writeString(pathProvider.receivedPath(), "Some received text", StandardOpenOption.CREATE);
 
@@ -67,7 +67,7 @@ class FileVerifierTest {
   @Test
   void accept_no_previously_accepted() {
     ApprovedPathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
-    FileVerifier fileVerifier = inFile(pathProvider);
+    FileApprover fileVerifier = file(pathProvider);
 
     assertThatExceptionOfType(ApprovalError.class)
         .isThrownBy(() -> fileVerifier.accept("Some text"))
@@ -79,7 +79,7 @@ class FileVerifierTest {
 
   @Test
   void accept_no_write_access() {
-    FileVerifier fileVerifier = inFile("/does/not/exist.txt");
+    FileApprover fileVerifier = file(approvedPath("/does/not/exist.txt"));
 
     assertThatExceptionOfType(FileVerifierError.class)
         .isThrownBy(() -> fileVerifier.accept("Some text"))
