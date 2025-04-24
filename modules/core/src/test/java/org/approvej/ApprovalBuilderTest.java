@@ -115,7 +115,7 @@ class ApprovalBuilderTest {
   @Test
   void approve_pojo_printWith_function() {
     Function<Person, String> personPrinter =
-        person -> "id=%s\nname=%s\nbirthday=%s".formatted(person.id, person.name, person.birthday);
+        person -> "id=%s%nname=%s%nbirthday=%s".formatted(person.id, person.name, person.birthday);
     approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
         .printWith(personPrinter)
         .byValue("id=000000-0000-0000-00000001\nname=Micha\nbirthday=1982-02-19");
