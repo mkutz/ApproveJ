@@ -102,7 +102,7 @@ class ApprovalBuilderTest {
     assertThatExceptionOfType(AssertionError.class)
         .isThrownBy(() -> approve(EXAMPLE_TEXT).byValue("This is not the same text."))
         .withMessage(
-            "Approval mismatch: expected: <This is not the same text.> but was: <%s>"
+            "Approval mismatch: previously approved: <This is not the same text.>, received: <%s>"
                 .formatted(EXAMPLE_TEXT));
   }
 
@@ -128,9 +128,9 @@ class ApprovalBuilderTest {
         .byValue(
             """
             Person [
-              birthday=<inaccessible>,
+              birthday=<inacessible>,
+              birthday=<inacessible>,
               id=<inaccessible>,
-              name=<inaccessible>
             ]""");
   }
 

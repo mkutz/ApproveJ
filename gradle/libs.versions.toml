@@ -1,22 +1,21 @@
 [versions]
-junitVersion = "5.12.2"
 assertjVersion = "3.27.3"
 jacksonVersion = "2.18.3"
+junitVersion = "5.12.2"
 
 [libraries]
 asciidoctorBlockSwitch = { module = "io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch", version = "0.6.3" }
+assertjCore = { module = "org.assertj:assertj-core", version.ref = "assertjVersion" }
+diffUtils = { module = "io.github.java-diff-utils:java-diff-utils", version = "4.12" }
+jacksonDatabind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jacksonVersion" }
+jacksonDatafromatYaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jacksonVersion" }
+jacksonJsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jacksonVersion" }
+jspecify = { module = "org.jspecify:jspecify", version = "1.0.0" }
 junitBom = { module = "org.junit:junit-bom", version.ref = "junitVersion" }
 junitJupiterApi = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junitVersion" }
 junitJupiterEngine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junitVersion" }
 junitJupiterParams = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junitVersion" }
 junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher", version = "1.12.2" }
-assertjCore = { module = "org.assertj:assertj-core", version.ref = "assertjVersion" }
-jacksonDatabind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jacksonVersion" }
-jacksonDatafromatYaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jacksonVersion" }
-jacksonJsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jacksonVersion" }
-
-jsonpath = { module = "com.jayway.jsonpath:json-path" , version = "2.9.0" }
-jspecify = { module = "org.jspecify:jspecify", version = "1.0.0" }
 
 [plugins]
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version = "4.0.4" }
