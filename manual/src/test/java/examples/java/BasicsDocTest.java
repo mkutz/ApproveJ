@@ -4,7 +4,6 @@ import static examples.ExampleClass.createBlogPost;
 import static examples.ExampleClass.createContact;
 import static examples.ExampleClass.createPerson;
 import static examples.ExampleClass.hello;
-import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.approve.PathProviders.nextToTest;
 import static org.approvej.print.ObjectPrinter.objectPrinter;
@@ -81,7 +80,7 @@ class BasicsDocTest {
 
     approve(blogPost)
         .printWith(objectPrinter())
-        .scrubbedOf(instants(ISO_LOCAL_DATE_TIME)) // <1>
+        .scrubbedOf(instants()) // <1>
         .scrubbedOf(uuids()) // <2>
         .byFile(); // <3>
     // end::scrubbing[]

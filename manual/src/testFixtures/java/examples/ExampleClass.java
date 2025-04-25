@@ -4,7 +4,6 @@ import static java.util.stream.Collectors.joining;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,13 +32,13 @@ public class ExampleClass {
     private final UUID id;
     private final String title;
     private final String content;
-    private final LocalDateTime published;
+    private final Instant published;
 
     public BlogPost(String title, String content) {
       this.id = UUID.randomUUID(); // <1>
       this.title = title;
       this.content = content;
-      this.published = LocalDateTime.now(); // <2>
+      this.published = Instant.now(); // <2>
     }
 
     public String title() {
@@ -50,7 +49,7 @@ public class ExampleClass {
       return content;
     }
 
-    public LocalDateTime published() {
+    public Instant published() {
       return published;
     }
 
