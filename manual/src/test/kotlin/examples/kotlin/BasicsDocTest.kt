@@ -6,6 +6,8 @@ import examples.ExampleClass.createBlogPost
 import examples.ExampleClass.createContact
 import examples.ExampleClass.createPerson
 import examples.ExampleClass.hello
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 import org.approvej.ApprovalBuilder.approve
 import org.approvej.approve.PathProviders.nextToTest
 import org.approvej.print.ObjectPrinter.objectPrinter
@@ -13,8 +15,6 @@ import org.approvej.print.Printer
 import org.approvej.scrub.Scrubbers.instants
 import org.approvej.scrub.Scrubbers.uuids
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
 class BasicsDocTest {
 
@@ -74,7 +74,8 @@ class BasicsDocTest {
   @Test
   fun scrubbing() {
     // tag::scrubbing[]
-    val blogPost = createBlogPost("Latest News", "Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
+    val blogPost =
+      createBlogPost("Latest News", "Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
 
     approve(blogPost)
       .printWith(objectPrinter())
@@ -101,8 +102,7 @@ class BasicsDocTest {
     // tag::approve_file_next_to_test[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
-    approve(person)
-      .byFile(nextToTest()) // <1>
+    approve(person).byFile(nextToTest()) // <1>
     // end::approve_file_next_to_test[]
   }
 
@@ -133,8 +133,7 @@ class BasicsDocTest {
     // tag::approve_inplace[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
-    approve(person)
-      .byValue("Person[name=John Doe, birthDate=1990-01-01]")
+    approve(person).byValue("Person[name=John Doe, birthDate=1990-01-01]")
     // end::approve_inplace[]
   }
 
@@ -151,11 +150,13 @@ class BasicsDocTest {
 
   // tag::person_yaml_printer[]
   class PersonYamlPrinter : Printer<Person> {
-    override fun apply(person: Person) = """
+    override fun apply(person: Person) =
+      """
         person:
           name: "${person.name}"
           birthDate: "${person.birthDate}"
-        """.trimIndent()
+        """
+        .trimIndent()
 
     override fun filenameExtension() = "yaml"
   }

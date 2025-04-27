@@ -100,6 +100,13 @@ spotless {
     leadingTabsToSpaces(2)
   }
 
+  kotlin {
+    target("**/*.kt")
+    targetExclude("**/build/**/*")
+    ktfmt().googleStyle()
+    leadingTabsToSpaces(2)
+  }
+
   kotlinGradle {
     target("**/*.gradle.kts")
     targetExclude("**/build/**/*.gradle.kts")

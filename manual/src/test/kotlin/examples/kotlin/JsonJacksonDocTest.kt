@@ -5,16 +5,16 @@ import com.fasterxml.jackson.databind.json.JsonMapper
 import examples.ExampleClass.Tag.ENTERTAINMENT
 import examples.ExampleClass.Tag.NEWS
 import examples.ExampleClass.createTaggedBlogPost
+import java.time.format.DateTimeFormatter
 import org.approvej.ApprovalBuilder.approve
+import org.approvej.approve.PathProviders.nextToTest
+import org.approvej.approve.Verifiers.file
 import org.approvej.json.jackson.JsonPointerScrubber.jsonPointer
 import org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter
 import org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter
 import org.approvej.scrub.Scrubbers.instants
 import org.approvej.scrub.Scrubbers.uuids
-import org.approvej.approve.PathProviders.nextToTest
-import org.approvej.approve.Verifiers.file
 import org.junit.jupiter.api.Test
-import java.time.format.DateTimeFormatter
 
 class JsonJacksonDocTest {
 
@@ -24,11 +24,12 @@ class JsonJacksonDocTest {
   @Throws(JsonProcessingException::class)
   fun scrub_json_pointer() {
     // tag::scrub_json_pointer[]
-    val createdBlogPostJson = createTaggedBlogPost(
-      "Latest News",
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      listOf(NEWS, ENTERTAINMENT)
-    )
+    val createdBlogPostJson =
+      createTaggedBlogPost(
+        "Latest News",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        listOf(NEWS, ENTERTAINMENT),
+      )
 
     approve(jsonMapper.readTree(createdBlogPostJson))
       .scrubbedOf(jsonPointer("/id").replacement("[scrubbed id]")) // <1>
@@ -41,11 +42,12 @@ class JsonJacksonDocTest {
   @Throws(JsonProcessingException::class)
   fun pretty_print_json() {
     // tag::pretty_print_json[]
-    val createdBlogPostJson = createTaggedBlogPost(
-      "Latest News",
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      listOf(NEWS, ENTERTAINMENT)
-    )
+    val createdBlogPostJson =
+      createTaggedBlogPost(
+        "Latest News",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        listOf(NEWS, ENTERTAINMENT),
+      )
 
     approve(jsonMapper.readTree(createdBlogPostJson))
       .scrubbedOf(jsonPointer("/id").replacement("[scrubbed id]"))
@@ -58,11 +60,12 @@ class JsonJacksonDocTest {
   @Test
   fun pretty_print_json_string() {
     // tag::pretty_print_json_string[]
-    val createdBlogPostJson = createTaggedBlogPost(
-      "Latest News",
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-      listOf(NEWS, ENTERTAINMENT)
-    )
+    val createdBlogPostJson =
+      createTaggedBlogPost(
+        "Latest News",
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        listOf(NEWS, ENTERTAINMENT),
+      )
 
     approve(createdBlogPostJson)
       .scrubbedOf(uuids())
