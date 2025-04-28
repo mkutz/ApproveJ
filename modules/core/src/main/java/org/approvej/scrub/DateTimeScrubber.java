@@ -10,32 +10,46 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class DateTimeScrubber extends RegexScrubber {
 
-  private String dateTimePattern;
-
+  /**
+   * Creates a {@link DateTimeScrubber} to scrub date/time strings of the given dateTimePattern.
+   *
+   * @param dateTimePattern a date/time pattern as used by {@link
+   *     java.time.format.DateTimeFormatter}
+   * @param replacement a function that receives the finding index and returns the replacement
+   *     string
+   * @see java.time.format.DateTimeFormatter
+   */
   DateTimeScrubber(String dateTimePattern, Function<Integer, Object> replacement) {
     super(regexFor(dateTimePattern), replacement);
-    this.dateTimePattern = dateTimePattern;
-  }
-
-  @Override
-  public String apply(String input) {
-    return super.apply(input);
   }
 
   private static Pattern regexFor(String dateTimePattern) {
     return Pattern.compile(
-        DateTimeField.ANY_FIELD
+        DateTimeToken.ANY_FIELD
             .matcher(dateTimePattern)
             .results()
             .map(
                 result -> {
-                  DateTimeField dateTimeField = DateTimeField.forString(result.group());
-                  return result.group().replaceAll(dateTimeField.regex, dateTimeField.replacement);
+                  DateTimeToken dateTimeToken = DateTimeToken.forString(result.group());
+                  if (dateTimeToken == DateTimeToken.OPTIONAL) {
+                    return "(%s)?"
+                        .formatted(
+                            regexFor(
+                                result
+                                    .group()
+                                    .replaceAll(
+                                        dateTimeToken.regex.pattern(),
+                                        dateTimeToken.replacement.pattern())));
+                  }
+                  return result
+                      .group()
+                      .replaceAll(
+                          dateTimeToken.regex.pattern(), dateTimeToken.replacement.pattern());
                 })
             .collect(Collectors.joining()));
   }
 
-  private enum DateTimeField {
+  private enum DateTimeToken {
     ERA_MAX("(GGGG+)", "(?<era>-?Anno Domini|Before Christ)"), // TODO very locale specific
     ERA_LONG("(GGG)", "(?<era>AD|BC)"), // TODO very locale specific
     ERA_MIDDLE("(GG)", "(?<era>AD|BC)"), // TODO very locale specific
@@ -104,27 +118,27 @@ public class DateTimeScrubber extends RegexScrubber {
     ZONE_OFFSET_LOCALIZED("(OOOO)", "(?<zoneOffset>GMT([+-](1[1-3]|0[1-9])(:[0-5][0-9])?)?)"),
     ZONE_OFFSET_LOCALIZED_SHORT("(O)", "(?<zoneOffset>GMT([+-](1[1-3]|[1-9])(:[0-5][0-9])?)?)"),
     TEXT("'([^']+)'", "$1"),
-    ESCAPE("([#$%^&*().\\[\\]])", "\\\\$1"),
+    OPTIONAL("\\[([^\\]]+)\\]", "$1"),
+    ESCAPE("([#$%^&*().])", "\\\\$1"),
     OTHER("(.)", "$1");
 
     static final Pattern ANY_FIELD =
         Pattern.compile(
-            stream(values()).map(field -> field.regex).collect(Collectors.joining("|")));
+            stream(values()).map(field -> field.regex.pattern()).collect(Collectors.joining("|")));
 
-    private final String regex;
-    private final String replacement;
+    private final Pattern regex;
+    private final Pattern replacement;
 
-    DateTimeField(String regex, String replacement) {
-      this.regex = regex;
-      this.replacement = replacement;
+    DateTimeToken(String regex, String replacement) {
+      this.regex = Pattern.compile(regex);
+      this.replacement = Pattern.compile(replacement);
     }
 
-    public static DateTimeField forString(String string) {
+    public static DateTimeToken forString(String string) {
       return stream(values())
-          .filter(field -> string.matches(field.regex))
+          .filter(field -> field.regex.matcher(string).matches())
           .findFirst()
-          .orElseThrow(
-              () -> new IllegalArgumentException("No matching field for string: " + string));
+          .orElse(OTHER);
     }
   }
 }

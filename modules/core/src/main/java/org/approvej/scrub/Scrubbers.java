@@ -12,10 +12,10 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class Scrubbers {
 
+  private Scrubbers() {}
+
   public static final Pattern UUID_PATTERN =
       Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
-
-  private Scrubbers() {}
 
   /**
    * Creates a {@link RegexScrubber} with the given pattern.
