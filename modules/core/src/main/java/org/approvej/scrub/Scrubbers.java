@@ -1,11 +1,11 @@
 package org.approvej.scrub;
 
+import static java.util.Arrays.stream;
 import static org.approvej.scrub.Replacements.numbered;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -15,11 +15,6 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class Scrubbers {
 
-  public static final Pattern INSTANT_PATTERN =
-      Pattern.compile(
-          "(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})(\\.\\d{3}?(\\d{3})?(\\d{3})?)?Z");
-
-  private static final LocalDate EXAMPLE_DATE = LocalDate.of(4567, 12, 30);
   public static final Pattern UUID_PATTERN =
       Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
 
@@ -46,13 +41,17 @@ public class Scrubbers {
     return stringsMatching(Pattern.compile(pattern));
   }
 
+  private static final LocalDate EXAMPLE_DATE = LocalDate.of(4567, 12, 30);
+
   /**
    * Creates {@link RegexScrubber} to replace date strings of the given pattern.
    *
    * @param formatter a {@link DateTimeFormatter} to parse the dates
    * @return a new {@link RegexScrubber} with the given {@link DateTimeFormatter} turned into a
    *     {@link Pattern}
+   * @deprecated use {@link #dateTimeFormat(String)} instead
    */
+  @Deprecated(since = "0.6.1", forRemoval = true)
   public static RegexScrubber dates(DateTimeFormatter formatter) {
     return stringsMatching(
             Pattern.compile(
@@ -73,57 +72,38 @@ public class Scrubbers {
   }
 
   private enum DateTimeField {
-    YEAR_SHORT("([^y]yy[^y]|[^u]uu[^u])", "(?<year>-?[0-9][1-9])"),
+    YEAR_SHORT("([^y]yy[^y]|[^u]uu[^u])", "(?<year>-?[0-9][0-9])"),
     YEAR("(y+|u+)", "(?<year>-?[0-9]*[1-9])"),
-    MONTH("(MM|LL)", "(?<month>0[1-9]|1[0-2])"),
-    MONTH_SHORT("(M|L)", "(?<month>[1-9]|1[0-2])"),
-    DAY("(dd)", "(?<dayOfMonth>0[1-9]|[1-2][0-9]|3[0-1])"),
-    DAY_SHORT("(d)", "(?<dayOfMonth>[1-9]|[1-2][0-9]|3[0-1])"),
-    DAY_OF_YEAR("(DDD)", "(?<dayOfYear>00[1-9]|0[1-9][0-9]|[1-2][0-9][0-9]|3[0-5][0-9]|36[0-6])"),
+    MONTH("(MM|LL)", "(?<month>1[0-2]|0[1-9])"),
+    MONTH_SHORT("(M|L)", "(?<month>1[0-2]|[1-9])"),
+    DAY("(dd)", "(?<dayOfMonth>3[0-1]|[1-2][0-9]|0[1-9])"),
+    DAY_SHORT("(d)", "(?<dayOfMonth>3[0-1]|[1-2][0-9]|[1-9])"),
+    DAY_OF_YEAR("(DDD)", "(?<dayOfYear>36[0-6]|3[0-5][0-9]|[1-2][0-9][0-9]|0[1-9][0-9]|00[1-9])"),
     DAY_OF_YEAR_2_DIGITS(
-        "(DD)", "(?<dayOfYear>0[1-9]|[1-9][0-9]|[1-2][0-9][0-9]|3[0-5][0-9]|36[0-6])"),
+        "(DD)", "(?<dayOfYear>36[0-6]|3[0-5][0-9]|[1-2][0-9][0-9]|[1-9][0-9]|0[1-9])"),
     DAY_OF_YEAR_1_DIGIT(
-        "(D)", "(?<dayOfYear>[1-9]|[1-9][0-9]|[1-2][0-9][0-9]|3[0-5][0-9]|36[0-6])"),
-    HOUR("(HH)", "(?<hour>0[1-9]|1[0-9]|2[0-3])"),
-    HOUR_SHORT("(H)", "(?<hour>[1-9]|1[0-9]|2[0-3])"),
-    MINUTE("(mm)", "(?<minute>0[1-9]|[1-5][0-9])"),
-    MINUTE_SHORT("(m)", "(?<minute>[1-9]|[1-5][0-9])"),
-    SECOND("(ss)", "(?<second>0[1-9]|[1-5][0-9])"),
-    SECOND_SHORT("(s)", "(?<second>[1-9]|[1-5][0-9])"),
-    FACTION_OF_SECOND("(S+)", "(?<factionOfSecond>[0-9]{3}?([0-9]{3})?([0-9]{3})?)"),
-    ZONE_OFFSET_Z("(X+)", "(?<zoneOffset>Z|[+-][0-9][1-9])"),
-    TEXT("('([^']+)')", "\1"),
-    ESCAPE("([#$%^&*().\\[\\]])", "\1"),
-    OTHER("(.)", "\1");
-
-    static final Pattern ANY_FIELD =
-        Pattern.compile(
-            Arrays.stream(values()).map(field -> field.regex).collect(Collectors.joining("|")));
-
-    private final String regex;
-    private final String replacement;
-
-    DateTimeField(String regex, String replacement) {
-      this.regex = regex;
-      this.replacement = replacement;
-    }
-
-    public static DateTimeField forString(String string) {
-      return Arrays.stream(values())
-          .filter(field -> string.matches(field.regex))
-          .findFirst()
-          .orElseThrow(
-              () -> new IllegalArgumentException("No matching field for string: " + string));
-    }
-  }
-
-  public static RegexScrubber dateTimeFormat(String dateTimePattern) {
+        "(D)", "(?<dayOfYear>36[0-6]|3[0-5][0-9]|[1-2][0-9][0-9]|[1-9][0-9]|[1-9])"),
+    HOUR("(HH)", "(?<hour>2[0-3]|1[0-9]|0[1-9])"),
+    HOUR_SHORT("(H)", "(?<hour>2[0-3]|1[0-9]|[1-9])"),
+    MINUTE("(mm)", "(?<minute>[1-5][0-9]|0[1-9])"),
+    MINUTE_SHORT("(m)", "(?<minute>[1-5][0-9]|[1-9])"),
+    SECOND("(ss)", "(?<second>[1-5][0-9]|0[1-9])"),
+    SECOND_SHORT("(s)", "(?<second>[1-5][0-9]|[1-9])"),
+    FACTION_OF_SECOND("(S+)", "(?<factionOfSecond>[0-9]{1,9})"),
+    ZONE_OFFSET_MAX(
+        "(ZZZZ+)", "(?<zoneOffset>GMT(([+-][0-9][0-9]:?([0-9][0-9])?:?([0-9][0-9])?)?))"),
+    ZONE_OFFSET_LONG("(ZZZ)", "(?<zoneOffset>[+-][0-9][0-9][0-9][0-9])"),
+    ZONE_OFFSET_MIDDLE("(ZZ)", "(?<zoneOffset>[+-][0-9][0-9][0-9][0-9])"),
+    ZONE_OFFSET_SHORT("(Z)", "(?<zoneOffset>[+-][0-9][0-9][0-9][0-9])"),
+    ZONE_OFFSET_Z_MAX("(XXXX+)", "(?<zoneOffset>Z|[+-][0-9][0-9]:?([0-9][0-9])?:?([0-9][0-9])?)"),
+    ZONE_OFFSET_Z_LONG("(XXX)", "(?<zoneOffset>Z|[+-][0-9][0-9]:[0-9][0-9])"),
+    ZONE_OFFSET_Z_MIDDLE("(XX)", "(?<zoneOffset>Z|[+-][0-9][0-9][0-9][0-9])"),
+    ZONE_OFFSET_Z_SHORT("(X)", "(?<zoneOffset>Z|[+-][0-9][1-9])"),
+    TEXT("'([^']+)'", "$1"),
+    ESCAPE("([#$%^&*().\\[\\]])", "\\\\$1"),
+    OTHER("(.)", "$1");
     /*
     Pattern era = Pattern.compile("(G+)"); // text
-    Pattern year = Pattern.compile("(y+|u+)"); // number negative, 1-x
-    Pattern month = Pattern.compile("(M+|L+)");
-    Pattern day = Pattern.compile("(d+)");
-    Pattern dayOfYear = Pattern.compile("(D+)");
     Pattern quarter = Pattern.compile("(Q+|q+)");
     Pattern yearWeekBased = Pattern.compile("(Y+)");
     Pattern week = Pattern.compile("(w+)");
@@ -134,10 +114,6 @@ public class Scrubbers {
     Pattern hourAmPmClock = Pattern.compile("(h+)"); // number 1-12
     Pattern hourAmPm = Pattern.compile("(K+)"); // number 0-11
     Pattern hourClock = Pattern.compile("(k+)"); // number 1-24
-    Pattern hour = Pattern.compile("(H+)"); // number 0-23
-    Pattern minute = Pattern.compile("(m+)"); // number 0-59
-    Pattern second = Pattern.compile("(s+)"); // number 0-59
-    Pattern fractionOfSecond = Pattern.compile("(S+)"); // number
     Pattern millisOfDay = Pattern.compile("(A+)"); // number
     Pattern nanos = Pattern.compile("(n+)"); // number
     Pattern nanosOfDay = Pattern.compile("(N+)"); // number
@@ -148,6 +124,28 @@ public class Scrubbers {
     Pattern timeZoneOffset = Pattern.compile("(x+|Z+)"); // text
      */
 
+    static final Pattern ANY_FIELD =
+        Pattern.compile(
+            stream(values()).map(field -> field.regex).collect(Collectors.joining("|")));
+
+    private final String regex;
+    private final String replacement;
+
+    DateTimeField(String regex, String replacement) {
+      this.regex = regex;
+      this.replacement = replacement;
+    }
+
+    public static DateTimeField forString(String string) {
+      return stream(values())
+          .filter(field -> string.matches(field.regex))
+          .findFirst()
+          .orElseThrow(
+              () -> new IllegalArgumentException("No matching field for string: " + string));
+    }
+  }
+
+  public static RegexScrubber dateTimeFormat(String dateTimePattern) {
     StringBuilder regexBuilder = new StringBuilder();
     Matcher matcher = DateTimeField.ANY_FIELD.matcher(dateTimePattern);
     matcher
@@ -155,12 +153,8 @@ public class Scrubbers {
         .forEach(
             result -> {
               DateTimeField dateTimeField = DateTimeField.forString(result.group());
-              if (dateTimeField == DateTimeField.OTHER) regexBuilder.append(result.group());
-              else if (dateTimeField == DateTimeField.TEXT)
-                regexBuilder.append(result.group().replaceAll("'", ""));
-              else if (dateTimeField == DateTimeField.ESCAPE) {
-                regexBuilder.append(result.group().replaceAll("(.)", "\\\\$1"));
-              } else regexBuilder.append(dateTimeField.replacement);
+              regexBuilder.append(
+                  result.group().replaceAll(dateTimeField.regex, dateTimeField.replacement));
             });
 
     return stringsMatching(Pattern.compile(regexBuilder.toString()))

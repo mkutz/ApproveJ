@@ -5,7 +5,7 @@ import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.approve.PathProviders.nextToTest;
 import static org.approvej.approve.Verifiers.file;
 import static org.approvej.print.ObjectPrinter.objectPrinter;
-import static org.approvej.scrub.Scrubbers.dates;
+import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.relativeDates;
 import static org.approvej.scrub.Scrubbers.uuids;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
@@ -139,7 +139,7 @@ class ApprovalBuilderTest {
     approve(new Person("Micha", LocalDate.of(1982, 2, 19)))
         .scrubbedOf(person -> new Person("[scrubbed id]", person.name, person.birthday))
         .printWith(Object::toString)
-        .scrubbedOf(dates(ofPattern("yyyy-MM-dd")))
+        .scrubbedOf(dateTimeFormat("yyyy-MM-dd"))
         .byFile();
   }
 

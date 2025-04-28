@@ -1,13 +1,7 @@
 package examples.kotlin
 
-import examples.ExampleClass.Contact
-import examples.ExampleClass.Person
-import examples.ExampleClass.createBlogPost
-import examples.ExampleClass.createContact
-import examples.ExampleClass.createPerson
-import examples.ExampleClass.hello
+import examples.ExampleClass.*
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 import org.approvej.ApprovalBuilder.approve
 import org.approvej.approve.PathProviders.nextToTest
 import org.approvej.print.ObjectPrinter.objectPrinter
@@ -79,7 +73,7 @@ class BasicsDocTest {
 
     approve(blogPost)
       .printWith(objectPrinter())
-      .scrubbedOf(instants(ISO_LOCAL_DATE_TIME)) // <1>
+      .scrubbedOf(instants()) // <1>
       .scrubbedOf(uuids()) // <2>
       .byFile()
     // end::scrubbing[]
