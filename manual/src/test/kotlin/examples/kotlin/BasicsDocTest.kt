@@ -2,6 +2,7 @@ package examples.kotlin
 
 import examples.ExampleClass.*
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter.ISO_INSTANT
 import org.approvej.ApprovalBuilder.approve
 import org.approvej.approve.PathProviders.nextToTest
 import org.approvej.print.ObjectPrinter.objectPrinter
@@ -73,7 +74,7 @@ class BasicsDocTest {
 
     approve(blogPost)
       .printWith(objectPrinter())
-      .scrubbedOf(instants()) // <1>
+      .scrubbedOf(instants(ISO_INSTANT)) // <1>
       .scrubbedOf(uuids()) // <2>
       .byFile()
     // end::scrubbing[]

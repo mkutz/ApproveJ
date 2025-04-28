@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 class DateScrubberTest {
 
   @Test
+  @Deprecated
   void apply() {
     RegexScrubber scrubber = dates(ISO_LOCAL_DATE);
     assertThat(scrubber.apply("datetime: 2023-10-01T12:00:00.000000"))

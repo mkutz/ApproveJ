@@ -7,7 +7,7 @@ import static examples.ExampleClass.hello;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.approve.PathProviders.nextToTest;
 import static org.approvej.print.ObjectPrinter.objectPrinter;
-import static org.approvej.scrub.Scrubbers.instants;
+import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
 
 import examples.ExampleClass.BlogPost;
@@ -80,7 +80,7 @@ class BasicsDocTest {
 
     approve(blogPost)
         .printWith(objectPrinter())
-        .scrubbedOf(instants()) // <1>
+        .scrubbedOf(dateTimeFormat()) // <1>
         .scrubbedOf(uuids()) // <2>
         .byFile(); // <3>
     // end::scrubbing[]
