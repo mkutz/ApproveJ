@@ -99,11 +99,11 @@ class DateTimeScrubberTest {
     String scrubbed = Scrubbers.dateTimeFormat(pattern).apply(unscrubbed);
 
     assertThat(scrubbed)
+        .as("unscrubbed was %n%s".formatted(unscrubbed))
         .isEqualTo(
             """
             non-utc: [datetime 1]
             utc: [datetime 2]
-            bc: [datetime 3]""")
-        .as("unscrubbed was %n%s".formatted(unscrubbed));
+            bc: [datetime 3]""");
   }
 }
