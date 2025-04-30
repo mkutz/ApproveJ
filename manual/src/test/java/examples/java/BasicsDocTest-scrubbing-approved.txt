@@ -1,6 +1,6 @@
 BlogPost [
   content=Lorem ipsum dolor sit amet, consectetur adipiscing elit.,
   id=[uuid 1],
-  published=[instant 1],
+  published=[datetime 1],
   title=Latest News
 ]

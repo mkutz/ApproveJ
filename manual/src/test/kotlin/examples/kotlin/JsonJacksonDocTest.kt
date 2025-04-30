@@ -5,14 +5,13 @@ import com.fasterxml.jackson.databind.json.JsonMapper
 import examples.ExampleClass.Tag.ENTERTAINMENT
 import examples.ExampleClass.Tag.NEWS
 import examples.ExampleClass.createTaggedBlogPost
-import java.time.format.DateTimeFormatter
 import org.approvej.ApprovalBuilder.approve
 import org.approvej.approve.PathProviders.nextToTest
 import org.approvej.approve.Verifiers.file
 import org.approvej.json.jackson.JsonPointerScrubber.jsonPointer
 import org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter
 import org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter
-import org.approvej.scrub.Scrubbers.instants
+import org.approvej.scrub.Scrubbers.dateTimeFormat
 import org.approvej.scrub.Scrubbers.uuids
 import org.junit.jupiter.api.Test
 
@@ -69,7 +68,7 @@ class JsonJacksonDocTest {
 
     approve(createdBlogPostJson)
       .scrubbedOf(uuids())
-      .scrubbedOf(instants(DateTimeFormatter.ISO_INSTANT))
+      .scrubbedOf(dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX"))
       .printWith(jsonStringPrettyPrinter()) // <1>
       .byFile()
     // end::pretty_print_json_string[]

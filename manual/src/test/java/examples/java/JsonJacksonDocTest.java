@@ -9,13 +9,12 @@ import static org.approvej.approve.Verifiers.file;
 import static org.approvej.json.jackson.JsonPointerScrubber.jsonPointer;
 import static org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter;
 import static org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter;
-import static org.approvej.scrub.Scrubbers.instants;
+import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -67,7 +66,7 @@ class JsonJacksonDocTest {
 
     approve(createdBlogPostJson)
         .scrubbedOf(uuids())
-        .scrubbedOf(instants(DateTimeFormatter.ISO_INSTANT))
+        .scrubbedOf(dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX"))
         .printWith(jsonStringPrettyPrinter()) // <1>
         .byFile();
     // end::pretty_print_json_string[]
