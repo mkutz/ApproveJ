@@ -1,6 +1,11 @@
 package examples.kotlin
 
-import examples.ExampleClass.*
+import examples.ExampleClass.Contact
+import examples.ExampleClass.Person
+import examples.ExampleClass.createBlogPost
+import examples.ExampleClass.createContact
+import examples.ExampleClass.createPerson
+import examples.ExampleClass.hello
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter.ISO_INSTANT
 import org.approvej.ApprovalBuilder.approve
