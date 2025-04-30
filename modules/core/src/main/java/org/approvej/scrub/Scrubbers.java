@@ -76,7 +76,7 @@ public class Scrubbers {
    *     {@link Pattern}
    * @deprecated use {@link #dateTimeFormat(String)} instead
    */
-  @Deprecated(since = "0.6.1", forRemoval = true)
+  @Deprecated(since = "0.7.1", forRemoval = true)
   public static RegexScrubber dates(DateTimeFormatter formatter) {
     return stringsMatching(
             Pattern.compile(
@@ -97,7 +97,7 @@ public class Scrubbers {
    *     {@link Pattern}
    * @deprecated use {@link #dateTimeFormat(String)}
    */
-  @Deprecated(since = "0.6.1", forRemoval = true)
+  @Deprecated(since = "0.7.1", forRemoval = true)
   public static RegexScrubber instants(DateTimeFormatter dateFormatPattern) {
     return stringsMatching(
             Pattern.compile(
