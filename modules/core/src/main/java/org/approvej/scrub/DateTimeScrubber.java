@@ -1,15 +1,5 @@
 package org.approvej.scrub;
 
-import static java.time.format.DateTimeFormatter.ISO_DATE;
-import static java.time.format.DateTimeFormatter.ISO_INSTANT;
-import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
-import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-import static java.time.format.DateTimeFormatter.ISO_LOCAL_TIME;
-import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE;
-import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-import static java.time.format.DateTimeFormatter.ISO_OFFSET_TIME;
-import static java.time.format.DateTimeFormatter.ISO_TIME;
-import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 
@@ -21,7 +11,6 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.NullMarked;
@@ -32,19 +21,6 @@ import org.jspecify.annotations.NullMarked;
  */
 @NullMarked
 public class DateTimeScrubber extends RegexScrubber {
-
-  private static Map<DateTimeFormatter, String> PRE_DEFINED_PATTERNS =
-      Map.of(
-          ISO_LOCAL_DATE, "yyyy-MM-dd",
-          ISO_OFFSET_DATE, "yyyy-MM-ddZ",
-          ISO_DATE, "yyyy-MM-dd[Z]",
-          ISO_LOCAL_TIME, "HH:mm:ss[.SSS]",
-          ISO_OFFSET_TIME, "HH:mm:ss[.SSS]Z",
-          ISO_TIME, "HH:mm:ss[.SSS][Z]",
-          ISO_LOCAL_DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss[.SSS]",
-          ISO_OFFSET_DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
-          ISO_ZONED_DATE_TIME, "yyyy-MM-dd'T'HH:mm:ss.SSS'['VV']'",
-          ISO_INSTANT, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
   /**
    * Creates a {@link DateTimeScrubber} to scrub date/time strings of the given dateTimePattern.
@@ -127,16 +103,13 @@ public class DateTimeScrubber extends RegexScrubber {
     NANOS_OF_DAY("nanosOfDay", "N+", "[0-9]+"),
     MILLIS_OF_DAY("millisOfDay", "(A+)", "[0-9]+"),
     ZONE_OFFSET_MAX("zoneOffset", "ZZZZ", "GMT(([+-][0-9][0-9]:?([0-5][0-9])?:?([0-5][0-9])?)?)"),
-    ZONE_OFFSET_LONG("zoneOffset", "ZZZ", "[+-][0-9][0-9][0-5][0-9]"),
-    ZONE_OFFSET_MIDDLE("zoneOffset", "ZZ", "[+-][0-9][0-9][0-5][0-9]"),
-    ZONE_OFFSET_SHORT("zoneOffset", "Z", "[+-][0-9][0-9][0-5][0-9]"),
+    ZONE_OFFSET_LONG("zoneOffset", List.of("ZZZ", "ZZ", "Z", "xx"), "[+-][0-9][0-9][0-5][0-9]"),
     ZONE_OFFSET_Z_MAX("zoneOffset", "XXXX", "Z|[+-][0-9][0-9]:?([0-5][0-9])?:?([0-5][0-9])?"),
     ZONE_OFFSET_Z_LONG("zoneOffset", List.of("XXX", "VV"), "Z|[+-][0-9][0-9]:[0-5][0-9]"),
     ZONE_OFFSET_Z_MIDDLE("zoneOffset", "XX", "Z|[+-][0-9][0-9][0-5][0-9]"),
     ZONE_OFFSET_Z_SHORT("zoneOffset", "X", "Z|[+-][0-9][1-9]([0-5][0-9])?"),
     ZONE_OFFSET_x_MAX("zoneOffset", "xxxx", "[+-][0-9][0-9]:?([0-5][0-9])?:?([0-5][0-9])?"),
     ZONE_OFFSET_x_LONG("zoneOffset", "xxx", "[+-][0-9][0-9]:[0-5][0-9]"),
-    ZONE_OFFSET_x_MIDDLE("zoneOffset", "xx", "[+-][0-9][0-9][0-5][0-9]"),
     ZONE_OFFSET_x_SHORT("zoneOffset", "x", "[+-][0-9][0-9]([0-5][0-9])?"),
     ZONE_OFFSET_LOCALIZED("zoneOffset", "OOOO", "GMT([+-](1[1-3]|0[1-9])(:[0-5][0-9])?)?"),
     ZONE_OFFSET_LOCALIZED_SHORT("zoneOffset", "O", "GMT([+-](1[1-3]|[1-9])(:[0-5][0-9])?)?"),
