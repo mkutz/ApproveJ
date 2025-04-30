@@ -3,5 +3,5 @@
   "title" : "Latest News",
   "content" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
   "tagIds" : [ "[uuid 2]", "[uuid 3]" ],
-  "published" : "[instant 1]"
+  "published" : "[datetime 1]"
 }

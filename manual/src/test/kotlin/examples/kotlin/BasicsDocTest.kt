@@ -7,12 +7,11 @@ import examples.ExampleClass.createContact
 import examples.ExampleClass.createPerson
 import examples.ExampleClass.hello
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter.ISO_INSTANT
 import org.approvej.ApprovalBuilder.approve
 import org.approvej.approve.PathProviders.nextToTest
 import org.approvej.print.ObjectPrinter.objectPrinter
 import org.approvej.print.Printer
-import org.approvej.scrub.Scrubbers.instants
+import org.approvej.scrub.Scrubbers.dateTimeFormat
 import org.approvej.scrub.Scrubbers.uuids
 import org.junit.jupiter.api.Test
 
@@ -79,7 +78,7 @@ class BasicsDocTest {
 
     approve(blogPost)
       .printWith(objectPrinter())
-      .scrubbedOf(instants(ISO_INSTANT)) // <1>
+      .scrubbedOf(dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX")) // <1>
       .scrubbedOf(uuids()) // <2>
       .byFile()
     // end::scrubbing[]

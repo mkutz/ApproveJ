@@ -4,11 +4,10 @@ import static examples.ExampleClass.createBlogPost;
 import static examples.ExampleClass.createContact;
 import static examples.ExampleClass.createPerson;
 import static examples.ExampleClass.hello;
-import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.approve.PathProviders.nextToTest;
 import static org.approvej.print.ObjectPrinter.objectPrinter;
-import static org.approvej.scrub.Scrubbers.instants;
+import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
 
 import examples.ExampleClass.BlogPost;
@@ -81,7 +80,7 @@ class BasicsDocTest {
 
     approve(blogPost)
         .printWith(objectPrinter())
-        .scrubbedOf(instants(ISO_INSTANT)) // <1>
+        .scrubbedOf(dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX")) // <1>
         .scrubbedOf(uuids()) // <2>
         .byFile(); // <3>
     // end::scrubbing[]
