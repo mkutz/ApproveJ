@@ -5,6 +5,7 @@ import static org.approvej.scrub.Replacements.numbered;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.NullMarked;
 
@@ -14,7 +15,7 @@ public class Scrubbers {
 
   private Scrubbers() {}
 
-  public static final Pattern UUID_PATTERN =
+  private static final Pattern UUID_PATTERN =
       Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
 
   /**
@@ -39,14 +40,30 @@ public class Scrubbers {
   }
 
   /**
-   * Creates {@link DateTimeScrubber} to replace date/time strings of the given pattern.
+   * Creates {@link DateTimeScrubber} to replace date/time strings of the given pattern localized by
+   * the given locale.
+   *
+   * @param dateTimePattern a pattern as defined by {@link DateTimeFormatter}
+   * @param locale the {@link Locale} to localize the date/time pattern (influences names of months
+   *     or weekdays for example)
+   * @return a {@link DateTimeScrubber} for the given date/time pattern
+   * @see DateTimeFormatter
+   */
+  public static RegexScrubber dateTimeFormat(String dateTimePattern, Locale locale) {
+    return new DateTimeScrubber(dateTimePattern, locale, numbered("datetime"));
+  }
+
+  /**
+   * Creates {@link DateTimeScrubber} to replace date/time strings of the given pattern localized by
+   * the default {@link Locale}.
    *
    * @param dateTimePattern a pattern as defined by {@link DateTimeFormatter}
    * @return a {@link DateTimeScrubber} for the given date/time pattern
    * @see DateTimeFormatter
+   * @see Locale#getDefault()
    */
   public static RegexScrubber dateTimeFormat(String dateTimePattern) {
-    return new DateTimeScrubber(dateTimePattern, numbered("datetime"));
+    return dateTimeFormat(dateTimePattern, Locale.getDefault());
   }
 
   private static final LocalDate EXAMPLE_DATE = LocalDate.of(4567, 12, 30);

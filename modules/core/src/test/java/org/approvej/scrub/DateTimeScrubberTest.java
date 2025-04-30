@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -81,7 +80,7 @@ class DateTimeScrubberTest {
         "yyyy-MM-dd'T'HH:mm:ss.SSS[X]"
       })
   void dateTimeFormat(String pattern) {
-    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern, Locale.US);
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(pattern);
     ZonedDateTime nonUtc =
         ZonedDateTime.of(2025, 9, 22, 23, 59, 48, 987_654_321, ZoneOffset.ofHours(-5));
     ZonedDateTime utc = ZonedDateTime.of(2026, 10, 12, 13, 39, 28, 987_654, UTC);

@@ -15,6 +15,7 @@ import static org.approvej.scrub.Scrubbers.uuids;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -66,7 +67,7 @@ class JsonJacksonDocTest {
 
     approve(createdBlogPostJson)
         .scrubbedOf(uuids())
-        .scrubbedOf(instants())
+        .scrubbedOf(instants(DateTimeFormatter.ISO_INSTANT))
         .printWith(jsonStringPrettyPrinter()) // <1>
         .byFile();
     // end::pretty_print_json_string[]
