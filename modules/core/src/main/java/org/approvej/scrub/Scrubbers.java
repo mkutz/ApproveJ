@@ -2,8 +2,6 @@ package org.approvej.scrub;
 
 import static org.approvej.scrub.Replacements.numbered;
 
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -64,48 +62,6 @@ public class Scrubbers {
    */
   public static RegexScrubber dateTimeFormat(String dateTimePattern) {
     return dateTimeFormat(dateTimePattern, Locale.getDefault());
-  }
-
-  private static final LocalDate EXAMPLE_DATE = LocalDate.of(4567, 12, 30);
-
-  /**
-   * Creates {@link RegexScrubber} to replace date strings of the given pattern.
-   *
-   * @param formatter a {@link DateTimeFormatter} to parse the dates
-   * @return a new {@link RegexScrubber} with the given {@link DateTimeFormatter} turned into a
-   *     {@link Pattern}
-   * @deprecated use {@link #dateTimeFormat(String)} instead
-   */
-  @Deprecated(since = "0.7.1", forRemoval = true)
-  public static RegexScrubber dates(DateTimeFormatter formatter) {
-    return stringsMatching(
-            Pattern.compile(
-                formatter
-                    .format(EXAMPLE_DATE)
-                    .replaceAll("\\p{L}+", "\\\\p{L}+")
-                    .replaceAll("\\d", "\\\\d")))
-        .replacement(numbered("date"));
-  }
-
-  private static final ZonedDateTime EXAMPLE_INSTANT = ZonedDateTime.now();
-
-  /**
-   * {@link RegexScrubber} that replaces instant strings of the given pattern.
-   *
-   * @param dateFormatPattern a {@link DateTimeFormatter} to parse the dates
-   * @return a new {@link RegexScrubber} with the given {@link DateTimeFormatter} turned into a
-   *     {@link Pattern}
-   * @deprecated use {@link #dateTimeFormat(String)}
-   */
-  @Deprecated(since = "0.7.1", forRemoval = true)
-  public static RegexScrubber instants(DateTimeFormatter dateFormatPattern) {
-    return stringsMatching(
-            Pattern.compile(
-                dateFormatPattern
-                    .format(EXAMPLE_INSTANT)
-                    .replaceAll("\\p{L}+", "\\\\p{L}+")
-                    .replaceAll("\\d", "\\\\d")))
-        .replacement(numbered("instant"));
   }
 
   /**
