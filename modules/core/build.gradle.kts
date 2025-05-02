@@ -57,7 +57,7 @@ testing {
 tasks.named("check") { dependsOn(testing.suites.named("testng"), testing.suites.named("spock")) }
 
 tasks.jacocoTestReport {
-  mustRunAfter(tasks.check)
+  mustRunAfter(tasks.check, tasks.javadoc)
   executionData(fileTree(project.layout.buildDirectory) { include("**/jacoco/*.exec") })
   reports { xml.required = true }
 }
