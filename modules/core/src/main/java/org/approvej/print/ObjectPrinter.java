@@ -32,6 +32,8 @@ public class ObjectPrinter<T> implements Printer<T> {
           Boolean.class,
           Character.class,
           CharSequence.class,
+          Class.class,
+          Enum.class,
           Number.class,
           UUID.class,
           Temporal.class,

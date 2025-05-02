@@ -3,6 +3,9 @@ package org.approvej.print;
 import static org.approvej.print.ObjectPrinter.objectPrinter;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -40,7 +43,11 @@ class ObjectPrinterTest {
         Instant.now(),
         LocalDateTime.now(),
         ZonedDateTime.now(),
-        Duration.ofDays(1).plusHours(2).plusMinutes(3).plusSeconds(4));
+        Duration.ofDays(1).plusHours(2).plusMinutes(3).plusSeconds(4),
+        DayOfWeek.MONDAY,
+        String.class,
+        BigDecimal.ONE,
+        BigInteger.ONE);
   }
 
   @Test
