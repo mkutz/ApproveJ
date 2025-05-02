@@ -10,8 +10,15 @@ import java.util.stream.Stream;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public interface TestMethod {
+interface TestMethod {
 
+  /**
+   * Tries to create a {@link TestMethod} from the given {@link Method}.
+   *
+   * @param method the potential test {@link Method}
+   * @return an {@link Optional} containing the {@link TestMethod} if the {@link Method} is a test
+   *     case.
+   */
   static Optional<TestMethod> create(Method method) {
     return Stream.<TestMethod>of(
             new JUnitTestMethod(method), new TestNGTestMethod(method), new SpockTestMethod(method))
@@ -19,6 +26,11 @@ public interface TestMethod {
         .findFirst();
   }
 
+  /**
+   * Returns the {@link Method} of the test case.
+   *
+   * @return the {@link Method} of the test case
+   */
   Method method();
 
   /**
@@ -42,6 +54,11 @@ public interface TestMethod {
    */
   List<Annotation> testAnnotations();
 
+  /**
+   * {@link TestMethod} implementation for JUnit/JUnit5.
+   *
+   * @param method the potential test {@link Method}
+   */
   record JUnitTestMethod(Method method) implements TestMethod {
 
     @Override
@@ -62,6 +79,11 @@ public interface TestMethod {
     }
   }
 
+  /**
+   * {@link TestMethod} implementation for TestNG.
+   *
+   * @param method the potential test {@link Method}
+   */
   record TestNGTestMethod(Method method) implements TestMethod {
 
     @Override
@@ -84,6 +106,11 @@ public interface TestMethod {
     }
   }
 
+  /**
+   * {@link TestMethod} implementation for Spock.
+   *
+   * @param method the potential test {@link Method}
+   */
   record SpockTestMethod(Method method) implements TestMethod {
 
     @Override
