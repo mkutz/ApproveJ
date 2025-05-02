@@ -57,13 +57,7 @@ testing {
 tasks.named("check") { dependsOn(testing.suites.named("testng"), testing.suites.named("spock")) }
 
 tasks.jacocoTestReport {
-  dependsOn(
-    testing.suites.named("test"),
-    testing.suites.named("testng"),
-    testing.suites.named("spock"),
-  )
+  mustRunAfter(tasks.check)
   executionData(fileTree(project.layout.buildDirectory) { include("**/jacoco/*.exec") })
   reports { xml.required = true }
-  sourceDirectories.from(sourceSets.main.get().allJava.srcDirs)
-  classDirectories.from(sourceSets.main.get().output.classesDirs)
 }
