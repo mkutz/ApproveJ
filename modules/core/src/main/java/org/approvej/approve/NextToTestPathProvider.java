@@ -3,7 +3,6 @@ package org.approvej.approve;
 import static org.approvej.approve.StackTraceTestFinderUtil.currentTestMethod;
 import static org.approvej.approve.StackTraceTestFinderUtil.findTestSourcePath;
 
-import java.lang.reflect.Method;
 import java.nio.file.Path;
 import org.jspecify.annotations.NullMarked;
 
@@ -16,7 +15,7 @@ public class NextToTestPathProvider implements PathProvider {
 
   private final Path testSourcePath;
   private final String testClassSimpleName;
-  private final String testMethodName;
+  private final String testCaseName;
   private Path directory;
   private String fileNamePattern;
   private String filenameExtension;
@@ -26,12 +25,12 @@ public class NextToTestPathProvider implements PathProvider {
    * determine the paths of the approved and received files.
    */
   NextToTestPathProvider() {
-    Method testMethod = currentTestMethod();
-    this.testSourcePath = findTestSourcePath(testMethod);
-    this.testClassSimpleName = testMethod.getDeclaringClass().getSimpleName();
-    this.testMethodName = testMethod.getName();
+    TestMethod testMethod = currentTestMethod();
+    this.testSourcePath = findTestSourcePath(testMethod.method());
+    this.testClassSimpleName = testMethod.testClass().getSimpleName();
+    this.testCaseName = testMethod.testCaseName();
     this.directory = testSourcePath.getParent();
-    this.fileNamePattern = "%s-%s-%%s.%%s".formatted(testClassSimpleName, testMethodName);
+    this.fileNamePattern = "%s-%s-%%s.%%s".formatted(testClassSimpleName, testCaseName);
     this.filenameExtension = DEFAULT_FILENAME_EXTENSION;
   }
 
@@ -42,7 +41,7 @@ public class NextToTestPathProvider implements PathProvider {
    */
   public NextToTestPathProvider inSubdirectory() {
     this.directory = testSourcePath.getParent().resolve(testClassSimpleName);
-    this.fileNamePattern = "%s-%%s.%%s".formatted(testMethodName);
+    this.fileNamePattern = "%s-%%s.%%s".formatted(testCaseName);
     return this;
   }
 
