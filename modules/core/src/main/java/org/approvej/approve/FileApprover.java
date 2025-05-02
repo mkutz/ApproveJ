@@ -63,7 +63,7 @@ public class FileApprover implements Approver {
     try {
       return op.call();
     } catch (IOException e) {
-      throw new FileVerifierError("Failed to %s".formatted(description), e);
+      throw new FileApproverError("Failed to %s".formatted(description), e);
     }
   }
 

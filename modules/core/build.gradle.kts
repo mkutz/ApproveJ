@@ -1,8 +1,10 @@
 @file:Suppress("UnstableApiUsage", "unused")
 
 plugins {
+  groovy
   `java-library`
   jacoco
+  `jacoco-report-aggregation`
   `jvm-test-suite`
   `maven-publish`
 }
@@ -15,10 +17,7 @@ java {
 
 repositories { mavenCentral() }
 
-dependencies {
-  api(libs.jspecify)
-  implementation(libs.junitJupiterApi)
-}
+dependencies { api(libs.jspecify) }
 
 testing {
   suites {
@@ -35,7 +34,30 @@ testing {
           runtimeOnly(libs.junitJupiterEngine)
         }
       }
+    val testng by
+      registering(JvmTestSuite::class) {
+        useTestNG()
+        dependencies {
+          implementation(libs.testng)
+          implementation(project())
+        }
+      }
+    val spock by
+      registering(JvmTestSuite::class) {
+        useSpock()
+        dependencies {
+          implementation(libs.spock)
+          implementation(libs.groovy)
+          implementation(project())
+        }
+      }
   }
 }
 
-tasks.jacocoTestReport { reports { xml.required = true } }
+tasks.named("check") { dependsOn(testing.suites.named("testng"), testing.suites.named("spock")) }
+
+tasks.jacocoTestReport {
+  mustRunAfter(tasks.check, tasks.javadoc)
+  executionData(fileTree(project.layout.buildDirectory) { include("**/jacoco/*.exec") })
+  reports { xml.required = true }
+}

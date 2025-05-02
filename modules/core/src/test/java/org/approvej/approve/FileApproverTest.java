@@ -81,7 +81,7 @@ class FileApproverTest {
   void accept_no_write_access() {
     FileApprover fileVerifier = file(approvedPath("/does/not/exist.txt"));
 
-    assertThatExceptionOfType(FileVerifierError.class)
+    assertThatExceptionOfType(FileApproverError.class)
         .isThrownBy(() -> fileVerifier.accept("Some text"))
         .withMessage("Failed to create directories /does/not");
   }

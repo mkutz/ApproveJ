@@ -113,5 +113,12 @@ spotless {
     ktfmt().googleStyle()
   }
 
+  groovy {
+    target("**/*.groovy")
+    targetExclude("**/build/**/*")
+    greclipse()
+    leadingTabsToSpaces(2)
+  }
+
   freshmark { target("*.md") }
 }

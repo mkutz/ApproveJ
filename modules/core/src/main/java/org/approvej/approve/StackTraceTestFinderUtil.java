@@ -6,9 +6,10 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.jspecify.annotations.NullMarked;
-import org.junit.jupiter.api.Test;
 
 /** Utility class to find the current test method using the stack trace. */
 @NullMarked
@@ -23,19 +24,22 @@ public class StackTraceTestFinderUtil {
    *
    * @return the currently executing test {@link Method}
    */
-  public static Method currentTestMethod() {
+  public static TestMethod currentTestMethod() {
     return stream(Thread.currentThread().getStackTrace())
         .map(
             element -> {
               try {
                 return Class.forName(element.getClassName())
                     .getDeclaredMethod(element.getMethodName());
-              } catch (ClassNotFoundException | NoSuchMethodException e) {
+              } catch (NoClassDefFoundError | ClassNotFoundException | NoSuchMethodException e) {
                 return null;
               }
             })
-        .filter(method -> method != null && method.isAnnotationPresent(Test.class))
+        .filter(Objects::nonNull)
+        .map(TestMethod::create)
+        .filter(Optional::isPresent)
         .findFirst()
+        .orElseThrow()
         .orElseThrow();
   }
 
@@ -65,9 +69,9 @@ public class StackTraceTestFinderUtil {
                 attributes.isRegularFile() && path.toString().matches(pathRegex))) {
       return pathStream
           .findFirst()
-          .orElseThrow(() -> new FileVerifierError("Could not locate test source file"));
+          .orElseThrow(() -> new FileApproverError("Could not locate test source file"));
     } catch (IOException e) {
-      throw new FileVerifierError(e);
+      throw new FileApproverError(e);
     }
   }
 }
