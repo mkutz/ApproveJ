@@ -1,6 +1,7 @@
 plugins {
   base
   `maven-publish`
+  `jacoco-report-aggregation`
   alias(libs.plugins.jreleaser)
   alias(libs.plugins.sonar)
   alias(libs.plugins.spotless)
