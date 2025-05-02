@@ -4,6 +4,7 @@ plugins {
   groovy
   `java-library`
   jacoco
+  `jacoco-report-aggregation`
   `jvm-test-suite`
   `maven-publish`
 }
@@ -55,4 +56,14 @@ testing {
 
 tasks.named("check") { dependsOn(testing.suites.named("testng"), testing.suites.named("spock")) }
 
-tasks.jacocoTestReport { reports { xml.required = true } }
+tasks.jacocoTestReport {
+  dependsOn(
+    testing.suites.named("test"),
+    testing.suites.named("testng"),
+    testing.suites.named("spock"),
+  )
+  executionData(fileTree(project.layout.buildDirectory) { include("**/jacoco/*.exec") })
+  reports { xml.required = true }
+  sourceDirectories.from(sourceSets.main.get().allJava.srcDirs)
+  classDirectories.from(sourceSets.main.get().output.classesDirs)
+}
