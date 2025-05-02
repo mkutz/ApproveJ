@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="SVGRoot"
+   width="1280"
+   height="256"
+   version="1.1"
+   viewBox="0 0 1279.9999 256"
+   sodipodi:docname="banner.svg"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   inkscape:export-filename="banner-0.7.1.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <rect
+       x="688.1756"
+       y="138.10863"
+       width="44.983955"
+       height="107.33014"
+       id="rect6" />
+  </defs>
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.2671185"
+     inkscape:cx="619.12126"
+     inkscape:cy="269.90372"
+     inkscape:window-width="3008"
+     inkscape:window-height="1639"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g18" />
+  <rect
+     style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:5;stroke-linecap:square"
+     id="rect18"
+     width="1280"
+     height="256"
+     x="0"
+     y="0"
+     rx="20"
+     ry="20" />
+  <path
+     id="path4"
+     style="fill:#00aa00;fill-opacity:1;stroke-width:5;stroke-linecap:square"
+     d="m 1089.8457,0 v 131.48828 c 0.8021,-0.89612 1.6215,-1.78046 2.4863,-2.63086 12.1355,-11.93326 28.8725,-17.84961 49.668,-17.84961 h 10 v 28.23047 h -10 c -11.9042,0 -20.7969,3.27009 -27.2402,9.69727 -6.2443,6.61443 -9.4629,15.93587 -9.4629,28.45703 v 2.5 c 0,15.45225 4.0373,27.44517 12.1094,35.97851 8.3027,8.3027 19.8333,12.45313 34.5937,12.45313 14.7604,0 26.1779,-4.15043 34.25,-12.45313 8.3027,-8.53334 12.4531,-20.52625 12.4531,-35.97851 V 59.537109 l -18.3242,-0.236328 17.502,-28.892578 L 1214.2715,0 Z m 124.4258,0 16.7187,29.712891 17.875,29.335937 -19.0273,0.384766 V 179.89258 c 0,23.52433 -7.0331,42.09005 -21.1016,55.69726 C 1194.8985,249.19705 1175.9856,256 1152,256 h 108 c 11.08,0 20,-8.92 20,-20 V 20 c 0,-11.0800003 -8.92,-20 -20,-20 z"
+     sodipodi:nodetypes="cccsccscsscscscccccccccsccssssc" />
+  <path
+     id="path2"
+     style="fill:#ff6600;fill-opacity:1;stroke-width:5;stroke-linecap:square"
+     d="M 5e-6,139.23828 V 236 c 0,11.07999 8.919995,20 20,20 H 128 c -24.21621,0 -43.244186,-6.80295 -57.082026,-20.41016 -13.83784,-13.60721 -20.75586,-32.17294 -20.75586,-55.69726 v -2.5 c 0,-12.52116 -3.220573,-21.8426 -9.464843,-28.45703 -6.44335,-6.42718 -15.334102,-9.69727 -27.238282,-9.69727 z" />
+  <path
+     id="rect1"
+     style="fill:#ff6600;fill-opacity:1;stroke-width:5;stroke-linecap:square"
+     d="m 20.000005,0 c -11.08,0 -20,8.92 -20,20 v 91.00781 h 13.458984 c 20.79548,0 37.532469,5.91636 49.667969,17.84961 0.90507,0.88998 1.766216,1.8127 2.603516,2.75196 0.0369,-0.0414 0.07819,-0.0797 0.115234,-0.1211 V 0 Z" />
+  <g
+     id="g18"
+     transform="translate(-38.809057)">
+    <text
+       xml:space="preserve"
+       style="font-size:56px;line-height:1;font-family:'JetBrains Mono';-inkscape-font-specification:'JetBrains Mono';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:#000000;stroke-width:5;stroke-linecap:square"
+       x="-127.21599"
+       y="173.93481"
+       id="text1"
+       transform="rotate(-90)"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         x="-127.21599"
+         y="173.93481"
+         style="font-weight:normal;font-size:56px;text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:2.50503">x.y<tspan
+   style="font-weight:bold"
+   id="tspan7">.z</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:42.5808px;line-height:1;font-family:'JetBrains Mono';-inkscape-font-specification:'JetBrains Mono';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ff6600;fill-opacity:1;stroke:#000000;stroke-width:5;stroke-linecap:square"
+       x="214.49484"
+       y="73.009109"
+       id="text2"><tspan
+         sodipodi:role="line"
+         x="214.49484"
+         y="73.009109"
+         style="text-align:start;text-anchor:start;fill:#ff6600;fill-opacity:1;stroke:none;stroke-width:2.50503"
+         id="tspan11"><tspan
+   style="text-align:start;text-anchor:start;fill:#000000;fill-opacity:1"
+   id="tspan12">approve(</tspan>received<tspan
+   style="text-align:start;text-anchor:start;fill:#040200;fill-opacity:1"
+   id="tspan6">)</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="214.49484"
+         y="115.5899"
+         style="text-align:start;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.50503"
+         id="tspan14">  .… // COOL NEW STUFF HERE</tspan><tspan
+         sodipodi:role="line"
+         x="214.49484"
+         y="158.17072"
+         style="text-align:start;text-anchor:start;fill:#ff6600;fill-opacity:1;stroke:none;stroke-width:2.50503"
+         id="tspan4"><tspan
+           style="text-align:start;text-anchor:start;fill:#000000;fill-opacity:1"
+           id="tspan9">  .byValue(</tspan><tspan
+           style="text-align:start;text-anchor:start;fill:#00aa00;fill-opacity:1"
+           id="tspan8">approved</tspan><tspan
+           style="text-align:start;text-anchor:start;fill:#1c1c1c;fill-opacity:1"
+           id="tspan10">)</tspan></tspan></text>
+  </g>
+  <text
+     xml:space="preserve"
+     id="text6"
+     style="font-size:21.3333px;line-height:1;font-family:'JetBrains Mono';-inkscape-font-specification:'JetBrains Mono';text-align:start;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect6);display:inline;fill:#040200;fill-opacity:1;stroke:none;stroke-width:5;stroke-linecap:square" />
+</svg>
