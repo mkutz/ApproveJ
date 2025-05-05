@@ -18,7 +18,7 @@ jsonpath = { module = "com.jayway.jsonpath:json-path" , version = "2.9.0" }
 jspecify = { module = "org.jspecify:jspecify", version = "1.0.0" }
 spock = { module = "org.spockframework:spock-core", version = "2.4-M6-groovy-4.0" }
 groovy = { module = "org.apache.groovy:groovy" , version = "4.0.26" }
-testng = { module = "org.testng:testng", version = "7.9.0" }
+testng = { module = "org.testng:testng", version = "7.11.0" }
 
 [plugins]
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version = "4.0.4" }
