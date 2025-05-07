@@ -3,6 +3,11 @@ package org.approvej.approve.review;
 import java.io.IOException;
 import java.nio.file.Path;
 
+/**
+ * A {@link FileReviewer} implementation that uses the <a
+ * href="https://www.jetbrains.com/help/idea/differences-viewer.html">IntelliJ IDEA diff viewer</a>
+ * to review files.
+ */
 public class IdeaDiffFileReviewer implements FileReviewer {
 
   @Override

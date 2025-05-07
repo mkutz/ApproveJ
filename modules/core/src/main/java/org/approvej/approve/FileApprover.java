@@ -8,7 +8,7 @@ import static java.nio.file.Files.readString;
 import static java.nio.file.Files.writeString;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
-import static org.approvej.Configuration.loadConfiguration;
+import static org.approvej.Configuration.configuration;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -43,7 +43,7 @@ public class FileApprover implements Approver {
     String previouslyApproved = readApprovedFile();
     String receivedTrimmed = received.trim();
     if (!check(previouslyApproved, receivedTrimmed)) {
-      loadConfiguration()
+      configuration
           .defaultFileReviewer()
           .trigger(pathProvider.receivedPath(), pathProvider.approvedPath());
       if (!check(readApprovedFile(), receivedTrimmed)) {
