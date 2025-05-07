@@ -3,6 +3,10 @@ package org.approvej.approve.review;
 import java.io.IOException;
 import java.nio.file.Path;
 
+/**
+ * A {@link FileReviewer} implementation that uses the <a href="https://meldmerge.org/">Meld</a>
+ * diff tool to review files.
+ */
 public class MeldFileReviewer implements FileReviewer {
 
   @Override
