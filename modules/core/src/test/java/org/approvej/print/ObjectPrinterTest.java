@@ -47,12 +47,13 @@ class ObjectPrinterTest {
         DayOfWeek.MONDAY,
         String.class,
         BigDecimal.ONE,
-        BigInteger.ONE);
+        BigInteger.ONE,
+        null);
   }
 
   @Test
   void apply() {
-    SimpleExampleClass exampleObject = new SimpleExampleClass("value1", 42, true);
+    SimpleExampleClass exampleObject = new SimpleExampleClass("value1", 42, true, null);
 
     assertThat(printer.apply(exampleObject))
         .isEqualTo(
@@ -60,16 +61,18 @@ class ObjectPrinterTest {
             SimpleExampleClass [
               field1=value1,
               field2=42,
-              field3=true
+              field3=true,
+              field4=null
             ]""");
   }
 
-  private record SimpleExampleClass(String field1, int field2, boolean field3) {}
+  private record SimpleExampleClass(String field1, int field2, boolean field3, Object field4) {}
 
   @Test
   void apply_complex_property() {
     ComplexExampleClass exampleObject =
-        new ComplexExampleClass("value1", 42, true, new SimpleExampleClass("value2", 24, false));
+        new ComplexExampleClass(
+            "value1", 42, true, new SimpleExampleClass("value2", 24, false, null));
 
     assertThat(printer.apply(exampleObject))
         .isEqualTo(
@@ -81,7 +84,8 @@ class ObjectPrinterTest {
               field4=SimpleExampleClass [
                 field1=value2,
                 field2=24,
-                field3=false
+                field3=false,
+                field4=null
               ]
             ]""");
   }
@@ -132,14 +136,16 @@ class ObjectPrinterTest {
   @Test
   void apply_map_of_complex() {
     assertThat(
-            printer.apply(Map.of("a", new SimpleExampleClass("b", 2, true), "b", "hello", "c", 3)))
+            printer.apply(
+                Map.of("a", new SimpleExampleClass("b", 2, true, null), "b", "hello", "c", 3)))
         .isEqualTo(
             """
             [
               a=SimpleExampleClass [
                 field1=b,
                 field2=2,
-                field3=true
+                field3=true,
+                field4=null
               ],
               b=hello,
               c=3
@@ -171,7 +177,7 @@ class ObjectPrinterTest {
     List<ComplexExampleClass> value =
         List.of(
             new ComplexExampleClass(
-                "value1", 42, true, new SimpleExampleClass("value2", 24, false)));
+                "value1", 42, true, new SimpleExampleClass("value2", 24, false, null)));
 
     assertThat(printer.apply(value))
         .isEqualTo(
@@ -184,7 +190,8 @@ class ObjectPrinterTest {
                 field4=SimpleExampleClass [
                   field1=value2,
                   field2=24,
-                  field3=false
+                  field3=false,
+                  field4=null
                 ]
               ]
             ]""");

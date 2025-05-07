@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A generic printer for Java {@link Object}s that prints their properties and values one per line.
@@ -58,10 +59,11 @@ public class ObjectPrinter<T> implements Printer<T> {
     return apply(value, "");
   }
 
-  private String apply(Object object, String baseIndent) {
+  private String apply(@Nullable Object object, String baseIndent) {
     return switch (object) {
       case Map<?, ?> map -> applyMap(map, baseIndent);
       case Collection<?> collection -> applyCollection(collection, baseIndent);
+      case null -> applyObject("null", baseIndent);
       default -> applyObject(object, baseIndent);
     };
   }
