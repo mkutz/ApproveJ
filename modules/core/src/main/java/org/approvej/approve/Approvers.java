@@ -4,9 +4,9 @@ import org.jspecify.annotations.NullMarked;
 
 /** Collection of static methods to create {@link Approver} instances. */
 @NullMarked
-public class Verifiers {
+public class Approvers {
 
-  private Verifiers() {}
+  private Approvers() {}
 
   /**
    * Creates a {@link Approver} using the given previouslyApproved value.

@@ -3,7 +3,7 @@ package org.approvej.approve;
 import org.approvej.ApprovalError;
 import org.jspecify.annotations.NullMarked;
 
-/** A verifier that checks if the received value is equal to a value given in place. */
+/** An {@link Approver} that checks if the received value is equal to a value given in place. */
 @NullMarked
 public class InplaceApprover implements Approver {
 

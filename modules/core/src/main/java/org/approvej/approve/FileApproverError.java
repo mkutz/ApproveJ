@@ -14,6 +14,6 @@ class FileApproverError extends RuntimeException {
   }
 
   public FileApproverError(Throwable cause) {
-    super("Failed to verify file", cause);
+    super("Failed to approve file", cause);
   }
 }

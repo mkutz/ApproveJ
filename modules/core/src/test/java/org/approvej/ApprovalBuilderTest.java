@@ -2,8 +2,8 @@ package org.approvej;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.approvej.ApprovalBuilder.approve;
+import static org.approvej.approve.Approvers.file;
 import static org.approvej.approve.PathProviders.nextToTest;
-import static org.approvej.approve.Verifiers.file;
 import static org.approvej.print.ObjectPrinter.objectPrinter;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.relativeDates;

@@ -38,14 +38,14 @@ class JsonApprovalBuilderTest {
           .stripIndent();
 
   @Test
-  void verify_list() {
+  void approve_list() {
     approve(List.of("a", "b", "c"))
         .printWith(jsonPrettyPrinter())
         .byValue("[ \"a\", \"b\", \"c\" ]");
   }
 
   @Test
-  void verify_file() {
+  void approve_file() {
     approve(EXAMPLE_JSON)
         .printWith(jsonStringPrettyPrinter())
         .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
@@ -54,7 +54,7 @@ class JsonApprovalBuilderTest {
   }
 
   @Test
-  void verify_with_scrubbers() {
+  void approve_with_scrubbers() {
     approve(EXAMPLE_JSON)
         .printWith(jsonStringPrettyPrinter())
         .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
@@ -63,7 +63,7 @@ class JsonApprovalBuilderTest {
   }
 
   @Test
-  void verify_failure() {
+  void approve_failure() {
     assertThatExceptionOfType(AssertionError.class)
         .isThrownBy(() -> approve(EXAMPLE_JSON).byValue("This is not the same text."))
         .withMessage(

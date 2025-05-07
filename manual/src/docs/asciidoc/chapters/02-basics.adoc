@@ -206,7 +206,7 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=scrubbing]
 ----
 <1> replaces the published date with a numbered placeholder
 <2> replaces the id UUID with a numbered placeholder
-<3> so that the verified result looks like this
+<3> so that the approved result looks like this
 
 [source]
 .Approved file

@@ -1,10 +1,10 @@
 package org.approvej;
 
+import static org.approvej.approve.Approvers.file;
+import static org.approvej.approve.Approvers.value;
 import static org.approvej.approve.PathProvider.DEFAULT_FILENAME_EXTENSION;
 import static org.approvej.approve.PathProviders.approvedPath;
 import static org.approvej.approve.PathProviders.nextToTest;
-import static org.approvej.approve.Verifiers.file;
-import static org.approvej.approve.Verifiers.value;
 
 import java.nio.file.Path;
 import java.util.function.Consumer;
