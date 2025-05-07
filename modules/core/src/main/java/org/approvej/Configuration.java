@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
+import org.approvej.approve.review.FileReviewer;
+import org.approvej.approve.review.NoFileReviewer;
 import org.approvej.print.Printer;
 import org.approvej.print.ToStringPrinter;
 import org.jspecify.annotations.NullMarked;
@@ -26,6 +28,7 @@ public record Configuration(Printer<Object> defaultPrinter) {
 
   static {
     DEFAULTS.setProperty("defaultPrinter", ToStringPrinter.class.getName());
+    DEFAULTS.setProperty("defaultFileReviewer", NoFileReviewer.class.getName());
   }
 
   private static Configuration loadConfiguration() {
@@ -41,7 +44,17 @@ public record Configuration(Printer<Object> defaultPrinter) {
       throw new ConfigurationError("Failed to create printer %s".formatted(defaultPrinter), e);
     }
 
-    return new Configuration(printer);
+      String defaultFileReviewer = properties.getProperty("defaultFileReviewer");
+      FileReviewer fileReviewer;
+      try {
+          // noinspection unchecked
+          fileReviewer =
+                  (FileReviewer) Class.forName(defaultFileReviewer).getDeclaredConstructor().newInstance();
+      } catch (ReflectiveOperationException e) {
+          throw new ConfigurationError("Failed to create file reviewer %s".formatted(defaultPrinter), e);
+      }
+
+    return new Configuration(printer, fileReviewer);
   }
 
   private static Properties loadProperties() {
