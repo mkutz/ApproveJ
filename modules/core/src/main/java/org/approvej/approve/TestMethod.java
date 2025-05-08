@@ -9,6 +9,16 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import org.jspecify.annotations.NullMarked;
 
+/**
+ * Represents a test method in a test class. This interface provides a way to identify and work with
+ * test methods across different testing frameworks.
+ *
+ * <p>Implementations of this interface are provided for JUnit, TestNG, and Spock.
+ *
+ * @see JUnitTestMethod
+ * @see TestNGTestMethod
+ * @see SpockTestMethod
+ */
 @NullMarked
 public interface TestMethod {
 

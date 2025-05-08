@@ -1,5 +1,6 @@
 package org.approvej;
 
+import static org.approvej.Configuration.configuration;
 import static org.approvej.approve.Approvers.file;
 import static org.approvej.approve.Approvers.value;
 import static org.approvej.approve.PathProvider.DEFAULT_FILENAME_EXTENSION;
@@ -56,9 +57,6 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class ApprovalBuilder<T> {
 
-  /** The default {@link Printer} used to print the value. */
-  public static final Printer<Object> DEFAULT_PRINTER = Object::toString;
-
   private T receivedValue;
   private final String filenameExtension;
 
@@ -113,7 +111,8 @@ public class ApprovalBuilder<T> {
   /**
    * Approves the {@link #receivedValue} by the given approver.
    *
-   * <p>If necessary the {@link #receivedValue} is printed using the {@link #DEFAULT_PRINTER}.
+   * <p>If necessary the {@link #receivedValue} is printed using the {@link
+   * Configuration#defaultPrinter()}.
    *
    * @param approver a {@link Consumer} or an {@link Approver} implementation
    * @throws ApprovalError if the approval fails
@@ -122,7 +121,7 @@ public class ApprovalBuilder<T> {
     if (receivedValue instanceof String printedValue) {
       approver.accept(printedValue);
     } else {
-      approver.accept(DEFAULT_PRINTER.apply(receivedValue));
+      approver.accept(configuration.defaultPrinter().apply(receivedValue));
     }
   }
 
