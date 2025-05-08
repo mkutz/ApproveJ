@@ -1,0 +1,3 @@
+person:
+  name: "John Doe"
+  birthDate: "1990-01-01"

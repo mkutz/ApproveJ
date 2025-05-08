@@ -107,17 +107,6 @@ class BasicsDocTest {
   }
 
   @Test
-  void approve_file_custom_extension() {
-    // tag::approve_file_custom_extension[]
-    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
-
-    approve(person)
-        .printWith(new PersonYamlPrinter()) // <1>
-        .byFile(nextToTest().filenameExtension("yml"));
-    // end::approve_file_custom_extension[]
-  }
-
-  @Test
   void approve_file_nextToTest_inSubdirectory() {
     // tag::approve_file_nextToTest_inSubdirectory[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));

@@ -55,7 +55,11 @@ public class YamlPrinter<T> implements Printer<T> {
     return new YamlPrinter<>();
   }
 
-  /** Creates a {@link YamlPrinter} using the given {@link ObjectWriter}. */
+  /**
+   * Creates a {@link YamlPrinter} using the given {@link ObjectWriter}.
+   *
+   * @param objectWriter the {@link ObjectWriter} that will be used for printing
+   */
   public YamlPrinter(ObjectWriter objectWriter) {
     this.objectWriter = objectWriter.without(WRITE_DATES_AS_TIMESTAMPS);
   }

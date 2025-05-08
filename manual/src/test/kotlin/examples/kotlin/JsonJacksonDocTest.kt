@@ -6,8 +6,6 @@ import examples.ExampleClass.Tag.ENTERTAINMENT
 import examples.ExampleClass.Tag.NEWS
 import examples.ExampleClass.createTaggedBlogPost
 import org.approvej.ApprovalBuilder.approve
-import org.approvej.approve.Approvers.file
-import org.approvej.approve.PathProviders.nextToTest
 import org.approvej.json.jackson.JsonPointerScrubber.jsonPointer
 import org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter
 import org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter
@@ -33,7 +31,7 @@ class JsonJacksonDocTest {
     approve(jsonMapper.readTree(createdBlogPostJson))
       .scrubbedOf(jsonPointer("/id").replacement("[scrubbed id]")) // <1>
       .scrubbedOf(jsonPointer("/published").replacement("[scrubbed published]")) // <2>
-      .by(file(nextToTest().filenameExtension("json"))) // <3>
+      .byFile()
     // end::scrub_json_pointer[]
   }
 

@@ -50,12 +50,11 @@ include::../../../test/kotlin/examples/kotlin/JsonJacksonDocTest.kt[tag=scrub_js
 ----
 <1> scrubs the dynamically assigned `id` node on the root level of the JSON and replaces it with "[scrubbed id]"
 <2> scrubs the `published` timestamp node on the root level of the JSON and replaces it with "[scrubbed published]"
-<3> stores the received data at a file next to the test with the file extension `.json`
 
 [source,json]
 .Approved file
 ----
-include::../../../test/java/examples/java/JsonJacksonDocTest-scrub_json_pointer-approved.json[]
+include::../../../test/java/examples/java/JsonJacksonDocTest-scrub_json_pointer-approved.txt[]
 ----
 
 

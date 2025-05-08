@@ -14,9 +14,6 @@ public interface PathProvider {
   /** The infix of the file containing a previously approved value. */
   String APPROVED = "approved";
 
-  /** Default filename extension for the approved and received files. */
-  String DEFAULT_FILENAME_EXTENSION = "txt";
-
   /**
    * The path of the directory containing the approved and received files.
    *
@@ -30,12 +27,12 @@ public interface PathProvider {
    *
    * @return the {@link Path} to the received file
    */
-  Path receivedPath();
+  Path receivedPath(String filenameExtension);
 
   /**
    * The path of the file containing a previously approved value.
    *
    * @return the {@link Path} to the approved file
    */
-  Path approvedPath();
+  Path approvedPath(String filenameExtension);
 }
