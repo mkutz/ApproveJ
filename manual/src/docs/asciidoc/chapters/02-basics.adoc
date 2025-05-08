@@ -427,3 +427,17 @@ In that case, you might want to take advantage of the link:{javadoc-url}/core/or
 === Built-In `PathProviders`
 
 All built-in link:{javadoc-url}/core/org/approvej/approve/PathProvider.html[`PathProvider`] implementations are available via the link:{javadoc-url}/core/org/approvej/approve/PathProviders.html[`PathProviders`] utility class.
+
+
+== Configuration
+
+Optionally you can configure the default behaviors of ApproveJ by putting an `approvej.properties` file into your resource folder of your test suite (e.g. `src/test/resources/approvej.properties`).
+
+.Example `approvej.properties`
+----
+include::../../../test/resources/approvej.properties[]
+----
+
+Supported properties are:
+
+`defaultPrinter`:: the default printer class if none is specified via the `printWith` method (see <<printing>>)
