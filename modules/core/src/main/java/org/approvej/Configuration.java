@@ -21,32 +21,38 @@ public record Configuration(Printer<Object> defaultPrinter) {
   /** The loaded {@link Configuration} object. */
   public static final Configuration configuration = loadConfiguration();
 
+  private static final Properties DEFAULTS = new Properties();
+
+  static {
+    DEFAULTS.setProperty("defaultPrinter", ToStringPrinter.class.getName());
+  }
+
   private static Configuration loadConfiguration() {
-    Properties properties = new Properties();
-    try (InputStream is =
+    Properties properties = loadProperties();
+
+    String defaultPrinter = properties.getProperty("defaultPrinter");
+    Printer<Object> printer;
+    try {
+      // noinspection unchecked
+      printer =
+          (Printer<Object>) Class.forName(defaultPrinter).getDeclaredConstructor().newInstance();
+    } catch (ReflectiveOperationException e) {
+      throw new ConfigurationError("Failed to create printer %s".formatted(defaultPrinter), e);
+    }
+
+    return new Configuration(printer);
+  }
+
+  private static Properties loadProperties() {
+    Properties properties = new Properties(Configuration.DEFAULTS);
+    try (InputStream inputStream =
         Configuration.class.getClassLoader().getResourceAsStream("approvej.properties")) {
-      if (is != null) {
-        properties.load(is);
-
-        Printer<Object> printer = new ToStringPrinter();
-        try {
-          Class<?> defaultPrinterClass = Class.forName(properties.getProperty("defaultPrinter"));
-          if (Printer.class.isAssignableFrom(defaultPrinterClass)) {
-            // noinspection unchecked
-            printer = (Printer<Object>) defaultPrinterClass.getDeclaredConstructor().newInstance();
-          } else {
-            throw new ConfigurationError("Configured printer does not implement Printer<Object>");
-          }
-        } catch (ReflectiveOperationException e) {
-          throw new ConfigurationError("Failed to create printer", e);
-        }
-
-        return new Configuration(printer);
+      if (inputStream != null) {
+        properties.load(inputStream);
       }
     } catch (IOException e) {
       throw new ConfigurationError("Failed to load configuration", e);
     }
-
-    return new Configuration(new ToStringPrinter());
+    return properties;
   }
 }
