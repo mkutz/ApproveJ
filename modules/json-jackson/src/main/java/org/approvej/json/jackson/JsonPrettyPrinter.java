@@ -52,15 +52,21 @@ public class JsonPrettyPrinter<T> implements JsonPrinter<T> {
    * @see JsonMapper.Builder#build()
    */
   public static <T> JsonPrettyPrinter<T> jsonPrettyPrinter() {
-    return new JsonPrettyPrinter<>(
+    return new JsonPrettyPrinter<>();
+  }
+
+  /** Creates a {@link JsonPrettyPrinter} using the given {@link ObjectWriter}. */
+  public JsonPrettyPrinter(ObjectWriter objectWriter) {
+    this.objectWriter = objectWriter.without(WRITE_DATES_AS_TIMESTAMPS);
+  }
+
+  /** Creates a {@link JsonPrettyPrinter} using the default {@link JsonMapper}. */
+  public JsonPrettyPrinter() {
+    this(
         JsonMapper.builder()
             .addModule(new JavaTimeModule())
             .build()
             .writerWithDefaultPrettyPrinter());
-  }
-
-  private JsonPrettyPrinter(ObjectWriter objectWriter) {
-    this.objectWriter = objectWriter.without(WRITE_DATES_AS_TIMESTAMPS);
   }
 
   @Override

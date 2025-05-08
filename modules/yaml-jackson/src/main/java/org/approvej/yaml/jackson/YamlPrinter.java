@@ -52,11 +52,17 @@ public class YamlPrinter<T> implements Printer<T> {
    * @see YAMLMapper.Builder#build()
    */
   public static <T> YamlPrinter<T> yamlPrinter() {
-    return yamlPrinter(YAMLMapper.builder().addModule(new JavaTimeModule()).build().writer());
+    return new YamlPrinter<>();
   }
 
-  private YamlPrinter(ObjectWriter objectWriter) {
+  /** Creates a {@link YamlPrinter} using the given {@link ObjectWriter}. */
+  public YamlPrinter(ObjectWriter objectWriter) {
     this.objectWriter = objectWriter.without(WRITE_DATES_AS_TIMESTAMPS);
+  }
+
+  /** Creates a {@link YamlPrinter} using the default {@link YAMLMapper}. */
+  public YamlPrinter() {
+    this(YAMLMapper.builder().addModule(new JavaTimeModule()).build().writer());
   }
 
   @Override

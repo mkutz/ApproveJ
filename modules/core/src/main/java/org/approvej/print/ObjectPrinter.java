@@ -52,7 +52,8 @@ public class ObjectPrinter<T> implements Printer<T> {
     return new ObjectPrinter<>();
   }
 
-  private ObjectPrinter() {}
+  /** Creates a new {@link ObjectPrinter} instance. */
+  public ObjectPrinter() {}
 
   @Override
   public String apply(Object value) {
