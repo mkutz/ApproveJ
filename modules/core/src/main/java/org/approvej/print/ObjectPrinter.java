@@ -91,11 +91,12 @@ public class ObjectPrinter<T> implements Printer<T> {
         baseIndent);
   }
 
-  private String applyObject(Object object, String baseIndent) {
+  private String applyObject(@Nullable Object object, String baseIndent) {
     String indent = baseIndent + "  ";
-    Class<?> type = object.getClass();
-    if (SIMPLE_TYPES.stream().anyMatch(simpleType -> simpleType.isAssignableFrom(type))) {
-      return object.toString();
+    if (object == null
+        || SIMPLE_TYPES.stream()
+            .anyMatch(simpleType -> simpleType.isAssignableFrom(object.getClass()))) {
+      return "%s".formatted(object);
     }
     return stream(object.getClass().getDeclaredMethods())
         .filter(method -> !EXCLUDED_METHODS.contains(method.getName()))
