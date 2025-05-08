@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-interface TestMethod {
+public interface TestMethod {
 
   /**
    * Tries to create a {@link TestMethod} from the given {@link Method}.

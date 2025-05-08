@@ -48,23 +48,24 @@ public class StackTraceTestFinderUtil {
    *
    * <ul>
    *   <li>the test class' name is also the name of the source file,
-   *   <li>the file is at most 10 levels deep,
-   *   <li>the filename extension of the file is <code>java</code>, <code>kt</code>, or <code>groovy
-   *       </code>
+   *   <li>the base package is at most 10 levels deep,
+   *   <li>the filename extension of the file is <code>java</code>, <code>kt</code>, <code>groovy
+   *       </code>, or <code>scala</code>
    * </ul>
    *
    * @param testMethod the test {@link Method}
    * @return the {@link Path} to the source file containing the given testMethod
    */
   public static Path findTestSourcePath(Method testMethod) {
+    int packageDepth = testMethod.getDeclaringClass().getPackageName().split("\\.").length;
     String packagePath = testMethod.getDeclaringClass().getPackageName().replace(".", "/");
     String pathRegex =
-        ".*%s/%s\\.(java|kt|groovy)$"
+        ".*%s/%s\\.(java|kt|groovy|scala)$"
             .formatted(packagePath, testMethod.getDeclaringClass().getSimpleName());
     try (Stream<Path> pathStream =
         Files.find(
             Path.of("."),
-            10,
+            packageDepth + 10,
             (path, attributes) ->
                 attributes.isRegularFile() && path.toString().matches(pathRegex))) {
       return pathStream
