@@ -57,19 +57,26 @@ public class StackTraceTestFinderUtil {
    * @return the {@link Path} to the source file containing the given testMethod
    */
   public static Path findTestSourcePath(Method testMethod) {
-    int packageDepth = testMethod.getDeclaringClass().getPackageName().split("\\.").length;
-    String packagePath = testMethod.getDeclaringClass().getPackageName().replace(".", "/");
+    Class<?> declaringClass = testMethod.getDeclaringClass();
+    int packageDepth = declaringClass.getPackageName().split("\\.").length;
+    String sourceSetName =
+        Path.of(declaringClass.getProtectionDomain().getCodeSource().getLocation().getPath())
+            .getFileName()
+            .toString();
+    String packagePath = declaringClass.getPackageName().replace(".", "/");
     String pathRegex =
-        ".*%s/%s\\.(java|kt|groovy|scala)$"
-            .formatted(packagePath, testMethod.getDeclaringClass().getSimpleName());
+        "(?!build|target).*%s.*/%s/%s\\.(java|kt|groovy|scala)$"
+            .formatted(sourceSetName, packagePath, declaringClass.getSimpleName());
     try (Stream<Path> pathStream =
         Files.find(
-            Path.of("."),
+            Path.of(""),
             packageDepth + 10,
             (path, attributes) ->
-                attributes.isRegularFile() && path.toString().matches(pathRegex))) {
+                attributes.isRegularFile() && path.normalize().toString().matches(pathRegex))) {
       return pathStream
           .findFirst()
+          .map(Path::toAbsolutePath)
+          .map(Path::normalize)
           .orElseThrow(() -> new FileApproverError("Could not locate test source file"));
     } catch (IOException e) {
       throw new FileApproverError(e);
