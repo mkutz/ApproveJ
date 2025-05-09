@@ -17,10 +17,10 @@ public class PathProviderBuilder {
    * The infix of the file containing the latest received value that didn't match the previously
    * approved.
    */
-  public static String RECEIVED = "received";
+  public static final String RECEIVED = "received";
 
   /** The infix of the file containing a previously approved value. */
-  public static String APPROVED = "approved";
+  public static final String APPROVED = "approved";
 
   private Path directory = Path.of(".");
   private String receivedBaseFilename = RECEIVED;
