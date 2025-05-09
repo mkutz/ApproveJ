@@ -8,7 +8,7 @@ import org.jspecify.annotations.NullMarked;
  *
  * @deprecated use {@link PathProviderBuilder} instead
  */
-@Deprecated
+@Deprecated(since = "0.8.3", forRemoval = true)
 @NullMarked
 public class PathProviders {
 
@@ -21,7 +21,7 @@ public class PathProviders {
    * @return a new {@link ApprovedPathProvider}
    * @deprecated use {@link PathProviderBuilder#approvedPath(Path)} instead
    */
-  @Deprecated
+  @Deprecated(since = "0.8.3", forRemoval = true)
   public static ApprovedPathProvider approvedPath(Path approvedPath) {
     return new ApprovedPathProvider(approvedPath);
   }
@@ -33,7 +33,7 @@ public class PathProviders {
    * @return a new {@link ApprovedPathProvider}
    * @deprecated use {@link PathProviderBuilder#approvedPath(String)} instead
    */
-  @Deprecated
+  @Deprecated(since = "0.8.3", forRemoval = true)
   public static ApprovedPathProvider approvedPath(String approvedPath) {
     return approvedPath(Path.of(approvedPath));
   }
@@ -44,7 +44,7 @@ public class PathProviders {
    * @return a new {@link NextToTestPathProvider}
    * @deprecated use {@link PathProviderBuilder#nextToTest()} instead
    */
-  @Deprecated
+  @Deprecated(since = "0.8.3", forRemoval = true)
   public static NextToTestPathProvider nextToTest() {
     return new NextToTestPathProvider();
   }

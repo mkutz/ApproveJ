@@ -25,7 +25,7 @@ import org.jspecify.annotations.NullMarked;
  * @deprecated use {@link PathProviderBuilder#approvedPath(Path)} instead
  */
 @NullMarked
-@Deprecated
+@Deprecated(since = "0.8.3", forRemoval = true)
 public class ApprovedPathProvider implements PathProvider {
 
   private static final Pattern FILE_NAME_PATTERN =

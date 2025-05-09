@@ -14,7 +14,7 @@ import org.jspecify.annotations.NullMarked;
  *     PathProviderBuilder#nextToTestInSubdirectory()} instead
  */
 @NullMarked
-@Deprecated
+@Deprecated(since = "0.8.3", forRemoval = true)
 public class NextToTestPathProvider implements PathProvider {
 
   private final Path testSourcePath;
