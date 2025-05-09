@@ -107,6 +107,17 @@ class BasicsDocTest {
   }
 
   @Test
+  fun approve_file_custom_extension() {
+    // tag::approve_file_custom_extension[]
+    val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
+
+    approve(person)
+      .printWith(PersonYamlPrinter()) // <1>
+      .byFile(nextToTest().filenameExtension("yml")) // <2>
+    // end::approve_file_custom_extension[]
+  }
+
+  @Test
   fun approve_file_nextToTest_inSubdirectory() {
     // tag::approve_file_nextToTestInSubdirectory[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))

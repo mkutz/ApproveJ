@@ -324,6 +324,35 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_
     └── 📄 <TestClass>-<testMethod>-received.txt
 ----
 
+==== Custom Filename Extension
+
+The link:{javadoc-url}/core/org/approvej/approve/NextToTestPathProvider.html#filenameExtension(java.lang.String)[`NextToTestPathProvider.filenameExtension`] method gives you the opportunity to use a different file extension for the approved and received files.
+
+NOTE:: most of the time you probably want to do this because you're using a special printer that creates a specific format (e.g. JSON, XML, YAML, …).
+In that case, you might want to provide a <<custom_printer_implementation>> and override the `filenameExtension` method of the `Printer` instead of changing the filename extension here.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_file_custom_extension]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_custom_extension]
+----
+<1> this printer will create a YAML version of the object
+<2> so it makes sense to change the filename extension, so your IDE will apply appropriate syntax highlighting
+
+.File structure with custom filename extension
+----
+.
+└── 📁src/test/java/…
+    ├── 📄 <TestClass>.java
+    ├── 📄 <TestClass>-<testMethod>-approved.<filenameExtension>
+    └── 📄 <TestClass>-<testMethod>-received.<filenameExtension>
+----
+
 
 ==== In a Subdirectory
 
