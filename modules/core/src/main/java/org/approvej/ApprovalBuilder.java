@@ -152,7 +152,12 @@ public class ApprovalBuilder<T> {
    * @throws ApprovalError if the approval fails
    */
   public void byFile(PathProviderBuilder pathProviderBuilder) {
-    by(file(pathProviderBuilder.filenameExtension(filenameExtension)));
+    if (receivedValue instanceof String printedValue) {
+      file(pathProviderBuilder.filenameExtension(filenameExtension)).accept(printedValue);
+    } else {
+      // noinspection unchecked
+      printWith((Printer<T>) configuration.defaultPrinter()).byFile(pathProviderBuilder);
+    }
   }
 
   /**
@@ -163,7 +168,7 @@ public class ApprovalBuilder<T> {
    * @throws ApprovalError if the approval fails
    */
   public void byFile() {
-    byFile(PathProviderBuilder.nextToTest().filenameExtension(filenameExtension));
+    byFile(PathProviderBuilder.nextToTest());
   }
 
   /**
