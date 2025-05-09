@@ -3,19 +3,18 @@ package org.approvej;
 import static org.approvej.Configuration.configuration;
 import static org.approvej.approve.Approvers.file;
 import static org.approvej.approve.Approvers.value;
-import static org.approvej.approve.PathProvider.DEFAULT_FILENAME_EXTENSION;
-import static org.approvej.approve.PathProviders.approvedPath;
-import static org.approvej.approve.PathProviders.nextToTest;
+import static org.approvej.approve.PathProviderBuilder.approvedPath;
+import static org.approvej.print.Printer.DEFAULT_FILENAME_EXTENSION;
 
 import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import org.approvej.approve.ApprovedPathProvider;
 import org.approvej.approve.Approver;
 import org.approvej.approve.FileApprover;
 import org.approvej.approve.InplaceApprover;
 import org.approvej.approve.PathProvider;
+import org.approvej.approve.PathProviderBuilder;
 import org.approvej.print.Printer;
 import org.approvej.scrub.Scrubber;
 import org.jspecify.annotations.NullMarked;
@@ -146,18 +145,32 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Approves the receivedValue by a {@link FileApprover}, a {@link
-   * org.approvej.approve.NextToTestPathProvider}, and the {@link Printer#filenameExtension()}.
+   * Approves the receivedValue by a {@link FileApprover} with the given {@link
+   * PathProviderBuilder}.
+   *
+   * @param pathProviderBuilder the provider for the paths of the approved and received files
+   * @throws ApprovalError if the approval fails
+   */
+  public void byFile(PathProviderBuilder pathProviderBuilder) {
+    by(file(pathProviderBuilder.filenameExtension(filenameExtension)));
+  }
+
+  /**
+   * Approves the receivedValue by a {@link FileApprover}, using a {@link
+   * PathProviderBuilder#nextToTest() nextToTest PathProviderBuilder}, and the {@link
+   * Printer#filenameExtension() used Printer's filenameExtension}.
    *
    * @throws ApprovalError if the approval fails
    */
   public void byFile() {
-    byFile(nextToTest().filenameExtension(filenameExtension));
+    byFile(PathProviderBuilder.nextToTest().filenameExtension(filenameExtension));
   }
 
   /**
-   * Approves the receivedValue by a {@link FileApprover} with an {@link ApprovedPathProvider} and
-   * the given {@link Path} to the approved file.
+   * Approves the receivedValue by a {@link FileApprover} with an {@link
+   * PathProviderBuilder#approvedPath(Path)} with the given {@link Path} to the approved file.
+   *
+   * <p>Note: the {@link Printer}'s filenameExtension is ignored.
    *
    * @param approvedPath the {@link Path} to the approved file
    * @throws ApprovalError if the approval fails
@@ -167,8 +180,10 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Approves the receivedValue by a {@link FileApprover} with an {@link ApprovedPathProvider} and
-   * the given path to the approved file.
+   * Approves the receivedValue by a {@link FileApprover} with an {@link
+   * PathProviderBuilder#approvedPath(Path)} with the given path to the approved file.
+   *
+   * <p>Note: the {@link Printer}'s filenameExtension is ignored.
    *
    * @param approvedPath the path to the approved file
    * @throws ApprovalError if the approval fails

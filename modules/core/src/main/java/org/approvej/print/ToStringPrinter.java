@@ -7,6 +7,9 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class ToStringPrinter implements Printer<Object> {
 
+  /** Creates a {@link ToStringPrinter}. */
+  public ToStringPrinter() {}
+
   @Override
   public String apply(@Nullable Object value) {
     return "%s".formatted(value);

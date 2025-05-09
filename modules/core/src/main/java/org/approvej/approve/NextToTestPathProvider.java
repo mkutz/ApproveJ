@@ -9,8 +9,12 @@ import org.jspecify.annotations.NullMarked;
 /**
  * A {@link PathProvider} that uses a stack trace to determine the paths of the approved and
  * received files.
+ *
+ * @deprecated use {@link PathProviderBuilder#nextToTest()}/{@link
+ *     PathProviderBuilder#nextToTestInSubdirectory()} instead
  */
 @NullMarked
+@Deprecated
 public class NextToTestPathProvider implements PathProvider {
 
   private final Path testSourcePath;

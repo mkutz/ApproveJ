@@ -5,7 +5,8 @@ import static examples.ExampleClass.createContact;
 import static examples.ExampleClass.createPerson;
 import static examples.ExampleClass.hello;
 import static org.approvej.ApprovalBuilder.approve;
-import static org.approvej.approve.PathProviders.nextToTest;
+import static org.approvej.approve.PathProviderBuilder.nextToTest;
+import static org.approvej.approve.PathProviderBuilder.nextToTestInSubdirectory;
 import static org.approvej.print.ObjectPrinter.objectPrinter;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
@@ -108,11 +109,11 @@ class BasicsDocTest {
 
   @Test
   void approve_file_nextToTest_inSubdirectory() {
-    // tag::approve_file_nextToTest_inSubdirectory[]
+    // tag::approve_file_nextToTestInSubdirectory[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
-    approve(person).printWith(new PersonYamlPrinter()).byFile(nextToTest().inSubdirectory());
-    // end::approve_file_nextToTest_inSubdirectory[]
+    approve(person).printWith(new PersonYamlPrinter()).byFile(nextToTestInSubdirectory());
+    // end::approve_file_nextToTestInSubdirectory[]
   }
 
   @Test

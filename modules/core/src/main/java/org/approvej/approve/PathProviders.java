@@ -3,7 +3,12 @@ package org.approvej.approve;
 import java.nio.file.Path;
 import org.jspecify.annotations.NullMarked;
 
-/** Collection of static methods to create {@link PathProviders} instances. */
+/**
+ * Collection of static methods to create {@link PathProviders} instances.
+ *
+ * @deprecated use {@link PathProviderBuilder} instead
+ */
+@Deprecated
 @NullMarked
 public class PathProviders {
 
@@ -14,7 +19,9 @@ public class PathProviders {
    *
    * @param approvedPath the {@link Path} to the approved file
    * @return a new {@link ApprovedPathProvider}
+   * @deprecated use {@link PathProviderBuilder#approvedPath(Path)} instead
    */
+  @Deprecated
   public static ApprovedPathProvider approvedPath(Path approvedPath) {
     return new ApprovedPathProvider(approvedPath);
   }
@@ -24,7 +31,9 @@ public class PathProviders {
    *
    * @param approvedPath the path to the approved file
    * @return a new {@link ApprovedPathProvider}
+   * @deprecated use {@link PathProviderBuilder#approvedPath(String)} instead
    */
+  @Deprecated
   public static ApprovedPathProvider approvedPath(String approvedPath) {
     return approvedPath(Path.of(approvedPath));
   }
@@ -33,7 +42,9 @@ public class PathProviders {
    * Creates a {@link NextToTestPathProvider}.
    *
    * @return a new {@link NextToTestPathProvider}
+   * @deprecated use {@link PathProviderBuilder#nextToTest()} instead
    */
+  @Deprecated
   public static NextToTestPathProvider nextToTest() {
     return new NextToTestPathProvider();
   }
