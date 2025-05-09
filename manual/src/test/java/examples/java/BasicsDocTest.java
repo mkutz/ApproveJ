@@ -119,7 +119,7 @@ class BasicsDocTest {
   }
 
   @Test
-  void approve_file_nextToTest_inSubdirectory() {
+  void approve_file_nextToTestInSubdirectory() {
     // tag::approve_file_nextToTestInSubdirectory[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 

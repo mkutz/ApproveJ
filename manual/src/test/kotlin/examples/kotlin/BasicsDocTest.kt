@@ -118,7 +118,7 @@ class BasicsDocTest {
   }
 
   @Test
-  fun approve_file_nextToTest_inSubdirectory() {
+  fun approve_file_nextToTestInSubdirectory() {
     // tag::approve_file_nextToTestInSubdirectory[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
