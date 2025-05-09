@@ -2,7 +2,7 @@ package org.approvej.approve;
 
 import static java.nio.file.Files.writeString;
 import static org.approvej.approve.Approvers.file;
-import static org.approvej.approve.PathProviders.approvedPath;
+import static org.approvej.approve.PathProviderBuilder.approvedPath;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -19,7 +19,7 @@ class FileApproverTest {
 
   @Test
   void accept() throws IOException {
-    ApprovedPathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
+    PathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
     FileApprover fileApprover = file(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
 
@@ -31,7 +31,7 @@ class FileApproverTest {
 
   @Test
   void accept_previously_accepted_differs() throws IOException {
-    ApprovedPathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
+    PathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
     FileApprover fileApprover = file(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
 
@@ -46,7 +46,7 @@ class FileApproverTest {
 
   @Test
   void accept_previously_received() throws IOException {
-    ApprovedPathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
+    PathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
     FileApprover fileApprover = file(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
     writeString(pathProvider.receivedPath(), "Some received text", StandardOpenOption.CREATE);
@@ -66,7 +66,7 @@ class FileApproverTest {
 
   @Test
   void accept_no_previously_accepted() {
-    ApprovedPathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
+    PathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
     FileApprover fileApprover = file(pathProvider);
 
     assertThatExceptionOfType(ApprovalError.class)

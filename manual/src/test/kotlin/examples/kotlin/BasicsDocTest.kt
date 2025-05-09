@@ -8,7 +8,8 @@ import examples.ExampleClass.createPerson
 import examples.ExampleClass.hello
 import java.time.LocalDate
 import org.approvej.ApprovalBuilder.approve
-import org.approvej.approve.PathProviders.nextToTest
+import org.approvej.approve.PathProviderBuilder.nextToTest
+import org.approvej.approve.PathProviderBuilder.nextToTestInSubdirectory
 import org.approvej.print.ObjectPrinter.objectPrinter
 import org.approvej.print.Printer
 import org.approvej.scrub.Scrubbers.dateTimeFormat
@@ -117,14 +118,12 @@ class BasicsDocTest {
   }
 
   @Test
-  fun approve_file_nextToTest_inSubdirectory() {
-    // tag::approve_file_nextToTest_inSubdirectory[]
+  fun approve_file_nextToTestInSubdirectory() {
+    // tag::approve_file_nextToTestInSubdirectory[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
-    approve(person)
-      .printWith(PersonYamlPrinter())
-      .byFile(nextToTest().inSubdirectory().filenameExtension("yaml"))
-    // end::approve_file_nextToTest_inSubdirectory[]
+    approve(person).printWith(PersonYamlPrinter()).byFile(nextToTestInSubdirectory())
+    // end::approve_file_nextToTestInSubdirectory[]
   }
 
   @Test

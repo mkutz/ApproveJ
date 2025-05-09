@@ -21,8 +21,11 @@ import org.jspecify.annotations.NullMarked;
  *
  * <p>Note that the {@code approved} infix is not enforced on the given approved file path. It is
  * also not necessary for the approved file to exist.
+ *
+ * @deprecated use {@link PathProviderBuilder#approvedPath(Path)} instead
  */
 @NullMarked
+@Deprecated(since = "0.8.3", forRemoval = true)
 public class ApprovedPathProvider implements PathProvider {
 
   private static final Pattern FILE_NAME_PATTERN =

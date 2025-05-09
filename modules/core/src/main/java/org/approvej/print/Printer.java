@@ -1,7 +1,5 @@
 package org.approvej.print;
 
-import static org.approvej.approve.PathProvider.DEFAULT_FILENAME_EXTENSION;
-
 import java.util.function.Function;
 
 /**
@@ -10,6 +8,9 @@ import java.util.function.Function;
  * @param <T> the type of the object to print
  */
 public interface Printer<T> extends Function<T, String> {
+
+  /** The default filename extension for files that the printed value is written to. */
+  String DEFAULT_FILENAME_EXTENSION = "txt";
 
   /**
    * Returns the suggested filename extension for the printed object. Defaults to "txt" if not

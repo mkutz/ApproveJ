@@ -55,7 +55,11 @@ public class JsonPrettyPrinter<T> implements JsonPrinter<T> {
     return new JsonPrettyPrinter<>();
   }
 
-  /** Creates a {@link JsonPrettyPrinter} using the given {@link ObjectWriter}. */
+  /**
+   * Creates a {@link JsonPrettyPrinter} using the given {@link ObjectWriter}.
+   *
+   * @param objectWriter the {@link ObjectWriter} that will be used for printing
+   */
   public JsonPrettyPrinter(ObjectWriter objectWriter) {
     this.objectWriter = objectWriter.without(WRITE_DATES_AS_TIMESTAMPS);
   }

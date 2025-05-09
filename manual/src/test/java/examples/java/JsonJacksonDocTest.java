@@ -5,7 +5,7 @@ import static examples.ExampleClass.Tag.NEWS;
 import static examples.ExampleClass.createTaggedBlogPost;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.approve.Approvers.file;
-import static org.approvej.approve.PathProviders.nextToTest;
+import static org.approvej.approve.PathProviderBuilder.nextToTest;
 import static org.approvej.json.jackson.JsonPointerScrubber.jsonPointer;
 import static org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter;
 import static org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter;
