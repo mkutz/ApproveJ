@@ -3,7 +3,7 @@ package org.approvej;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.approve.Approvers.file;
-import static org.approvej.approve.PathProviders.nextToTest;
+import static org.approvej.approve.PathProviderBuilder.nextToTest;
 import static org.approvej.print.ObjectPrinter.objectPrinter;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.relativeDates;
@@ -43,7 +43,7 @@ class ApprovalBuilderTest {
     approve(EXAMPLE_TEXT)
         .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
         .scrubbedOf(uuids())
-        .by(file(nextToTest()));
+        .by(file(nextToTest().filenameExtension("txt")));
   }
 
   @Test
