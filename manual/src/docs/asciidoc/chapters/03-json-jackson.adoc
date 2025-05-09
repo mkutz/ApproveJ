@@ -54,7 +54,7 @@ include::../../../test/kotlin/examples/kotlin/JsonJacksonDocTest.kt[tag=scrub_js
 [source,json]
 .Approved file
 ----
-include::../../../test/java/examples/java/JsonJacksonDocTest-scrub_json_pointer-approved.txt[]
+include::../../../test/java/examples/java/JsonJacksonDocTest-scrub_json_pointer-approved.json[]
 ----
 
 
