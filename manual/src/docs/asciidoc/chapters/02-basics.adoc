@@ -298,9 +298,9 @@ You can use a diff tool of your choice to compare the two files and merge values
 
 ==== Next to Test
 
-By default, the `FileApprover` will use a link:{javadoc-url}/core/org/approvej/approve/NextToTestPathProvider.html[`NextToTestPathProvider`], which will put the received and approved files next to the test class and name them like the test case method.
+By default, the `FileApprover` will put the received and approved files next to the test class and name them like the test case method.
 
-You can make this explicit by using the `nextToFile` method.
+You can make this explicit by using the link:{javadoc-url}/core/org/approvej/approve/PathProviderBuilder.html#nextToTest()[`PathProviderBuilder.nextToTest()`] method.
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -312,7 +312,7 @@ include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_file_ne
 ----
 include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_next_to_test]
 ----
-<1> defines the `NextToTestPathProvider` explicitly, same as just calling `byFile()`
+<1> defines the `PathProviderBuilder` explicitly, same as just calling `byFile()`
 
 
 .File structure
@@ -326,7 +326,7 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_
 
 ==== Custom Filename Extension
 
-The link:{javadoc-url}/core/org/approvej/approve/NextToTestPathProvider.html#filenameExtension(java.lang.String)[`NextToTestPathProvider.filenameExtension`] method gives you the opportunity to use a different file extension for the approved and received files.
+The link:{javadoc-url}/core/org/approvej/approve/PathProviderBuilder.html#filenameExtension(java.lang.String)[`PathProviderBuilder.filenameExtension`] method gives you the opportunity to use a different file extension for the approved and received files.
 
 NOTE:: most of the time you probably want to do this because you're using a special printer that creates a specific format (e.g. JSON, XML, YAML, …).
 In that case, you might want to provide a <<custom_printer_implementation>> and override the `filenameExtension` method of the `Printer` instead of changing the filename extension here.
@@ -357,7 +357,7 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_
 ==== In a Subdirectory
 
 If you have test classes with a lot of approval tests, there a quite a lot of files created next to the test class.
-In that case, you can use the link:{javadoc-url}/core/org/approvej/approve/NextToTestPathProvider.html#inSubdirectory()[`NextToTestPathProvider.inSubdirectory`] method to instruct the link:{javadoc-url}/core/org/approvej/approve/NextToTestPathProvider.html[`NextToTestPathProvider`] to put all the files in a subdirectory named after the test class.
+In that case, you can use the link:{javadoc-url}/core/org/approvej/approve/PathProviderBuilder.html#nextToTestInSubdirectory()[`PathProviderBuilder.nextToTestInSubdirectory`] to put all the files in a subdirectory named after the test class.
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -417,16 +417,14 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_
 ----
 
 
-==== Custom `PathProvider`
+==== Custom `PathProvider`/`PathProviderBuilder`
 
-You can also define your own link:{javadoc-url}/core/org/approvej/approve/FileApprover.PathProvider.html[`PathProvider`] and pass it to the `byFile` method.
+You can also define your own link:{javadoc-url}/core/org/approvej/approve/PathProvider.html[`PathProvider`] and pass it to the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byFile(org.approvej.approve.PathProvider)[`byFile`] method.
+
+Or you can create a method that returns a link:{javadoc-url}/core/org/approvej/approve/PathProviderBuilder.html[`PathProviderBuilder`] and pass it to the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byFile(org.approvej.approve.PathProviderBuilder)[`byFile`] method.
+That way the filename extension of the used `Printer` is set just before approval.
 
 In that case, you might want to take advantage of the link:{javadoc-url}/core/org/approvej/approve/StackTraceTestFinderUtil.html[`StackTraceTestFinderUtil`] class to find the test source path or the current test method based on the current stack trace.
-
-
-=== Built-In `PathProviders`
-
-All built-in link:{javadoc-url}/core/org/approvej/approve/PathProvider.html[`PathProvider`] implementations are available via the link:{javadoc-url}/core/org/approvej/approve/PathProviders.html[`PathProviders`] utility class.
 
 
 == Configuration

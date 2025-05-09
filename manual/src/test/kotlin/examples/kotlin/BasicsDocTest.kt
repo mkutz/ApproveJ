@@ -112,7 +112,14 @@ class BasicsDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printWith(PersonYamlPrinter()) // <1>
+      .printWith {
+        """
+        person:
+          name: "${it.name}"
+          birthDate: "${it.birthDate}"
+        """
+          .trimIndent()
+      } // <1>
       .byFile(nextToTest().filenameExtension("yml")) // <2>
     // end::approve_file_custom_extension[]
   }

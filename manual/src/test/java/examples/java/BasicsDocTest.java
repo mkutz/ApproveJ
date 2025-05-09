@@ -113,7 +113,14 @@ class BasicsDocTest {
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
     approve(person)
-        .printWith(new PersonYamlPrinter()) // <1>
+        .printWith(
+            it ->
+                """
+                person:
+                  name: "%s"
+                  birthDate: "%s"
+                """
+                    .formatted(it.name(), it.birthDate())) // <1>
         .byFile(nextToTest().filenameExtension("yml"));
     // end::approve_file_custom_extension[]
   }
