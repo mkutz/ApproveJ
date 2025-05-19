@@ -24,5 +24,5 @@ testng = { module = "org.testng:testng", version = "7.11.0" }
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version = "4.0.4" }
 jreleaser = { id = "org.jreleaser", version = "1.18.0" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version = "2.1.20" }
-sonar = { id = "org.sonarqube", version = "6.1.0.5360" }
+sonar = { id = "org.sonarqube", version = "6.2.0.5505" }
 spotless = { id = "com.diffplug.spotless", version = "7.0.3" }
