@@ -11,7 +11,6 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.concurrent.Callable;
 import org.approvej.ApprovalError;
 import org.jspecify.annotations.NullMarked;
 
@@ -37,39 +36,62 @@ public class FileApprover implements Approver {
   }
 
   @Override
-  public void accept(String received) {
-    String trimmed = received.trim();
-    doIoOp(
-        "create directories %s".formatted(pathProvider.directory()),
-        () -> createDirectories(pathProvider.directory()));
-    Path approvedPath = pathProvider.approvedPath();
-    if (notExists(approvedPath)) {
-      doIoOp("create approved file %s".formatted(approvedPath), () -> createFile(approvedPath));
-    }
-    String previouslyApproved =
-        doIoOp(
-            "read approved file %s".formatted(approvedPath), () -> readString(approvedPath).trim());
-    Path receivedPath = pathProvider.receivedPath();
-    if (!previouslyApproved.equals(trimmed)) {
-      doIoOp(
-          "write received to %s".formatted(receivedPath),
-          () -> writeString(receivedPath, trimmed, CREATE, TRUNCATE_EXISTING));
-      throw new ApprovalError(trimmed, previouslyApproved);
-    }
-    doIoOp("delete received file %s".formatted(receivedPath), () -> deleteIfExists(receivedPath));
+  public ApprovalResult apply(String received) {
+    ensureDirectory();
+    ensureApprovedFile();
+    return check(readApprovedFile(), received.trim());
   }
 
-  private static <T> T doIoOp(String description, IoOp<T> op) {
+  private void ensureDirectory() {
+    String description = "create directories %s".formatted(pathProvider.directory());
     try {
-      return op.call();
+      createDirectories(pathProvider.directory());
     } catch (IOException e) {
       throw new FileApproverError("Failed to %s".formatted(description), e);
     }
   }
 
-  @FunctionalInterface
-  private interface IoOp<T> extends Callable<T> {
-    @Override
-    T call() throws IOException;
+  private void ensureApprovedFile() {
+    Path approvedPath = pathProvider.approvedPath();
+    if (notExists(approvedPath)) {
+      try {
+        createFile(approvedPath);
+      } catch (IOException e) {
+        throw new FileApproverError(
+            "Failed to %s".formatted("create approved file %s".formatted(approvedPath)), e);
+      }
+    }
+  }
+
+  private String readApprovedFile() {
+    Path approvedPath = pathProvider.approvedPath();
+    try {
+      return readString(approvedPath).trim();
+    } catch (IOException e) {
+      throw new FileApproverError(
+          "Failed to %s".formatted("read approved file %s".formatted(approvedPath)), e);
+    }
+  }
+
+  private ApprovalResult check(String previouslyApproved, String receivedTrimmed) {
+    ApprovalResult result =
+        new FileApprovalResult(previouslyApproved, receivedTrimmed, pathProvider);
+    Path receivedPath = pathProvider.receivedPath();
+    if (result.needsApproval()) {
+      try {
+        writeString(receivedPath, receivedTrimmed, CREATE, TRUNCATE_EXISTING);
+      } catch (IOException e) {
+        throw new FileApproverError(
+            "Failed to %s".formatted("write received to %s".formatted(receivedPath)), e);
+      }
+      return result;
+    }
+    try {
+      deleteIfExists(receivedPath);
+      return result;
+    } catch (IOException e) {
+      throw new FileApproverError(
+          "Failed to %s".formatted("delete received file %s".formatted(receivedPath)), e);
+    }
   }
 }

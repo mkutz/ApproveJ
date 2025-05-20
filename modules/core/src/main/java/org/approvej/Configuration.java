@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.Properties;
 import org.approvej.print.Printer;
 import org.approvej.print.ToStringPrinter;
+import org.approvej.review.FileReviewer;
+import org.approvej.review.LoggerFileReviewer;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -16,16 +18,17 @@ import org.jspecify.annotations.NullMarked;
  * @param defaultPrinter the {@link Printer} that will be used if none is specified otherwise
  */
 @NullMarked
-public record Configuration(Printer<Object> defaultPrinter) {
-
-  /** The loaded {@link Configuration} object. */
-  public static final Configuration configuration = loadConfiguration();
+public record Configuration(Printer<Object> defaultPrinter, FileReviewer defaultFileReviewer) {
 
   private static final Properties DEFAULTS = new Properties();
 
   static {
     DEFAULTS.setProperty("defaultPrinter", ToStringPrinter.class.getName());
+    DEFAULTS.setProperty("defaultFileReviewer", LoggerFileReviewer.class.getName());
   }
+
+  /** The loaded {@link Configuration} object. */
+  public static final Configuration configuration = loadConfiguration();
 
   private static Configuration loadConfiguration() {
     Properties properties = loadProperties();
@@ -40,7 +43,17 @@ public record Configuration(Printer<Object> defaultPrinter) {
       throw new ConfigurationError("Failed to create printer %s".formatted(defaultPrinter), e);
     }
 
-    return new Configuration(printer);
+    String defaultFileReviewer = properties.getProperty("defaultFileReviewer");
+    FileReviewer fileReviewer;
+    try {
+      fileReviewer =
+          (FileReviewer) Class.forName(defaultFileReviewer).getDeclaredConstructor().newInstance();
+    } catch (ReflectiveOperationException e) {
+      throw new ConfigurationError(
+          "Failed to create file reviewer %s".formatted(defaultPrinter), e);
+    }
+
+    return new Configuration(printer, fileReviewer);
   }
 
   private static Properties loadProperties() {

@@ -1,28 +1,25 @@
 package org.approvej.approve;
 
 import static org.approvej.approve.Approvers.value;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.approvej.ApprovalError;
 import org.junit.jupiter.api.Test;
 
 class InplaceApproverTest {
 
   @Test
-  void accept() {
+  void apply() {
     String previouslyApproved = "Some text";
     InplaceApprover inplaceApprover = value(previouslyApproved);
 
-    assertThatNoException().isThrownBy(() -> inplaceApprover.accept(previouslyApproved));
+    assertThat(inplaceApprover.apply(previouslyApproved).needsApproval()).isFalse();
   }
 
   @Test
-  void accept_previously_approved_differs() {
+  void apply_previously_approved_differs() {
     String previouslyApproved = "Some other text";
     InplaceApprover inplaceApprover = value(previouslyApproved);
 
-    assertThatExceptionOfType(ApprovalError.class)
-        .isThrownBy(() -> inplaceApprover.accept("Some text"));
+    assertThat(inplaceApprover.apply("Some text").needsApproval()).isTrue();
   }
 }
