@@ -3,10 +3,10 @@ package org.approvej;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
-import org.approvej.approve.review.FileReviewer;
-import org.approvej.approve.review.NoFileReviewer;
 import org.approvej.print.Printer;
 import org.approvej.print.ToStringPrinter;
+import org.approvej.review.FileReviewer;
+import org.approvej.review.LoggerFileReviewer;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -24,7 +24,7 @@ public record Configuration(Printer<Object> defaultPrinter, FileReviewer default
 
   static {
     DEFAULTS.setProperty("defaultPrinter", ToStringPrinter.class.getName());
-    DEFAULTS.setProperty("defaultFileReviewer", NoFileReviewer.class.getName());
+    DEFAULTS.setProperty("defaultFileReviewer", LoggerFileReviewer.class.getName());
   }
 
   /** The loaded {@link Configuration} object. */
