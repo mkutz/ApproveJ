@@ -1,4 +1,4 @@
-package org.approvej.approve.review;
+package org.approvej.review;
 
 /** Exception thrown when a reviewer fails to open the diff tool. */
 class ReviewerError extends RuntimeException {

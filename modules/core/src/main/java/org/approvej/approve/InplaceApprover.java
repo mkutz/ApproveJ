@@ -1,6 +1,5 @@
 package org.approvej.approve;
 
-import org.approvej.ApprovalError;
 import org.jspecify.annotations.NullMarked;
 
 /** An {@link Approver} that checks if the received value is equal to a value given in place. */
@@ -19,9 +18,7 @@ public class InplaceApprover implements Approver {
   }
 
   @Override
-  public void accept(String received) {
-    if (!previouslyApproved.equals(received.trim())) {
-      throw new ApprovalError(received, previouslyApproved);
-    }
+  public ApprovalResult apply(String received) {
+    return new InplaceApprovalResult(previouslyApproved, received.trim());
   }
 }
