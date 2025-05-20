@@ -1,5 +1,7 @@
 package org.approvej;
 
+import static java.util.stream.Collectors.joining;
+
 import org.jspecify.annotations.NullMarked;
 
 /** An {@link AssertionError} thrown when an approval fails. */
@@ -15,6 +17,9 @@ public class ApprovalError extends AssertionError {
    */
   public ApprovalError(String received, String previouslyApproved) {
     super(
-        "Approval mismatch: expected: <%s> but was: <%s>".formatted(previouslyApproved, received));
+        "Approval mismatch:%nexpected:%n  \"%s\"%n but was:%n  \"%s\"%n"
+            .formatted(
+                previouslyApproved.lines().collect(joining("\n  ")),
+                received.lines().collect(joining("\n  "))));
   }
 }

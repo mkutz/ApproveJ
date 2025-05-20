@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import org.approvej.approve.ApprovalResult;
 import org.approvej.approve.Approver;
 import org.approvej.approve.FileApprover;
 import org.approvej.approve.InplaceApprover;
@@ -125,14 +126,16 @@ public class ApprovalBuilder<T> {
    * <p>If necessary the {@link #receivedValue} is printed using the {@link
    * Configuration#defaultPrinter()}.
    *
-   * @param approver a {@link Consumer} or an {@link Approver} implementation
+   * @param approver a {@link Function} or an {@link Approver} implementation
    * @throws ApprovalError if the approval fails
    */
-  public void by(final Consumer<String> approver) {
-    if (receivedValue instanceof String printedValue) {
-      approver.accept(printedValue);
-    } else {
+  public void by(final Function<String, ApprovalResult> approver) {
+    if (!(receivedValue instanceof String)) {
       print().by(approver);
+    }
+    ApprovalResult result = approver.apply(String.valueOf(receivedValue));
+    if (result.needsApproval()) {
+      throw new ApprovalError(result.received(), result.previouslyApproved());
     }
   }
 
@@ -163,11 +166,15 @@ public class ApprovalBuilder<T> {
    * @throws ApprovalError if the approval fails
    */
   public void byFile(PathProviderBuilder pathProviderBuilder) {
-    if (receivedValue instanceof String printedValue) {
-      file(pathProviderBuilder.filenameExtension(filenameExtension)).accept(printedValue);
-    } else {
+    if (!(receivedValue instanceof String)) {
       // noinspection unchecked
       printWith((Printer<T>) configuration.defaultPrinter()).byFile(pathProviderBuilder);
+    }
+    ApprovalResult result =
+        file(pathProviderBuilder.filenameExtension(filenameExtension))
+            .apply(String.valueOf(receivedValue));
+    if (result.needsApproval()) {
+      throw new ApprovalError(result.received(), result.previouslyApproved());
     }
   }
 

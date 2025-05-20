@@ -8,7 +8,6 @@ import static java.nio.file.Files.readString;
 import static java.nio.file.Files.writeString;
 import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
-import static org.approvej.Configuration.configuration;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -37,19 +36,10 @@ public class FileApprover implements Approver {
   }
 
   @Override
-  public void accept(String received) {
+  public ApprovalResult apply(String received) {
     ensureDirectory();
     ensureApprovedFile();
-    String previouslyApproved = readApprovedFile();
-    String receivedTrimmed = received.trim();
-    if (!check(previouslyApproved, receivedTrimmed)) {
-      configuration
-          .defaultFileReviewer()
-          .trigger(pathProvider.receivedPath(), pathProvider.approvedPath());
-      if (!check(readApprovedFile(), receivedTrimmed)) {
-        throw new ApprovalError(receivedTrimmed, previouslyApproved);
-      }
-    }
+    return check(readApprovedFile(), received.trim());
   }
 
   private void ensureDirectory() {
@@ -83,20 +73,22 @@ public class FileApprover implements Approver {
     }
   }
 
-  private boolean check(String previouslyApproved, String receivedTrimmed) {
+  private ApprovalResult check(String previouslyApproved, String receivedTrimmed) {
+    ApprovalResult result =
+        new FileApprovalResult(previouslyApproved, receivedTrimmed, pathProvider);
     Path receivedPath = pathProvider.receivedPath();
-    if (!previouslyApproved.equals(receivedTrimmed)) {
+    if (result.needsApproval()) {
       try {
         writeString(receivedPath, receivedTrimmed, CREATE, TRUNCATE_EXISTING);
       } catch (IOException e) {
         throw new FileApproverError(
             "Failed to %s".formatted("write received to %s".formatted(receivedPath)), e);
       }
-      return false;
+      return result;
     }
     try {
       deleteIfExists(receivedPath);
-      return true;
+      return result;
     } catch (IOException e) {
       throw new FileApproverError(
           "Failed to %s".formatted("delete received file %s".formatted(receivedPath)), e);
