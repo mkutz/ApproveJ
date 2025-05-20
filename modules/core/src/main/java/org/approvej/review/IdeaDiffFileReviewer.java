@@ -1,4 +1,4 @@
-package org.approvej.approve.review;
+package org.approvej.review;
 
 import java.io.IOException;
 import java.nio.file.Path;
