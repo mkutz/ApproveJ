@@ -6,18 +6,6 @@ import java.nio.file.Path;
 public interface PathProvider {
 
   /**
-   * The infix of the file containing the latest received value that didn't match the previously
-   * approved.
-   */
-  String RECEIVED = "received";
-
-  /** The infix of the file containing a previously approved value. */
-  String APPROVED = "approved";
-
-  /** Default filename extension for the approved and received files. */
-  String DEFAULT_FILENAME_EXTENSION = "txt";
-
-  /**
    * The path of the directory containing the approved and received files.
    *
    * @return the {@link Path} to the directory
