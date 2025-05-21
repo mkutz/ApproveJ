@@ -27,7 +27,7 @@ public class LoggerFileReviewer implements FileReviewer {
           .build();
 
   @Override
-  public void trigger(Path receivedPath, Path approvedPath) {
+  public void accept(Path receivedPath, Path approvedPath) {
     try {
       LOGGER.warning(
           CONSOLE_DIFF_ROW_GENERATOR
