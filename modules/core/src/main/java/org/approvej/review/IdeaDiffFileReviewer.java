@@ -11,7 +11,7 @@ import java.nio.file.Path;
 public class IdeaDiffFileReviewer implements FileReviewer {
 
   @Override
-  public void trigger(Path receivedPath, Path approvedPath) {
+  public void accept(Path receivedPath, Path approvedPath) {
     try {
       new ProcessBuilder(
               switch (OS.current()) {

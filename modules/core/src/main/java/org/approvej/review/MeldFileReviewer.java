@@ -10,7 +10,7 @@ import java.nio.file.Path;
 public class MeldFileReviewer implements FileReviewer {
 
   @Override
-  public void trigger(Path receivedPath, Path approvedPath) {
+  public void accept(Path receivedPath, Path approvedPath) {
     try {
       new ProcessBuilder(
               "meld",
