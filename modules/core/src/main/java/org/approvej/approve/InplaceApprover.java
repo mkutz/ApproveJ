@@ -19,6 +19,6 @@ public class InplaceApprover implements Approver {
 
   @Override
   public ApprovalResult apply(String received) {
-    return new InplaceApprovalResult(previouslyApproved, received.trim());
+    return new InplaceApprovalResult(received.trim(), previouslyApproved);
   }
 }
