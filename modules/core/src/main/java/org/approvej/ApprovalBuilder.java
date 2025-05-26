@@ -17,6 +17,7 @@ import org.approvej.approve.InplaceApprover;
 import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviderBuilder;
 import org.approvej.print.Printer;
+import org.approvej.review.FileReviewer;
 import org.approvej.scrub.Scrubber;
 import org.jspecify.annotations.NullMarked;
 
@@ -59,10 +60,12 @@ public class ApprovalBuilder<T> {
 
   private T receivedValue;
   private final String filenameExtension;
+  private FileReviewer fileReviewer;
 
   private ApprovalBuilder(T originalValue, String filenameExtension) {
     this.receivedValue = originalValue;
     this.filenameExtension = filenameExtension;
+    this.fileReviewer = configuration.defaultFileReviewer();
   }
 
   /**
@@ -121,6 +124,18 @@ public class ApprovalBuilder<T> {
   }
 
   /**
+   * Sets the given {@link FileReviewer} to trigger if the received value is not equal to the
+   * previously approved.
+   *
+   * @param reviewer the {@link FileReviewer} to be used
+   * @return this
+   */
+  public ApprovalBuilder<T> reviewWith(FileReviewer reviewer) {
+    this.fileReviewer = reviewer;
+    return this;
+  }
+
+  /**
    * Approves the {@link #receivedValue} by the given approver.
    *
    * <p>If necessary the {@link #receivedValue} is printed using the {@link
@@ -170,10 +185,10 @@ public class ApprovalBuilder<T> {
       // noinspection unchecked
       printWith((Printer<T>) configuration.defaultPrinter()).byFile(pathProviderBuilder);
     }
-    ApprovalResult result =
-        file(pathProviderBuilder.filenameExtension(filenameExtension))
-            .apply(String.valueOf(receivedValue));
+    PathProvider pathProvider = pathProviderBuilder.filenameExtension(filenameExtension);
+    ApprovalResult result = file(pathProvider).apply(String.valueOf(receivedValue));
     if (result.needsApproval()) {
+      fileReviewer.accept(pathProvider.receivedPath(), pathProvider.approvedPath());
       throw new ApprovalError(result.received(), result.previouslyApproved());
     }
   }

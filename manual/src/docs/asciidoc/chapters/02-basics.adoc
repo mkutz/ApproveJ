@@ -427,6 +427,27 @@ That way the filename extension of the used `Printer` is set just before approva
 In that case, you might want to take advantage of the link:{javadoc-url}/core/org/approvej/approve/StackTraceTestFinderUtil.html[`StackTraceTestFinderUtil`] class to find the test source path or the current test method based on the current stack trace.
 
 
+[id="reviewing"]
+== Reviewing -- check differences
+
+If the received value differs from the previously approved, ApproveJ will by default simply fail the test.
+You then need to review the differences and decide if these are to be approved or actually were not intended.
+This can simply be done by find the failing test and compare the received and approved files within you IDE or with an external tool.
+To help you with that process, ApproveJ allows to configure a link:{javadoc-url}/core/org/approvej/review/FileReviewer.html[`FileReviewer`], which will trigger such a tool automatically (see <<configuration>>).
+
+
+=== Blocking/Non-Blocking Review
+
+Some link:{javadoc-url}/core/org/approvej/review/FileReviewer.html[`FileReviewers`] are blocking.
+They trigger the diff/merge tool and wait for you to close it again.
+This gives you the opportunity to merge the content of the two files before the test finishes, so the test does not fail due to your given approval.
+
+Other implementations are non-blocking.
+These simply display the differences between the two files, but will fail the test immediately.
+So, after you merged the files or fixed the code, you need to run the test again.
+
+
+[id="configuration"]
 == Configuration
 
 Optionally you can configure the default behaviors of ApproveJ by putting an `approvej.properties` file into your resource folder of your test suite (e.g. `src/test/resources/approvej.properties`).
