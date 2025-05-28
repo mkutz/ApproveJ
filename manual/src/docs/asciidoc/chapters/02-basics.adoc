@@ -433,7 +433,7 @@ In that case, you might want to take advantage of the link:{javadoc-url}/core/or
 If the received value differs from the previously approved, ApproveJ will by default simply fail the test.
 You then need to review the differences and decide if these are to be approved or actually were not intended.
 This can simply be done by find the failing test and compare the received and approved files within you IDE or with an external tool.
-To help you with that process, ApproveJ allows to configure a link:{javadoc-url}/core/org/approvej/review/FileReviewer.html[`FileReviewer`], which will trigger such a tool automatically (see <<configuration>>).
+To help you with that process, ApproveJ allows to configure a script that will open such a tool automatically (see <<configuration>>).
 
 
 === Blocking/Non-Blocking Review
