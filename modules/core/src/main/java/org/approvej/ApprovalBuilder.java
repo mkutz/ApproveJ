@@ -80,7 +80,7 @@ public class ApprovalBuilder<T> {
    *
    * @param printer the {@link Function} used to convert the {@link #receivedValue} to a {@link
    *     String}
-   * @return this
+   * @return a new {@link ApprovalBuilder} with the printed value
    */
   public ApprovalBuilder<String> printWith(Function<T, String> printer) {
     return new ApprovalBuilder<>(printer.apply(receivedValue), DEFAULT_FILENAME_EXTENSION);
@@ -90,10 +90,22 @@ public class ApprovalBuilder<T> {
    * Uses the given {@link Printer} to convert the {@link #receivedValue} to a {@link String}.
    *
    * @param printer the printer used to convert the value to a {@link String}
-   * @return this
+   * @return a new {@link ApprovalBuilder} with the printed value
    */
   public ApprovalBuilder<String> printWith(Printer<T> printer) {
     return new ApprovalBuilder<>(printer.apply(receivedValue), printer.filenameExtension());
+  }
+
+  /**
+   * Uses the default {@link Printer} to convert the {@link #receivedValue} to a {@link String}.
+   *
+   * @return a new {@link ApprovalBuilder} with the printed value
+   * @see Configuration#defaultPrinter()
+   * @see #printWith(Printer)
+   */
+  public ApprovalBuilder<String> print() {
+    // noinspection unchecked
+    return printWith((Printer<T>) configuration.defaultPrinter());
   }
 
   /**
@@ -120,8 +132,7 @@ public class ApprovalBuilder<T> {
     if (receivedValue instanceof String printedValue) {
       approver.accept(printedValue);
     } else {
-      // noinspection unchecked
-      printWith((Printer<T>) configuration.defaultPrinter()).by(approver);
+      print().by(approver);
     }
   }
 
