@@ -17,7 +17,10 @@ java {
 
 repositories { mavenCentral() }
 
-dependencies { api(libs.jspecify) }
+dependencies {
+  api(libs.jspecify)
+  api(libs.diffUtils)
+}
 
 testing {
   suites {
