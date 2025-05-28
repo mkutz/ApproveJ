@@ -7,8 +7,9 @@ import java.util.Properties;
 import org.approvej.print.Printer;
 import org.approvej.print.ToStringPrinter;
 import org.approvej.review.FileReviewer;
-import org.approvej.review.LoggerFileReviewer;
+import org.approvej.review.FileReviewerScript;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Central configuration class for ApproveJ.
@@ -19,13 +20,13 @@ import org.jspecify.annotations.NullMarked;
  * @param defaultPrinter the {@link Printer} that will be used if none is specified otherwise
  */
 @NullMarked
-public record Configuration(Printer<Object> defaultPrinter, FileReviewer defaultFileReviewer) {
+public record Configuration(
+    Printer<Object> defaultPrinter, @Nullable FileReviewer defaultFileReviewer) {
 
   private static final Properties DEFAULTS = new Properties();
 
   static {
     DEFAULTS.setProperty("defaultPrinter", ToStringPrinter.class.getName());
-    DEFAULTS.setProperty("defaultFileReviewer", LoggerFileReviewer.class.getName());
   }
 
   /** The loaded {@link Configuration} object. */
@@ -44,17 +45,13 @@ public record Configuration(Printer<Object> defaultPrinter, FileReviewer default
       throw new ConfigurationError("Failed to create printer %s".formatted(defaultPrinter), e);
     }
 
-    String defaultFileReviewer = properties.getProperty("defaultFileReviewer");
-    FileReviewer fileReviewer;
-    try {
-      fileReviewer =
-          (FileReviewer) Class.forName(defaultFileReviewer).getDeclaredConstructor().newInstance();
-    } catch (ReflectiveOperationException e) {
-      throw new ConfigurationError(
-          "Failed to create file reviewer %s".formatted(defaultPrinter), e);
+    String defaultFileReviewerScript = properties.getProperty("defaultFileReviewerScript");
+    FileReviewerScript defaultFileReviewer = null;
+    if (defaultFileReviewerScript != null) {
+      defaultFileReviewer = new FileReviewerScript(defaultFileReviewerScript);
     }
 
-    return new Configuration(printer, fileReviewer);
+    return new Configuration(printer, defaultFileReviewer);
   }
 
   private static Properties loadProperties() {

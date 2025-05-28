@@ -79,7 +79,7 @@ public class FileApprover implements Approver {
     Path receivedPath = pathProvider.receivedPath();
     if (result.needsApproval()) {
       try {
-        writeString(receivedPath, receivedTrimmed, CREATE, TRUNCATE_EXISTING);
+        writeString(receivedPath, receivedTrimmed + "\n", CREATE, TRUNCATE_EXISTING);
       } catch (IOException e) {
         throw new FileApproverError(
             "Failed to %s".formatted("write received to %s".formatted(receivedPath)), e);
