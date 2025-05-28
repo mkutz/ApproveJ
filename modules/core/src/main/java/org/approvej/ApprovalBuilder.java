@@ -7,7 +7,6 @@ import static org.approvej.approve.PathProviderBuilder.approvedPath;
 import static org.approvej.print.Printer.DEFAULT_FILENAME_EXTENSION;
 
 import java.nio.file.Path;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import org.approvej.approve.ApprovalResult;
@@ -20,6 +19,7 @@ import org.approvej.print.Printer;
 import org.approvej.review.FileReviewer;
 import org.approvej.scrub.Scrubber;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A builder to configure an approval for a given value.
@@ -46,7 +46,7 @@ import org.jspecify.annotations.NullMarked;
  *
  * <h2>Approving</h2>
  *
- * <p>The builder is concluded by specifying an approver to approve the value {@link #by(Consumer)
+ * <p>The builder is concluded by specifying an approver to approve the value {@link #by(Function)}
  * by} ( {@link #byFile()} and {@link #byValue(String)}).
  *
  * <p>E.g. {@code approve(result).byFile();} approves the result with the content of a file next to
@@ -60,7 +60,7 @@ public class ApprovalBuilder<T> {
 
   private T receivedValue;
   private final String filenameExtension;
-  private FileReviewer fileReviewer;
+  @Nullable private FileReviewer fileReviewer;
 
   private ApprovalBuilder(T originalValue, String filenameExtension) {
     this.receivedValue = originalValue;
@@ -187,8 +187,11 @@ public class ApprovalBuilder<T> {
     }
     PathProvider pathProvider = pathProviderBuilder.filenameExtension(filenameExtension);
     ApprovalResult result = file(pathProvider).apply(String.valueOf(receivedValue));
-    if (result.needsApproval()) {
+    if (result.needsApproval() && fileReviewer != null) {
       fileReviewer.accept(pathProvider.receivedPath(), pathProvider.approvedPath());
+      result = file(pathProvider).apply(String.valueOf(receivedValue));
+    }
+    if (result.needsApproval()) {
       throw new ApprovalError(result.received(), result.previouslyApproved());
     }
   }
