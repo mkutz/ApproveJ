@@ -12,7 +12,7 @@ plugins {
 java {
   withJavadocJar()
   withSourcesJar()
-  toolchain { languageVersion.set(JavaLanguageVersion.of(21)) }
+  toolchain { languageVersion = JavaLanguageVersion.of(21) }
 }
 
 repositories { mavenCentral() }
