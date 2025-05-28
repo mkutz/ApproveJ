@@ -2,6 +2,7 @@ package org.approvej;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
 import org.approvej.print.Printer;
 import org.approvej.print.ToStringPrinter;
@@ -45,8 +46,12 @@ public record Configuration(Printer<Object> defaultPrinter) {
 
   private static Properties loadProperties() {
     Properties properties = new Properties(Configuration.DEFAULTS);
-    try (InputStream inputStream =
-        Configuration.class.getClassLoader().getResourceAsStream("approvej.properties")) {
+    URL configurationFileUrl =
+        Configuration.class.getClassLoader().getResource("approvej.properties");
+    if (configurationFileUrl == null) {
+      return properties;
+    }
+    try (InputStream inputStream = configurationFileUrl.openStream()) {
       if (inputStream != null) {
         properties.load(inputStream);
       }
