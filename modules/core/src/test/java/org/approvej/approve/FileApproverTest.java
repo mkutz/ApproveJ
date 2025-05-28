@@ -33,15 +33,15 @@ class FileApproverTest {
   void accept_previously_accepted_differs() throws IOException {
     PathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
     FileApprover fileApprover = file(pathProvider);
-    writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
+    writeString(pathProvider.approvedPath(), "Some approved text\n", StandardOpenOption.CREATE);
 
     assertThatExceptionOfType(ApprovalError.class)
         .isThrownBy(() -> fileApprover.accept("Some other text"))
         .withMessage(
             "Approval mismatch: expected: <Some approved text> but was: <Some other text>");
 
-    assertThat(pathProvider.receivedPath()).exists().content().isEqualTo("Some other text");
-    assertThat(pathProvider.approvedPath()).exists().content().isEqualTo("Some approved text");
+    assertThat(pathProvider.receivedPath()).exists().content().isEqualTo("Some other text\n");
+    assertThat(pathProvider.approvedPath()).exists().content().isEqualTo("Some approved text\n");
   }
 
   @Test
@@ -60,7 +60,7 @@ class FileApproverTest {
     assertThat(pathProvider.receivedPath())
         .exists()
         .content()
-        .isEqualTo("Some newly received text");
+        .isEqualTo("Some newly received text\n");
     assertThat(pathProvider.approvedPath()).exists().content().isEqualTo("Some approved text");
   }
 
@@ -73,7 +73,7 @@ class FileApproverTest {
         .isThrownBy(() -> fileApprover.accept("Some text"))
         .withMessage("Approval mismatch: expected: <> but was: <Some text>");
 
-    assertThat(pathProvider.receivedPath()).exists().content().isEqualTo("Some text");
+    assertThat(pathProvider.receivedPath()).exists().content().isEqualTo("Some text\n");
     assertThat(pathProvider.approvedPath()).exists().content().isEmpty();
   }
 

@@ -53,7 +53,7 @@ public class FileApprover implements Approver {
     if (!previouslyApproved.equals(trimmed)) {
       doIoOp(
           "write received to %s".formatted(receivedPath),
-          () -> writeString(receivedPath, trimmed, CREATE, TRUNCATE_EXISTING));
+          () -> writeString(receivedPath, trimmed + "\n", CREATE, TRUNCATE_EXISTING));
       throw new ApprovalError(trimmed, previouslyApproved);
     }
     doIoOp("delete received file %s".formatted(receivedPath), () -> deleteIfExists(receivedPath));
