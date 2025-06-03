@@ -9,7 +9,6 @@ import static org.approvej.print.Printer.DEFAULT_FILENAME_EXTENSION;
 import java.nio.file.Path;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import org.approvej.approve.ApprovalResult;
 import org.approvej.approve.Approver;
 import org.approvej.approve.FileApprover;
 import org.approvej.approve.InplaceApprover;
@@ -170,7 +169,11 @@ public class ApprovalBuilder<T> {
    * @throws ApprovalError if the approval fails
    */
   public void byFile(PathProvider pathProvider) {
-    by(file(pathProvider));
+    ApprovalResult result = file(pathProvider).apply(String.valueOf(receivedValue));
+    if (result.needsApproval() && fileReviewer != null) {
+      result = fileReviewer.apply(pathProvider);
+    }
+    result.throwIfNotApproved();
   }
 
   /**
@@ -185,15 +188,7 @@ public class ApprovalBuilder<T> {
       // noinspection unchecked
       printWith((Printer<T>) configuration.defaultPrinter()).byFile(pathProviderBuilder);
     }
-    PathProvider pathProvider = pathProviderBuilder.filenameExtension(filenameExtension);
-    ApprovalResult result = file(pathProvider).apply(String.valueOf(receivedValue));
-    if (result.needsApproval() && fileReviewer != null) {
-      fileReviewer.accept(pathProvider.receivedPath(), pathProvider.approvedPath());
-      result = file(pathProvider).apply(String.valueOf(receivedValue));
-    }
-    if (result.needsApproval()) {
-      throw new ApprovalError(result.received(), result.previouslyApproved());
-    }
+    byFile(pathProviderBuilder.filenameExtension(filenameExtension));
   }
 
   /**

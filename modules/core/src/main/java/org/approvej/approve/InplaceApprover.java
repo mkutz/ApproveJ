@@ -1,5 +1,6 @@
 package org.approvej.approve;
 
+import org.approvej.ApprovalResult;
 import org.jspecify.annotations.NullMarked;
 
 /** An {@link Approver} that checks if the received value is equal to a value given in place. */

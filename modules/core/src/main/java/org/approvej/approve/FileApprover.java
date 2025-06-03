@@ -12,6 +12,7 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import java.io.IOException;
 import java.nio.file.Path;
 import org.approvej.ApprovalError;
+import org.approvej.ApprovalResult;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -43,11 +44,11 @@ public class FileApprover implements Approver {
   }
 
   private void ensureDirectory() {
-    String description = "create directories %s".formatted(pathProvider.directory());
     try {
       createDirectories(pathProvider.directory());
     } catch (IOException e) {
-      throw new FileApproverError("Failed to %s".formatted(description), e);
+      throw new FileApproverError(
+          "Failed to %s".formatted("create directories %s".formatted(pathProvider.directory())), e);
     }
   }
 
