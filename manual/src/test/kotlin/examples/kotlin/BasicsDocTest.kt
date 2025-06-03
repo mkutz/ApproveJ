@@ -12,9 +12,11 @@ import org.approvej.approve.PathProviderBuilder.nextToTest
 import org.approvej.approve.PathProviderBuilder.nextToTestInSubdirectory
 import org.approvej.print.ObjectPrinter.objectPrinter
 import org.approvej.print.Printer
+import org.approvej.review.FileReviewerScript
 import org.approvej.scrub.Scrubbers.dateTimeFormat
 import org.approvej.scrub.Scrubbers.uuids
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledIf
 
 class BasicsDocTest {
 
@@ -151,6 +153,27 @@ class BasicsDocTest {
       .printWith(PersonYamlPrinter())
       .byFile("src/test/resources/BasicExamples-approve_file_approved_path.yaml") // <1>
     // end::approve_file_approved_path[]
+  }
+
+  @Test
+  @EnabledIf("ideaAvailable")
+  fun approve_reviewWith_fileReviewer() {
+    // tag::approve_reviewWith_fileReviewer[]
+    val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
+
+    approve(person)
+      .printWith(PersonYamlPrinter())
+      .reviewWith(FileReviewerScript("idea diff {receivedFile} {approvedFile}")) // <1>
+      .byFile() // <2>
+    // end::approve_reviewWith_fileReviewer[]
+  }
+
+  fun ideaAvailable(): Boolean {
+    return try {
+      ProcessBuilder("which", "idea").start().waitFor() == 0
+    } catch (_: Exception) {
+      false
+    }
   }
 
   // tag::person_yaml_printer[]

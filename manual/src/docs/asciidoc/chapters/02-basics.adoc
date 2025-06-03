@@ -447,6 +447,23 @@ These simply display the differences between the two files, but will fail the te
 So, after you merged the files or fixed the code, you need to run the test again.
 
 
+=== Choose Reviewer in Test
+
+You can choose the link:{javadoc-url}/core/org/approvej/review/FileReviewer.html[`FileReviewer`] to use in the test code by calling the `reviewWith` method on the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`].
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_reviewWith_fileReviewer]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_reviewWith_fileReviewer]
+----
+<1> sets the given script to be executed to support the review
+<2> executes the review script if the received value differs from the approved value
+
 [id="configuration"]
 == Configuration
 
