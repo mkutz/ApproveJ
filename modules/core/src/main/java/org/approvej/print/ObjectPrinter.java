@@ -43,6 +43,14 @@ public class ObjectPrinter<T> implements Printer<T> {
   private static final String PAIR_FORMAT = "%s=%s";
 
   /**
+   * Creates a new {@link ObjectPrinter} instance that prints the given object.
+   *
+   * <p>This constructor is public to allow instantiation via reflection, e.g. in the {@link
+   * org.approvej.Configuration} class.
+   */
+  public ObjectPrinter() {}
+
+  /**
    * Creates a new {@link ObjectPrinter} instance.
    *
    * @return a new {@link ObjectPrinter} instance

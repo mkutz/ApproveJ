@@ -1,5 +1,7 @@
 package org.approvej.approve;
 
+import static java.nio.file.Files.createFile;
+import static java.nio.file.Files.setPosixFilePermissions;
 import static java.nio.file.Files.writeString;
 import static org.approvej.approve.Approvers.file;
 import static org.approvej.approve.PathProviderBuilder.approvedPath;
@@ -9,6 +11,9 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.Set;
+import org.approvej.ApprovalResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -18,7 +23,7 @@ class FileApproverTest {
 
   @Test
   void apply() throws IOException {
-    PathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
+    PathProvider pathProvider = approvedPath(tempDir.resolve("apply-approved.txt"));
     FileApprover fileApprover = file(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
 
@@ -31,7 +36,8 @@ class FileApproverTest {
 
   @Test
   void apply_previously_accepted_differs() throws IOException {
-    PathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
+    PathProvider pathProvider =
+        approvedPath(tempDir.resolve("apply_previously_accepted_differs-approved.txt"));
     FileApprover fileApprover = file(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text\n", StandardOpenOption.CREATE);
 
@@ -44,7 +50,8 @@ class FileApproverTest {
 
   @Test
   void apply_previously_received() throws IOException {
-    PathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
+    PathProvider pathProvider =
+        approvedPath(tempDir.resolve("apply_previously_received-approved.txt"));
     FileApprover fileApprover = file(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
     writeString(pathProvider.receivedPath(), "Some received text", StandardOpenOption.CREATE);
@@ -61,7 +68,8 @@ class FileApproverTest {
 
   @Test
   void apply_no_previously_accepted() {
-    PathProvider pathProvider = approvedPath(tempDir.resolve("some_file-approved.txt"));
+    PathProvider pathProvider =
+        approvedPath(tempDir.resolve("apply_no_previously_accepted-approved.txt"));
     FileApprover fileApprover = file(pathProvider);
 
     ApprovalResult result = fileApprover.apply("Some text");
@@ -78,5 +86,32 @@ class FileApproverTest {
     assertThatExceptionOfType(FileApproverError.class)
         .isThrownBy(() -> fileApprover.apply("Some text"))
         .withMessage("Failed to create directories /does/not");
+  }
+
+  @Test
+  void apply_file_not_readable() throws IOException {
+    PathProvider pathProvider =
+        approvedPath(tempDir.resolve("apply_file_not_readable-approved.txt"));
+    writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
+    setPosixFilePermissions(pathProvider.approvedPath(), Set.of());
+    FileApprover fileApprover = file(pathProvider);
+
+    assertThatExceptionOfType(FileApproverError.class)
+        .isThrownBy(() -> fileApprover.apply("Some text"))
+        .withMessage("Failed to read approved file %s".formatted(pathProvider.approvedPath()));
+  }
+
+  @Test
+  void apply_file_not_writable() throws IOException {
+    PathProvider pathProvider =
+        approvedPath(tempDir.resolve("apply_file_not_writable-approved.txt"));
+    writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
+    createFile(pathProvider.receivedPath());
+    setPosixFilePermissions(pathProvider.receivedPath(), Set.of(PosixFilePermission.OWNER_READ));
+    FileApprover fileApprover = file(pathProvider);
+
+    assertThatExceptionOfType(FileApproverError.class)
+        .isThrownBy(() -> fileApprover.apply("Some text"))
+        .withMessage("Failed to write received to %s".formatted(pathProvider.receivedPath()));
   }
 }

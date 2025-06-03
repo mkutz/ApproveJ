@@ -18,6 +18,7 @@ import org.jspecify.annotations.Nullable;
  * src/test/resources/approvej.properties
  *
  * @param defaultPrinter the {@link Printer} that will be used if none is specified otherwise
+ * @param defaultFileReviewer the {@link FileReviewer} that will be used if none is specified
  */
 @NullMarked
 public record Configuration(
