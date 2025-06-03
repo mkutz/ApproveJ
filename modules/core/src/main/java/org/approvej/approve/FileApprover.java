@@ -48,7 +48,7 @@ public class FileApprover implements Approver {
       createDirectories(pathProvider.directory());
     } catch (IOException e) {
       throw new FileApproverError(
-          "Failed to %s".formatted("create directories %s".formatted(pathProvider.directory())), e);
+          "Creating directories %s failed".formatted(pathProvider.directory()), e);
     }
   }
 
@@ -58,8 +58,7 @@ public class FileApprover implements Approver {
       try {
         createFile(approvedPath);
       } catch (IOException e) {
-        throw new FileApproverError(
-            "Failed to %s".formatted("create approved file %s".formatted(approvedPath)), e);
+        throw new FileApproverError("Creating approved file %s failed".formatted(approvedPath), e);
       }
     }
   }
@@ -69,8 +68,7 @@ public class FileApprover implements Approver {
     try {
       return readString(approvedPath).trim();
     } catch (IOException e) {
-      throw new FileApproverError(
-          "Failed to %s".formatted("read approved file %s".formatted(approvedPath)), e);
+      throw new FileApproverError("Reading approved file %s failed".formatted(approvedPath), e);
     }
   }
 
@@ -82,8 +80,7 @@ public class FileApprover implements Approver {
       try {
         writeString(receivedPath, receivedTrimmed + "\n", CREATE, TRUNCATE_EXISTING);
       } catch (IOException e) {
-        throw new FileApproverError(
-            "Failed to %s".formatted("write received to %s".formatted(receivedPath)), e);
+        throw new FileApproverError("Writing received to %s failed".formatted(receivedPath), e);
       }
       return result;
     }
@@ -91,8 +88,7 @@ public class FileApprover implements Approver {
       deleteIfExists(receivedPath);
       return result;
     } catch (IOException e) {
-      throw new FileApproverError(
-          "Failed to %s".formatted("delete received file %s".formatted(receivedPath)), e);
+      throw new FileApproverError("Deleting received file %s failed".formatted(receivedPath), e);
     }
   }
 }

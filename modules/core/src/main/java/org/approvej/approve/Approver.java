@@ -19,7 +19,7 @@ public interface Approver extends Consumer<String>, Function<String, ApprovalRes
    *     {@link ApprovalResult#throwIfNotApproved()} to achieve the same outcome.
    */
   @Override
-  @Deprecated
+  @Deprecated(since = "0.8.6", forRemoval = true)
   default void accept(String received) {
     apply(received).throwIfNotApproved();
   }
