@@ -14,9 +14,12 @@ import static org.approvej.scrub.Scrubbers.uuids;
 import examples.ExampleClass.BlogPost;
 import examples.ExampleClass.Contact;
 import examples.ExampleClass.Person;
+import java.io.IOException;
 import java.time.LocalDate;
 import org.approvej.print.Printer;
+import org.approvej.review.FileReviewerScript;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 
 class BasicsDocTest {
 
@@ -152,6 +155,30 @@ class BasicsDocTest {
         .printWith(new PersonYamlPrinter())
         .byFile("src/test/resources/BasicExamples-approve_file_approved_path.yaml"); // <1>
     // end::approve_file_approved_path[]
+  }
+
+  @Test
+  @EnabledIf("ideaAvailable")
+  void approve_reviewWith_fileReviewer() {
+    // tag::approve_reviewWith_fileReviewer[]
+    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+
+    approve(person)
+        .printWith(new PersonYamlPrinter())
+        .reviewWith(new FileReviewerScript("idea diff {receivedFile} {approvedFile}")) // <1>
+        .byFile(); // <2>
+    // end::approve_reviewWith_fileReviewer[]
+  }
+
+  static boolean ideaAvailable() {
+    try {
+      return new ProcessBuilder("which", "idea").start().waitFor() == 0;
+    } catch (IOException | InterruptedException e) {
+      if (e instanceof InterruptedException) {
+        Thread.currentThread().interrupt();
+      }
+      return false;
+    }
   }
 
   // tag::person_yaml_printer[]
