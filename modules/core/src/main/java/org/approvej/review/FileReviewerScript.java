@@ -31,8 +31,12 @@ public record FileReviewerScript(String script) implements FileReviewer {
           readString(pathProvider.receivedPath()),
           readString(pathProvider.approvedPath()),
           pathProvider);
-    } catch (IOException | InterruptedException e) {
-      throw new ReviewerError("Failed to open %s".formatted(getClass().getSimpleName()), e);
+    } catch (IOException e) {
+      throw new ReviewerError("Review by %s failed".formatted(getClass().getSimpleName()), e);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new ReviewerError(
+          "Review by %s was interrupted".formatted(getClass().getSimpleName()), e);
     }
   }
 }

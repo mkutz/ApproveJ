@@ -13,7 +13,9 @@ public class ToStringPrinter implements Printer<Object> {
    * <p>This constructor is public to allow instantiation via reflection, e.g. in the {@link
    * org.approvej.Configuration} class.
    */
-  public ToStringPrinter() {}
+  public ToStringPrinter() {
+    // No initialization needed
+  }
 
   @Override
   public String apply(@Nullable Object value) {

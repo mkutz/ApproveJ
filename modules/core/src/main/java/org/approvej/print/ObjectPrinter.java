@@ -48,7 +48,9 @@ public class ObjectPrinter<T> implements Printer<T> {
    * <p>This constructor is public to allow instantiation via reflection, e.g. in the {@link
    * org.approvej.Configuration} class.
    */
-  public ObjectPrinter() {}
+  public ObjectPrinter() {
+    // No initialization needed
+  }
 
   /**
    * Creates a new {@link ObjectPrinter} instance.
