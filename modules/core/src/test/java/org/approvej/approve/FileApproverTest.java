@@ -85,7 +85,7 @@ class FileApproverTest {
 
     assertThatExceptionOfType(FileApproverError.class)
         .isThrownBy(() -> fileApprover.apply("Some text"))
-        .withMessage("Failed to create directories /does/not");
+        .withMessage("Creating directories /does/not failed");
   }
 
   @Test
@@ -98,7 +98,7 @@ class FileApproverTest {
 
     assertThatExceptionOfType(FileApproverError.class)
         .isThrownBy(() -> fileApprover.apply("Some text"))
-        .withMessage("Failed to read approved file %s".formatted(pathProvider.approvedPath()));
+        .withMessage("Reading approved file %s failed".formatted(pathProvider.approvedPath()));
   }
 
   @Test
@@ -112,6 +112,6 @@ class FileApproverTest {
 
     assertThatExceptionOfType(FileApproverError.class)
         .isThrownBy(() -> fileApprover.apply("Some text"))
-        .withMessage("Failed to write received to %s".formatted(pathProvider.receivedPath()));
+        .withMessage("Writing received to %s failed".formatted(pathProvider.receivedPath()));
   }
 }
