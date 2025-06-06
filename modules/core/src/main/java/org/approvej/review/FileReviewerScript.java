@@ -23,9 +23,11 @@ public record FileReviewerScript(String script) implements FileReviewer {
     try {
       String command =
           script
-              .replace(RECEIVED_PLACEHOLDER, pathProvider.receivedPath().toString())
-              .replace(APPROVED_PLACEHOLDER, pathProvider.approvedPath().toString());
-      new ProcessBuilder(command.split("\\s+")).inheritIO().start().waitFor();
+              .replace(RECEIVED_PLACEHOLDER, "\"%s\"".formatted(pathProvider.receivedPath()))
+              .replace(APPROVED_PLACEHOLDER, "\"%s\"".formatted(pathProvider.approvedPath()));
+
+      Process process = new ProcessBuilder().command("sh", "-c", command).inheritIO().start();
+      process.waitFor();
 
       return new FileApprovalResult(
           readString(pathProvider.receivedPath()),
