@@ -192,8 +192,9 @@ public class ApprovalBuilder<T> {
     if (!(receivedValue instanceof String)) {
       // noinspection unchecked
       printWith((Printer<T>) configuration.defaultPrinter()).byFile(pathProviderBuilder);
+    } else {
+      byFile(pathProviderBuilder.filenameExtension(filenameExtension));
     }
-    byFile(pathProviderBuilder.filenameExtension(filenameExtension));
   }
 
   /**
