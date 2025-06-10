@@ -16,6 +16,7 @@ import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviderBuilder;
 import org.approvej.print.Printer;
 import org.approvej.review.FileReviewer;
+import org.approvej.review.ReviewResult;
 import org.approvej.scrub.Scrubber;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -170,13 +171,14 @@ public class ApprovalBuilder<T> {
    */
   public void byFile(PathProvider pathProvider) {
     FileApprover approver = file(pathProvider);
-    ApprovalResult result = approver.apply(String.valueOf(receivedValue));
-    if (result.needsApproval() && fileReviewer != null) {
-      if (fileReviewer.apply(pathProvider).needsReapproval()) {
-        result = approver.apply(String.valueOf(receivedValue));
+    ApprovalResult approvalResult = approver.apply(String.valueOf(receivedValue));
+    if (approvalResult.needsApproval() && fileReviewer != null) {
+      ReviewResult reviewResult = fileReviewer.apply(pathProvider);
+      if (reviewResult.needsReapproval()) {
+        approvalResult = approver.apply(String.valueOf(receivedValue));
       }
     }
-    result.throwIfNotApproved();
+    approvalResult.throwIfNotApproved();
   }
 
   /**
