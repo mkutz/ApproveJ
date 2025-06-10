@@ -1,6 +1,6 @@
 package org.approvej;
 
-/** Interface for results of approvals and reviews. */
+/** Interface for results of approvals. */
 public interface ApprovalResult {
 
   /**

@@ -1,10 +1,6 @@
 package org.approvej.review;
 
-import static java.nio.file.Files.readString;
-
 import java.io.IOException;
-import org.approvej.ApprovalResult;
-import org.approvej.approve.FileApprovalResult;
 import org.approvej.approve.PathProvider;
 
 /**
@@ -19,7 +15,7 @@ public record FileReviewerScript(String script) implements FileReviewer {
   private static final String APPROVED_PLACEHOLDER = "{approvedFile}";
 
   @Override
-  public ApprovalResult apply(PathProvider pathProvider) {
+  public ReviewResult apply(PathProvider pathProvider) {
     try {
       String command =
           script
@@ -29,10 +25,7 @@ public record FileReviewerScript(String script) implements FileReviewer {
       Process process = new ProcessBuilder().command("sh", "-c", command).inheritIO().start();
       process.waitFor();
 
-      return new FileApprovalResult(
-          readString(pathProvider.receivedPath()),
-          readString(pathProvider.approvedPath()),
-          pathProvider);
+      return new FileReviewResult(process.exitValue() == 0);
     } catch (IOException e) {
       throw new ReviewerError("Review by %s failed".formatted(getClass().getSimpleName()), e);
     } catch (InterruptedException e) {

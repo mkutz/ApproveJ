@@ -1,7 +1,6 @@
 package org.approvej;
 
 import static java.nio.file.Files.copy;
-import static java.nio.file.Files.readString;
 import static java.nio.file.Files.writeString;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.time.format.DateTimeFormatter.ofPattern;
@@ -20,10 +19,11 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.UUID;
 import java.util.function.Function;
-import org.approvej.approve.FileApprovalResult;
 import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviderBuilder;
+import org.approvej.review.FileReviewResult;
 import org.approvej.review.FileReviewer;
+import org.approvej.review.ReviewResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -184,13 +184,10 @@ class ApprovalBuilderTest {
   static class AutoAcceptFileReviewer implements FileReviewer {
 
     @Override
-    public ApprovalResult apply(PathProvider pathProvider) {
+    public ReviewResult apply(PathProvider pathProvider) {
       try {
         copy(pathProvider.receivedPath(), pathProvider.approvedPath(), REPLACE_EXISTING);
-        return new FileApprovalResult(
-            readString(pathProvider.approvedPath()).trim(),
-            readString(pathProvider.receivedPath()).trim(),
-            pathProvider);
+        return new FileReviewResult(true);
       } catch (IOException e) {
         throw new RuntimeException(e);
       }

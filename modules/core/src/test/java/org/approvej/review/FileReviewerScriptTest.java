@@ -3,13 +3,10 @@ package org.approvej.review;
 import static java.nio.file.Files.writeString;
 import static org.approvej.approve.PathProviderBuilder.approvedPath;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.io.IOException;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import org.approvej.ApprovalResult;
 import org.approvej.approve.PathProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -19,15 +16,15 @@ class FileReviewerScriptTest {
   @TempDir private Path tempDir;
 
   @Test
-  void apply() throws IOException {
+  void accept() throws IOException {
     FileReviewerScript reviewer = new FileReviewerScript("diff {receivedFile} {approvedFile}");
     PathProvider pathProvider = approvedPath(tempDir.resolve("apply-approved.txt"));
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
     writeString(pathProvider.receivedPath(), "Some approved text", StandardOpenOption.CREATE);
 
-    ApprovalResult result = reviewer.apply(pathProvider);
+    ReviewResult result = reviewer.apply(pathProvider);
 
-    assertThat(result.needsApproval()).isFalse();
+    assertThat(result.needsReapproval()).isTrue();
   }
 
   @Test
@@ -37,18 +34,21 @@ class FileReviewerScriptTest {
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
     writeString(pathProvider.receivedPath(), "Some received text", StandardOpenOption.CREATE);
 
-    ApprovalResult result = reviewer.apply(pathProvider);
+    ReviewResult result = reviewer.apply(pathProvider);
 
-    assertThat(result.needsApproval()).isTrue();
+    assertThat(result.needsReapproval()).isFalse();
   }
 
   @Test
-  void apply_no_file() {
-    FileReviewerScript reviewer = new FileReviewerScript("diff {receivedFile} {approvedFile}");
-    PathProvider pathProvider = approvedPath(tempDir.resolve("apply_no_file-approved.txt"));
+  void apply_unknown_command() throws IOException {
+    FileReviewerScript reviewer =
+        new FileReviewerScript("unknown-command {receivedFile} {approvedFile}");
+    PathProvider pathProvider = approvedPath(tempDir.resolve("apply_different-approved.txt"));
+    writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
+    writeString(pathProvider.receivedPath(), "Some approved text", StandardOpenOption.CREATE);
 
-    assertThatExceptionOfType(ReviewerError.class)
-        .isThrownBy(() -> reviewer.apply(pathProvider))
-        .withCauseInstanceOf(NoSuchFileException.class);
+    ReviewResult result = reviewer.apply(pathProvider);
+
+    assertThat(result.needsReapproval()).isFalse();
   }
 }

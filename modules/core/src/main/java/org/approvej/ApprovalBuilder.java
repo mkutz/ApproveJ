@@ -169,9 +169,12 @@ public class ApprovalBuilder<T> {
    * @throws ApprovalError if the approval fails
    */
   public void byFile(PathProvider pathProvider) {
-    ApprovalResult result = file(pathProvider).apply(String.valueOf(receivedValue));
+    FileApprover approver = file(pathProvider);
+    ApprovalResult result = approver.apply(String.valueOf(receivedValue));
     if (result.needsApproval() && fileReviewer != null) {
-      result = fileReviewer.apply(pathProvider);
+      if (fileReviewer.apply(pathProvider).needsReapproval()) {
+        result = approver.apply(String.valueOf(receivedValue));
+      }
     }
     result.throwIfNotApproved();
   }
