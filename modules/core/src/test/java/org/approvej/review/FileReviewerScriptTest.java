@@ -16,7 +16,7 @@ class FileReviewerScriptTest {
   @TempDir private Path tempDir;
 
   @Test
-  void accept() throws IOException {
+  void apply() throws IOException {
     FileReviewerScript reviewer = new FileReviewerScript("diff {receivedFile} {approvedFile}");
     PathProvider pathProvider = approvedPath(tempDir.resolve("apply-approved.txt"));
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
