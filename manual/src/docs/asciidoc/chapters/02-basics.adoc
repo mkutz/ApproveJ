@@ -81,6 +81,30 @@ include::../../../test/java/examples/java/BasicsDocTest-approve_pojos-approved.t
 See <<printing>> if need a more sophisticated way of printing.
 
 
+[id=naming]
+== Naming Approvals
+
+Optionally, you can assign a specific name for an approval.
+When you <<_approve_by_file>> the chosen name will be added to the filename to help identify the specific approval.
+It is also necessary to assign a name if there are multiple approvals per test case, as otherwise later approvals will overwrite earlier ones.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_name]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_name]
+----
+
+This test generates two sets of files
+
+1. <TestClass>-<testMethod>-*jane*-<received/approved>.txt
+2. <TestClass>-<testMethod>-*john*-<received/approved>.txt
+
+
 [id="printing"]
 == Printing -- customize how values are turned into Strings
 

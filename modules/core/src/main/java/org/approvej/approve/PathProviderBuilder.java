@@ -23,8 +23,7 @@ public class PathProviderBuilder {
   public static final String APPROVED = "approved";
 
   private Path directory = Path.of(".");
-  private String receivedBaseFilename = RECEIVED;
-  private String approvedBaseFilename = APPROVED;
+  private String baseFilename = "";
 
   /**
    * Creates a new {@link PathProvider} that uses the given approved {@link Path}.
@@ -35,14 +34,14 @@ public class PathProviderBuilder {
   public static PathProvider approvedPath(Path approvedPath) {
     Pattern approvedFilenamePattern =
         Pattern.compile(
-            "(?<baseName>.+?)(?<approved>[-_. ]" + APPROVED + ")?(?:\\.(?<extension>[^.]*))?$");
+            "(?<baseFilename>.+?)(?<approved>[-_. ]" + APPROVED + ")?(?:\\.(?<extension>[^.]*))?$");
     Path directory = approvedPath.getParent();
     String approvedFilename = approvedPath.getFileName().toString();
     Matcher matcher = approvedFilenamePattern.matcher(approvedFilename);
-    String baseName = matcher.matches() ? matcher.group("baseName") : approvedFilename;
+    String baseFilename = matcher.matches() ? matcher.group("baseFilename") : approvedFilename;
     String filenameExtension =
         matcher.matches() ? Objects.requireNonNullElse(matcher.group("extension"), "txt") : "txt";
-    String receivedFilename = "%s-%s.%s".formatted(baseName, RECEIVED, filenameExtension);
+    String receivedFilename = "%s-%s.%s".formatted(baseFilename, RECEIVED, filenameExtension);
     return new PathProviderRecord(directory, approvedFilename, receivedFilename);
   }
 
@@ -64,14 +63,10 @@ public class PathProviderBuilder {
    */
   public static PathProviderBuilder nextToTest() {
     TestMethod testMethod = currentTestMethod();
-    Path directory = findTestSourcePath(testMethod.method()).getParent();
-    String baseFilename =
-        "%s-%s".formatted(testMethod.testClass().getSimpleName(), testMethod.testCaseName());
-
     return new PathProviderBuilder()
-        .directory(directory)
-        .receivedBaseFilename("%s-%s".formatted(baseFilename, RECEIVED))
-        .approvedBaseFilename("%s-%s".formatted(baseFilename, APPROVED));
+        .directory(findTestSourcePath(testMethod.method()).getParent())
+        .baseFilename(
+            "%s-%s".formatted(testMethod.testClass().getSimpleName(), testMethod.testCaseName()));
   }
 
   /**
@@ -82,15 +77,12 @@ public class PathProviderBuilder {
    */
   public static PathProviderBuilder nextToTestInSubdirectory() {
     TestMethod testMethod = currentTestMethod();
-    Path directory =
-        findTestSourcePath(testMethod.method())
-            .getParent()
-            .resolve(testMethod.testClass().getSimpleName());
-    String baseFilename = "%s".formatted(testMethod.testCaseName());
     return new PathProviderBuilder()
-        .directory(directory)
-        .receivedBaseFilename("%s-%s".formatted(baseFilename, RECEIVED))
-        .approvedBaseFilename("%s-%s".formatted(baseFilename, APPROVED));
+        .directory(
+            findTestSourcePath(testMethod.method())
+                .getParent()
+                .resolve(testMethod.testClass().getSimpleName()))
+        .baseFilename("%s".formatted(testMethod.testCaseName()));
   }
 
   private PathProviderBuilder() {}
@@ -107,25 +99,25 @@ public class PathProviderBuilder {
   }
 
   /**
-   * Set the approved filename <em>without filename extension</em>.
+   * Sets the {@link #baseFilename} to the given {@link String}.
    *
-   * @param approvedFilename the received filename without filename extension
+   * @param baseFilename the new {@link #baseFilename}
    * @return this
    */
-  public PathProviderBuilder approvedBaseFilename(String approvedFilename) {
-    this.approvedBaseFilename = approvedFilename;
+  public PathProviderBuilder baseFilename(String baseFilename) {
+    this.baseFilename = baseFilename;
     return this;
   }
 
   /**
-   * Set the received filename <em>without filename extension</em>.
+   * Extends the {@link #baseFilename} with the given {@link String}.
    *
-   * @param receivedFilename the received filename without filename extension
+   * @param filenameAffix affix to add to the {@link #baseFilename}
    * @return this
    */
-  public PathProviderBuilder receivedBaseFilename(String receivedFilename) {
-    this.receivedBaseFilename = receivedFilename;
-    return this;
+  public PathProviderBuilder filenameAffix(String filenameAffix) {
+    if (filenameAffix.isBlank()) return this;
+    return baseFilename("%s-%s".formatted(baseFilename, filenameAffix));
   }
 
   /**
@@ -137,7 +129,7 @@ public class PathProviderBuilder {
   public PathProvider filenameExtension(String filenameExtension) {
     return new PathProviderRecord(
         directory,
-        "%s.%s".formatted(approvedBaseFilename, filenameExtension),
-        "%s.%s".formatted(receivedBaseFilename, filenameExtension));
+        "%s-%s.%s".formatted(baseFilename, APPROVED, filenameExtension),
+        "%s-%s.%s".formatted(baseFilename, RECEIVED, filenameExtension));
   }
 }
