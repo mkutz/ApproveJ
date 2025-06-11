@@ -1,6 +1,7 @@
 package org.approvej.scrub;
 
-import org.jspecify.annotations.NullMarked;
+import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
 
 import java.time.DayOfWeek;
 import java.time.Month;
@@ -12,9 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-
-import static java.util.Arrays.stream;
-import static java.util.stream.Collectors.joining;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Special {@link RegexScrubber} to scrub date/time strings described by a {@link DateTimeFormatter}
