@@ -60,11 +60,13 @@ import org.jspecify.annotations.Nullable;
 public class ApprovalBuilder<T> {
 
   private T receivedValue;
+  private String name = "";
   private final String filenameExtension;
   @Nullable private FileReviewer fileReviewer;
 
-  private ApprovalBuilder(T originalValue, String filenameExtension) {
+  private ApprovalBuilder(T originalValue, String name, String filenameExtension) {
     this.receivedValue = originalValue;
+    this.name = name;
     this.filenameExtension = filenameExtension;
     this.fileReviewer = configuration.defaultFileReviewer();
   }
@@ -77,7 +79,18 @@ public class ApprovalBuilder<T> {
    * @param <T> the type of the value to approve
    */
   public static <T> ApprovalBuilder<T> approve(T originalValue) {
-    return new ApprovalBuilder<>(originalValue, DEFAULT_FILENAME_EXTENSION);
+    return new ApprovalBuilder<>(originalValue, "", DEFAULT_FILENAME_EXTENSION);
+  }
+
+  /**
+   * Sets a name for the current approval. Generally this should
+   *
+   * @param name the name for the current approval
+   * @return this
+   */
+  public ApprovalBuilder<T> name(String name) {
+    this.name = name;
+    return this;
   }
 
   /**
@@ -88,7 +101,7 @@ public class ApprovalBuilder<T> {
    * @return a new {@link ApprovalBuilder} with the printed value
    */
   public ApprovalBuilder<String> printWith(Function<T, String> printer) {
-    return new ApprovalBuilder<>(printer.apply(receivedValue), DEFAULT_FILENAME_EXTENSION);
+    return new ApprovalBuilder<>(printer.apply(receivedValue), name, DEFAULT_FILENAME_EXTENSION);
   }
 
   /**
@@ -98,7 +111,7 @@ public class ApprovalBuilder<T> {
    * @return a new {@link ApprovalBuilder} with the printed value
    */
   public ApprovalBuilder<String> printWith(Printer<T> printer) {
-    return new ApprovalBuilder<>(printer.apply(receivedValue), printer.filenameExtension());
+    return new ApprovalBuilder<>(printer.apply(receivedValue), name, printer.filenameExtension());
   }
 
   /**
@@ -210,7 +223,7 @@ public class ApprovalBuilder<T> {
       // noinspection unchecked
       printWith((Printer<T>) configuration.defaultPrinter()).byFile(pathProviderBuilder);
     } else {
-      byFile(pathProviderBuilder.filenameExtension(filenameExtension));
+      byFile(pathProviderBuilder.filenameAffix(name).filenameExtension(filenameExtension));
     }
   }
 

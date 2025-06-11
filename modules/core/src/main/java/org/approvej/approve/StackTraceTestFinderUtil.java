@@ -25,7 +25,8 @@ public class StackTraceTestFinderUtil {
    * @return the currently executing test {@link Method}
    */
   public static TestMethod currentTestMethod() {
-    return stream(Thread.currentThread().getStackTrace())
+    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+    return stream(stackTrace)
         .map(
             element -> {
               try {

@@ -40,6 +40,17 @@ class BasicsDocTest {
   }
 
   @Test
+  fun approve_name() {
+    // tag::approve_name[]
+    val jane = createPerson("Jane Doe", LocalDate.of(1990, 1, 1))
+    val john = createPerson("John Doe", LocalDate.of(2012, 6, 2))
+
+    approve(jane).name("jane").byFile()
+    approve(john).name("john").byFile()
+    // end::approve_name[]
+  }
+
+  @Test
   fun `object printer`() {
     // tag::object_printer[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
