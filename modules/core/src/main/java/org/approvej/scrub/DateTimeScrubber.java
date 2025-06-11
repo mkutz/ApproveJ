@@ -94,7 +94,7 @@ public class DateTimeScrubber extends RegexScrubber {
     HOUR_SHORT("hour", List.of("H", "k"), "2[0-3]|1[0-9]|[1-9]"),
     HOUR_12H("hour", List.of("hh", "KK"), "1[0-2]|0[1-9]"),
     HOUR_12H_SHORT("hour", List.of("h", "K"), "1[0-2]|[1-9]"),
-    AMPM("ampm", "a", "am|AM|pm|PM"),
+    AMPM("ampm", "a", "(?i)am|pm"),
     MINUTE("minute", "mm", "[1-5][0-9]|0[1-9]"),
     MINUTE_SHORT("minute", "m", "[1-5][0-9]|[1-9]"),
     SECOND("second", "ss", "[1-5][0-9]|0[1-9]"),
