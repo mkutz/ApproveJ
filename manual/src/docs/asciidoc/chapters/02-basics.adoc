@@ -464,6 +464,7 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_revie
 <1> sets the given script to be executed to support the review
 <2> executes the review script if the received value differs from the approved value
 
+
 [id="configuration"]
 == Configuration
 

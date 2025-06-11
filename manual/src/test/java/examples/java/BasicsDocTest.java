@@ -17,7 +17,6 @@ import examples.ExampleClass.Person;
 import java.io.IOException;
 import java.time.LocalDate;
 import org.approvej.print.Printer;
-import org.approvej.review.FileReviewerScript;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 
@@ -165,7 +164,7 @@ class BasicsDocTest {
 
     approve(person)
         .printWith(new PersonYamlPrinter())
-        .reviewWith(new FileReviewerScript("idea diff {receivedFile} {approvedFile}")) // <1>
+        .reviewWith("idea diff {receivedFile} {approvedFile}") // <1>
         .byFile(); // <2>
     // end::approve_reviewWith_fileReviewer[]
   }

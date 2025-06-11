@@ -5,6 +5,7 @@ import static org.approvej.approve.Approvers.file;
 import static org.approvej.approve.Approvers.value;
 import static org.approvej.approve.PathProviderBuilder.approvedPath;
 import static org.approvej.print.Printer.DEFAULT_FILENAME_EXTENSION;
+import static org.approvej.review.FileReviewerScript.script;
 
 import java.nio.file.Path;
 import java.util.function.Function;
@@ -129,10 +130,26 @@ public class ApprovalBuilder<T> {
    *
    * @param reviewer the {@link FileReviewer} to be used
    * @return this
+   * @see Configuration#defaultFileReviewer()
+   * @see org.approvej.review.FileReviewerScript#script()
    */
   public ApprovalBuilder<T> reviewWith(FileReviewer reviewer) {
     this.fileReviewer = reviewer;
     return this;
+  }
+
+  /**
+   * Creates a {@link org.approvej.review.FileReviewerScript} from the given script {@link String}
+   * to trigger if the received value is not equal to the previously approved.
+   *
+   * @param script the script {@link String} to be used as a {@link
+   *     org.approvej.review.FileReviewerScript}
+   * @return this
+   * @see Configuration#defaultFileReviewer()
+   * @see org.approvej.review.FileReviewerScript#script()
+   */
+  public ApprovalBuilder<T> reviewWith(String script) {
+    return reviewWith(script(script));
   }
 
   /**

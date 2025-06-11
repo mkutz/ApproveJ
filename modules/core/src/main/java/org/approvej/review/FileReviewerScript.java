@@ -14,6 +14,17 @@ public record FileReviewerScript(String script) implements FileReviewer {
   private static final String RECEIVED_PLACEHOLDER = "{receivedFile}";
   private static final String APPROVED_PLACEHOLDER = "{approvedFile}";
 
+  /**
+   * A {@link FileReviewer} implementation that executes the given script.
+   *
+   * @param script the script to be executed with placeholders <code>{@value RECEIVED_PLACEHOLDER}
+   *     </code> and <code>{@value APPROVED_PLACEHOLDER}</code>
+   * @return the new {@link FileReviewerScript}
+   */
+  public static FileReviewerScript script(String script) {
+    return new FileReviewerScript(script);
+  }
+
   @Override
   public ReviewResult apply(PathProvider pathProvider) {
     try {

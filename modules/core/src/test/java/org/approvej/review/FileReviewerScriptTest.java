@@ -2,6 +2,7 @@ package org.approvej.review;
 
 import static java.nio.file.Files.writeString;
 import static org.approvej.approve.PathProviderBuilder.approvedPath;
+import static org.approvej.review.FileReviewerScript.script;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -17,7 +18,7 @@ class FileReviewerScriptTest {
 
   @Test
   void apply() throws IOException {
-    FileReviewerScript reviewer = new FileReviewerScript("diff {receivedFile} {approvedFile}");
+    FileReviewerScript reviewer = script("diff {receivedFile} {approvedFile}");
     PathProvider pathProvider = approvedPath(tempDir.resolve("apply-approved.txt"));
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
     writeString(pathProvider.receivedPath(), "Some approved text", StandardOpenOption.CREATE);
@@ -29,7 +30,7 @@ class FileReviewerScriptTest {
 
   @Test
   void apply_different() throws IOException {
-    FileReviewerScript reviewer = new FileReviewerScript("diff {receivedFile} {approvedFile}");
+    FileReviewerScript reviewer = script("diff {receivedFile} {approvedFile}");
     PathProvider pathProvider = approvedPath(tempDir.resolve("apply_different-approved.txt"));
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
     writeString(pathProvider.receivedPath(), "Some received text", StandardOpenOption.CREATE);
@@ -41,8 +42,7 @@ class FileReviewerScriptTest {
 
   @Test
   void apply_unknown_command() throws IOException {
-    FileReviewerScript reviewer =
-        new FileReviewerScript("unknown-command {receivedFile} {approvedFile}");
+    FileReviewerScript reviewer = script("unknown-command {receivedFile} {approvedFile}");
     PathProvider pathProvider = approvedPath(tempDir.resolve("apply_different-approved.txt"));
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
     writeString(pathProvider.receivedPath(), "Some approved text", StandardOpenOption.CREATE);

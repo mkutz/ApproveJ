@@ -12,7 +12,6 @@ import org.approvej.approve.PathProviderBuilder.nextToTest
 import org.approvej.approve.PathProviderBuilder.nextToTestInSubdirectory
 import org.approvej.print.ObjectPrinter.objectPrinter
 import org.approvej.print.Printer
-import org.approvej.review.FileReviewerScript
 import org.approvej.scrub.Scrubbers.dateTimeFormat
 import org.approvej.scrub.Scrubbers.uuids
 import org.junit.jupiter.api.Test
@@ -163,7 +162,7 @@ class BasicsDocTest {
 
     approve(person)
       .printWith(PersonYamlPrinter())
-      .reviewWith(FileReviewerScript("idea diff {receivedFile} {approvedFile}")) // <1>
+      .reviewWith("idea diff {receivedFile} {approvedFile}") // <1>
       .byFile() // <2>
     // end::approve_reviewWith_fileReviewer[]
   }
