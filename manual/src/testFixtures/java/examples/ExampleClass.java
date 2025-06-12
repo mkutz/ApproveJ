@@ -2,8 +2,10 @@ package examples;
 
 import static java.util.stream.Collectors.joining;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -65,6 +67,57 @@ public class ExampleClass {
   }
 
   // end::blog_post_pojo[]
+
+  public static Order getOrderById(String id) {
+    return new ExampleClass.Order(
+        id,
+        LocalDateTime.now().minusMinutes(12),
+        new ExampleClass.Order.Customer(UUID.randomUUID().toString(), "John", "Doe"),
+        new ExampleClass.Order.Address("Liberty St", "1A", "10007", "New York", "US"),
+        new ExampleClass.Order.Address("Independence Ave", "1776", "20500", "Washington", "US"),
+        List.of(
+            new ExampleClass.Order.Item(
+                "323e4567-e89b-12d3-a456-426614174002",
+                "Baseball Cap",
+                2,
+                new BigDecimal("24.99"),
+                new BigDecimal("49.98")),
+            new ExampleClass.Order.Item(
+                "423e4567-e89b-12d3-a456-426614174003",
+                "Hot Dog",
+                5,
+                new BigDecimal("3.50"),
+                new BigDecimal("17.50"))),
+        ExampleClass.Order.Status.OPEN);
+  }
+
+  // tag::order_pojo[]
+  public record Order(
+      String id,
+      LocalDateTime orderDateTime,
+      Customer customer,
+      Address deliveryAddress,
+      Address billingAddress,
+      List<Item> items,
+      Status status) {
+    public record Customer(String id, String firstname, String surname) {}
+
+    public record Address(
+        String street, String houseNumber, String postalCode, String city, String country) {}
+
+    public record Item(
+        String id, String title, int quantity, BigDecimal pricePerUnit, BigDecimal totalPrice) {}
+
+    public enum Status {
+      OPEN,
+      IN_COMMISSION,
+      COMMISSIONED,
+      IN_DELIVERY,
+      DELIVERED
+    }
+  }
+
+  // end::order_pojo[]
 
   public static Contact createContact(String name, String email, String phoneNumber) {
     return new Contact(name, email, phoneNumber);

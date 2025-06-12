@@ -2,9 +2,48 @@
 
 == Approval Testing
 
-Approval testing is a technique that allows you to compare the output of your code with a known good/previously approved output.
+Approval testing is a technique that allows you to compare the output of your code with a known good/previously approved output in one simple step.
+This is different from traditional (unit) testing, where every aspect of a result is usually _asserted_ explicitly.
 
-An approval test case will only succeed, if the actually received output is equal to the previously approved output.
+For example, if we test something that returns an instance if the following record:
+
+[source,java,indent=0]
+.Order POJO
+----
+include::../../../testFixtures/java/examples/ExampleClass.java[tag=order_pojo]
+----
+
+The traditional assertion-based approach might lead to a test like this:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/IntroductionDocTest.java[tag=assertions]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/IntroductionDocTest.kt[tag=assertions]
+----
+
+This is a very long list of assertions.
+It is hard to read, and it is quite easy to overlook a mistake.
+Especially to spot if any assertion is missing, if a lazy `assertNonNull` could and should be replaced with something more meaningful.
+
+The corresponding approval test would simply look like this:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/IntroductionDocTest.java[tag=approval]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/IntroductionDocTest.kt[tag=approval]
+----
+
+That last line will only succeed, if the actually received output is equal to a previously approved output.
 
 If the received output is different from the approved output, the test will fail and leave it to human reviewer to approve received output or to fix the code.
 
