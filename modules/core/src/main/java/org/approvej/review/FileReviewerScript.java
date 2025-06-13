@@ -1,6 +1,7 @@
 package org.approvej.review;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 import org.approvej.approve.PathProvider;
 
 /**
@@ -13,6 +14,7 @@ public record FileReviewerScript(String script) implements FileReviewer {
 
   private static final String RECEIVED_PLACEHOLDER = "{receivedFile}";
   private static final String APPROVED_PLACEHOLDER = "{approvedFile}";
+  private static final Logger LOGGER = Logger.getLogger(FileReviewerScript.class.getName());
 
   /**
    * A {@link FileReviewer} implementation that executes the given script.
@@ -38,11 +40,13 @@ public record FileReviewerScript(String script) implements FileReviewer {
 
       return new FileReviewResult(process.exitValue() == 0);
     } catch (IOException e) {
-      throw new ReviewerError("Review by %s failed".formatted(getClass().getSimpleName()), e);
+      LOGGER.info("Review by %s failed with exception %s".formatted(getClass().getSimpleName(), e));
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
-      throw new ReviewerError(
-          "Review by %s was interrupted".formatted(getClass().getSimpleName()), e);
+      LOGGER.info(
+          "Review by %s was interrupted with exception %s"
+              .formatted(getClass().getSimpleName(), e));
     }
+    return new FileReviewResult(false);
   }
 }
