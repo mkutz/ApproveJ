@@ -10,6 +10,7 @@ import static org.approvej.approve.PathProviderBuilder.nextToTestInSubdirectory;
 import static org.approvej.print.ObjectPrinter.objectPrinter;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
+import static org.assertj.core.api.Assumptions.assumeThat;
 
 import examples.ExampleClass.BlogPost;
 import examples.ExampleClass.Contact;
@@ -18,7 +19,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import org.approvej.print.Printer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIf;
 
 class BasicsDocTest {
 
@@ -157,8 +157,8 @@ class BasicsDocTest {
   }
 
   @Test
-  @EnabledIf("ideaAvailable")
-  void approve_reviewWith_fileReviewer() {
+  void approve_reviewWith_fileReviewer() throws IOException, InterruptedException {
+    assumeThat(new ProcessBuilder("which", "meld").start().waitFor()).isEqualTo(0);
     // tag::approve_reviewWith_fileReviewer[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
@@ -167,17 +167,6 @@ class BasicsDocTest {
         .reviewWith("idea diff {receivedFile} {approvedFile}") // <1>
         .byFile(); // <2>
     // end::approve_reviewWith_fileReviewer[]
-  }
-
-  static boolean ideaAvailable() {
-    try {
-      return new ProcessBuilder("which", "idea").start().waitFor() == 0;
-    } catch (IOException | InterruptedException e) {
-      if (e instanceof InterruptedException) {
-        Thread.currentThread().interrupt();
-      }
-      return false;
-    }
   }
 
   // tag::person_yaml_printer[]

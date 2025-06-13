@@ -16,7 +16,6 @@ import org.approvej.scrub.Scrubbers.dateTimeFormat
 import org.approvej.scrub.Scrubbers.uuids
 import org.assertj.core.api.Assumptions.assumeThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.EnabledIf
 
 class BasicsDocTest {
 
@@ -156,7 +155,6 @@ class BasicsDocTest {
   }
 
   @Test
-  @EnabledIf("ideaAvailable")
   fun `approve reviewWith fileReviewer`() {
     assumeThat(ProcessBuilder("which", "meld").start().waitFor()).isEqualTo(0)
     // tag::approve_reviewWith_fileReviewer[]
