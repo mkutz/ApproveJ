@@ -21,7 +21,7 @@ class JsonJacksonDocTest {
 
   @Test
   @Throws(JsonProcessingException::class)
-  fun scrub_json_pointer() {
+  fun `scrub json pointer`() {
     // tag::scrub_json_pointer[]
     val createdBlogPostJson =
       createTaggedBlogPost(
@@ -39,7 +39,7 @@ class JsonJacksonDocTest {
 
   @Test
   @Throws(JsonProcessingException::class)
-  fun pretty_print_json() {
+  fun `pretty print json`() {
     // tag::pretty_print_json[]
     val createdBlogPostJson =
       createTaggedBlogPost(
@@ -57,7 +57,7 @@ class JsonJacksonDocTest {
   }
 
   @Test
-  fun pretty_print_json_string() {
+  fun `pretty print json string`() {
     // tag::pretty_print_json_string[]
     val createdBlogPostJson =
       createTaggedBlogPost(
