@@ -20,7 +20,7 @@ import org.junit.jupiter.api.condition.EnabledIf
 class BasicsDocTest {
 
   @Test
-  fun approve_strings() {
+  fun `approve strings`() {
     // tag::approve_strings[]
     val result = hello("World")
 
@@ -30,7 +30,7 @@ class BasicsDocTest {
   }
 
   @Test
-  fun approve_pojos() {
+  fun `approve pojos`() {
     // tag::approve_pojos[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
@@ -40,7 +40,7 @@ class BasicsDocTest {
   }
 
   @Test
-  fun object_printer() {
+  fun `object printer`() {
     // tag::object_printer[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
@@ -51,7 +51,7 @@ class BasicsDocTest {
   }
 
   @Test
-  fun custom_printer_function() {
+  fun `custom printer function`() {
     // tag::custom_printer_function[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
@@ -62,7 +62,7 @@ class BasicsDocTest {
   }
 
   @Test
-  fun custom_printer() {
+  fun `custom printer`() {
     // tag::custom_printer[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
@@ -87,7 +87,7 @@ class BasicsDocTest {
   }
 
   @Test
-  fun custom_scrubbing() {
+  fun `custom scrubbing`() {
     // tag::custom_scrubbing[]
     val contact = createContact("Jane Doe", "jane@approvej.org", "+1 123 456 7890")
 
@@ -99,7 +99,7 @@ class BasicsDocTest {
   }
 
   @Test
-  fun approve_file_next_to_test() {
+  fun `approve file next to test`() {
     // tag::approve_file_next_to_test[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
@@ -108,7 +108,7 @@ class BasicsDocTest {
   }
 
   @Test
-  fun approve_file_custom_extension() {
+  fun `approve file custom extension`() {
     // tag::approve_file_custom_extension[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
@@ -126,7 +126,7 @@ class BasicsDocTest {
   }
 
   @Test
-  fun approve_file_nextToTestInSubdirectory() {
+  fun `approve file nextToTestInSubdirectory`() {
     // tag::approve_file_nextToTestInSubdirectory[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
@@ -135,7 +135,7 @@ class BasicsDocTest {
   }
 
   @Test
-  fun approve_inplace() {
+  fun `approve inplace`() {
     // tag::approve_inplace[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
@@ -144,25 +144,25 @@ class BasicsDocTest {
   }
 
   @Test
-  fun approve_file_approved_path() {
+  fun `approve file approved path`() {
     // tag::approve_file_approved_path[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
       .printWith(PersonYamlPrinter())
-      .byFile("src/test/resources/BasicExamples-approve_file_approved_path.yaml") // <1>
+      .byFile("src/test/resources/BasicExamples-approve file approved path.yaml") // <1>
     // end::approve_file_approved_path[]
   }
 
   @Test
   @EnabledIf("ideaAvailable")
-  fun approve_reviewWith_fileReviewer() {
+  fun `approve reviewWith fileReviewer`() {
     // tag::approve_reviewWith_fileReviewer[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
       .printWith(PersonYamlPrinter())
-      .reviewWith("idea diff {receivedFile} {approvedFile}") // <1>
+      .reviewWith("idea diff \"{receivedFile}\" \"{approvedFile}\"") // <1>
       .byFile() // <2>
     // end::approve_reviewWith_fileReviewer[]
   }

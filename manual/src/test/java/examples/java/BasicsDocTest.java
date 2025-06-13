@@ -152,7 +152,7 @@ class BasicsDocTest {
 
     approve(person)
         .printWith(new PersonYamlPrinter())
-        .byFile("src/test/resources/BasicExamples-approve_file_approved_path.yaml"); // <1>
+        .byFile("src/test/resources/BasicExamples-approve file approved path.yaml"); // <1>
     // end::approve_file_approved_path[]
   }
 
