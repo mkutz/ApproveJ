@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -105,5 +106,159 @@ class DateTimeScrubberTest {
             non-utc: [datetime 1]
             utc: [datetime 2]
             bc: [datetime 3]""");
+  }
+
+  @Test
+  void isoLocalDates() {
+    assertThat(
+            Scrubbers.isoLocalDates()
+                .apply(
+                    "isoLocalDate: %s"
+                        .formatted(DateTimeFormatter.ISO_LOCAL_DATE.format(ZonedDateTime.now()))))
+        .isEqualTo("isoLocalDate: [datetime 1]");
+  }
+
+  @Test
+  void isoOffsetDates() {
+    assertThat(
+            Scrubbers.isoOffsetDates()
+                .apply(
+                    "isoOffsetDate: %s"
+                        .formatted(DateTimeFormatter.ISO_OFFSET_DATE.format(ZonedDateTime.now()))))
+        .isEqualTo("isoOffsetDate: [datetime 1]");
+  }
+
+  @Test
+  void isoDates() {
+    assertThat(
+            Scrubbers.isoDates()
+                .apply(
+                    "isoDate: %s"
+                        .formatted(DateTimeFormatter.ISO_DATE.format(ZonedDateTime.now()))))
+        .isEqualTo("isoDate: [datetime 1]");
+  }
+
+  @Test
+  void isoLocalTimes() {
+    assertThat(
+            Scrubbers.isoLocalTimes()
+                .apply(
+                    "isoLocalTime: %s"
+                        .formatted(DateTimeFormatter.ISO_LOCAL_TIME.format(ZonedDateTime.now()))))
+        .isEqualTo("isoLocalTime: [datetime 1]");
+  }
+
+  @Test
+  void isoOffsetTimes() {
+    assertThat(
+            Scrubbers.isoOffsetTimes()
+                .apply(
+                    "isoOffsetTime: %s"
+                        .formatted(DateTimeFormatter.ISO_OFFSET_TIME.format(ZonedDateTime.now()))))
+        .isEqualTo("isoOffsetTime: [datetime 1]");
+  }
+
+  @Test
+  void isoTimes() {
+    assertThat(
+            Scrubbers.isoTimes()
+                .apply(
+                    "isoTime: %s"
+                        .formatted(DateTimeFormatter.ISO_TIME.format(ZonedDateTime.now()))))
+        .isEqualTo("isoTime: [datetime 1]");
+  }
+
+  @Test
+  void isoLocalDateTimes() {
+    assertThat(
+            Scrubbers.isoLocalDateTimes()
+                .apply(
+                    "isoLocalDateTime: %s"
+                        .formatted(
+                            DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(ZonedDateTime.now()))))
+        .isEqualTo("isoLocalDateTime: [datetime 1]");
+  }
+
+  @Test
+  void isoOffsetDateTimes() {
+    assertThat(
+            Scrubbers.isoOffsetDateTimes()
+                .apply(
+                    "isoOffsetDateTime: %s"
+                        .formatted(
+                            DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now()))))
+        .isEqualTo("isoOffsetDateTime: [datetime 1]");
+  }
+
+  @Test
+  void isoZonedDateTimes() {
+    assertThat(
+            Scrubbers.isoZonedDateTimes()
+                .apply(
+                    "isoZonedDateTime: %s"
+                        .formatted(
+                            DateTimeFormatter.ISO_ZONED_DATE_TIME.format(ZonedDateTime.now()))))
+        .isEqualTo("isoZonedDateTime: [datetime 1]");
+  }
+
+  @Test
+  void isoDateTimes() {
+    assertThat(
+            Scrubbers.isoDateTimes()
+                .apply(
+                    "isoDateTime: %s"
+                        .formatted(DateTimeFormatter.ISO_DATE_TIME.format(ZonedDateTime.now()))))
+        .isEqualTo("isoDateTime: [datetime 1]");
+  }
+
+  @Test
+  void isoOrdinalDates() {
+    assertThat(
+            Scrubbers.isoOrdinalDates()
+                .apply(
+                    "isoOrdinalDate: %s"
+                        .formatted(DateTimeFormatter.ISO_ORDINAL_DATE.format(ZonedDateTime.now()))))
+        .isEqualTo("isoOrdinalDate: [datetime 1]");
+  }
+
+  @Test
+  void isoWeekDates() {
+    assertThat(
+            Scrubbers.isoWeekDates()
+                .apply(
+                    "isoWeekDate: %s"
+                        .formatted(DateTimeFormatter.ISO_WEEK_DATE.format(ZonedDateTime.now()))))
+        .isEqualTo("isoWeekDate: [datetime 1]");
+  }
+
+  @Test
+  void isoInstants() {
+    assertThat(
+            Scrubbers.isoInstants()
+                .apply(
+                    "isoInstant: %s"
+                        .formatted(DateTimeFormatter.ISO_INSTANT.format(ZonedDateTime.now()))))
+        .isEqualTo("isoInstant: [datetime 1]");
+  }
+
+  @Test
+  void basicIsoDates() {
+    assertThat(
+            Scrubbers.basicIsoDates()
+                .apply(
+                    "basicIsoDate: %s"
+                        .formatted(DateTimeFormatter.BASIC_ISO_DATE.format(ZonedDateTime.now()))))
+        .isEqualTo("basicIsoDate: [datetime 1]");
+  }
+
+  @Test
+  void rfc1123DateTimes() {
+    assertThat(
+            Scrubbers.rfc1123DateTimes()
+                .apply(
+                    "rfc1123DateTime: %s"
+                        .formatted(
+                            DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.now()))))
+        .isEqualTo("rfc1123DateTime: [datetime 1]");
   }
 }
