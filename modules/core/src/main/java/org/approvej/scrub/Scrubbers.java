@@ -64,6 +64,66 @@ public class Scrubbers {
     return dateTimeFormat(dateTimePattern, Locale.getDefault());
   }
 
+  public static RegexScrubber isoLocalDates() {
+    return dateTimeFormat("yyyy-MM-dd");
+  }
+
+  public static RegexScrubber isoOffsetDates() {
+    return dateTimeFormat("yyyy-MM-ddXXX");
+  }
+
+  public static RegexScrubber isoDates() {
+    return dateTimeFormat("yyyy-MM-dd[[XXX][X]]");
+  }
+
+  public static RegexScrubber isoLocalTimes() {
+    return dateTimeFormat("HH:mm:ss[.S]");
+  }
+
+  public static RegexScrubber isoOffsetTimes() {
+    return dateTimeFormat("HH:mm:ss[.S]XXX");
+  }
+
+  public static RegexScrubber isoTimes() {
+    return dateTimeFormat("HH:mm:ss[.S][XXX][X]");
+  }
+
+  public static RegexScrubber isoLocalDateTimes() {
+    return dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss[.S]");
+  }
+
+  public static RegexScrubber isoOffsetDateTimes() {
+    return dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss[.S]XXX");
+  }
+
+  public static RegexScrubber isoZonedDateTimes() {
+    return dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss[.S]XXX'['VV']'");
+  }
+
+  public static RegexScrubber isoDateTimes() {
+    return dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss[.S][XXX][X]['['VV']']");
+  }
+
+  public static RegexScrubber isoOrdinalDates() {
+    return dateTimeFormat("yyyy-DDD");
+  }
+
+  public static RegexScrubber isoWeekDates() {
+    return dateTimeFormat("YYYY-'W'ww-e");
+  }
+
+  public static RegexScrubber isoInstants() {
+    return dateTimeFormat("uuuu-MM-dd'T'HH:mm:ss.SX");
+  }
+
+  public static RegexScrubber basicIsoDates() {
+    return dateTimeFormat("yyyyMMdd");
+  }
+
+  public static RegexScrubber rfc1123DateTimes() {
+    return dateTimeFormat("EEE, dd MMM yyyy HH:mm:ss Z");
+  }
+
   /**
    * {@link RegexScrubber} for UUIDs.
    *
