@@ -121,7 +121,7 @@ public class Scrubbers {
   }
 
   public static RegexScrubber rfc1123DateTimes() {
-    return dateTimeFormat("EEE, dd MMM yyyy HH:mm:ss Z");
+    return dateTimeFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.US);
   }
 
   /**
