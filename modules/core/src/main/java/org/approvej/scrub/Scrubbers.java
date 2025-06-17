@@ -64,62 +64,195 @@ public class Scrubbers {
     return dateTimeFormat(dateTimePattern, Locale.getDefault());
   }
 
+  /**
+   * Creates a {@link DateTimeScrubber} for ISO-8601 local dates, like {@code 2019-02-25}.
+   *
+   * @return a {@link DateTimeScrubber} for ISO-8601 local dates
+   * @see DateTimeFormatter#ISO_LOCAL_DATE
+   */
   public static RegexScrubber isoLocalDates() {
     return dateTimeFormat("yyyy-MM-dd");
   }
 
+  /**
+   * Creates a {@link DateTimeScrubber} for ISO-8601 offset dates, like {@code 2019-02-25+02:00}.
+   *
+   * @return a {@link DateTimeScrubber} for ISO-8601 offset dates
+   * @see DateTimeFormatter#ISO_OFFSET_DATE
+   */
   public static RegexScrubber isoOffsetDates() {
     return dateTimeFormat("yyyy-MM-ddXXX");
   }
 
+  /**
+   * Creates a {@link DateTimeScrubber} for ISO-8601 dates, like {@code 2019-02-25}, or {@code
+   * 2019-02-25+02:00}.
+   *
+   * @return a {@link DateTimeScrubber} for ISO-8601 dates
+   * @see DateTimeFormatter#ISO_DATE
+   */
   public static RegexScrubber isoDates() {
     return dateTimeFormat("yyyy-MM-dd[XXX]");
   }
 
+  /**
+   * Creates a {@link DateTimeScrubber} for ISO-8601 local times, like {@code 12:34:56}, or {@code
+   * 12:34:56.123456789}.
+   *
+   * @return a {@link DateTimeScrubber} for ISO-8601 local times
+   * @see DateTimeFormatter#ISO_LOCAL_TIME
+   */
   public static RegexScrubber isoLocalTimes() {
     return dateTimeFormat("HH:mm:ss[.S]");
   }
 
+  /**
+   * Creates a {@link DateTimeScrubber} for ISO-8601 offset times, like {@code 12:34:56+02:00}, or
+   * {@code 12:34:56.123456789+02:00}.
+   *
+   * @return a {@link DateTimeScrubber} for ISO-8601 offset times
+   * @see DateTimeFormatter#ISO_OFFSET_TIME
+   */
   public static RegexScrubber isoOffsetTimes() {
     return dateTimeFormat("HH:mm:ss[.S]XXX");
   }
 
+  /**
+   * Creates a {@link DateTimeScrubber} for ISO-8601 times, like {@code 12:34:56}, {@code
+   * 12:34:56+02:00}, {@code 12:34:56.123456789}, or {@code 12:34:56.123456789+02:00}.
+   *
+   * @return a {@link DateTimeScrubber} for ISO-8601 times
+   * @see DateTimeFormatter#ISO_TIME
+   */
   public static RegexScrubber isoTimes() {
     return dateTimeFormat("HH:mm:ss[.S][XXX]");
   }
 
+  /**
+   * Creates a {@link DateTimeScrubber} for ISO-8601 local date/times, like {@code 12:34:56}, {@code
+   * 12:34:56+02:00}, {@code 12:34:56.123456789}, or {@code 12:34:56.123456789+02:00}.
+   *
+   * @return a {@link DateTimeScrubber} for ISO-8601 local date/times
+   * @see DateTimeFormatter#ISO_LOCAL_DATE_TIME
+   */
   public static RegexScrubber isoLocalDateTimes() {
     return dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss[.S]");
   }
 
+  /**
+   * Creates a {@link DateTimeScrubber} for ISO-8601 offset date/times, like {@code
+   * 2019-02-25T12:34:56+02:00}, or {@code 2019-02-25T12:34:56.123456789+02:00}.
+   *
+   * @return a {@link DateTimeScrubber} for ISO-8601 offset date/times
+   * @see DateTimeFormatter#ISO_OFFSET_DATE_TIME
+   */
   public static RegexScrubber isoOffsetDateTimes() {
     return dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss[.S]XXX");
   }
 
+  /**
+   * Creates a {@link DateTimeScrubber} for ISO-8601 zoned date/times, like {@code
+   * 2019-02-25T12:34:56+02:00}, {@code 2019-02-25T12:34:56.123456789+02:00}, {@code
+   * 2019-02-25T12:34:56+02:00[Europe/Berlin]}, or {@code
+   * 2019-02-25T12:34:56.123456789+02:00[Europe/Berlin]}.
+   *
+   * @param locale the {@link Locale} to localize the date/time pattern (influences names for zones
+   *     codes)
+   * @return a {@link DateTimeScrubber} for ISO-8601 zoned date/times
+   * @see DateTimeFormatter#ISO_ZONED_DATE_TIME
+   */
+  public static RegexScrubber isoZonedDateTimes(Locale locale) {
+    return dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss[.S]XXX'['VV']'", locale);
+  }
+
+  /**
+   * Creates a {@link DateTimeScrubber} for ISO-8601 zoned date/times, like {@code
+   * 2019-02-25T12:34:56+02:00}, {@code 2019-02-25T12:34:56.123456789+02:00}, {@code
+   * 2019-02-25T12:34:56+02:00[Europe/Berlin]}, or {@code
+   * 2019-02-25T12:34:56.123456789+02:00[Europe/Berlin]}.
+   *
+   * @return a {@link DateTimeScrubber} for ISO-8601 zoned date/times
+   * @see #isoZonedDateTimes(Locale)
+   */
   public static RegexScrubber isoZonedDateTimes() {
-    return dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss[.S]XXX'['VV']'");
+    return isoZonedDateTimes(Locale.getDefault());
   }
 
+  /**
+   * Creates a {@link DateTimeScrubber} for ISO-8601 date/times, like {@code 2019-02-25T12:34:56},
+   * {@code 2019-02-25T12:34:56.123456789}, {@code 2019-02-25T12:34:56+02:00}, or {@code
+   * 2019-02-25T12:34:56.123456789+02:00[Europe/Berlin]}.
+   *
+   * @return a {@link DateTimeScrubber} for ISO-8601 date/times
+   * @see DateTimeFormatter#ISO_DATE_TIME
+   */
+  public static RegexScrubber isoDateTimes(Locale locale) {
+    return dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss[.S][XXX['['VV']']]", locale);
+  }
+
+  /**
+   * Creates a {@link DateTimeScrubber} for ISO-8601 date/times, like {@code 2019-02-25T12:34:56},
+   * {@code 2019-02-25T12:34:56.123456789}, {@code 2019-02-25T12:34:56+02:00}, or {@code
+   * 2019-02-25T12:34:56.123456789+02:00[Europe/Berlin]}.
+   *
+   * @return a {@link DateTimeScrubber} for ISO-8601 date/times
+   * @see #isoDateTimes(Locale)
+   */
   public static RegexScrubber isoDateTimes() {
-    return dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss[.S][XXX]['['VV']']");
+    return isoDateTimes(Locale.getDefault());
   }
 
+  /**
+   * Creates a {@link DateTimeScrubber} for ISO-8601 ordinal dates, like {@code 2019-86}, or {@code
+   * 2019-86+02:00:00}.
+   *
+   * @return a {@link DateTimeScrubber} for ISO-8601 ordinal dates
+   * @see DateTimeFormatter#ISO_ORDINAL_DATE
+   */
   public static RegexScrubber isoOrdinalDates() {
     return dateTimeFormat("yyyy-DDD[XXXX]");
   }
 
+  /**
+   * Creates a {@link DateTimeScrubber} for ISO-8601 week dates, like {@code 2019-W09-1}, or {@code
+   * 2019-W09-1+02:00:00}.
+   *
+   * @return a {@link DateTimeScrubber} for ISO-8601 week dates
+   * @see DateTimeFormatter#ISO_WEEK_DATE
+   */
   public static RegexScrubber isoWeekDates() {
     return dateTimeFormat("YYYY-'W'ww-e[XXXX]");
   }
 
+  /**
+   * Creates a {@link DateTimeScrubber} for ISO-8601 instants, like {@code
+   * 2019-02-25T12:34:56.123456789+02:00}, or {@code 2019-02-25T12:34:56.123456789Z}.
+   *
+   * @return a {@link DateTimeScrubber} for ISO-8601 instants
+   * @see DateTimeFormatter#ISO_INSTANT
+   */
   public static RegexScrubber isoInstants() {
     return dateTimeFormat("uuuu-MM-dd'T'HH:mm:ss.SX");
   }
 
+  /**
+   * Creates a {@link DateTimeScrubber} for basic ISO-8601 dates, like {@code 20190225}, or {@code
+   * 20190225+02:00}.
+   *
+   * @return a {@link DateTimeScrubber} for basic ISO-8601 dates
+   * @see DateTimeFormatter#BASIC_ISO_DATE
+   */
   public static RegexScrubber basicIsoDates() {
     return dateTimeFormat("yyyyMMdd[X]");
   }
 
+  /**
+   * Creates a {@link DateTimeScrubber} for RFC-1123 date/times, like {@code Mon, 35 Feb 2019
+   * 12:34:56 GMT}. Note that this always uses the {@link Locale#US}.
+   *
+   * @return a {@link DateTimeScrubber} for RFC-1123 date/times
+   * @see DateTimeFormatter#RFC_1123_DATE_TIME
+   */
   public static RegexScrubber rfc1123DateTimes() {
     return dateTimeFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.US);
   }
