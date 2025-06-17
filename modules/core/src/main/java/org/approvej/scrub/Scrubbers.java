@@ -73,7 +73,7 @@ public class Scrubbers {
   }
 
   public static RegexScrubber isoDates() {
-    return dateTimeFormat("yyyy-MM-dd[[XXX][X]]");
+    return dateTimeFormat("yyyy-MM-dd[XXX]");
   }
 
   public static RegexScrubber isoLocalTimes() {
@@ -85,7 +85,7 @@ public class Scrubbers {
   }
 
   public static RegexScrubber isoTimes() {
-    return dateTimeFormat("HH:mm:ss[.S][XXX][X]");
+    return dateTimeFormat("HH:mm:ss[.S][XXX]");
   }
 
   public static RegexScrubber isoLocalDateTimes() {
@@ -101,15 +101,15 @@ public class Scrubbers {
   }
 
   public static RegexScrubber isoDateTimes() {
-    return dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss[.S][XXX][X]['['VV']']");
+    return dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss[.S][XXX]['['VV']']");
   }
 
   public static RegexScrubber isoOrdinalDates() {
-    return dateTimeFormat("yyyy-DDD");
+    return dateTimeFormat("yyyy-DDD[XXXX]");
   }
 
   public static RegexScrubber isoWeekDates() {
-    return dateTimeFormat("YYYY-'W'ww-e");
+    return dateTimeFormat("YYYY-'W'ww-e[XXXX]");
   }
 
   public static RegexScrubber isoInstants() {
@@ -117,7 +117,7 @@ public class Scrubbers {
   }
 
   public static RegexScrubber basicIsoDates() {
-    return dateTimeFormat("yyyyMMdd");
+    return dateTimeFormat("yyyyMMdd[X]");
   }
 
   public static RegexScrubber rfc1123DateTimes() {

@@ -192,12 +192,11 @@ class DateTimeScrubberTest {
 
   @Test
   void isoZonedDateTimes() {
+    RegexScrubber isoZonedDateTimes = Scrubbers.isoZonedDateTimes();
     assertThat(
-            Scrubbers.isoZonedDateTimes()
-                .apply(
-                    "isoZonedDateTime: %s"
-                        .formatted(
-                            DateTimeFormatter.ISO_ZONED_DATE_TIME.format(ZonedDateTime.now()))))
+            isoZonedDateTimes.apply(
+                "isoZonedDateTime: %s"
+                    .formatted(DateTimeFormatter.ISO_ZONED_DATE_TIME.format(ZonedDateTime.now()))))
         .isEqualTo("isoZonedDateTime: [datetime 1]");
   }
 
