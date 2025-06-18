@@ -27,10 +27,10 @@ public class DateTimeScrubber extends RegexScrubber {
    *
    * @param dateTimePattern a date/time pattern as used by {@link
    *     java.time.format.DateTimeFormatter}
-   * @param locale the locale for the date/time pattern (influences names of moths or weekdays for
-   *     example)
-   * @param replacement a function that receives the finding index and returns the replacement
-   *     string
+   * @param locale the {@link Locale} for the date/time pattern (influences names of moths or
+   *     weekdays for example)
+   * @param replacement a {@link Function} that receives the finding index and returns the
+   *     replacement string
    * @see java.time.format.DateTimeFormatter
    */
   DateTimeScrubber(String dateTimePattern, Locale locale, Function<Integer, Object> replacement) {
@@ -44,17 +44,6 @@ public class DateTimeScrubber extends RegexScrubber {
         .map(
             result -> {
               DateTimeToken dateTimeToken = DateTimeToken.forString(result.group());
-              if (dateTimeToken == DateTimeToken.OPTIONAL) {
-                return "(%s)?"
-                    .formatted(
-                        regexFor(
-                            result
-                                .group()
-                                .replaceAll(
-                                    dateTimeToken.tokenRegex,
-                                    dateTimeToken.replacementRegex(locale)),
-                            locale));
-              }
               return result
                   .group()
                   .replaceAll(dateTimeToken.tokenRegex, dateTimeToken.replacementRegex(locale));
@@ -64,10 +53,10 @@ public class DateTimeScrubber extends RegexScrubber {
 
   private enum DateTimeToken {
     ERA("era", List.of("GGGG", "GGG", "GG", "G"), List.of(Year.of(-1), Year.of(1))),
-    YEAR_4("year", List.of("yyyy", "YYYY", "uuuu"), "-?[0-9][0-9][0-9][1-9]"),
-    YEAR_3("year", List.of("yyy", "YYY", "uuu"), "-?[0-9][0-9][1-9]"),
-    YEAR_2("year", List.of("yy", "YY", "uu"), "-?[0-9][1-9]"),
-    YEAR("year", List.of("y", "Y", "u"), "-?[0-9]*[1-9]"),
+    YEAR_4("year", List.of("yyyy", "YYYY", "uuuu"), "-?[0-9][0-9][0-9][0-9]"),
+    YEAR_3("year", List.of("yyy", "YYY", "uuu"), "-?[0-9][0-9][0-9]"),
+    YEAR_2("year", List.of("yy", "YY", "uu"), "-?[0-9][0-9]"),
+    YEAR("year", List.of("y", "Y", "u"), "-?[0-9]*[0-9]"),
     QUARTER(
         "quarter",
         List.of("QQQQ", "qqqq", "QQQQ", "qqqq", "QQQ", "qqq", "QQ", "qq", "Q", "q"),
@@ -89,15 +78,15 @@ public class DateTimeScrubber extends RegexScrubber {
         List.of(DayOfWeek.values())),
     DAY_OF_WEEK_MIDDLE("dayOfWeek", List.of("ee", "cc"), "0[1-7]"),
     DAY_OF_WEEK_SHORT("dayOfWeek", List.of("e", "c"), "[1-7]"),
-    HOUR("hour", List.of("HH", "kk"), "2[0-3]|1[0-9]|0[1-9]"),
-    HOUR_SHORT("hour", List.of("H", "k"), "2[0-3]|1[0-9]|[1-9]"),
-    HOUR_12H("hour", List.of("hh", "KK"), "1[0-2]|0[1-9]"),
-    HOUR_12H_SHORT("hour", List.of("h", "K"), "1[0-2]|[1-9]"),
+    HOUR("hour", List.of("HH", "kk"), "2[0-3]|1[0-9]|0[0-9]"),
+    HOUR_SHORT("hour", List.of("H", "k"), "2[0-3]|1[0-9]|[0-9]"),
+    HOUR_12H("hour", List.of("hh", "KK"), "1[0-2]|0[0-9]"),
+    HOUR_12H_SHORT("hour", List.of("h", "K"), "1[0-2]|[0-9]"),
     AMPM("ampm", "a", "(?i)am|pm"),
-    MINUTE("minute", "mm", "[1-5][0-9]|0[1-9]"),
-    MINUTE_SHORT("minute", "m", "[1-5][0-9]|[1-9]"),
-    SECOND("second", "ss", "[1-5][0-9]|0[1-9]"),
-    SECOND_SHORT("second", "s", "[1-5][0-9]|[1-9]"),
+    MINUTE("minute", "mm", "[1-5][0-9]|0[0-9]"),
+    MINUTE_SHORT("minute", "m", "[1-5][0-9]|[0-9]"),
+    SECOND("second", "ss", "[1-5][0-9]|0[0-9]"),
+    SECOND_SHORT("second", "s", "[1-5][0-9]|[0-9]"),
     FACTION_OF_SECOND("fractionOfSecond", List.of("SSS", "SS", "S"), "[0-9]{1,9}"),
     NANOS("nanos", "n+", "[0-9]+"),
     NANOS_OF_DAY("nanosOfDay", "N+", "[0-9]+"),
@@ -116,7 +105,8 @@ public class DateTimeScrubber extends RegexScrubber {
     ZONE_OFFSET_LOCALIZED("zoneOffset", "OOOO", "GMT([+-](1[1-3]|0[1-9])(:[0-5][0-9])?)?"),
     ZONE_OFFSET_LOCALIZED_SHORT("zoneOffset", "O", "GMT([+-](1[1-3]|[1-9])(:[0-5][0-9])?)?"),
     TEXT("'([^']+)'", "\\\\Q$1\\\\E"),
-    OPTIONAL("\\[([^\\]]+)\\]", "$1"),
+    OPTIONAL_START("(?<!\\\\)\\[", "("),
+    OPTIONAL_END("(?<!\\\\)\\]", ")?"),
     ESCAPE("([#$%^&*().])", "\\\\$1"),
     OTHER("(.)", "$1");
 
