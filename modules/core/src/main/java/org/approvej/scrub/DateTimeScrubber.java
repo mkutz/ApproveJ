@@ -27,7 +27,7 @@ public class DateTimeScrubber extends RegexScrubber {
    *
    * @param dateTimePattern a date/time pattern as used by {@link
    *     java.time.format.DateTimeFormatter}
-   * @param locale the {@link Locale} for the date/time pattern (influences names of moths or
+   * @param locale the {@link Locale} for the date/time pattern (influences names of months or
    *     weekdays for example)
    * @param replacement a {@link Function} that receives the finding index and returns the
    *     replacement string
