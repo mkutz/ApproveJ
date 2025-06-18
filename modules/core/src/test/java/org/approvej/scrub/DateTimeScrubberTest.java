@@ -115,7 +115,7 @@ class DateTimeScrubberTest {
                 .apply(
                     "isoLocalDate: %s"
                         .formatted(DateTimeFormatter.ISO_LOCAL_DATE.format(ZonedDateTime.now()))))
-        .isEqualTo("isoLocalDate: [datetime 1]");
+        .isEqualTo("isoLocalDate: [isoLocalDate 1]");
   }
 
   @Test
@@ -125,7 +125,7 @@ class DateTimeScrubberTest {
                 .apply(
                     "isoOffsetDate: %s"
                         .formatted(DateTimeFormatter.ISO_OFFSET_DATE.format(ZonedDateTime.now()))))
-        .isEqualTo("isoOffsetDate: [datetime 1]");
+        .isEqualTo("isoOffsetDate: [isoOffsetDate 1]");
   }
 
   @Test
@@ -135,7 +135,7 @@ class DateTimeScrubberTest {
                 .apply(
                     "isoDate: %s"
                         .formatted(DateTimeFormatter.ISO_DATE.format(ZonedDateTime.now()))))
-        .isEqualTo("isoDate: [datetime 1]");
+        .isEqualTo("isoDate: [isoDate 1]");
   }
 
   @Test
@@ -145,7 +145,7 @@ class DateTimeScrubberTest {
                 .apply(
                     "isoLocalTime: %s"
                         .formatted(DateTimeFormatter.ISO_LOCAL_TIME.format(ZonedDateTime.now()))))
-        .isEqualTo("isoLocalTime: [datetime 1]");
+        .isEqualTo("isoLocalTime: [isoLocalTime 1]");
   }
 
   @Test
@@ -155,7 +155,7 @@ class DateTimeScrubberTest {
                 .apply(
                     "isoOffsetTime: %s"
                         .formatted(DateTimeFormatter.ISO_OFFSET_TIME.format(ZonedDateTime.now()))))
-        .isEqualTo("isoOffsetTime: [datetime 1]");
+        .isEqualTo("isoOffsetTime: [isoOffsetTime 1]");
   }
 
   @Test
@@ -165,7 +165,7 @@ class DateTimeScrubberTest {
                 .apply(
                     "isoTime: %s"
                         .formatted(DateTimeFormatter.ISO_TIME.format(ZonedDateTime.now()))))
-        .isEqualTo("isoTime: [datetime 1]");
+        .isEqualTo("isoTime: [isoTime 1]");
   }
 
   @Test
@@ -176,7 +176,7 @@ class DateTimeScrubberTest {
                     "isoLocalDateTime: %s"
                         .formatted(
                             DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(ZonedDateTime.now()))))
-        .isEqualTo("isoLocalDateTime: [datetime 1]");
+        .isEqualTo("isoLocalDateTime: [isoLocalDateTime 1]");
   }
 
   @Test
@@ -187,7 +187,7 @@ class DateTimeScrubberTest {
                     "isoOffsetDateTime: %s"
                         .formatted(
                             DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now()))))
-        .isEqualTo("isoOffsetDateTime: [datetime 1]");
+        .isEqualTo("isoOffsetDateTime: [isoOffsetDateTime 1]");
   }
 
   @Test
@@ -197,7 +197,7 @@ class DateTimeScrubberTest {
             isoZonedDateTimes.apply(
                 "isoZonedDateTime: %s"
                     .formatted(DateTimeFormatter.ISO_ZONED_DATE_TIME.format(ZonedDateTime.now()))))
-        .isEqualTo("isoZonedDateTime: [datetime 1]");
+        .isEqualTo("isoZonedDateTime: [isoZonedDateTime 1]");
   }
 
   @Test
@@ -207,7 +207,7 @@ class DateTimeScrubberTest {
                 .apply(
                     "isoDateTime: %s"
                         .formatted(DateTimeFormatter.ISO_DATE_TIME.format(ZonedDateTime.now()))))
-        .isEqualTo("isoDateTime: [datetime 1]");
+        .isEqualTo("isoDateTime: [isoDateTime 1]");
   }
 
   @Test
@@ -217,7 +217,7 @@ class DateTimeScrubberTest {
                 .apply(
                     "isoOrdinalDate: %s"
                         .formatted(DateTimeFormatter.ISO_ORDINAL_DATE.format(ZonedDateTime.now()))))
-        .isEqualTo("isoOrdinalDate: [datetime 1]");
+        .isEqualTo("isoOrdinalDate: [isoOrdinalDate 1]");
   }
 
   @Test
@@ -227,7 +227,7 @@ class DateTimeScrubberTest {
                 .apply(
                     "isoWeekDate: %s"
                         .formatted(DateTimeFormatter.ISO_WEEK_DATE.format(ZonedDateTime.now()))))
-        .isEqualTo("isoWeekDate: [datetime 1]");
+        .isEqualTo("isoWeekDate: [isoWeekDate 1]");
   }
 
   @Test
@@ -237,7 +237,7 @@ class DateTimeScrubberTest {
                 .apply(
                     "isoInstant: %s"
                         .formatted(DateTimeFormatter.ISO_INSTANT.format(ZonedDateTime.now()))))
-        .isEqualTo("isoInstant: [datetime 1]");
+        .isEqualTo("isoInstant: [isoInstant 1]");
   }
 
   @Test
@@ -247,7 +247,7 @@ class DateTimeScrubberTest {
                 .apply(
                     "basicIsoDate: %s"
                         .formatted(DateTimeFormatter.BASIC_ISO_DATE.format(ZonedDateTime.now()))))
-        .isEqualTo("basicIsoDate: [datetime 1]");
+        .isEqualTo("basicIsoDate: [basicIsoDate 1]");
   }
 
   @Test
@@ -258,6 +258,6 @@ class DateTimeScrubberTest {
                     "rfc1123DateTime: %s"
                         .formatted(
                             DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.now()))))
-        .isEqualTo("rfc1123DateTime: [datetime 1]");
+        .isEqualTo("rfc1123DateTime: [rfc1123DateTime 1]");
   }
 }
