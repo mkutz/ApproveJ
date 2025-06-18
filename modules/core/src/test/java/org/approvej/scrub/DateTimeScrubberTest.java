@@ -3,6 +3,7 @@ package org.approvej.scrub;
 import static java.time.ZoneOffset.UTC;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -257,7 +258,8 @@ class DateTimeScrubberTest {
                 .apply(
                     "rfc1123DateTime: %s"
                         .formatted(
-                            DateTimeFormatter.RFC_1123_DATE_TIME.format(ZonedDateTime.now()))))
+                            DateTimeFormatter.RFC_1123_DATE_TIME.format(
+                                ZonedDateTime.now().withZoneSameInstant(ZoneId.of("GMT"))))))
         .isEqualTo("rfc1123DateTime: [rfc1123DateTime 1]");
   }
 }
