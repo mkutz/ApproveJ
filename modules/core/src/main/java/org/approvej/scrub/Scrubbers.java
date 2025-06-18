@@ -271,7 +271,9 @@ public class Scrubbers {
   }
 
   /**
-   * Creates a {@link Scrubber} to replace date strings of the given pattern.
+   * Creates a {@link Scrubber} to replace date strings of the given pattern with relative
+   * descriptions, like {@code [today]}, {@code [yesterday]}, {@code [2 days from now]} , {@code [21
+   * days ago]}.
    *
    * @param dateFormatPattern a {@link DateTimeFormatter} to parse the dates
    * @return a new {@link RelativeDateScrubber} with the given {@link DateTimeFormatter}.

@@ -9,8 +9,8 @@ import org.jspecify.annotations.NullMarked;
 
 /**
  * Scrubs a {@link String} by replacing all occurrences of a date pattern with relative
- * descriptions, like <code>[today]</code>, <code>[yesterday]</code>, <code>[2 days from now]</code>
- * , <code>[21 days ago]</code> .
+ * descriptions, like {@code [today]}, {@code [yesterday]}, {@code [2 days from now]} , {@code [21
+ * days ago]}.
  */
 @NullMarked
 public class RelativeDateScrubber implements Scrubber<String> {
