@@ -45,6 +45,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: modules-test-reports
+          path: modules/**/build/reports/tests/test/
+
       - name: Enable auto merge for Dependabot PRs
         run: |
           gh pr review --approve "${{ github.event.pull_request.html_url }}"
