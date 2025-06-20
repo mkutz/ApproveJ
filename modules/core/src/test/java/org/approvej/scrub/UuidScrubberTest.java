@@ -31,7 +31,7 @@ class UuidScrubberTest {
 
   @Test
   void apply_custom_replacement() {
-    assertThat(uuids().replacement("<id%d>"::formatted).apply(EXAMPLE))
+    assertThat(uuids().replacement((match, count) -> "<id%d>".formatted(count)).apply(EXAMPLE))
         .isEqualTo(
             """
             {

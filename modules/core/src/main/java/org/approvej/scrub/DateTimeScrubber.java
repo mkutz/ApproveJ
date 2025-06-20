@@ -29,11 +29,10 @@ public class DateTimeScrubber extends RegexScrubber {
    *     java.time.format.DateTimeFormatter}
    * @param locale the {@link Locale} for the date/time pattern (influences names of months or
    *     weekdays for example)
-   * @param replacement a {@link Function} that receives the finding index and returns the
-   *     replacement string
+   * @param replacement the {@link Replacement} function
    * @see java.time.format.DateTimeFormatter
    */
-  DateTimeScrubber(String dateTimePattern, Locale locale, Function<Integer, Object> replacement) {
+  DateTimeScrubber(String dateTimePattern, Locale locale, Replacement replacement) {
     super(Pattern.compile(regexFor(dateTimePattern, locale)), replacement);
   }
 

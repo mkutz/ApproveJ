@@ -33,7 +33,8 @@ class RegexScrubberTest {
 
   @Test
   void apply_custom_replacement() {
-    RegexScrubber scrubber = stringsMatching("[aeiou]").replacement("<vowel%d>"::formatted);
+    RegexScrubber scrubber =
+        stringsMatching("[aeiou]").replacement((match, count) -> "<vowel%d>".formatted(count));
 
     assertThat(scrubber.apply("Hello World!")).isEqualTo("H<vowel1>ll<vowel2> W<vowel2>rld!");
   }

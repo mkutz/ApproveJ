@@ -18,17 +18,16 @@ import org.jspecify.annotations.NullMarked;
 public class RegexScrubber implements Scrubber<String> {
 
   private final Pattern pattern;
-  private Function<Integer, Object> replacement;
+  private Replacement replacement;
 
   /**
    * Creates a {@link RegexScrubber} with the given pattern and replacement {@link Function}.
    *
    * @param pattern the pattern matching the string to be scrubbed as {@link String}
-   * @param replacement a function that receives the finding index and returns the replacement
-   *     string
+   * @param replacement a {@link Replacement} function
    * @see Pattern#compile(String)
    */
-  RegexScrubber(Pattern pattern, Function<Integer, Object> replacement) {
+  RegexScrubber(Pattern pattern, Replacement replacement) {
     this.pattern = pattern;
     this.replacement = replacement;
   }
@@ -41,19 +40,18 @@ public class RegexScrubber implements Scrubber<String> {
         result -> {
           String group = result.group();
           findings.putIfAbsent(group, findings.size() + 1);
-          return replacement.apply(findings.get(group)).toString();
+          return replacement.apply(group, findings.get(group));
         };
     return matcher.replaceAll(replacer);
   }
 
   /**
-   * Set the replacement {@link Function} to be used.
+   * Set the {@link Replacement} to be used.
    *
-   * @param replacement a {@link Function} that receives the finding index and returns the
-   *     replacement string
+   * @param replacement a {@link Replacement} function
    * @return this
    */
-  public RegexScrubber replacement(Function<Integer, Object> replacement) {
+  public RegexScrubber replacement(Replacement replacement) {
     this.replacement = replacement;
     return this;
   }
