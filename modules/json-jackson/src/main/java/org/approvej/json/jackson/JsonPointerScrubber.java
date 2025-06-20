@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import java.util.function.Function;
+import org.approvej.scrub.Replacement;
 import org.approvej.scrub.Scrubber;
 import org.jspecify.annotations.NullMarked;
 
@@ -15,7 +16,7 @@ import org.jspecify.annotations.NullMarked;
 public class JsonPointerScrubber implements Scrubber<JsonNode> {
 
   private final JsonPointer jsonPointer;
-  private Function<Integer, Object> replacement;
+  private Replacement replacement;
 
   /**
    * Create a {@link JsonPointerScrubber} to replace the JSON node at the given {@link JsonPointer}
@@ -29,7 +30,7 @@ public class JsonPointerScrubber implements Scrubber<JsonNode> {
     return new JsonPointerScrubber(JsonPointer.compile(jsonPointerString), string("[scrubbed]"));
   }
 
-  private JsonPointerScrubber(JsonPointer jsonPointer, Function<Integer, Object> replacement) {
+  private JsonPointerScrubber(JsonPointer jsonPointer, Replacement replacement) {
     this.jsonPointer = jsonPointer;
     this.replacement = replacement;
   }
@@ -43,7 +44,9 @@ public class JsonPointerScrubber implements Scrubber<JsonNode> {
     if (!parentNode.at(jsonPointer.last()).isMissingNode()) {
       parentNode.replace(
           jsonPointer.last().getMatchingProperty(),
-          TextNode.valueOf(replacement.apply(jsonPointer.getMatchingIndex()).toString()));
+          TextNode.valueOf(
+              replacement.apply(
+                  jsonPointer.getMatchingProperty(), jsonPointer.getMatchingIndex())));
     }
 
     return scrubbedJsonNode;
@@ -53,12 +56,11 @@ public class JsonPointerScrubber implements Scrubber<JsonNode> {
    * Create a {@link Scrubber} to replace any match of the {@link #jsonPointer} with the result of
    * the given replacement {@link Function}.
    *
-   * @param replacement a function that receives the finding index and returns the replacement
-   *     string
+   * @param replacement the {@link Replacement} function
    * @return a {@link JsonPointerScrubber} to replace any match of the {@link #jsonPointer} with the
    *     result of the given replacement {@link Function}.
    */
-  public JsonPointerScrubber replacement(Function<Integer, Object> replacement) {
+  public JsonPointerScrubber replacement(Replacement replacement) {
     this.replacement = replacement;
     return this;
   }
@@ -72,7 +74,7 @@ public class JsonPointerScrubber implements Scrubber<JsonNode> {
    *     the given staticReplacement.
    */
   public JsonPointerScrubber replacement(String staticReplacement) {
-    this.replacement = number -> staticReplacement;
+    this.replacement = (match, number) -> staticReplacement;
     return this;
   }
 }
