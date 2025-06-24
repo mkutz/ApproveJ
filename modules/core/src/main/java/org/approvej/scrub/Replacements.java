@@ -1,5 +1,6 @@
 package org.approvej.scrub;
 
+import java.time.format.DateTimeFormatter;
 import java.util.function.Function;
 import org.jspecify.annotations.NullMarked;
 
@@ -39,6 +40,10 @@ public class Replacements {
    * @return a replacement function that always returns the same string
    */
   public static Replacement string(String replacement) {
-    return (match, number) -> replacement;
+    return (match, count) -> replacement;
+  }
+
+  public static Replacement relativeDate(String pattern) {
+    return new RelativeDateReplacement(DateTimeFormatter.ofPattern(pattern));
   }
 }

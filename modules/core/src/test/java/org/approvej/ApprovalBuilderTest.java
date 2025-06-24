@@ -3,7 +3,6 @@ package org.approvej;
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.writeString;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.approve.Approvers.value;
 import static org.approvej.approve.PathProviderBuilder.approvedPath;
@@ -127,7 +126,7 @@ class ApprovalBuilderTest {
         """;
 
     approve(received)
-        .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
+        .scrubbedOf(relativeDates("yyyy-MM-dd"))
         .scrubbedOf(uuids())
         .byValue(previouslyApprovedScrubbed);
   }

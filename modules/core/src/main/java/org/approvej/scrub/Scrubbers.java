@@ -1,6 +1,7 @@
 package org.approvej.scrub;
 
 import static org.approvej.scrub.Replacements.numbered;
+import static org.approvej.scrub.Replacements.relativeDate;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -279,8 +280,14 @@ public class Scrubbers {
    *
    * @param dateFormatPattern a {@link DateTimeFormatter} to parse the dates
    * @return a new {@link RelativeDateScrubber} with the given {@link DateTimeFormatter}.
+   * @deprecated use {@link #dateTimeFormat(String)} with {@link RelativeDateReplacement}
    */
+  @Deprecated(forRemoval = true, since = "0.9.4")
   public static RelativeDateScrubber relativeDates(DateTimeFormatter dateFormatPattern) {
     return new RelativeDateScrubber(dateFormatPattern);
+  }
+
+  public static RegexScrubber relativeDates(String pattern) {
+    return dateTimeFormat(pattern).replacement(relativeDate(pattern));
   }
 }
