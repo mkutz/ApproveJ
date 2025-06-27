@@ -1,0 +1,7 @@
+GET /something
+Connection: Upgrade, HTTP2-Settings
+Host: {{Host}}
+Http2-settings: AAEAAEAAAAIAAAAAAAMAAAAAAAQBAAAAAAUAAEAAAAYABgAA
+Upgrade: h2c
+User-agent: Java-http-client/21.0.7
+X-my-header: some header value

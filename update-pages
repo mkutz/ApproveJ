@@ -20,3 +20,5 @@ mv modules/json-jackson/build/docs/javadoc pages/javadoc/json-jackson
 mv modules/json-jackson3/build/docs/javadoc pages/javadoc/json-jackson3
 mv modules/yaml-jackson/build/docs/javadoc pages/javadoc/yaml-jackson
 mv modules/yaml-jackson3/build/docs/javadoc pages/javadoc/yaml-jackson3
+mv modules/http/build/docs/javadoc pages/javadoc/http
+mv modules/http-wiremock/build/docs/javadoc pages/javadoc/http-wiremock

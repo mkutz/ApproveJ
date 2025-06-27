@@ -1,0 +1,38 @@
+= HTTP Server
+
+The `http` module contains various capabilities to approval test the HTTP interactions of your software component.
+
+
+.Gradle
+[source,groovy,subs=attributes+,role="primary"]
+----
+implementation 'org.approvej:http:{revnumber}'
+----
+.Gradle.kts
+[source,kotlin,subs=attributes+,role="secondary"]
+----
+implementation("org.approvej:http:{revnumber}")
+----
+.Maven
+[source,xml,subs=attributes+,role="secondary"]
+----
+<project>
+  <!-- … -->
+  <dependencies>
+    <dependency>
+      <groupId>org.approvej</groupId>
+      <artifactId>http</artifactId>
+      <version>{revnumber}</version>
+    </dependency>
+  </dependencies>
+  <!-- … -->
+</project>
+----
+
+
+== Receive Requests via `HttpServerStub`
+
+The link:{javadoc-url}/http/org/approvej/http/HttpServerStub.html[`HttpServerStub`] is a simple HTTP server base upon the JVM's own link:https://docs.oracle.com/en/java/javase/21/docs/api//jdk.httpserver/com/sun/net/httpserver/package-summary.html[HttpServer].
+
+Once initialized you can configure your software component to use its address instead of another service it depends on.
+The server automatically stores all
