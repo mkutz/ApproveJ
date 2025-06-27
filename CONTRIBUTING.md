@@ -116,6 +116,7 @@ It is structured in four main modules:
   - [core](modules/core) contains the code for the core framework and should not have any dependencies to other modules and only very few (if any) to external libraries,
   - [json-jackson](modules/json-jackson) contains JSON-related code using Jackson,
   - [yaml-jackson](modules/yaml-jackson) contains YAML-related code using Jackson
+  - [http](modules/http) contains code to create an HTTP server for approving requests
 - the [bom](bom) directory contains the build file to generate a [Maven Bill of Material (BOM)](https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#bill-of-materials-bom-poms) for all the ApproveJ modules, and
 - the [manual](manual) directory contains the projects documentation written in [AsciiDoc](https://docs.asciidoctor.org/asciidoc/latest/).
 

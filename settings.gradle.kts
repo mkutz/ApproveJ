@@ -14,4 +14,6 @@ include("modules:yaml-jackson")
 
 include("modules:yaml-jackson3")
 
+include("modules:http")
+
 include("manual")
