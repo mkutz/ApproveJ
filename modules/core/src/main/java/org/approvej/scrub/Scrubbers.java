@@ -257,7 +257,7 @@ public class Scrubbers {
    * @see DateTimeFormatter#RFC_1123_DATE_TIME
    */
   public static RegexScrubber rfc1123DateTimes() {
-    return dateTimeFormat("EEE, dd MMM yyyy HH:mm:ss O", Locale.US)
+    return dateTimeFormat("EEE, d MMM yyyy HH:mm:ss O", Locale.US)
         .replacement(numbered("rfc1123DateTime"));
   }
 
