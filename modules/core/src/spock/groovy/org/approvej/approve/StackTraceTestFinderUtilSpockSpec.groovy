@@ -8,9 +8,9 @@ import static java.nio.file.Files.copy
 import static java.nio.file.Files.createDirectories
 import static java.nio.file.Files.delete
 
-class StackTraceTestFinderUtilSpec extends Specification {
+class StackTraceTestFinderUtilSpockSpec extends Specification {
 
-  private final Path thisTestSourcePath = Path.of("src/spock/groovy/org/approvej/approve/StackTraceTestFinderUtilSpec.groovy")
+  private final Path thisTestSourcePath = Path.of("src/spock/groovy/org/approvej/approve/StackTraceTestFinderUtilSpockSpec.groovy")
   private final List<Path> wrongTestSourcePathsToCleanup = []
 
   def 'currentTestMethod'() {
@@ -20,7 +20,7 @@ class StackTraceTestFinderUtilSpec extends Specification {
     then:
     verifyAll(currentTestMethod) {
       method()
-      testClass() == StackTraceTestFinderUtilSpec
+      testClass() == StackTraceTestFinderUtilSpockSpec
       testCaseName() == 'currentTestMethod'
     }
   }

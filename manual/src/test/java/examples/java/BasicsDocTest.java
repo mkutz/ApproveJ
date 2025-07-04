@@ -43,6 +43,15 @@ class BasicsDocTest {
   }
 
   @Test
+  void approve_name() {
+    // tag::approve_name[]
+    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+
+    approve(person).name("john").byFile();
+    // end::approve_name[]
+  }
+
+  @Test
   void object_printer() {
     // tag::object_printer[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
@@ -67,11 +76,11 @@ class BasicsDocTest {
   @Test
   void custom_printer() {
     // tag::custom_printer[]
-    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+    Person jane = createPerson("Jane Doe", LocalDate.of(1990, 1, 1));
+    Person john = createPerson("John Doe", LocalDate.of(2012, 6, 2));
 
-    approve(person)
-        .printWith(new PersonYamlPrinter()) // <1>
-        .byFile();
+    approve(jane).name("jane").byFile();
+    approve(john).name("john").byFile();
     // end::custom_printer[]
   }
 
