@@ -43,6 +43,17 @@ class BasicsDocTest {
   }
 
   @Test
+  void approve_named() {
+    // tag::approve_named[]
+    Person jane = createPerson("Jane Doe", LocalDate.of(1990, 1, 1));
+    Person john = createPerson("John Doe", LocalDate.of(2012, 6, 2));
+
+    approve(jane).named("jane").byFile();
+    approve(john).named("john").byFile();
+    // end::approve_named[]
+  }
+
+  @Test
   void object_printer() {
     // tag::object_printer[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));

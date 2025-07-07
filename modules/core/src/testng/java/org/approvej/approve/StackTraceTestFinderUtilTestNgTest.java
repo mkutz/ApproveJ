@@ -13,10 +13,10 @@ import java.util.List;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.Test;
 
-public class StackTraceTestFinderUtilTest {
+public class StackTraceTestFinderUtilTestNgTest {
 
   private final Path thisTestSourcePath =
-      Path.of("src/testng/java/org/approvej/approve/StackTraceTestFinderUtilTest.java");
+      Path.of("src/testng/java/org/approvej/approve/StackTraceTestFinderUtilTestNgTest.java");
   private final List<Path> wrongTestSourcePathsToCleanup = new ArrayList<>();
 
   @AfterTest

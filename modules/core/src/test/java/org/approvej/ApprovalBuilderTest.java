@@ -12,6 +12,7 @@ import static org.approvej.print.ObjectPrinter.objectPrinter;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.relativeDates;
 import static org.approvej.scrub.Scrubbers.uuids;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 import java.io.IOException;
@@ -89,6 +90,23 @@ class ApprovalBuilderTest {
   @Test
   void approve_string_byValue() {
     approve("Some text").byValue("Some text");
+  }
+
+  @Test
+  void approve_multiple_named() {
+    approve("Some text").named("first").byFile();
+    approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
+        .named("second")
+        .byFile();
+
+    assertThat(
+            Path.of(
+                "src/test/java/org/approvej/ApprovalBuilderTest-approve_multiple_named-first-approved.txt"))
+        .exists();
+    assertThat(
+            Path.of(
+                "src/test/java/org/approvej/ApprovalBuilderTest-approve_multiple_named-second-approved.txt"))
+        .exists();
   }
 
   @Test

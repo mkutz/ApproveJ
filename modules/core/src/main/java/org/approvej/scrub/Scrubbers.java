@@ -185,6 +185,8 @@ public class Scrubbers {
    * {@code 2019-02-25T12:34:56.123456789}, {@code 2019-02-25T12:34:56+02:00}, or {@code
    * 2019-02-25T12:34:56.123456789+02:00[Europe/Berlin]}.
    *
+   * @param locale the {@link Locale} to localize the date/time pattern (influences names for zones
+   *     codes)
    * @return a {@link DateTimeScrubber} for ISO-8601 date/times
    * @see DateTimeFormatter#ISO_DATE_TIME
    */

@@ -77,4 +77,30 @@ class NextToTestPathProviderTest {
                 .toAbsolutePath()
                 .normalize());
   }
+
+  @Test
+  void paths_filenameAffix() {
+    PathProvider pathProvider =
+        nextToTest().filenameAffix("additional info").filenameExtension("txt");
+    assertThat(pathProvider.approvedPath())
+        .isEqualTo(
+            Path.of(
+                    "./src/test/java/org/approvej/approve/"
+                        + "NextToTestPathProviderTest"
+                        + "-paths_filenameAffix"
+                        + "-additional info"
+                        + "-approved.txt")
+                .toAbsolutePath()
+                .normalize());
+    assertThat(pathProvider.receivedPath())
+        .isEqualTo(
+            Path.of(
+                    "./src/test/java/org/approvej/approve/"
+                        + "NextToTestPathProviderTest"
+                        + "-paths_filenameAffix"
+                        + "-additional info"
+                        + "-received.txt")
+                .toAbsolutePath()
+                .normalize());
+  }
 }
