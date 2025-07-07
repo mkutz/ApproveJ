@@ -1,20 +1,21 @@
 package examples.java;
 
 import static org.approvej.ApprovalBuilder.approve;
-import static org.approvej.http.HttpRequestPrinter.requestPrinter;
 import static org.approvej.http.HttpScrubbers.hostHeader;
+import static org.approvej.http.ReceivedHttpRequestPrinter.httpRequestPrinter;
 import static org.approvej.http.StubbedHttpResponse.response;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import examples.PriceComparator;
+import examples.PriceComparator.CheeeperVendor;
 import examples.PriceComparator.LookupResult;
-import examples.PriceComparator.Vendor;
+import examples.PriceComparator.PrycyVendor;
 import java.util.List;
 import org.approvej.http.HttpStubServer;
 import org.junit.jupiter.api.AutoClose;
 import org.junit.jupiter.api.Test;
 
-class HttpExamples {
+class HttpDocTest {
 
   // tag::initialize[]
   @AutoClose
@@ -29,22 +30,26 @@ class HttpExamples {
 
   @Test
   void approve_http_request() {
+    // tag::approve_http_request[]
     PriceComparator priceComparator =
         new PriceComparator(
-            new Vendor("Cheeeper", cheeeperStub.address()),
-            new Vendor("Prycy", prycyStub.address()));
+            new CheeeperVendor(cheeeperStub.address()),
+            new PrycyVendor(prycyStub.address(), "secret token"));
 
     List<LookupResult> lookupResults = priceComparator.lookupPrice("1234567890123");
 
     assertThat(lookupResults).hasSize(2);
 
     approve(cheeeperStub.lastReceivedRequest())
+        .named("cheeper")
         .scrubbedOf(hostHeader())
-        .printWith(requestPrinter())
+        .printWith(httpRequestPrinter())
         .byFile();
     approve(prycyStub.lastReceivedRequest())
+        .named("prycy")
         .scrubbedOf(hostHeader())
-        .printWith(requestPrinter())
+        .printWith(httpRequestPrinter())
         .byFile();
+    // end::approve_http_request[]
   }
 }

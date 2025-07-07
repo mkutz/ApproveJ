@@ -1,0 +1,10 @@
+POST /api/price-requests/
+Authorization: Bearer secret token
+Connection: Upgrade, HTTP2-Settings
+Content-length: 24
+Host: {{Host}}
+Http2-settings: AAEAAEAAAAIAAAAAAAMAAAAAAAQBAAAAAAUAAEAAAAYABgAA
+Upgrade: h2c
+User-agent: Java-http-client/21.0.7
+
+{"gtin":"1234567890123"}

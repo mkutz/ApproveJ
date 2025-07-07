@@ -42,11 +42,39 @@ public class PriceComparator {
         .collect(Collectors.toList());
   }
 
-  public record Vendor(String name, String apiUrl) {
+  public interface Vendor {
+    String name();
 
-    HttpRequest requestPriceForArticle(String gtin) {
+    HttpRequest requestPriceForArticle(String gtin);
+  }
+
+  public record CheeeperVendor(String apiUrl) implements Vendor {
+
+    @Override
+    public String name() {
+      return "Cheeeper";
+    }
+
+    @Override
+    public HttpRequest requestPriceForArticle(String gtin) {
       return newBuilder(URI.create(apiUrl).resolve("api/prices?id=%s".formatted(gtin)))
           .GET()
+          .build();
+    }
+  }
+
+  public record PrycyVendor(String apiUrl, String token) implements Vendor {
+
+    @Override
+    public String name() {
+      return "Prycy";
+    }
+
+    @Override
+    public HttpRequest requestPriceForArticle(String gtin) {
+      return newBuilder(URI.create(apiUrl).resolve("api/price-requests/"))
+          .POST(HttpRequest.BodyPublishers.ofString("{\"gtin\":\"%s\"}".formatted(gtin)))
+          .header("Authorization", "Bearer %s".formatted(token))
           .build();
     }
   }

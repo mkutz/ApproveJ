@@ -30,9 +30,49 @@ implementation("org.approvej:http:{revnumber}")
 ----
 
 
-== Receive Requests via `HttpServerStub`
+== Receive Requests via `HttpStubServer`
 
-The link:{javadoc-url}/http/org/approvej/http/HttpServerStub.html[`HttpServerStub`] is a simple HTTP server base upon the JVM's own link:https://docs.oracle.com/en/java/javase/21/docs/api//jdk.httpserver/com/sun/net/httpserver/package-summary.html[HttpServer].
+The link:{javadoc-url}/http/org/approvej/http/HttpStubServer.html[`HttpStubServer`] is a simple HTTP server base upon the JVM's own link:https://docs.oracle.com/en/java/javase/21/docs/api//jdk.httpserver/com/sun/net/httpserver/package-summary.html[HttpServer].
 
 Once initialized you can configure your software component to use its address instead of another service it depends on.
-The server automatically stores all
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/HttpDocTest.java[tag=initialize]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/HttpDocTest.kt[tag=initialize]
+----
+
+The server automatically stores all received requests as a list of link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequest.html[`ReceivedHttpRequest`].
+
+In the following test code, two requests are performed by the `PriceComparator`.
+Both can be retrieved from the stubs which were used instead of the actual services and approved after being printed by an link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequestPrinter.html[`ReceivedHttpRequestPrinter`].
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/HttpDocTest.java[tag=approve_http_request]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/HttpDocTest.kt[tag=approve_http_request]
+----
+
+The approved files will look like this
+
+[source,httprequest,indent=0]
+.Simple GET request for Cheepter
+----
+include::../../../test/java/examples/java/HttpDocTest-approve_http_request-cheeper-approved.http[]
+----
+
+[source,httprequest,indent=0]
+.POST request with Authorization header for Prycy
+----
+include::../../../test/java/examples/java/HttpDocTest-approve_http_request-prycy-approved.http[]
+----
