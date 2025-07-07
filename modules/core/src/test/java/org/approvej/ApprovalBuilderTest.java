@@ -95,7 +95,9 @@ class ApprovalBuilderTest {
   @Test
   void approve_multiple_named() {
     approve("Some text").named("first").byFile();
-    approve("Some other text").named("second").byFile();
+    approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
+        .named("second")
+        .byFile();
 
     assertThat(
             Path.of(
