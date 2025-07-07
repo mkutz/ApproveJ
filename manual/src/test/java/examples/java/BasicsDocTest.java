@@ -47,7 +47,7 @@ class BasicsDocTest {
     // tag::approve_name[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
-    approve(person).name("john").byFile();
+    approve(person).named("john").byFile();
     // end::approve_name[]
   }
 
@@ -79,8 +79,8 @@ class BasicsDocTest {
     Person jane = createPerson("Jane Doe", LocalDate.of(1990, 1, 1));
     Person john = createPerson("John Doe", LocalDate.of(2012, 6, 2));
 
-    approve(jane).name("jane").byFile();
-    approve(john).name("john").byFile();
+    approve(jane).named("jane").byFile();
+    approve(john).named("john").byFile();
     // end::custom_printer[]
   }
 

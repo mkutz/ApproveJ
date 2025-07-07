@@ -60,7 +60,7 @@ import org.jspecify.annotations.Nullable;
 public class ApprovalBuilder<T> {
 
   private T receivedValue;
-  private String name = "";
+  private String name;
   private final String filenameExtension;
   @Nullable private FileReviewer fileReviewer;
 
@@ -83,12 +83,14 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Sets a name for the current approval. Generally this should
+   * Sets a name for the current approval. Generally this should be used when there are multiple
+   * values in one test case are being approved {@link #byFile()} as the second approval would
+   * otherwise simply overwrite the first one.
    *
    * @param name the name for the current approval
    * @return this
    */
-  public ApprovalBuilder<T> name(String name) {
+  public ApprovalBuilder<T> named(String name) {
     this.name = name;
     return this;
   }

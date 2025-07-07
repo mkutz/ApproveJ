@@ -45,8 +45,8 @@ class BasicsDocTest {
     val jane = createPerson("Jane Doe", LocalDate.of(1990, 1, 1))
     val john = createPerson("John Doe", LocalDate.of(2012, 6, 2))
 
-    approve(jane).name("jane").byFile()
-    approve(john).name("john").byFile()
+    approve(jane).named("jane").byFile()
+    approve(john).named("john").byFile()
     // end::approve_name[]
   }
 
