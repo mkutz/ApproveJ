@@ -40,14 +40,14 @@ class BasicsDocTest {
   }
 
   @Test
-  fun approve_name() {
-    // tag::approve_name[]
+  fun approve_named() {
+    // tag::approve_named[]
     val jane = createPerson("Jane Doe", LocalDate.of(1990, 1, 1))
     val john = createPerson("John Doe", LocalDate.of(2012, 6, 2))
 
     approve(jane).named("jane").byFile()
     approve(john).named("john").byFile()
-    // end::approve_name[]
+    // end::approve_named[]
   }
 
   @Test

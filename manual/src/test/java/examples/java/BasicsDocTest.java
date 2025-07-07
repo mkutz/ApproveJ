@@ -43,12 +43,14 @@ class BasicsDocTest {
   }
 
   @Test
-  void approve_name() {
-    // tag::approve_name[]
-    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+  void approve_named() {
+    // tag::approve_named[]
+    Person jane = createPerson("Jane Doe", LocalDate.of(1990, 1, 1));
+    Person john = createPerson("John Doe", LocalDate.of(2012, 6, 2));
 
-    approve(person).named("john").byFile();
-    // end::approve_name[]
+    approve(jane).named("jane").byFile();
+    approve(john).named("john").byFile();
+    // end::approve_named[]
   }
 
   @Test
@@ -76,11 +78,11 @@ class BasicsDocTest {
   @Test
   void custom_printer() {
     // tag::custom_printer[]
-    Person jane = createPerson("Jane Doe", LocalDate.of(1990, 1, 1));
-    Person john = createPerson("John Doe", LocalDate.of(2012, 6, 2));
+    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
-    approve(jane).named("jane").byFile();
-    approve(john).named("john").byFile();
+    approve(person)
+        .printWith(new PersonYamlPrinter()) // <1>
+        .byFile();
     // end::custom_printer[]
   }
 

@@ -81,22 +81,22 @@ include::../../../test/java/examples/java/BasicsDocTest-approve_pojos-approved.t
 See <<printing>> if need a more sophisticated way of printing.
 
 
-[id=naming]
-== Naming Approvals
+[id=named]
+== Named Approvals -- approve multiple values per test case
 
 Optionally, you can assign a specific name for an approval.
-When you <<_approve_by_file>> the chosen name will be added to the filename to help identify the specific approval.
+When you <<approve_by_file>> the chosen name will be added to the filename to help identify the specific approval.
 It is also necessary to assign a name if there are multiple approvals per test case, as otherwise later approvals will overwrite earlier ones.
 
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_name]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_named]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_name]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_named]
 ----
 
 This test generates two sets of files
@@ -282,6 +282,7 @@ All built-in `Scrubber` implementations are available via the link:{javadoc-url}
 You conclude the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`] by specifying `by` which link:{javadoc-url}/core/org/approvej/approve/Approver.html[`Approver`] the received value should be approved.
 
 
+[id=approve_by_value]
 === Approve by Value
 
 The link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byValue(java.lang.String)[`ApprovalBuilder.byValue()`] method will use an link:{javadoc-url}/core/org/approvej/approve/InplaceApprover.html[`InplaceApprover`] to approve the received value by comparison with a directly provided previously approved value.
@@ -301,6 +302,7 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_inpla
 ----
 
 
+[id=approve_by_file]
 === Approve by File
 
 The link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byFile()[`ApprovalBuilder.byFile()`] method will use a link:{javadoc-url}/core/org/approvej/approve/FileApprover.html[`FileApprover`] to approve the received value by comparison a previously approved value stored in a file.
