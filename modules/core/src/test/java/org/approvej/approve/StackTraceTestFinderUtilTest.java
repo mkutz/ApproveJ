@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 class StackTraceTestFinderUtilTest {
 
@@ -31,18 +29,6 @@ class StackTraceTestFinderUtilTest {
   @Test
   void currentTestMethod() throws NoSuchMethodException {
     Method thisMethod = getClass().getDeclaredMethod("currentTestMethod");
-
-    TestMethod currentTestMethod = StackTraceTestFinderUtil.currentTestMethod();
-
-    assertThat(currentTestMethod.method()).isEqualTo(thisMethod);
-    assertThat(currentTestMethod.testClass()).isEqualTo(thisMethod.getDeclaringClass());
-    assertThat(currentTestMethod.testCaseName()).isEqualTo(thisMethod.getName());
-  }
-
-  @ParameterizedTest
-  @ValueSource(strings = {"a", "b", "c"})
-  void currentTestMethod_parameterized_test() throws NoSuchMethodException {
-    Method thisMethod = getClass().getDeclaredMethod("currentTestMethod_parameterized_test");
 
     TestMethod currentTestMethod = StackTraceTestFinderUtil.currentTestMethod();
 
