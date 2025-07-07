@@ -9,9 +9,9 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import org.junit.jupiter.api.Test;
 
-class HttpRequestPrinterTest {
+class ReceivedHttpRequestPrinterTest {
 
-  HttpRequestPrinter printer = new HttpRequestPrinter();
+  ReceivedHttpRequestPrinter printer = new ReceivedHttpRequestPrinter();
 
   @Test
   public void apply_get() throws IOException, InterruptedException {
