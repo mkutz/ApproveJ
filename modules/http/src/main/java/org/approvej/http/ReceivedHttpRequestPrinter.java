@@ -26,24 +26,24 @@ import org.jspecify.annotations.NullMarked;
  * </pre>
  */
 @NullMarked
-public class HttpRequestPrinter implements Printer<ReceivedHttpRequest> {
+public class ReceivedHttpRequestPrinter implements Printer<ReceivedHttpRequest> {
 
   /**
-   * Creates a and returns new {@link HttpRequestPrinter} instance.
+   * Creates a and returns new {@link ReceivedHttpRequestPrinter} instance.
    *
    * @return the new instance
    */
-  public static HttpRequestPrinter requestPrinter() {
-    return new HttpRequestPrinter();
+  public static ReceivedHttpRequestPrinter httpRequestPrinter() {
+    return new ReceivedHttpRequestPrinter();
   }
 
   /**
-   * Creates a new {@link HttpRequestPrinter} instance.
+   * Creates a new {@link ReceivedHttpRequestPrinter} instance.
    *
    * <p>This constructor is public to allow instantiation via reflection, e.g. in the {@link
    * org.approvej.Configuration} class.
    */
-  public HttpRequestPrinter() {}
+  public ReceivedHttpRequestPrinter() {}
 
   @Override
   public String apply(ReceivedHttpRequest request) {
