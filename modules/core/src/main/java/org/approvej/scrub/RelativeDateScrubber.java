@@ -3,6 +3,7 @@ package org.approvej.scrub;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.NullMarked;
 
@@ -17,7 +18,7 @@ public class RelativeDateScrubber implements Scrubber<String> {
   private static final LocalDate EXAMPLE_DATE = LocalDate.of(4567, 12, 30);
 
   private final Pattern pattern;
-  private final RelativeDateReplacement replacement;
+  private final UnaryOperator<String> replacement;
 
   RelativeDateScrubber(DateTimeFormatter dateFormatPattern) {
     pattern =

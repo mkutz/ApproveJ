@@ -43,7 +43,27 @@ public class Replacements {
     return (match, count) -> replacement;
   }
 
-  public static Replacement relativeDate(String pattern) {
-    return new RelativeDateReplacement(DateTimeFormatter.ofPattern(pattern));
+  /**
+   * Replaces each match of the given dateTimePattern (as defined by {@link DateTimeFormatter}) with
+   * a relative description, like {@code [today]}, {@code [yesterday]}, {@code [13 days from now]}.
+   *
+   * @param dateTimeFormatter the {@link DateTimeFormatter} to parse the date/time strings
+   * @return a replacement function that returns a relative description for dates of the given
+   *     dateTimePattern
+   */
+  public static Replacement relativeDate(DateTimeFormatter dateTimeFormatter) {
+    return new RelativeDateReplacement(dateTimeFormatter);
+  }
+
+  /**
+   * Replaces each match of the given dateTimePattern (as defined by {@link DateTimeFormatter}) with
+   * a relative description, like {@code [today]}, {@code [yesterday]}, {@code [13 days from now]}.
+   *
+   * @param dateTimePattern a pattern as defined by {@link DateTimeFormatter}
+   * @return a replacement function that returns a relative description for dates of the given
+   *     dateTimePattern
+   */
+  public static Replacement relativeDate(String dateTimePattern) {
+    return relativeDate(DateTimeFormatter.ofPattern(dateTimePattern));
   }
 }

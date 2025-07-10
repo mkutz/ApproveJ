@@ -1,7 +1,6 @@
 package org.approvej.scrub;
 
 import static org.approvej.scrub.Replacements.numbered;
-import static org.approvej.scrub.Replacements.relativeDate;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -48,7 +47,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for the given date/time pattern
    * @see DateTimeFormatter
    */
-  public static RegexScrubber dateTimeFormat(String dateTimePattern, Locale locale) {
+  public static DateTimeScrubber dateTimeFormat(String dateTimePattern, Locale locale) {
     return new DateTimeScrubber(dateTimePattern, locale, numbered("datetime"));
   }
 
@@ -61,7 +60,7 @@ public class Scrubbers {
    * @see DateTimeFormatter
    * @see Locale#getDefault()
    */
-  public static RegexScrubber dateTimeFormat(String dateTimePattern) {
+  public static DateTimeScrubber dateTimeFormat(String dateTimePattern) {
     return dateTimeFormat(dateTimePattern, Locale.getDefault());
   }
 
@@ -71,7 +70,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for ISO-8601 local dates
    * @see DateTimeFormatter#ISO_LOCAL_DATE
    */
-  public static RegexScrubber isoLocalDates() {
+  public static DateTimeScrubber isoLocalDates() {
     return dateTimeFormat("yyyy-MM-dd").replacement(numbered("isoLocalDate"));
   }
 
@@ -81,7 +80,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for ISO-8601 offset dates
    * @see DateTimeFormatter#ISO_OFFSET_DATE
    */
-  public static RegexScrubber isoOffsetDates() {
+  public static DateTimeScrubber isoOffsetDates() {
     return dateTimeFormat("yyyy-MM-ddXXX").replacement(numbered("isoOffsetDate"));
   }
 
@@ -92,7 +91,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for ISO-8601 dates
    * @see DateTimeFormatter#ISO_DATE
    */
-  public static RegexScrubber isoDates() {
+  public static DateTimeScrubber isoDates() {
     return dateTimeFormat("yyyy-MM-dd[XXX]").replacement(numbered("isoDate"));
   }
 
@@ -103,7 +102,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for ISO-8601 local times
    * @see DateTimeFormatter#ISO_LOCAL_TIME
    */
-  public static RegexScrubber isoLocalTimes() {
+  public static DateTimeScrubber isoLocalTimes() {
     return dateTimeFormat("HH:mm:ss[.S]").replacement(numbered("isoLocalTime"));
   }
 
@@ -114,7 +113,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for ISO-8601 offset times
    * @see DateTimeFormatter#ISO_OFFSET_TIME
    */
-  public static RegexScrubber isoOffsetTimes() {
+  public static DateTimeScrubber isoOffsetTimes() {
     return dateTimeFormat("HH:mm:ss[.S]XXX").replacement(numbered("isoOffsetTime"));
   }
 
@@ -125,7 +124,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for ISO-8601 times
    * @see DateTimeFormatter#ISO_TIME
    */
-  public static RegexScrubber isoTimes() {
+  public static DateTimeScrubber isoTimes() {
     return dateTimeFormat("HH:mm:ss[.S][XXX]").replacement(numbered("isoTime"));
   }
 
@@ -136,7 +135,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for ISO-8601 local date/times
    * @see DateTimeFormatter#ISO_LOCAL_DATE_TIME
    */
-  public static RegexScrubber isoLocalDateTimes() {
+  public static DateTimeScrubber isoLocalDateTimes() {
     return dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss[.S]").replacement(numbered("isoLocalDateTime"));
   }
 
@@ -147,7 +146,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for ISO-8601 offset date/times
    * @see DateTimeFormatter#ISO_OFFSET_DATE_TIME
    */
-  public static RegexScrubber isoOffsetDateTimes() {
+  public static DateTimeScrubber isoOffsetDateTimes() {
     return dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss[.S]XXX")
         .replacement(numbered("isoOffsetDateTime"));
   }
@@ -163,7 +162,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for ISO-8601 zoned date/times
    * @see DateTimeFormatter#ISO_ZONED_DATE_TIME
    */
-  public static RegexScrubber isoZonedDateTimes(Locale locale) {
+  public static DateTimeScrubber isoZonedDateTimes(Locale locale) {
     return dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss[.S]XXX'['VV']'", locale)
         .replacement(numbered("isoZonedDateTime"));
   }
@@ -177,7 +176,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for ISO-8601 zoned date/times
    * @see #isoZonedDateTimes(Locale)
    */
-  public static RegexScrubber isoZonedDateTimes() {
+  public static DateTimeScrubber isoZonedDateTimes() {
     return isoZonedDateTimes(Locale.getDefault());
   }
 
@@ -191,7 +190,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for ISO-8601 date/times
    * @see DateTimeFormatter#ISO_DATE_TIME
    */
-  public static RegexScrubber isoDateTimes(Locale locale) {
+  public static DateTimeScrubber isoDateTimes(Locale locale) {
     return dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss[.S][XXX['['VV']']]", locale)
         .replacement(numbered("isoDateTime"));
   }
@@ -204,7 +203,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for ISO-8601 date/times
    * @see #isoDateTimes(Locale)
    */
-  public static RegexScrubber isoDateTimes() {
+  public static DateTimeScrubber isoDateTimes() {
     return isoDateTimes(Locale.getDefault());
   }
 
@@ -215,7 +214,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for ISO-8601 ordinal dates
    * @see DateTimeFormatter#ISO_ORDINAL_DATE
    */
-  public static RegexScrubber isoOrdinalDates() {
+  public static DateTimeScrubber isoOrdinalDates() {
     return dateTimeFormat("yyyy-DDD[XXXX]").replacement(numbered("isoOrdinalDate"));
   }
 
@@ -226,7 +225,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for ISO-8601 week dates
    * @see DateTimeFormatter#ISO_WEEK_DATE
    */
-  public static RegexScrubber isoWeekDates() {
+  public static DateTimeScrubber isoWeekDates() {
     return dateTimeFormat("YYYY-'W'ww-e[XXXX]").replacement(numbered("isoWeekDate"));
   }
 
@@ -237,7 +236,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for ISO-8601 instants
    * @see DateTimeFormatter#ISO_INSTANT
    */
-  public static RegexScrubber isoInstants() {
+  public static DateTimeScrubber isoInstants() {
     return dateTimeFormat("uuuu-MM-dd'T'HH:mm:ss.SX").replacement(numbered("isoInstant"));
   }
 
@@ -248,7 +247,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for basic ISO-8601 dates
    * @see DateTimeFormatter#BASIC_ISO_DATE
    */
-  public static RegexScrubber basicIsoDates() {
+  public static DateTimeScrubber basicIsoDates() {
     return dateTimeFormat("yyyyMMdd[X]").replacement(numbered("basicIsoDate"));
   }
 
@@ -259,7 +258,7 @@ public class Scrubbers {
    * @return a {@link DateTimeScrubber} for RFC-1123 date/times
    * @see DateTimeFormatter#RFC_1123_DATE_TIME
    */
-  public static RegexScrubber rfc1123DateTimes() {
+  public static DateTimeScrubber rfc1123DateTimes() {
     return dateTimeFormat("EEE, d MMM yyyy HH:mm:ss O", Locale.US)
         .replacement(numbered("rfc1123DateTime"));
   }
@@ -280,14 +279,11 @@ public class Scrubbers {
    *
    * @param dateFormatPattern a {@link DateTimeFormatter} to parse the dates
    * @return a new {@link RelativeDateScrubber} with the given {@link DateTimeFormatter}.
-   * @deprecated use {@link #dateTimeFormat(String)} with {@link RelativeDateReplacement}
+   * @deprecated use {@link DateTimeScrubber} with {@link
+   *     DateTimeScrubber#replaceWithRelativeDate()} instead
    */
-  @Deprecated(forRemoval = true, since = "0.9.4")
+  @Deprecated(forRemoval = true, since = "0.9.5")
   public static RelativeDateScrubber relativeDates(DateTimeFormatter dateFormatPattern) {
     return new RelativeDateScrubber(dateFormatPattern);
-  }
-
-  public static RegexScrubber relativeDates(String pattern) {
-    return dateTimeFormat(pattern).replacement(relativeDate(pattern));
   }
 }

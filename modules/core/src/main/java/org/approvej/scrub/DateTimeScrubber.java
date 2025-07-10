@@ -22,6 +22,8 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class DateTimeScrubber extends RegexScrubber {
 
+  private final String dateTimePattern;
+
   /**
    * Creates a {@link DateTimeScrubber} to scrub date/time strings of the given dateTimePattern.
    *
@@ -34,6 +36,30 @@ public class DateTimeScrubber extends RegexScrubber {
    */
   DateTimeScrubber(String dateTimePattern, Locale locale, Replacement replacement) {
     super(Pattern.compile(regexFor(dateTimePattern, locale)), replacement);
+    this.dateTimePattern = dateTimePattern;
+  }
+
+  @Override
+  public DateTimeScrubber replacement(Replacement replacement) {
+    super.replacement(replacement);
+    return this;
+  }
+
+  @Override
+  public DateTimeScrubber replacement(String staticReplacement) {
+    super.replacement(staticReplacement);
+    return this;
+  }
+
+  /**
+   * Makes this use a {@link Replacements#relativeDate(String) relativeDate} to replace matches of
+   * the {@link #dateTimePattern}.
+   *
+   * @return this
+   */
+  public DateTimeScrubber replaceWithRelativeDate() {
+    replacement(new RelativeDateReplacement(DateTimeFormatter.ofPattern(dateTimePattern)));
+    return this;
   }
 
   private static String regexFor(String dateTimePattern, Locale locale) {
