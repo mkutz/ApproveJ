@@ -3,14 +3,12 @@ package org.approvej;
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.writeString;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static java.time.format.DateTimeFormatter.ofPattern;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.approve.Approvers.value;
 import static org.approvej.approve.PathProviderBuilder.approvedPath;
 import static org.approvej.approve.PathProviderBuilder.nextToTest;
 import static org.approvej.print.ObjectPrinter.objectPrinter;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
-import static org.approvej.scrub.Scrubbers.relativeDates;
 import static org.approvej.scrub.Scrubbers.uuids;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
@@ -127,7 +125,7 @@ class ApprovalBuilderTest {
         """;
 
     approve(received)
-        .scrubbedOf(relativeDates(ofPattern("yyyy-MM-dd")))
+        .scrubbedOf(dateTimeFormat("yyyy-MM-dd").replaceWithRelativeDate())
         .scrubbedOf(uuids())
         .byValue(previouslyApprovedScrubbed);
   }
