@@ -5,7 +5,7 @@ jacksonVersion = "2.19.1"
 
 [libraries]
 asciidoctorBlockSwitch = { module = "io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch", version = "0.6.3" }
-diffUtils = { module = "io.github.java-diff-utils:java-diff-utils", version = "4.15" }
+diffUtils = { module = "io.github.java-diff-utils:java-diff-utils", version = "4.16" }
 junitBom = { module = "org.junit:junit-bom", version.ref = "junitVersion" }
 junitJupiterApi = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junitVersion" }
 junitJupiterEngine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junitVersion" }
