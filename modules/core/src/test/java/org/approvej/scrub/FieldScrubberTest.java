@@ -13,7 +13,7 @@ class FieldScrubberTest {
     Thing thing = new ThingMutableClass("some thing");
     UUID replacement = new UUID(0, 0);
     FieldScrubber<Thing> scrubber =
-        new FieldScrubber<>(ThingMutableClass.class.getDeclaredField("id"), replacement);
+        Scrubbers.field(ThingMutableClass.class, "id").replacement(replacement);
 
     assertThat(scrubber.apply(thing).id()).isEqualTo(replacement);
   }
@@ -22,8 +22,7 @@ class FieldScrubberTest {
   void apply_record() throws NoSuchFieldException {
     Thing thing = new ThingRecord("some thing");
     UUID replacement = new UUID(0, 0);
-    FieldScrubber<Thing> scrubber =
-        new FieldScrubber<>(ThingRecord.class.getDeclaredField("id"), replacement);
+    FieldScrubber<Thing> scrubber = new FieldScrubber<>(ThingRecord.class.getDeclaredField("id"));
 
     assertThatExceptionOfType(ScrubbingError.class).isThrownBy(() -> scrubber.apply(thing));
   }
