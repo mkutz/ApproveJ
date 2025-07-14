@@ -293,4 +293,17 @@ public class Scrubbers {
   public static RegexScrubber uuids() {
     return stringsMatching(UUID_PATTERN).replacement(numbered("uuid"));
   }
+
+  /**
+   * Creates a {@link Scrubber} to replace the value of the named field with another value, null by
+   * default.
+   *
+   * @param type the class, which declares the field to be scrubbed
+   * @param fieldName the name of the field to be scrubbed
+   * @param <T> the type of the scrubbed object
+   * @return a new {@link FieldScrubber} for the given field
+   */
+  public static <T> FieldScrubber<T> field(Class<T> type, String fieldName) {
+    return new FieldScrubber<>(type, fieldName);
+  }
 }
