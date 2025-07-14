@@ -25,7 +25,7 @@ class FieldScrubberTest {
     FieldScrubber<Thing> scrubber =
         new FieldScrubber<>(ThingRecord.class.getDeclaredField("id"), replacement);
 
-    assertThatExceptionOfType(ScrubbingError.class).isThrownBy(() -> scrubber.apply(thing).id());
+    assertThatExceptionOfType(ScrubbingError.class).isThrownBy(() -> scrubber.apply(thing));
   }
 
   private interface Thing {
