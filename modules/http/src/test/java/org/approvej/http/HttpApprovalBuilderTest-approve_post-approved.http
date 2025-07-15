@@ -1,0 +1,10 @@
+POST /something
+Connection: Upgrade, HTTP2-Settings
+Content-length: 16
+Content-type: application/json
+Host: {{Host}}
+Http2-settings: AAEAAEAAAAIAAAAAAAMAAAAAAAQBAAAAAAUAAEAAAAYABgAA
+Upgrade: h2c
+User-agent: Java-http-client/21.0.8
+
+{"some":"value"}

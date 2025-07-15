@@ -18,7 +18,7 @@ import org.junit.jupiter.api.AutoClose;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class UseCaseTest {
+class HttpApprovalBuilderTest {
 
   @AutoClose private static final HttpStubServer server = new HttpStubServer();
 
