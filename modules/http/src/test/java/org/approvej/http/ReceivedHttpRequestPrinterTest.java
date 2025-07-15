@@ -14,7 +14,7 @@ class ReceivedHttpRequestPrinterTest {
   ReceivedHttpRequestPrinter printer = new ReceivedHttpRequestPrinter();
 
   @Test
-  public void apply_get() throws IOException, InterruptedException {
+  void apply_get() throws IOException, InterruptedException {
     try (HttpStubServer server = new HttpStubServer()) {
       try (HttpClient client = HttpClient.newHttpClient()) {
         client.send(
