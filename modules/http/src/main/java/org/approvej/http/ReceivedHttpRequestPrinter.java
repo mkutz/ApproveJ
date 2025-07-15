@@ -43,7 +43,9 @@ public class ReceivedHttpRequestPrinter implements Printer<ReceivedHttpRequest> 
    * <p>This constructor is public to allow instantiation via reflection, e.g. in the {@link
    * org.approvej.Configuration} class.
    */
-  public ReceivedHttpRequestPrinter() {}
+  public ReceivedHttpRequestPrinter() {
+    // No initialization needed
+  }
 
   @Override
   public String apply(ReceivedHttpRequest request) {
