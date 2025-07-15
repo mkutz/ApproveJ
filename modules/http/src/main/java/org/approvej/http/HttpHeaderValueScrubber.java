@@ -2,6 +2,8 @@ package org.approvej.http;
 
 import java.util.List;
 import java.util.function.UnaryOperator;
+import org.approvej.scrub.Replacement;
+import org.approvej.scrub.Replacements;
 import org.approvej.scrub.Scrubber;
 import org.jspecify.annotations.NullMarked;
 
@@ -10,13 +12,13 @@ import org.jspecify.annotations.NullMarked;
 public class HttpHeaderValueScrubber implements Scrubber<ReceivedHttpRequest> {
 
   private final String headerName;
-  private UnaryOperator<String> replacement;
+  private Replacement replacement;
 
   /**
    * Creates a {@link Scrubber} for the given headerName.
    *
    * <p>By default, a header "MyHeaderName" will be replaced with "{{MyHeaderName}}". This can be
-   * changed via {@link #replacement(String)} or {@link #replacement(UnaryOperator)}
+   * changed via {@link #replacement(String)} or {@link #replacement(Replacement)}
    *
    * @param headerName the name of the Header to be scrubbed
    */
@@ -27,8 +29,7 @@ public class HttpHeaderValueScrubber implements Scrubber<ReceivedHttpRequest> {
 
   @Override
   public ReceivedHttpRequest apply(ReceivedHttpRequest request) {
-    request.headers().get(headerName);
-    request.headers().put(headerName, List.of(replacement.apply(headerName)));
+    request.headers().put(headerName, List.of(replacement.apply(headerName, 1)));
     return request;
   }
 
@@ -39,7 +40,7 @@ public class HttpHeaderValueScrubber implements Scrubber<ReceivedHttpRequest> {
    * @return this
    */
   public HttpHeaderValueScrubber replacement(String staticReplacement) {
-    this.replacement = headerName -> staticReplacement;
+    this.replacement = Replacements.string(staticReplacement);
     return this;
   }
 
@@ -50,7 +51,7 @@ public class HttpHeaderValueScrubber implements Scrubber<ReceivedHttpRequest> {
    * @param replacement a {@link UnaryOperator} to replace the header's value
    * @return this
    */
-  public HttpHeaderValueScrubber replacement(UnaryOperator<String> replacement) {
+  public HttpHeaderValueScrubber replacement(Replacement replacement) {
     this.replacement = replacement;
     return this;
   }

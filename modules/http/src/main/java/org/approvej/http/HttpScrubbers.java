@@ -14,7 +14,7 @@ public class HttpScrubbers {
    * @param headerName the name of the header to be scrubbed.
    * @return the new {@link HttpHeaderValueScrubber}
    */
-  public static HttpHeaderValueScrubber header(String headerName) {
+  public static HttpHeaderValueScrubber headerValue(String headerName) {
     return new HttpHeaderValueScrubber(headerName);
   }
 
@@ -23,7 +23,16 @@ public class HttpScrubbers {
    *
    * @return the new {@link HttpHeaderValueScrubber}
    */
-  public static HttpHeaderValueScrubber hostHeader() {
-    return header("Host");
+  public static HttpHeaderValueScrubber hostHeaderValue() {
+    return headerValue("Host");
+  }
+
+  /**
+   * Creates a {@link HttpHeaderValueScrubber} for the {@code User-agent} header.
+   *
+   * @return the new {@link HttpHeaderValueScrubber}
+   */
+  public static HttpHeaderValueScrubber userAgentHeaderValue() {
+    return headerValue("User-agent");
   }
 }
