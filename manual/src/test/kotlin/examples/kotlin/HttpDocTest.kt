@@ -4,7 +4,8 @@ import examples.PriceComparator
 import examples.PriceComparator.CheeeperVendor
 import examples.PriceComparator.PrycyVendor
 import org.approvej.ApprovalBuilder.approve
-import org.approvej.http.HttpScrubbers.hostHeader
+import org.approvej.http.HttpScrubbers.hostHeaderValue
+import org.approvej.http.HttpScrubbers.userAgentHeaderValue
 import org.approvej.http.HttpStubServer
 import org.approvej.http.ReceivedHttpRequestPrinter.httpRequestPrinter
 import org.approvej.http.StubbedHttpResponse.response
@@ -28,12 +29,14 @@ class HttpDocTest {
 
     approve(cheeeperStub.lastReceivedRequest())
       .named("cheeeper")
-      .scrubbedOf(hostHeader())
+      .scrubbedOf(hostHeaderValue())
+      .scrubbedOf(userAgentHeaderValue())
       .printWith(httpRequestPrinter())
       .byFile()
     approve(prycyStub.lastReceivedRequest())
       .named("prycy")
-      .scrubbedOf(hostHeader())
+      .scrubbedOf(hostHeaderValue())
+      .scrubbedOf(userAgentHeaderValue())
       .printWith(httpRequestPrinter())
       .byFile()
     // end::approve_http_request[]
