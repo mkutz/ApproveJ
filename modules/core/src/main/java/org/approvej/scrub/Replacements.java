@@ -66,4 +66,22 @@ public class Replacements {
   public static Replacement relativeDate(String dateTimePattern) {
     return relativeDate(DateTimeFormatter.ofPattern(dateTimePattern));
   }
+
+  /**
+   * Masks each letter or digit of the match with a generic one. E.g. all latin uppercase letters
+   * are replaces with {@code A}, hence the String "John Doe" is replaced with "Aaaa Aaa".
+   *
+   * <p>This {@link Replacement} is generally useful for well-structured strings that do not vary in
+   * length or composition like oder numbers, ID's, or strict date/time strings. It is not a good
+   * choice for names as they usually vary in length, or UUID's as they are composed random
+   * characters and digits (hexadecimal).
+   */
+  public static Replacement masking() {
+    return (match, count) ->
+        match
+            .replaceAll("\\p{M}", "")
+            .replaceAll("\\p{Lu}", "A")
+            .replaceAll("(\\p{Ll}|\\p{Lt}|\\p{Lm}|\\p{Lo})", "a")
+            .replaceAll("\\p{N}", "1");
+  }
 }
