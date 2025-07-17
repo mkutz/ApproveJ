@@ -271,19 +271,4 @@ public class Scrubbers {
   public static RegexScrubber uuids() {
     return stringsMatching(UUID_PATTERN).replacement(numbered("uuid"));
   }
-
-  /**
-   * Creates a {@link Scrubber} to replace date strings of the given pattern with relative
-   * descriptions, like {@code [today]}, {@code [yesterday]}, {@code [2 days from now]} , {@code [21
-   * days ago]}.
-   *
-   * @param dateFormatPattern a {@link DateTimeFormatter} to parse the dates
-   * @return a new {@link RelativeDateScrubber} with the given {@link DateTimeFormatter}.
-   * @deprecated use {@link DateTimeScrubber} with {@link
-   *     DateTimeScrubber#replaceWithRelativeDate()} instead
-   */
-  @Deprecated(forRemoval = true, since = "0.9.5")
-  public static RelativeDateScrubber relativeDates(DateTimeFormatter dateFormatPattern) {
-    return new RelativeDateScrubber(dateFormatPattern);
-  }
 }
