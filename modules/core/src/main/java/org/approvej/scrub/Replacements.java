@@ -69,7 +69,7 @@ public class Replacements {
 
   /**
    * Masks each letter or digit of the match with a generic one. E.g. all latin uppercase letters
-   * are replaces with {@code A}, hence the String "John Doe" is replaced with "Aaaa Aaa".
+   * are replaced with {@code A}, hence the String "John Doe" is replaced with "Aaaa Aaa".
    *
    * <p>This {@link Replacement} is generally useful for well-structured strings that do not vary in
    * length or composition like oder numbers, ID's, or strict date/time strings. It is not a good
