@@ -76,8 +76,6 @@ class JsonPointerScrubberTest {
 
     JsonNode scrubbedJsonNode = enrollmentDateScrubber.apply(jsonNode);
 
-    System.out.println(scrubbedJsonNode);
-
     assertThat(scrubbedJsonNode.at("/enrollmentDate").textValue())
         .isEqualTo("[scrubbed enrollment date]");
   }
