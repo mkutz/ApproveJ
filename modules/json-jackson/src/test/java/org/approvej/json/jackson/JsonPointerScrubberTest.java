@@ -62,7 +62,7 @@ class JsonPointerScrubberTest {
   void apply_no_match() throws JsonProcessingException {
     JsonMapper jsonMapper = JsonMapper.builder().build();
     JsonNode jsonNode = jsonMapper.readTree(EXAMPLE_JSON);
-    Scrubber<JsonNode> itemScrubber = jsonPointer("/unkown");
+    Scrubber<JsonNode> itemScrubber = jsonPointer("/unknown");
     JsonNode scrubbedJsonNode = itemScrubber.apply(jsonNode);
 
     assertThat(scrubbedJsonNode).isEqualTo(jsonNode);
