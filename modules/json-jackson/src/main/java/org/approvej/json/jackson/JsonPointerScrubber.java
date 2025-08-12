@@ -56,7 +56,7 @@ public class JsonPointerScrubber implements Scrubber<JsonNode> {
         TextNode replacementNode =
             TextNode.valueOf(
                 replacement.apply(String.valueOf(index), jsonPointer.getMatchingIndex()));
-        arrayNode.insert(index, replacementNode);
+        arrayNode.set(index, replacementNode);
       }
       default -> throw new JsonPointerScrubberException(jsonPointer, parentNode);
     }
