@@ -121,4 +121,9 @@ spotless {
   }
 
   freshmark { target("*.md") }
+
+  sql {
+    target("**/*.sql")
+    dbeaver()
+  }
 }

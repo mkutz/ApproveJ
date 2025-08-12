@@ -1,0 +1,9 @@
+Item [
+  articleId=39a3f3aa-0b56-4df7-97ae-ee2fb2c3d755,
+  id=a30c0f5a-048f-4937-804c-f817b94a5347,
+  imageUrl=https://approvej.org/images/1fc9a9b3-e274-448d-a71a-3bc95c7fbd88,
+  pricePerPiece=1,
+  priceTotal=1,
+  quantity=1,
+  title=Some title
+]

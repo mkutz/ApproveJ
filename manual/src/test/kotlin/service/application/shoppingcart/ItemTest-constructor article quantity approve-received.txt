@@ -1,0 +1,1 @@
+Item(id=a9b8fae2-1045-43f0-83dd-40c41e9aeb77, articleId=05bb7654-01fb-4d07-b545-d88b71f60941, title=Some title, imageUrl=https://approvej.org/images/4b05eb53-6e78-4567-8be1-965d274c7d1d, quantity=1, pricePerPiece=1)
