@@ -1,0 +1,51 @@
+[
+  Article [
+    id=[uuid 1],
+    title=Match Some title,
+    description=Some description,
+    imageUrl=https://approvej.org/images/[uuid 2],
+    price=1
+  ],
+  Article [
+    id=[uuid 3],
+    title=Match Some title,
+    description=Some description,
+    imageUrl=https://approvej.org/images/[uuid 4],
+    price=1
+  ],
+  Article [
+    id=[uuid 5],
+    title=Match Some title,
+    description=Some description,
+    imageUrl=https://approvej.org/images/[uuid 6],
+    price=1
+  ],
+  Article [
+    id=[uuid 7],
+    title=Match Some title,
+    description=Some description,
+    imageUrl=https://approvej.org/images/[uuid 8],
+    price=1
+  ],
+  Article [
+    id=[uuid 9],
+    title=Match Some title,
+    description=Some description,
+    imageUrl=https://approvej.org/images/[uuid 10],
+    price=1
+  ],
+  Article [
+    id=[uuid 11],
+    title=Match Some title,
+    description=Some description,
+    imageUrl=https://approvej.org/images/[uuid 12],
+    price=1
+  ],
+  Article [
+    id=[uuid 13],
+    title=Match Some title,
+    description=Some description,
+    imageUrl=https://approvej.org/images/[uuid 14],
+    price=1
+  ]
+]

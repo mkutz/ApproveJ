@@ -1,0 +1,9 @@
+Item [
+  id=[uuid 1],
+  articleId=[uuid 2],
+  title=Some title,
+  imageUrl=https://approvej.org/images/[uuid 3],
+  quantity=1,
+  pricePerPiece=1,
+  priceTotal=1
+]

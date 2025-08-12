@@ -7,6 +7,11 @@ It takes the object which you want to approve as an argument and returns a build
 [id="approve_strings"]
 == Approve Strings
 
+
+- [ ] Reuse example from <<Introduction>>
+
+
+
 If you have anything that returns an arbitrary string, you can simply build an approval like this
 
 [source,java,indent=0,role="primary"]
@@ -45,6 +50,10 @@ You can adjust various details of this process:
 
 [id="approve_pojos"]
 == Approve POJOs
+
+
+- [ ] Use call to service class (instead of API) -> approve(customerService.registerCustomer(…)).byFile()
+
 
 Of course, you might want to approve more complex objects than just strings.
 

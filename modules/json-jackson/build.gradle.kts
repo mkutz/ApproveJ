@@ -18,8 +18,8 @@ repositories { mavenCentral() }
 dependencies {
   api(project(":modules:core"))
   api(libs.jspecify)
-  api(libs.jacksonDatabind)
-  api(libs.jacksonJsr310)
+  api(libs.jackson.databind)
+  api(libs.jackson.jsr310)
 }
 
 testing {
@@ -28,14 +28,14 @@ testing {
       getting(JvmTestSuite::class) {
         useJUnitJupiter()
         dependencies {
-          implementation(libs.jacksonJsr310)
-          implementation(platform(libs.junitBom))
-          implementation(libs.junitJupiterApi)
-          implementation(libs.junitJupiterParams)
-          implementation(libs.assertjCore)
+          implementation(libs.jackson.jsr310)
+          implementation(platform(libs.junit.bom))
+          implementation(libs.junit.jupiter.api)
+          implementation(libs.junit.jupiter.params)
+          implementation(libs.assertj.core)
 
-          runtimeOnly(libs.junitPlatformLauncher)
-          runtimeOnly(libs.junitJupiterEngine)
+          runtimeOnly(libs.junit.platform.launcher)
+          runtimeOnly(libs.junit.jupiter.engine)
         }
       }
   }

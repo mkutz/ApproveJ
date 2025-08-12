@@ -1,5 +1,38 @@
 = Introduction
 
+Traditionally, unit tests do something with a unit under test and assert that the returned result or the resulting state of the unit under test meet the specified criteria.
+
+This is perfectly fine for tests with only few criteria to assert.
+For example, in the following tests there's just the value of the created shopping cart that's being asserted:
+
+[source,kotlin,indent=0]
+.Kotlin
+----
+include::../../../test/kotlin/service/application/shoppingcart/ShoppingCartTest.kt[tag=simple_assertion]
+----
+
+But it tends to get messy, when there are a lot of criteria that need to be asserted.
+
+[source,kotlin,indent=0]
+.Kotlin
+----
+include::../../../test/kotlin/service/application/shoppingcart/ItemTest.kt[tag=arrange]
+
+include::../../../test/kotlin/service/application/shoppingcart/ItemTest.kt[tag=act]
+
+include::../../../test/kotlin/service/application/shoppingcart/ItemTest.kt[tag=assert]
+----
+
+Logically, this is simply asserting that the Item was created correctly with the given Article and quantity.
+
+Unfortunately, this results takes a lot of individual assert statements.
+While this example might seem not too bad, it holds several risks:
+
+1. There are a lot of similar lines, which makes it hard to spot the intention(s) behind the individual assertions.
+   Note that the first assertion is actually different from the others.
+2. It seems that the intention was to compare all the properties of the Item, but if there was another one, the test would succeed anyway.
+
+
 == Approval Testing
 
 Approval testing is a technique that allows you to compare the output of your code with a known good/previously approved output.
@@ -10,9 +43,26 @@ If the received output is different from the approved output, the test will fail
 
 Approval testing is especially useful for testing complex objects or large data sets, where it is impractical to write individual assertions for each property.
 
+So, we can simply take a result as a whole and approve it instead of checking for each and every property.
+
 
 == ApproveJ
 
 ApproveJ is a Java implementation of approval testing with a builder-based fluent API, several built-in tools, and optional extension points.
+
+Using ApproveJ, we can replace the many assertions with just one approval:
+
+[source,kotlin,indent=0]
+.Kotlin
+----
+include::../../../test/kotlin/service/application/shoppingcart/ItemTest.kt[tag=approve_byFile_trivial]
+----
+
+The `byFile` will make ApproveJ save the received `item` as a text in a received file next to the test.
+It will also create an empty "approved" file if it does not exist yet.
+Only if the content of the approved file is equal to the received value, the test succeeds automatically.
+If the content is different, the test will fail.
+
+=== Contributing
 
 To review the code, file issues or suggest changes, please visit the project's link:https://github.com/mkutz/approvej[GitHub page].

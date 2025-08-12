@@ -6,7 +6,7 @@ Michael Kutz <mail@michael-kutz.de>
 :sectlinks:
 :sectanchors:
 :source-highlighter: highlight.js
-:highlightjs-languages: java, kotlin, xml, properties
+:highlightjs-languages: java, kotlin, groovy, json, yaml, xml, properties
 :hide-uri-scheme:
 :javadoc-url: javadoc
 
