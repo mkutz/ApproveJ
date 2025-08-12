@@ -1,0 +1,21 @@
+{
+  "id" : "[uuid 1]",
+  "items" : [ {
+    "id" : "[uuid 2]",
+    "articleId" : "[uuid 3]",
+    "title" : "Some title",
+    "imageUrl" : "https://approvej.org/images/[uuid 4]",
+    "quantity" : 1,
+    "pricePerPiece" : 299,
+    "priceTotal" : 299
+  }, {
+    "id" : "[uuid 5]",
+    "articleId" : "[uuid 6]",
+    "title" : "Some title",
+    "imageUrl" : "https://approvej.org/images/[uuid 7]",
+    "quantity" : 1,
+    "pricePerPiece" : 299,
+    "priceTotal" : 299
+  } ],
+  "value" : 598
+}

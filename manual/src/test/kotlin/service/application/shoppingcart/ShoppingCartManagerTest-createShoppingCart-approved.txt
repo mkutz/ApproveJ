@@ -1,0 +1,1 @@
+ShoppingCart(id=44c676d3-a66e-4616-bfc9-4fdd4f224fe2, items=[])
