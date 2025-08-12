@@ -4,6 +4,7 @@ import static org.approvej.scrub.Replacements.string;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import java.util.function.Function;
@@ -37,16 +38,27 @@ public class JsonPointerScrubber implements Scrubber<JsonNode> {
 
   @Override
   public JsonNode apply(JsonNode unscrubbedJsonNode) {
-    JsonNode scrubbedJsonNode = unscrubbedJsonNode.deepCopy();
-    JsonPointer parentPointer = JsonPointer.compile("");
-    ObjectNode parentNode = (ObjectNode) scrubbedJsonNode.at(parentPointer);
+    if (unscrubbedJsonNode.at(jsonPointer).isMissingNode()) {
+      return unscrubbedJsonNode;
+    }
 
-    if (!parentNode.at(jsonPointer.last()).isMissingNode()) {
-      parentNode.replace(
-          jsonPointer.last().getMatchingProperty(),
-          TextNode.valueOf(
-              replacement.apply(
-                  jsonPointer.getMatchingProperty(), jsonPointer.getMatchingIndex())));
+    JsonNode scrubbedJsonNode = unscrubbedJsonNode.deepCopy();
+    JsonNode parentNode = scrubbedJsonNode.at(jsonPointer.head());
+    switch (parentNode) {
+      case ObjectNode objectNode -> {
+        String propertyName = jsonPointer.last().getMatchingProperty();
+        TextNode replacementNode =
+            TextNode.valueOf(replacement.apply(propertyName, jsonPointer.getMatchingIndex()));
+        objectNode.replace(propertyName, replacementNode);
+      }
+      case ArrayNode arrayNode -> {
+        int index = jsonPointer.last().getMatchingIndex();
+        TextNode replacementNode =
+            TextNode.valueOf(
+                replacement.apply(String.valueOf(index), jsonPointer.getMatchingIndex()));
+        arrayNode.insert(index, replacementNode);
+      }
+      default -> throw new JsonPointerScrubberException(jsonPointer, parentNode);
     }
 
     return scrubbedJsonNode;

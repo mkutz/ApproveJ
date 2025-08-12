@@ -20,10 +20,13 @@ class JsonPointerScrubberTest {
         "id": "%s",
         "name": "John Doe",
         "birthday": "1990-01-01",
-        "enrollmentDate": "%s"
+        "enrollmentDate": "%s",
+        "items": [
+          { "itemId": "%s" }
+        ]
       }
       """
-          .formatted(randomUUID(), LocalDateTime.now());
+          .formatted(randomUUID(), LocalDateTime.now(), randomUUID());
 
   @Test
   void apply() throws JsonProcessingException {
@@ -36,12 +39,44 @@ class JsonPointerScrubberTest {
   }
 
   @Test
+  void apply_deeper_value() throws JsonProcessingException {
+    JsonMapper jsonMapper = JsonMapper.builder().build();
+    JsonNode jsonNode = jsonMapper.readTree(EXAMPLE_JSON);
+    Scrubber<JsonNode> itemScrubber = jsonPointer("/items/0/itemId");
+    JsonNode scrubbedJsonNode = itemScrubber.apply(jsonNode);
+
+    assertThat(scrubbedJsonNode.at("/items/0/itemId").textValue()).isEqualTo("[scrubbed]");
+  }
+
+  @Test
+  void apply_subtree() throws JsonProcessingException {
+    JsonMapper jsonMapper = JsonMapper.builder().build();
+    JsonNode jsonNode = jsonMapper.readTree(EXAMPLE_JSON);
+    Scrubber<JsonNode> itemScrubber = jsonPointer("/items/0");
+    JsonNode scrubbedJsonNode = itemScrubber.apply(jsonNode);
+
+    assertThat(scrubbedJsonNode.at("/items/0").textValue()).isEqualTo("[scrubbed]");
+  }
+
+  @Test
+  void apply_no_match() throws JsonProcessingException {
+    JsonMapper jsonMapper = JsonMapper.builder().build();
+    JsonNode jsonNode = jsonMapper.readTree(EXAMPLE_JSON);
+    Scrubber<JsonNode> itemScrubber = jsonPointer("/unkown");
+    JsonNode scrubbedJsonNode = itemScrubber.apply(jsonNode);
+
+    assertThat(scrubbedJsonNode).isEqualTo(jsonNode);
+  }
+
+  @Test
   void apply_custom_static_replacement() throws JsonProcessingException {
     JsonNode jsonNode = JSON_MAPPER.readTree(EXAMPLE_JSON);
     Scrubber<JsonNode> enrollmentDateScrubber =
         jsonPointer("/enrollmentDate").replacement("[scrubbed enrollment date]");
 
     JsonNode scrubbedJsonNode = enrollmentDateScrubber.apply(jsonNode);
+
+    System.out.println(scrubbedJsonNode);
 
     assertThat(scrubbedJsonNode.at("/enrollmentDate").textValue())
         .isEqualTo("[scrubbed enrollment date]");
