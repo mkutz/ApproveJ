@@ -34,7 +34,7 @@ public interface ApprovalResult {
    */
   default void throwIfNotApproved() {
     if (needsApproval()) {
-      throw new ApprovalError(received(), previouslyApproved());
+      throw new ApprovalError(previouslyApproved(), received());
     }
   }
 }
