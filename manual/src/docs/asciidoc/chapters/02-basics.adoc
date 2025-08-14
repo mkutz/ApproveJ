@@ -271,9 +271,12 @@ Hence, it is necessary to apply it _before_ the `Printer` is applied.
 In case you want to reuse the `Scrubber`, you can also define in a separate class implementing the link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber<T>`] interface.
 
 
-=== Built-In `Scrubbers`
+=== Built-In `Scrubbers` & `Replacements`
 
-All built-in `Scrubber` implementations are available via the link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html[Scrubbers] utility class.
+All built-in link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber`] implementations are available via the link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html[`Scrubbers`] utility class.
+
+Note that link:{javadoc-url}/core/org/approvej/scrub/RegexScrubber.html[RegexScrubber] implementations also allow to change the link:{javadoc-url}/core/org/approvej/scrub/Replacement.html[`Replacement`] function.
+Built-in implementation can be found in the link:{javadoc-url}/core/org/approvej/scrub/Replacements.html[`Replacements`] utility class.
 
 
 [id=approving]
@@ -349,6 +352,7 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_
     ├── 📄 <TestClass>-<testMethod>-approved.txt
     └── 📄 <TestClass>-<testMethod>-received.txt
 ----
+
 
 ==== Custom Filename Extension
 
