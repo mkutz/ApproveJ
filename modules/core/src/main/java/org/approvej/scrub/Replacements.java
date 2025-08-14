@@ -75,6 +75,8 @@ public class Replacements {
    * length or composition like order numbers, IDs, or strict date/time strings. It is not a good
    * choice for names as they usually vary in length, or UUIDs as they are composed of random
    * characters and digits (hexadecimal).
+   *
+   * @return a replacement function replaces each character with a generic one
    */
   public static Replacement masking() {
     return (match, count) ->
