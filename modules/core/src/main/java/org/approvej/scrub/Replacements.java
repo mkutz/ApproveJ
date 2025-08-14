@@ -72,8 +72,8 @@ public class Replacements {
    * are replaced with {@code A}, hence the String "John Doe" is replaced with "Aaaa Aaa".
    *
    * <p>This {@link Replacement} is generally useful for well-structured strings that do not vary in
-   * length or composition like oder numbers, ID's, or strict date/time strings. It is not a good
-   * choice for names as they usually vary in length, or UUID's as they are composed random
+   * length or composition like order numbers, IDs, or strict date/time strings. It is not a good
+   * choice for names as they usually vary in length, or UUIDs as they are composed of random
    * characters and digits (hexadecimal).
    */
   public static Replacement masking() {
