@@ -1,10 +1,13 @@
 package org.approvej.scrub;
 
+import static java.util.stream.Collectors.joining;
 import static org.approvej.scrub.Replacements.numbered;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.jspecify.annotations.NullMarked;
 
 /** Collection of static methods to create {@link Scrubber} instances. */
@@ -15,6 +18,25 @@ public class Scrubbers {
 
   private static final Pattern UUID_PATTERN =
       Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+
+  /**
+   * Creates a {@link RegexScrubber} for all given strings.
+   *
+   * <p>This type of {@link Scrubber} is particularly useful if dynamic parts of the value are
+   * known. E.g. if they were part of the import parameters of the method under test.
+   *
+   * @param first the first {@link String} that should be scrubbed
+   * @param more more {@link String}s that should be scrubbed
+   * @return a {@link RegexScrubber} for all given strings
+   */
+  public static RegexScrubber strings(String first, String... more) {
+    return new RegexScrubber(
+        Pattern.compile(
+            Stream.concat(Stream.of(first), Arrays.stream(more))
+                .map(Pattern::quote)
+                .collect(joining("|", "(", ")"))),
+        numbered());
+  }
 
   /**
    * Creates a {@link RegexScrubber} with the given pattern.
