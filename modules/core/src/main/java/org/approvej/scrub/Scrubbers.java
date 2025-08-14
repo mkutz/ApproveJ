@@ -286,7 +286,7 @@ public class Scrubbers {
   }
 
   /**
-   * {@link RegexScrubber} for UUIDs.
+   * Creates a {@link RegexScrubber} for UUIDs.
    *
    * @return a {@link RegexScrubber} that replaces all UUIDs
    */
