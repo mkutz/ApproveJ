@@ -10,3 +10,4 @@ docs/**
 .jqwik-database
 *.key
 pages
+banner-*.*
