@@ -1,5 +1,7 @@
 package org.approvej;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -15,7 +17,7 @@ import org.jspecify.annotations.Nullable;
  * Central configuration class for ApproveJ.
  *
  * <p>All properties have a default value, which can be overwritten in your
- * src/test/resources/approvej.properties
+ * src/test/resources/approvej.properties or ~/.config/approvej/approvej.properties.
  *
  * @param defaultPrinter the {@link Printer} that will be used if none is specified otherwise
  * @param defaultFileReviewer the {@link FileReviewer} that will be used if none is specified
@@ -57,6 +59,18 @@ public record Configuration(
 
   private static Properties loadProperties() {
     Properties properties = new Properties(Configuration.DEFAULTS);
+
+    File userHomeProperties =
+        new File(System.getProperty("user.home"), ".config/approvej/approvej.properties");
+    if (userHomeProperties.exists()) {
+      try (FileInputStream fis = new FileInputStream(userHomeProperties)) {
+        properties.load(fis);
+      } catch (IOException e) {
+        throw new ConfigurationError(
+            "Fehler beim Laden der Konfiguration aus dem Home-Verzeichnis", e);
+      }
+    }
+
     URL configurationFileUrl =
         Configuration.class.getClassLoader().getResource("approvej.properties");
     if (configurationFileUrl == null) {
