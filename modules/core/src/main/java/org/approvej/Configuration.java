@@ -66,8 +66,7 @@ public record Configuration(
       try (FileInputStream fis = new FileInputStream(userHomeProperties)) {
         properties.load(fis);
       } catch (IOException e) {
-        throw new ConfigurationError(
-            "Fehler beim Laden der Konfiguration aus dem Home-Verzeichnis", e);
+        throw new ConfigurationError("Error loading configuration from home directory", e);
       }
     }
 
