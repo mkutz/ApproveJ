@@ -3,8 +3,9 @@ package org.approvej.print;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
 import java.util.Collection;
@@ -106,24 +107,37 @@ public class ObjectPrinter<T> implements Printer<T> {
             .anyMatch(simpleType -> simpleType.isAssignableFrom(object.getClass()))) {
       return "%s".formatted(object);
     }
-    return stream(object.getClass().getDeclaredMethods())
-        .filter(method -> !EXCLUDED_METHODS.contains(method.getName()))
-        .filter(method -> method.getParameterCount() == 0)
-        .filter(method -> Void.class != method.getReturnType())
-        .sorted(Comparator.comparing(Method::getName))
+    return stream(object.getClass().getDeclaredFields())
+        .filter(field -> !Modifier.isStatic(field.getModifiers()))
+        .sorted(Comparator.comparing(Field::getName))
         .map(
-            method -> {
-              try {
-                return PAIR_FORMAT.formatted(
-                    method.getName(), apply(method.invoke(object), indent));
-              } catch (IllegalAccessException | InvocationTargetException e) {
-                return PAIR_FORMAT.formatted(method.getName(), "<inaccessible>");
-              }
-            })
+            field -> PAIR_FORMAT.formatted(field.getName(), apply(getValue(object, field), indent)))
         .collect(
             joining(
                 ",%n%s".formatted(indent),
                 "%s [%n%s".formatted(object.getClass().getSimpleName(), indent),
                 "%n%s]".formatted(baseIndent)));
+  }
+
+  @Nullable
+  private Object getValue(Object object, Field field) {
+    String fieldName = field.getName();
+    String capitalized = fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+    String methodNameRegex = String.format("(%s|get%s|is%s)", fieldName, capitalized, capitalized);
+    return stream(object.getClass().getDeclaredMethods())
+        .filter(method -> method.getParameterCount() == 0)
+        .filter(method -> Void.class != method.getReturnType())
+        .filter(method -> !EXCLUDED_METHODS.contains(method.getName()))
+        .filter(method -> method.getName().matches(methodNameRegex))
+        .findFirst()
+        .map(
+            method -> {
+              try {
+                return method.invoke(object);
+              } catch (IllegalAccessException | InvocationTargetException e) {
+                return "<inaccessible>";
+              }
+            })
+        .orElse(null);
   }
 }
