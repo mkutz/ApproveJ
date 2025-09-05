@@ -1,0 +1,6 @@
+GET /api/prices?id=1234567890123
+Connection: Upgrade, HTTP2-Settings
+Host: {{Host}}
+Http2-settings: AAEAAEAAAAIAAAAAAAMAAAAAAAQBAAAAAAUAAEAAAAYABgAA
+Upgrade: h2c
+User-agent: Java-http-client/21.0.7
