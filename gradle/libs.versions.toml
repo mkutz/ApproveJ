@@ -22,7 +22,7 @@ testng = { module = "org.testng:testng", version = "7.11.0" }
 
 [plugins]
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version = "4.0.5" }
-jreleaser = { id = "org.jreleaser", version = "1.19.0" }
+jreleaser = { id = "org.jreleaser", version = "1.20.0" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version = "2.2.10" }
 sonar = { id = "org.sonarqube", version = "6.3.1.5724" }
 spotless = { id = "com.diffplug.spotless", version = "7.2.1" }
