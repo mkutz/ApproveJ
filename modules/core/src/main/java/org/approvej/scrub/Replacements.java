@@ -83,7 +83,7 @@ public class Replacements {
         match
             .replaceAll("\\p{M}", "")
             .replaceAll("\\p{Lu}", "A")
-            .replaceAll("(\\p{Ll}|\\p{Lt}|\\p{Lm}|\\p{Lo})", "a")
+            .replaceAll("[\\p{Ll}\\p{Lt}\\p{Lm}\\p{Lo}]", "a")
             .replaceAll("\\p{N}", "1");
   }
 }
