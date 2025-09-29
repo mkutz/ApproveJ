@@ -63,7 +63,8 @@ class ObjectPrinterTest {
               field2=42,
               field3=true,
               field4=null
-            ]""");
+            ]\
+            """);
   }
 
   private record SimpleExampleClass(String field1, int field2, boolean field3, Object field4) {}
@@ -87,7 +88,8 @@ class ObjectPrinterTest {
                 field3=false,
                 field4=null
               ]
-            ]""");
+            ]\
+            """);
   }
 
   private record ComplexExampleClass(
@@ -102,7 +104,8 @@ class ObjectPrinterTest {
               a,
               b,
               c
-            ]""");
+            ]\
+            """);
   }
 
   @Test
@@ -118,7 +121,8 @@ class ObjectPrinterTest {
                 3
               ],
               c
-            ]""");
+            ]\
+            """);
   }
 
   @Test
@@ -130,7 +134,8 @@ class ObjectPrinterTest {
               a=1,
               b=2,
               c=3
-            ]""");
+            ]\
+            """);
   }
 
   @Test
@@ -149,7 +154,8 @@ class ObjectPrinterTest {
               ],
               b=hello,
               c=3
-            ]""");
+            ]\
+            """);
   }
 
   @Test
@@ -167,7 +173,8 @@ class ObjectPrinterTest {
                 b,
                 c
               ]
-            ]""");
+            ]\
+            """);
   }
 
   private record ComplexExampleCollectionClass(String field1, List<String> field2) {}
@@ -194,6 +201,7 @@ class ObjectPrinterTest {
                   field4=null
                 ]
               ]
-            ]""");
+            ]\
+            """);
   }
 }
