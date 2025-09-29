@@ -1,6 +1,6 @@
 [versions]
 junitVersion = "5.13.4"
-assertjVersion = "3.27.5"
+assertjVersion = "3.27.6"
 jacksonVersion = "2.20.0"
 
 [libraries]
