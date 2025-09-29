@@ -92,7 +92,8 @@ class DateTimeScrubberTest {
         """
         non-utc: %s
         utc: %s
-        bc: %s"""
+        bc: %s\
+        """
             .formatted(
                 dateTimeFormatter.format(nonUtc),
                 dateTimeFormatter.format(utc),
@@ -106,7 +107,8 @@ class DateTimeScrubberTest {
             """
             non-utc: [datetime 1]
             utc: [datetime 2]
-            bc: [datetime 3]""");
+            bc: [datetime 3]\
+            """);
   }
 
   @Test
