@@ -82,14 +82,14 @@ public class ExampleClass {
     Instant published = Instant.now();
     UUID id = UUID.randomUUID();
     return """
-    {
-      "id": "%s",
-      "title": "%s",
-      "content": "%s",
-      "tagIds": [%s],
-      "published": "%s"
-    }
-    """
+           {
+             "id": "%s",
+             "title": "%s",
+             "content": "%s",
+             "tagIds": [%s],
+             "published": "%s"
+           }
+           """
         .formatted(
             id,
             title,

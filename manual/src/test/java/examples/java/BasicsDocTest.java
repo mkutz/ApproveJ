@@ -185,10 +185,10 @@ class BasicsDocTest {
     @Override
     public String apply(Person person) {
       return """
-      person:
-        name: "%s"
-        birthDate: "%s"
-      """
+             person:
+               name: "%s"
+               birthDate: "%s"
+             """
           .formatted(person.name(), person.birthDate());
     }
 

@@ -6,9 +6,8 @@ updates:
       interval: weekly
     open-pull-requests-limit: 10
     ignore:
-      - dependency-name: org.jreleaser
+      - dependency-name: com.diffplug.spotless
         update-types:
-        - version-update:semver-minor
         - version-update:semver-major
   - package-ecosystem: github-actions
     directory: /
