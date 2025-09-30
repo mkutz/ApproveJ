@@ -172,7 +172,8 @@ class ApprovalBuilderTest {
               birthday=<inaccessible>,
               id=<inaccessible>,
               name=<inaccessible>
-            ]""");
+            ]\
+            """);
   }
 
   @Test

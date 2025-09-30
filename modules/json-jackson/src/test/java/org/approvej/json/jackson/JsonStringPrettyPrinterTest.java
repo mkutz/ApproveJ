@@ -21,7 +21,8 @@ class JsonStringPrettyPrinterTest {
             {
               "name" : "Micha",
               "birthday" : "1982-02-19"
-            }""");
+            }\
+            """);
   }
 
   @Test

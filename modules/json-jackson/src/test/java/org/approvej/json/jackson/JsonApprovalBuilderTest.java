@@ -20,7 +20,8 @@ class JsonApprovalBuilderTest {
         "date": "%s",
         "id": "%s",
         "timestamp": "%s"
-      }"""
+      }\
+      """
           .trim()
           .stripIndent()
           .formatted(LocalDate.now(), UUID.randomUUID(), LocalDate.now().atTime(11, 22, 33));
