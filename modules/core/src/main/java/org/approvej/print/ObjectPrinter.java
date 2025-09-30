@@ -78,6 +78,9 @@ public class ObjectPrinter<T> implements Printer<T> {
   }
 
   private String applyCollection(Collection<?> collection, String baseIndent) {
+    if (collection.isEmpty()) {
+      return "[]";
+    }
     String indent = baseIndent + "  ";
     return collection.stream()
         .map(element -> apply(element, indent))

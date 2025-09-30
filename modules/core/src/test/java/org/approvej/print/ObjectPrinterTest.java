@@ -106,6 +106,12 @@ class ObjectPrinterTest {
   }
 
   @Test
+  void apply_list_empty() {
+    assertThat(printer.apply(List.of()))
+        .isEqualTo("[]");
+  }
+
+  @Test
   void apply_nested_lists() {
     assertThat(printer.apply(List.of("a", List.of(1, 2, 3), "c")))
         .isEqualTo(
@@ -131,6 +137,12 @@ class ObjectPrinterTest {
               b=2,
               c=3
             ]""");
+  }
+
+  @Test
+  void apply_map_empty() {
+    assertThat(printer.apply(Map.of()))
+        .isEqualTo("[]");
   }
 
   @Test
