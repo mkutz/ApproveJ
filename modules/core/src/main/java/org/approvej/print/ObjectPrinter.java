@@ -25,9 +25,6 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class ObjectPrinter<T> implements Printer<T> {
 
-  /** A {@link Set} of methods that won't be regarded as property getters. */
-  public static final Set<String> EXCLUDED_METHODS = Set.of("hashCode", "toString", "hash");
-
   /** A {@link Set} of classes that will be printed directly. */
   public static final Set<Class<?>> SIMPLE_TYPES =
       Set.of(
@@ -130,7 +127,6 @@ public class ObjectPrinter<T> implements Printer<T> {
     return stream(object.getClass().getDeclaredMethods())
         .filter(method -> method.getParameterCount() == 0)
         .filter(method -> Void.class != method.getReturnType())
-        .filter(method -> !EXCLUDED_METHODS.contains(method.getName()))
         .filter(method -> method.getName().matches(methodNameRegex))
         .findFirst()
         .map(
