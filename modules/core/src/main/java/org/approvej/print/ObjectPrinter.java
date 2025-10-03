@@ -40,6 +40,8 @@ public class ObjectPrinter<T> implements Printer<T> {
 
   private static final String PAIR_FORMAT = "%s=%s";
 
+  private Comparator<Field> fieldComparator = (field1, field2) -> 0;
+
   /**
    * Creates a new {@link ObjectPrinter} instance that prints the given object.
    *
@@ -58,6 +60,17 @@ public class ObjectPrinter<T> implements Printer<T> {
    */
   public static <T> ObjectPrinter<T> objectPrinter() {
     return new ObjectPrinter<>();
+  }
+
+  /**
+   * Causes the {@link Printer} to sort the printed object's fields by their name. By default, the
+   * fields will be printed in the order of their declaration.
+   *
+   * @return this
+   */
+  public ObjectPrinter<T> sorted() {
+    fieldComparator = Comparator.comparing(Field::getName);
+    return this;
   }
 
   @Override
@@ -109,7 +122,7 @@ public class ObjectPrinter<T> implements Printer<T> {
     }
     return stream(object.getClass().getDeclaredFields())
         .filter(field -> !Modifier.isStatic(field.getModifiers()))
-        .sorted(Comparator.comparing(Field::getName))
+        .sorted(fieldComparator)
         .map(
             field -> PAIR_FORMAT.formatted(field.getName(), apply(getValue(object, field), indent)))
         .collect(

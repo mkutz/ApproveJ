@@ -169,9 +169,9 @@ class ApprovalBuilderTest {
         .byValue(
             """
             Person [
-              birthday=<inaccessible>,
               id=<inaccessible>,
-              name=<inaccessible>
+              name=<inaccessible>,
+              birthday=<inaccessible>
             ]\
             """);
   }
