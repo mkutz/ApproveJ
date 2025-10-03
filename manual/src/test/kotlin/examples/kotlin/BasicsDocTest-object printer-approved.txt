@@ -1,4 +1,4 @@
 Person [
-  birthDate=1990-01-01,
-  name=John Doe
+  name=John Doe,
+  birthDate=1990-01-01
 ]

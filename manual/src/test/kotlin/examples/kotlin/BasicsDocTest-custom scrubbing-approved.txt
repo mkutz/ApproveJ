@@ -1,6 +1,6 @@
 Contact [
-  email=jane@approvej.org,
-  name=Jane Doe,
   number=-1,
+  name=Jane Doe,
+  email=jane@approvej.org,
   phoneNumber=+1 123 456 7890
 ]

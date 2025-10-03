@@ -53,47 +53,71 @@ class ObjectPrinterTest {
 
   @Test
   void apply() {
-    SimpleExampleClass exampleObject = new SimpleExampleClass("value1", 42, true, null);
+    SimpleExampleClass exampleObject =
+        new SimpleExampleClass(
+            UUID.fromString("00000000-0000-0000-0000-000000000001"), 42, true, null);
 
     assertThat(printer.apply(exampleObject))
         .isEqualTo(
             """
             SimpleExampleClass [
-              field1=value1,
-              field2=42,
-              field3=true,
-              field4=null
+              uuid=00000000-0000-0000-0000-000000000001,
+              number=42,
+              bool=true,
+              object=null
             ]\
             """);
   }
 
-  private record SimpleExampleClass(String field1, int field2, boolean field3, Object field4) {}
+  @Test
+  void apply_sorted() {
+    SimpleExampleClass exampleObject =
+        new SimpleExampleClass(
+            UUID.fromString("00000000-0000-0000-0000-000000000001"), 42, true, null);
+
+    assertThat(printer.sorted().apply(exampleObject))
+        .isEqualTo(
+            """
+            SimpleExampleClass [
+              bool=true,
+              number=42,
+              object=null,
+              uuid=00000000-0000-0000-0000-000000000001
+            ]\
+            """);
+  }
+
+  private record SimpleExampleClass(UUID uuid, int number, boolean bool, Object object) {}
 
   @Test
   void apply_complex_property() {
     ComplexExampleClass exampleObject =
         new ComplexExampleClass(
-            "value1", 42, true, new SimpleExampleClass("value2", 24, false, null));
+            UUID.fromString("00000000-0000-0000-0000-000000000001"),
+            42,
+            true,
+            new SimpleExampleClass(
+                UUID.fromString("00000000-0000-0000-0000-000000000002"), 24, false, null));
 
     assertThat(printer.apply(exampleObject))
         .isEqualTo(
             """
             ComplexExampleClass [
-              field1=value1,
-              field2=42,
-              field3=true,
-              field4=SimpleExampleClass [
-                field1=value2,
-                field2=24,
-                field3=false,
-                field4=null
+              uuid=00000000-0000-0000-0000-000000000001,
+              number=42,
+              bool=true,
+              object=SimpleExampleClass [
+                uuid=00000000-0000-0000-0000-000000000002,
+                number=24,
+                bool=false,
+                object=null
               ]
             ]\
             """);
   }
 
   private record ComplexExampleClass(
-      String field1, int field2, boolean field3, SimpleExampleClass field4) {}
+      UUID uuid, int number, boolean bool, SimpleExampleClass object) {}
 
   @Test
   void apply_list() {
@@ -152,15 +176,22 @@ class ObjectPrinterTest {
   void apply_map_of_complex() {
     assertThat(
             printer.apply(
-                Map.of("a", new SimpleExampleClass("b", 2, true, null), "b", "hello", "c", 3)))
+                Map.of(
+                    "a",
+                    new SimpleExampleClass(
+                        UUID.fromString("00000000-0000-0000-0000-000000000001"), 2, true, null),
+                    "b",
+                    "hello",
+                    "c",
+                    3)))
         .isEqualTo(
             """
             [
               a=SimpleExampleClass [
-                field1=b,
-                field2=2,
-                field3=true,
-                field4=null
+                uuid=00000000-0000-0000-0000-000000000001,
+                number=2,
+                bool=true,
+                object=null
               ],
               b=hello,
               c=3
@@ -171,14 +202,15 @@ class ObjectPrinterTest {
   @Test
   void apply_collection_property() {
     ComplexExampleCollectionClass value =
-        new ComplexExampleCollectionClass("value1", List.of("a", "b", "c"));
+        new ComplexExampleCollectionClass(
+            UUID.fromString("00000000-0000-0000-0000-000000000001"), List.of("a", "b", "c"));
 
     assertThat(printer.apply(value))
         .isEqualTo(
             """
             ComplexExampleCollectionClass [
-              field1=value1,
-              field2=[
+              uuid=00000000-0000-0000-0000-000000000001,
+              list=[
                 a,
                 b,
                 c
@@ -187,28 +219,32 @@ class ObjectPrinterTest {
             """);
   }
 
-  private record ComplexExampleCollectionClass(String field1, List<String> field2) {}
+  private record ComplexExampleCollectionClass(UUID uuid, List<String> list) {}
 
   @Test
   void apply_collection_of_complex() {
     List<ComplexExampleClass> value =
         List.of(
             new ComplexExampleClass(
-                "value1", 42, true, new SimpleExampleClass("value2", 24, false, null)));
+                UUID.fromString("00000000-0000-0000-0000-000000000001"),
+                42,
+                true,
+                new SimpleExampleClass(
+                    UUID.fromString("00000000-0000-0000-0000-000000000002"), 24, false, null)));
 
     assertThat(printer.apply(value))
         .isEqualTo(
             """
             [
               ComplexExampleClass [
-                field1=value1,
-                field2=42,
-                field3=true,
-                field4=SimpleExampleClass [
-                  field1=value2,
-                  field2=24,
-                  field3=false,
-                  field4=null
+                uuid=00000000-0000-0000-0000-000000000001,
+                number=42,
+                bool=true,
+                object=SimpleExampleClass [
+                  uuid=00000000-0000-0000-0000-000000000002,
+                  number=24,
+                  bool=false,
+                  object=null
                 ]
               ]
             ]\
