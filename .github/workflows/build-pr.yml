@@ -32,6 +32,8 @@ jobs:
 
       - run: ./gradlew check
 
+      - run: ./gradlew jreleaserConfig -Pversion=0.0.1-SNAPSHOT --git-root-search
+
       - name: cache SonarCloud packages
         uses: actions/cache@v4
         with:
