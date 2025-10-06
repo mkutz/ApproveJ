@@ -5,15 +5,19 @@ import static java.util.stream.Collectors.joining;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -120,11 +124,12 @@ public class ObjectPrinter<T> implements Printer<T> {
             .anyMatch(simpleType -> simpleType.isAssignableFrom(object.getClass()))) {
       return "%s".formatted(object);
     }
-    return stream(object.getClass().getDeclaredFields())
-        .filter(field -> !Modifier.isStatic(field.getModifiers()))
-        .sorted(fieldComparator)
+    return getFieldsAndGetters(object)
+        .filter(FieldAndGetter::hasGetter)
         .map(
-            field -> PAIR_FORMAT.formatted(field.getName(), apply(getValue(object, field), indent)))
+            fieldAndGetter ->
+                PAIR_FORMAT.formatted(
+                    fieldAndGetter.field.getName(), apply(fieldAndGetter.value(), indent)))
         .collect(
             joining(
                 ",%n%s".formatted(indent),
@@ -132,24 +137,62 @@ public class ObjectPrinter<T> implements Printer<T> {
                 "%n%s]".formatted(baseIndent)));
   }
 
-  @Nullable
-  private Object getValue(Object object, Field field) {
-    String fieldName = field.getName();
-    String capitalized = fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-    String methodNameRegex = String.format("(%s|get%s|is%s)", fieldName, capitalized, capitalized);
-    return stream(object.getClass().getDeclaredMethods())
-        .filter(method -> method.getParameterCount() == 0)
-        .filter(method -> Void.class != method.getReturnType())
-        .filter(method -> method.getName().matches(methodNameRegex))
-        .findFirst()
-        .map(
-            method -> {
-              try {
-                return method.invoke(object);
-              } catch (IllegalAccessException | InvocationTargetException e) {
-                return "<inaccessible>";
-              }
-            })
-        .orElse(null);
+  private Stream<FieldAndGetter> getFieldsAndGetters(Object object) {
+    return getFields(object).map(field -> new FieldAndGetter(field, object));
+  }
+
+  private Stream<Field> getFields(Object object) {
+    return getTypes(object)
+        .flatMap(aClass -> Arrays.stream(aClass.getDeclaredFields()))
+        .filter(field -> !Modifier.isStatic(field.getModifiers()))
+        .sorted(fieldComparator);
+  }
+
+  private Stream<Class<?>> getTypes(Object object) {
+    return Stream.<Class<?>>iterate(
+        object.getClass(), type -> type != Object.class, Class::getSuperclass)
+        .toList()
+        .reversed()
+        .stream();
+  }
+
+  private record FieldAndGetter(Object object, Field field, Optional<Method> getter) {
+
+    private FieldAndGetter(Field field, Object object) {
+      this(
+          object,
+          field,
+          stream(field.getDeclaringClass().getDeclaredMethods())
+              .filter(
+                  method ->
+                      method.getParameterCount() == 0
+                          && Void.class != method.getReturnType()
+                          && method
+                              .getName()
+                              .matches(
+                                  String.format(
+                                      "(%s|get%2$s|is%2$s)",
+                                      field.getName(),
+                                      field.getName().substring(0, 1).toUpperCase()
+                                          + field.getName().substring(1))))
+              .findFirst());
+    }
+
+    boolean hasGetter() {
+      return getter.isPresent();
+    }
+
+    @Nullable Object value() {
+      return getter
+          .map(
+              method -> {
+                try {
+                  return method.invoke(object);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                  return "<inaccessible>";
+                }
+              })
+          .orElse(null);
+    }
   }
 }
