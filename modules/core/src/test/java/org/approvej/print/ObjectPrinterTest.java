@@ -270,7 +270,7 @@ class ObjectPrinterTest {
 
   @SuppressWarnings("unused")
   private static class ExampleSuperClass {
-    private static final int staticField = 42;
+    private static final int STATIC_FIELD = 42;
     private final UUID uuid;
     private final String string;
     private final String fieldWithoutGetter = "should not show";
