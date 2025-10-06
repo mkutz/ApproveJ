@@ -31,7 +31,8 @@ public class StackTraceTestFinderUtil {
             element -> {
               try {
                 return Class.forName(element.getClassName())
-                    .getDeclaredMethod(element.getMethodName());
+                    .getDeclaredMethod(
+                        element.getMethodName().replaceAll("^lambda\\$([^$]+)\\$\\d$", "$1"));
               } catch (NoClassDefFoundError | ClassNotFoundException | NoSuchMethodException e) {
                 return null;
               }

@@ -32,6 +32,7 @@ testing {
           implementation(libs.junitJupiterApi)
           implementation(libs.junitJupiterParams)
           implementation(libs.assertjCore)
+          implementation(libs.awaitility)
 
           runtimeOnly(libs.junitPlatformLauncher)
           runtimeOnly(libs.junitJupiterEngine)

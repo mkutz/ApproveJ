@@ -12,6 +12,7 @@ import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
+import static org.awaitility.Awaitility.await;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -190,6 +191,18 @@ class ApprovalBuilderTest {
         .printWith(Object::toString)
         .scrubbedOf(dateTimeFormat("yyyy-MM-dd"))
         .byFile();
+  }
+
+  @Test
+  void approve_byFile_in_lambda() {
+    await()
+        .untilAsserted(
+            () ->
+                approve(new Person("Micha", LocalDate.of(1982, 2, 19)))
+                    .scrubbedOf(person -> new Person("[scrubbed id]", person.name, person.birthday))
+                    .printWith(Object::toString)
+                    .scrubbedOf(dateTimeFormat("yyyy-MM-dd"))
+                    .byFile());
   }
 
   record Person(String id, String name, LocalDate birthday) {
