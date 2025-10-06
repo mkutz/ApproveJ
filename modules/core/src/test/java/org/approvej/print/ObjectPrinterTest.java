@@ -250,4 +250,56 @@ class ObjectPrinterTest {
             ]\
             """);
   }
+
+  @Test
+  void apply_subclass() {
+    ExampleSubClass value =
+        new ExampleSubClass(
+            UUID.fromString("00000000-0000-0000-0000-000000000001"), "Some Name", 123);
+
+    assertThat(printer.apply(value))
+        .isEqualTo(
+            """
+            ExampleSubClass [
+              uuid=00000000-0000-0000-0000-000000000001,
+              string=Some Name,
+              number=123
+            ]\
+            """);
+  }
+
+  @SuppressWarnings("unused")
+  private static class ExampleSuperClass {
+    private static final int staticField = 42;
+    private final UUID uuid;
+    private final String string;
+    private final String fieldWithoutGetter = "should not show";
+
+    public ExampleSuperClass(UUID uuid, String string) {
+      this.uuid = uuid;
+      this.string = string;
+    }
+
+    public UUID getUuid() {
+      return uuid;
+    }
+
+    public String getString() {
+      return string;
+    }
+  }
+
+  @SuppressWarnings("unused")
+  private static class ExampleSubClass extends ExampleSuperClass {
+    private final int number;
+
+    public ExampleSubClass(UUID uuid, String string, int number) {
+      super(uuid, string);
+      this.number = number;
+    }
+
+    public int number() {
+      return number;
+    }
+  }
 }
