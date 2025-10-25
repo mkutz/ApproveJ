@@ -110,9 +110,11 @@ public class FileApprover implements Approver {
             try {
               deleteIfExists(path);
             } catch (IOException ignored) {
+              // this is an optional cleanup
             }
           });
     } catch (IOException ignored) {
+      // this is an optional cleanup
     }
   }
 
