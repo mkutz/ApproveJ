@@ -17,10 +17,7 @@ java {
 
 repositories { mavenCentral() }
 
-dependencies {
-  api(libs.jspecify)
-  api(libs.diffUtils)
-}
+dependencies { api(libs.jspecify) }
 
 testing {
   suites {
@@ -28,14 +25,14 @@ testing {
       getting(JvmTestSuite::class) {
         useJUnitJupiter()
         dependencies {
-          implementation(platform(libs.junitBom))
-          implementation(libs.junitJupiterApi)
-          implementation(libs.junitJupiterParams)
-          implementation(libs.assertjCore)
+          implementation(platform(libs.junit.bom))
+          implementation(libs.junit.jupiter.api)
+          implementation(libs.junit.jupiter.params)
+          implementation(libs.assertj.core)
           implementation(libs.awaitility)
 
-          runtimeOnly(libs.junitPlatformLauncher)
-          runtimeOnly(libs.junitJupiterEngine)
+          runtimeOnly(libs.junit.platform.launcher)
+          runtimeOnly(libs.junit.jupiter.engine)
         }
       }
     val testng by

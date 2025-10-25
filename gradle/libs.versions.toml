@@ -1,21 +1,20 @@
 [versions]
-junitVersion = "6.0.0"
-assertjVersion = "3.27.6"
-jacksonVersion = "2.20.0"
+junit = "6.0.0"
+assertj = "3.27.6"
+jackson = "2.20.0"
 
 [libraries]
-asciidoctorBlockSwitch = { module = "io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch", version = "0.6.3" }
-diffUtils = { module = "io.github.java-diff-utils:java-diff-utils", version = "4.16" }
-junitBom = { module = "org.junit:junit-bom", version.ref = "junitVersion" }
-junitJupiterApi = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junitVersion" }
-junitJupiterEngine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junitVersion" }
-junitJupiterParams = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junitVersion" }
-junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher", version = "6.0.0" }
-assertjCore = { module = "org.assertj:assertj-core", version.ref = "assertjVersion" }
+asciidoctor-block-switch = { module = "io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch", version = "0.6.3" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version = "6.0.0" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 awaitility = { module = "org.awaitility:awaitility", version = "4.3.0" }
-jacksonDatabind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jacksonVersion" }
-jacksonDatafromatYaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jacksonVersion" }
-jacksonJsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jacksonVersion" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-datafromat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
+jackson-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
 jspecify = { module = "org.jspecify:jspecify", version = "1.0.0" }
 spock = { module = "org.spockframework:spock-core", version = "2.4-M6-groovy-4.0" }
 groovy = { module = "org.apache.groovy:groovy" , version = "4.0.28" }
@@ -24,6 +23,6 @@ testng = { module = "org.testng:testng", version = "7.11.0" }
 [plugins]
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version = "4.0.5" }
 jreleaser = { id = "org.jreleaser", version = "1.20.0" }
-kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version = "2.2.21" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.2.21" }
 sonar = { id = "org.sonarqube", version = "7.0.0.6105" }
 spotless = { id = "com.diffplug.spotless", version = "7.2.1" }
