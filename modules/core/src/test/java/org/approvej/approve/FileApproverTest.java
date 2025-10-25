@@ -1,6 +1,7 @@
 package org.approvej.approve;
 
 import static java.nio.file.Files.createFile;
+import static java.nio.file.Files.setLastModifiedTime;
 import static java.nio.file.Files.setPosixFilePermissions;
 import static java.nio.file.Files.writeString;
 import static org.approvej.approve.Approvers.file;
@@ -11,7 +12,9 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.FileTime;
 import java.nio.file.attribute.PosixFilePermission;
+import java.time.Instant;
 import java.util.Set;
 import org.approvej.ApprovalResult;
 import org.junit.jupiter.api.Test;
@@ -51,15 +54,20 @@ class FileApproverTest {
   @Test
   void apply_previously_accepted_different_filename_extension() throws IOException {
     Path oldTxtApprovedPath =
-        writeString(
-            tempDir.resolve("apply_previously_accepted_different_filename_extension-approved.txt"),
-            "<some/><older/>approved<xml/>\n",
-            StandardOpenOption.CREATE);
+        setLastModifiedTime(
+            writeString(
+                tempDir.resolve(
+                    "apply_previously_accepted_different_filename_extension-approved.txt"),
+                "<some/><older/>approved<xml/>\n",
+                StandardOpenOption.CREATE),
+            FileTime.from(Instant.now().minusSeconds(100)));
     Path oldApprovedPath =
-        writeString(
-            tempDir.resolve("apply_previously_accepted_different_filename_extension-approved"),
-            "Some approved text\n",
-            StandardOpenOption.CREATE);
+        setLastModifiedTime(
+            writeString(
+                tempDir.resolve("apply_previously_accepted_different_filename_extension-approved"),
+                "Some approved text\n",
+                StandardOpenOption.CREATE),
+            FileTime.from(Instant.now().minusSeconds(50)));
     Path otherApprovedPath =
         writeString(
             tempDir.resolve("apply_previously_accepted_different_filename-approved.json"),
