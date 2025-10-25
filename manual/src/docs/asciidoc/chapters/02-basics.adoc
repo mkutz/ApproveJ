@@ -314,6 +314,9 @@ It is used in most of the examples above.
 If no approved file exists, it will be created as an empty _approved_ file.
 The received value will be written to another _received_ file.
 
+If there are approved files with the correct base name, but a different filename extension, these will be automatically deleted.
+The most recently modified one is renamed with the correct filename extension, if no file of that name exists yet.
+
 If the approved file exists, it will be compared with the received value.
 If they are equal, the test will pass.
 Any existing received file will be deleted automatically in that case.
