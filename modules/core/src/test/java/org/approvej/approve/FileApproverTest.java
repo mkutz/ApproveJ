@@ -49,6 +49,39 @@ class FileApproverTest {
   }
 
   @Test
+  void apply_previously_accepted_different_filename_extension() throws IOException {
+    Path oldTxtApprovedPath =
+        writeString(
+            tempDir.resolve("apply_previously_accepted_different_filename_extension-approved.txt"),
+            "<some/><older/>approved<xml/>\n",
+            StandardOpenOption.CREATE);
+    Path oldApprovedPath =
+        writeString(
+            tempDir.resolve("apply_previously_accepted_different_filename_extension-approved"),
+            "Some approved text\n",
+            StandardOpenOption.CREATE);
+    Path otherApprovedPath =
+        writeString(
+            tempDir.resolve("apply_previously_accepted_different_filename-approved.json"),
+            "Some file from another test\n",
+            StandardOpenOption.CREATE);
+    PathProvider pathProvider =
+        approvedPath(
+            tempDir.resolve(
+                "apply_previously_accepted_different_filename_extension-approved.json"));
+    FileApprover fileApprover = file(pathProvider);
+
+    ApprovalResult result = fileApprover.apply("Some approved text");
+
+    assertThat(result.needsApproval()).isFalse();
+    assertThat(oldTxtApprovedPath).doesNotExist();
+    assertThat(oldApprovedPath).doesNotExist();
+    assertThat(otherApprovedPath).exists();
+    assertThat(pathProvider.receivedPath()).doesNotExist();
+    assertThat(pathProvider.approvedPath()).exists().content().isEqualTo("Some approved text\n");
+  }
+
+  @Test
   void apply_previously_received() throws IOException {
     PathProvider pathProvider =
         approvedPath(tempDir.resolve("apply_previously_received-approved.txt"));
