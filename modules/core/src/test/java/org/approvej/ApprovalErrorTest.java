@@ -26,4 +26,18 @@ class ApprovalErrorTest {
               received"
             """);
   }
+
+  @Test
+  void message_previouslyApproved_empty() {
+    ApprovalError approvalError = new ApprovalError("", "something\n    actually\nreceived");
+
+    assertThat(approvalError.getMessage())
+        .isEqualTo(
+            """
+            Missing approval for received
+              "something
+                  actually
+              received"
+            """);
+  }
 }
