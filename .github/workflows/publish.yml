@@ -41,7 +41,7 @@ jobs:
       - run: ./gradlew jreleaserConfig -Pversion=${{ github.event.inputs.version }} --git-root-search
       - run: ./gradlew publish -Pversion=${{ github.event.inputs.version }}
       - run: ./gradlew jreleaserFullRelease -Pversion=${{ github.event.inputs.version }} --git-root-search --stacktrace
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           path: build/jreleaser/trace.log
         if: always()
