@@ -26,10 +26,13 @@ import org.jspecify.annotations.Nullable;
 public record Configuration(
     Printer<Object> defaultPrinter, @Nullable FileReviewer defaultFileReviewer) {
 
+  private static final String DEFAULT_PRINTER_PROPERTY = "defaultPrinter";
+  private static final String DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY = "defaultFileReviewerScript";
+
   private static final Properties DEFAULTS = new Properties();
 
   static {
-    DEFAULTS.setProperty("defaultPrinter", ToStringPrinter.class.getName());
+    DEFAULTS.setProperty(DEFAULT_PRINTER_PROPERTY, ToStringPrinter.class.getName());
   }
 
   /** The loaded {@link Configuration} object. */
@@ -38,7 +41,7 @@ public record Configuration(
   private static Configuration loadConfiguration() {
     Properties properties = loadProperties();
 
-    String defaultPrinter = properties.getProperty("defaultPrinter");
+    String defaultPrinter = properties.getProperty(DEFAULT_PRINTER_PROPERTY);
     Printer<Object> printer;
     try {
       // noinspection unchecked
@@ -48,7 +51,8 @@ public record Configuration(
       throw new ConfigurationError("Failed to create printer %s".formatted(defaultPrinter), e);
     }
 
-    String defaultFileReviewerScript = properties.getProperty("defaultFileReviewerScript");
+    String defaultFileReviewerScript =
+        properties.getProperty(DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY);
     FileReviewerScript defaultFileReviewer = null;
     if (defaultFileReviewerScript != null) {
       defaultFileReviewer = new FileReviewerScript(defaultFileReviewerScript);
