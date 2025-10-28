@@ -2,7 +2,7 @@ package org.approvej.http;
 
 import org.jspecify.annotations.NullMarked;
 
-/** An error that occurs when there is an issue with stating the {@link HttpStubServer}. */
+/** An error that occurs when there is an issue with starting the {@link HttpStubServer}. */
 @NullMarked
 public class HttpStubServerException extends RuntimeException {
 
