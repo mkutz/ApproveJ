@@ -29,7 +29,7 @@ import org.jspecify.annotations.NullMarked;
 public class ReceivedHttpRequestPrinter implements Printer<ReceivedHttpRequest> {
 
   /**
-   * Creates a and returns new {@link ReceivedHttpRequestPrinter} instance.
+   * Creates and returns a new {@link ReceivedHttpRequestPrinter} instance.
    *
    * @return the new instance
    */

@@ -32,7 +32,7 @@ implementation("org.approvej:http:{revnumber}")
 
 == Receive Requests via `HttpStubServer`
 
-The link:{javadoc-url}/http/org/approvej/http/HttpStubServer.html[`HttpStubServer`] is a simple HTTP server base upon the JVM's own link:https://docs.oracle.com/en/java/javase/21/docs/api//jdk.httpserver/com/sun/net/httpserver/package-summary.html[HttpServer].
+The link:{javadoc-url}/http/org/approvej/http/HttpStubServer.html[`HttpStubServer`] is a simple HTTP server based upon the JVM's own link:https://docs.oracle.com/en/java/javase/21/docs/api//jdk.httpserver/com/sun/net/httpserver/package-summary.html[HttpServer].
 
 Once initialized you can configure your software component to use its address instead of another service it depends on.
 
