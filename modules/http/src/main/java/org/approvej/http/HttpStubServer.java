@@ -13,7 +13,7 @@ import java.util.TreeMap;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * A simple stub for an HTTP server. It wraps a {@link HttpServer} bound to a random post on
+ * A simple stub for an HTTP server. It wraps a {@link HttpServer} bound to a random port on
  * localhost and simply handles each received request by storing in as a {@link ReceivedHttpRequest}
  * object that can then be approved.
  *
