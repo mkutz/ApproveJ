@@ -155,18 +155,18 @@ class ApprovalBuilderTest {
   }
 
   @Test
-  void approve_pojo_printWith_function() {
+  void approve_pojo_printedWith_function() {
     Function<Person, String> personPrinter =
         person -> "id=%s%nname=%s%nbirthday=%s".formatted(person.id, person.name, person.birthday);
     approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
-        .printWith(personPrinter)
+        .printedWith(personPrinter)
         .byValue("id=000000-0000-0000-00000001\nname=Micha\nbirthday=1982-02-19");
   }
 
   @Test
-  void approve_pojo_printWith_printer() {
+  void approve_pojo_printedWith_printer() {
     approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
-        .printWith(objectPrinter())
+        .printedWith(objectPrinter())
         .byValue(
             """
             Person [
@@ -178,17 +178,17 @@ class ApprovalBuilderTest {
   }
 
   @Test
-  void approve_reviewWith_fileReviewer() {
+  void approve_reviewedWith_fileReviewer() {
     PathProvider pathProvider =
         approvedPath(tempDir.resolve("approve_reviewWith_fileReviewer-approved.txt"));
-    approve("Some text").reviewWith(new AutoAcceptFileReviewer()).byFile(pathProvider);
+    approve("Some text").reviewedWith(new AutoAcceptFileReviewer()).byFile(pathProvider);
   }
 
   @Test
-  void approve_pojo_byFile_pre_and_post_print_scrubbing() {
+  void approve_pojo_byFile_pre_and_post_printed_scrubbing() {
     approve(new Person("Micha", LocalDate.of(1982, 2, 19)))
         .scrubbedOf(person -> new Person("[scrubbed id]", person.name, person.birthday))
-        .printWith(Object::toString)
+        .printedWith(Object::toString)
         .scrubbedOf(dateTimeFormat("yyyy-MM-dd"))
         .byFile();
   }
@@ -200,7 +200,7 @@ class ApprovalBuilderTest {
             () ->
                 approve(new Person("Micha", LocalDate.of(1982, 2, 19)))
                     .scrubbedOf(person -> new Person("[scrubbed id]", person.name, person.birthday))
-                    .printWith(Object::toString)
+                    .printedWith(Object::toString)
                     .scrubbedOf(dateTimeFormat("yyyy-MM-dd"))
                     .byFile());
   }

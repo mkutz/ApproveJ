@@ -56,7 +56,7 @@ class BasicsDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printWith(objectPrinter()) // <1>
+      .printedWith(objectPrinter()) // <1>
       .byFile()
     // end::object_printer[]
   }
@@ -67,7 +67,7 @@ class BasicsDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printWith { "%s, born %s".format(it.name, it.birthDate) } // <1>
+      .printedWith { "%s, born %s".format(it.name, it.birthDate) } // <1>
       .byFile()
     // end::custom_printer_function[]
   }
@@ -78,7 +78,7 @@ class BasicsDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printWith(PersonYamlPrinter()) // <1>
+      .printedWith(PersonYamlPrinter()) // <1>
       .byFile()
     // end::custom_printer[]
   }
@@ -90,7 +90,7 @@ class BasicsDocTest {
       createBlogPost("Latest News", "Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
 
     approve(blogPost)
-      .printWith(objectPrinter())
+      .printedWith(objectPrinter())
       .scrubbedOf(dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX")) // <1>
       .scrubbedOf(uuids()) // <2>
       .byFile()
@@ -104,7 +104,7 @@ class BasicsDocTest {
 
     approve(contact)
       .scrubbedOf { Contact(-1, it.name, it.email, it.phoneNumber) } // <1>
-      .printWith(objectPrinter())
+      .printedWith(objectPrinter())
       .byFile()
     // end::custom_scrubbing[]
   }
@@ -124,7 +124,7 @@ class BasicsDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printWith {
+      .printedWith {
         """
         person:
           name: "${it.name}"
@@ -141,7 +141,7 @@ class BasicsDocTest {
     // tag::approve_file_nextToTestInSubdirectory[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
-    approve(person).printWith(PersonYamlPrinter()).byFile(nextToTestInSubdirectory())
+    approve(person).printedWith(PersonYamlPrinter()).byFile(nextToTestInSubdirectory())
     // end::approve_file_nextToTestInSubdirectory[]
   }
 
@@ -160,7 +160,7 @@ class BasicsDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printWith(PersonYamlPrinter())
+      .printedWith(PersonYamlPrinter())
       .byFile("src/test/resources/BasicExamples-approve file approved path.yaml") // <1>
     // end::approve_file_approved_path[]
   }
@@ -172,8 +172,8 @@ class BasicsDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printWith(PersonYamlPrinter())
-      .reviewWith("meld \"{receivedFile}\" \"{approvedFile}\"") // <1>
+      .printedWith(PersonYamlPrinter())
+      .reviewedWith("meld \"{receivedFile}\" \"{approvedFile}\"") // <1>
       .byFile() // <2>
     // end::approve_reviewWith_fileReviewer[]
   }
