@@ -123,12 +123,12 @@ You can use this printer by calling the `printAs` method on the builder.
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=object_printer]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=multi_line_string_printer]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=object_printer]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=multi_line_string_printer]
 ----
 <1> applies the `MultiLinePrinter` and returns a new `ApprovalBuilder<String>`
 
