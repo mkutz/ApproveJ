@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 class ConfigurationTest {
 
   @Test
-  void testLoadConfiguration() {
+  void configuration() {
     assertThat(Configuration.configuration).isNotNull();
     assertThat(Configuration.configuration.defaultPrinter()).isInstanceOf(ToStringPrinter.class);
   }
