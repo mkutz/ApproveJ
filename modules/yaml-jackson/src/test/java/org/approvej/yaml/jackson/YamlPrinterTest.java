@@ -1,6 +1,6 @@
 package org.approvej.yaml.jackson;
 
-import static org.approvej.yaml.jackson.YamlPrinter.yamlPrinter;
+import static org.approvej.yaml.jackson.YamlPrinter.yaml;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -13,14 +13,14 @@ class YamlPrinterTest {
 
   @Test
   void constructor() {
-    assertThat(yamlPrinter()).isNotNull();
-    assertThat(yamlPrinter(new ObjectMapper())).isNotNull();
-    assertThat(yamlPrinter(YAMLMapper.builder().build())).isNotNull();
+    assertThat(yaml()).isNotNull();
+    assertThat(yaml(new ObjectMapper())).isNotNull();
+    assertThat(yaml(YAMLMapper.builder().build())).isNotNull();
   }
 
   @Test
   void apply() {
-    assertThat(yamlPrinter().apply(new Person("Micha", LocalDate.of(1982, 2, 19))))
+    assertThat(yaml().apply(new Person("Micha", LocalDate.of(1982, 2, 19))))
         .isEqualTo(
             """
             ---
@@ -31,7 +31,7 @@ class YamlPrinterTest {
 
   @Test
   void apply_failure() {
-    YamlPrinter<Object> yamlPrinterNoJavaTimeModule = yamlPrinter(new ObjectMapper());
+    YamlPrinter<Object> yamlPrinterNoJavaTimeModule = yaml(new ObjectMapper());
     LocalDate someLocalDate = LocalDate.of(1982, 2, 19);
     assertThatExceptionOfType(YamlPrinterException.class)
         .isThrownBy(() -> yamlPrinterNoJavaTimeModule.apply(someLocalDate))
@@ -40,7 +40,7 @@ class YamlPrinterTest {
 
   @Test
   void filenameExtension() {
-    assertThat(yamlPrinter().filenameExtension()).isEqualTo("yaml");
+    assertThat(yaml().filenameExtension()).isEqualTo("yaml");
   }
 
   record Person(String name, LocalDate birthday) {}

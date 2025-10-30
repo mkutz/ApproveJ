@@ -115,10 +115,10 @@ However, if you have a lot of properties, it is much easier to read the result i
 In order to change the way objects are being transformed to strings, you can use the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`]'s `printWith` method and provide a link:{javadoc-url}/core/org/approvej/print/Printer.html[`Printer`]/`Function<T, String>` instance as an argument.
 
 
-=== Generic Object Printer
+=== Generic Multi Line Printer
 
-ApproveJ provides a generic link:{javadoc-url}/core/org/approvej/print/ObjectPrinter.html[`ObjectPrinter`] that will print the object with each of its properties on a new line to make comparing the result easier.
-You can use this printer by calling the `printWith` method on the builder.
+ApproveJ provides a generic link:{javadoc-url}/core/org/approvej/print/MultiLinePrinter.html[`MultiLinePrinter`] that will print the object with each of its properties on a new line to make comparing the result easier.
+You can use this printer by calling the `printAs` method on the builder.
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -130,14 +130,14 @@ include::../../../test/java/examples/java/BasicsDocTest.java[tag=object_printer]
 ----
 include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=object_printer]
 ----
-<1> applies the `ObjectPrinter` and returns a new `ApprovalBuilder<String>`
+<1> applies the `MultiLinePrinter` and returns a new `ApprovalBuilder<String>`
 
 Now the approved file will look like this
 
 [source,text]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicsDocTest-object_printer-approved.txt[]
+include::../../../test/java/examples/java/BasicsDocTest-multi_line_string_printer-approved.txt[]
 ----
 
 

@@ -1,6 +1,6 @@
 package org.approvej.print;
 
-import static org.approvej.print.ObjectPrinter.objectPrinter;
+import static org.approvej.print.MultiLinePrinter.multiLineString;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
@@ -18,14 +18,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class ObjectPrinterTest {
-
-  ObjectPrinter<?> printer = objectPrinter();
+class MultiLinePrinterTest {
 
   @ParameterizedTest(name = "{displayName}({arguments})")
   @MethodSource("applySimpleArguments")
   void apply_simple(Object value) {
-    assertThat(printer.apply(value)).isEqualTo("%s".formatted(value));
+    assertThat(multiLineString().apply(value)).isEqualTo("%s".formatted(value));
   }
 
   static Stream<Object> applySimpleArguments() {
@@ -57,7 +55,7 @@ class ObjectPrinterTest {
         new SimpleExampleClass(
             UUID.fromString("00000000-0000-0000-0000-000000000001"), 42, true, null);
 
-    assertThat(printer.apply(exampleObject))
+    assertThat(multiLineString().apply(exampleObject))
         .isEqualTo(
             """
             SimpleExampleClass [
@@ -75,7 +73,7 @@ class ObjectPrinterTest {
         new SimpleExampleClass(
             UUID.fromString("00000000-0000-0000-0000-000000000001"), 42, true, null);
 
-    assertThat(printer.sorted().apply(exampleObject))
+    assertThat(((MultiLinePrinter<?>) multiLineString()).sorted().apply(exampleObject))
         .isEqualTo(
             """
             SimpleExampleClass [
@@ -99,7 +97,7 @@ class ObjectPrinterTest {
             new SimpleExampleClass(
                 UUID.fromString("00000000-0000-0000-0000-000000000002"), 24, false, null));
 
-    assertThat(printer.apply(exampleObject))
+    assertThat(multiLineString().apply(exampleObject))
         .isEqualTo(
             """
             ComplexExampleClass [
@@ -121,7 +119,7 @@ class ObjectPrinterTest {
 
   @Test
   void apply_list() {
-    assertThat(printer.apply(List.of("a", "b", "c")))
+    assertThat(multiLineString().apply(List.of("a", "b", "c")))
         .isEqualTo(
             """
             [
@@ -134,12 +132,12 @@ class ObjectPrinterTest {
 
   @Test
   void apply_list_empty() {
-    assertThat(printer.apply(List.of())).isEqualTo("[]");
+    assertThat(multiLineString().apply(List.of())).isEqualTo("[]");
   }
 
   @Test
   void apply_nested_lists() {
-    assertThat(printer.apply(List.of("a", List.of(1, 2, 3), "c")))
+    assertThat(multiLineString().apply(List.of("a", List.of(1, 2, 3), "c")))
         .isEqualTo(
             """
             [
@@ -156,7 +154,7 @@ class ObjectPrinterTest {
 
   @Test
   void apply_map() {
-    assertThat(printer.apply(Map.of("a", 1, "b", 2, "c", 3)))
+    assertThat(multiLineString().apply(Map.of("a", 1, "b", 2, "c", 3)))
         .isEqualTo(
             """
             [
@@ -169,21 +167,22 @@ class ObjectPrinterTest {
 
   @Test
   void apply_map_empty() {
-    assertThat(printer.apply(Map.of())).isEqualTo("[]");
+    assertThat(multiLineString().apply(Map.of())).isEqualTo("[]");
   }
 
   @Test
   void apply_map_of_complex() {
     assertThat(
-            printer.apply(
-                Map.of(
-                    "a",
-                    new SimpleExampleClass(
-                        UUID.fromString("00000000-0000-0000-0000-000000000001"), 2, true, null),
-                    "b",
-                    "hello",
-                    "c",
-                    3)))
+            multiLineString()
+                .apply(
+                    Map.of(
+                        "a",
+                        new SimpleExampleClass(
+                            UUID.fromString("00000000-0000-0000-0000-000000000001"), 2, true, null),
+                        "b",
+                        "hello",
+                        "c",
+                        3)))
         .isEqualTo(
             """
             [
@@ -205,7 +204,7 @@ class ObjectPrinterTest {
         new ComplexExampleCollectionClass(
             UUID.fromString("00000000-0000-0000-0000-000000000001"), List.of("a", "b", "c"));
 
-    assertThat(printer.apply(value))
+    assertThat(multiLineString().apply(value))
         .isEqualTo(
             """
             ComplexExampleCollectionClass [
@@ -232,7 +231,7 @@ class ObjectPrinterTest {
                 new SimpleExampleClass(
                     UUID.fromString("00000000-0000-0000-0000-000000000002"), 24, false, null)));
 
-    assertThat(printer.apply(value))
+    assertThat(multiLineString().apply(value))
         .isEqualTo(
             """
             [
@@ -257,7 +256,7 @@ class ObjectPrinterTest {
         new ExampleSubClass(
             UUID.fromString("00000000-0000-0000-0000-000000000001"), "Some Name", 123);
 
-    assertThat(printer.apply(value))
+    assertThat(multiLineString().apply(value))
         .isEqualTo(
             """
             ExampleSubClass [

@@ -1,6 +1,6 @@
 package org.approvej.json.jackson;
 
-import static org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter;
+import static org.approvej.json.jackson.JsonStringPrettyPrinter.jsonString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -13,7 +13,7 @@ class JsonStringPrettyPrinterTest {
   @Test
   void apply() {
     JsonStringPrettyPrinter jsonStringPrettyPrinter =
-        jsonStringPrettyPrinter(JsonMapper.builder().addModule(new JavaTimeModule()).build());
+        jsonString(JsonMapper.builder().addModule(new JavaTimeModule()).build());
 
     assertThat(jsonStringPrettyPrinter.apply("{\"name\":\"Micha\",\"birthday\":\"1982-02-19\"}"))
         .isEqualTo(
@@ -28,7 +28,7 @@ class JsonStringPrettyPrinterTest {
   @Test
   void apply_invalid() {
     JsonStringPrettyPrinter jsonStringPrettyPrinter =
-        jsonStringPrettyPrinter(JsonMapper.builder().addModule(new JavaTimeModule()).build());
+        jsonString(JsonMapper.builder().addModule(new JavaTimeModule()).build());
 
     assertThatExceptionOfType(JsonPrettyPrinterException.class)
         .isThrownBy(() -> jsonStringPrettyPrinter.apply("{"));
@@ -36,6 +36,6 @@ class JsonStringPrettyPrinterTest {
 
   @Test
   void filenameExtension() {
-    assertThat(jsonStringPrettyPrinter().filenameExtension()).isEqualTo("json");
+    assertThat(JsonStringPrettyPrinter.jsonString().filenameExtension()).isEqualTo("json");
   }
 }

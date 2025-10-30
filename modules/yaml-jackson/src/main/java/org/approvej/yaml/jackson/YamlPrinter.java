@@ -28,8 +28,21 @@ public class YamlPrinter<T> implements Printer<T> {
    * @param <T> the type of value to print
    * @return a new {@link YamlPrinter} instance
    */
-  public static <T> YamlPrinter<T> yamlPrinter(ObjectWriter objectWriter) {
+  public static <T> YamlPrinter<T> yaml(ObjectWriter objectWriter) {
     return new YamlPrinter<>(objectWriter);
+  }
+
+  /**
+   * Creates a {@link YamlPrinter} using the given {@link ObjectWriter}.
+   *
+   * @param objectWriter the {@link ObjectWriter} that will be used for printing
+   * @param <T> the type of value to print
+   * @return a new {@link YamlPrinter} instance
+   * @deprecated use {@link #yaml(ObjectWriter)}
+   */
+  @Deprecated(since = "0.12", forRemoval = true)
+  public static <T> YamlPrinter<T> yamlPrinter(ObjectWriter objectWriter) {
+    return yaml(objectWriter);
   }
 
   /**
@@ -38,10 +51,24 @@ public class YamlPrinter<T> implements Printer<T> {
    * @param objectMapper the {@link ObjectMapper} used to create the {@link ObjectWriter}
    * @param <T> the type of value to print
    * @return a new {@link YamlPrinter} instance
-   * @see ObjectMapper#writerWithDefaultPrettyPrinter()
+   * @see ObjectMapper#writer()
    */
+  public static <T> YamlPrinter<T> yaml(ObjectMapper objectMapper) {
+    return yaml(objectMapper.writer());
+  }
+
+  /**
+   * Creates a {@link YamlPrinter} using the given {@link ObjectMapper}.
+   *
+   * @param objectMapper the {@link ObjectMapper} used to create the {@link ObjectWriter}
+   * @param <T> the type of value to print
+   * @return a new {@link YamlPrinter} instance
+   * @see ObjectMapper#writer()
+   * @deprecated use {@link #yaml(ObjectMapper)}
+   */
+  @Deprecated(since = "0.12", forRemoval = true)
   public static <T> YamlPrinter<T> yamlPrinter(ObjectMapper objectMapper) {
-    return yamlPrinter(objectMapper.writer());
+    return yaml(objectMapper);
   }
 
   /**
@@ -51,6 +78,19 @@ public class YamlPrinter<T> implements Printer<T> {
    * @param <T> the type of value to print
    * @see YAMLMapper.Builder#build()
    */
+  public static <T> YamlPrinter<T> yaml() {
+    return new YamlPrinter<>();
+  }
+
+  /**
+   * Creates a {@link YamlPrinter} using the default {@link YAMLMapper}.
+   *
+   * @return a new {@link YamlPrinter} instance
+   * @param <T> the type of value to print
+   * @see YAMLMapper.Builder#build()
+   * @deprecated use {@link #yaml()}
+   */
+  @Deprecated(since = "0.12", forRemoval = true)
   public static <T> YamlPrinter<T> yamlPrinter() {
     return new YamlPrinter<>();
   }

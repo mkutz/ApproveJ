@@ -9,8 +9,8 @@ import org.approvej.ApprovalBuilder.approve
 import org.approvej.approve.Approvers.file
 import org.approvej.approve.PathProviderBuilder.nextToTest
 import org.approvej.json.jackson.JsonPointerScrubber.jsonPointer
-import org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter
-import org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter
+import org.approvej.json.jackson.JsonPrettyPrinter.json
+import org.approvej.json.jackson.JsonStringPrettyPrinter.jsonString
 import org.approvej.scrub.Scrubbers.dateTimeFormat
 import org.approvej.scrub.Scrubbers.uuids
 import org.junit.jupiter.api.Test
@@ -51,7 +51,7 @@ class JsonJacksonDocTest {
     approve(jsonMapper.readTree(createdBlogPostJson))
       .scrubbedOf(jsonPointer("/id").replacement("[scrubbed id]"))
       .scrubbedOf(jsonPointer("/published").replacement("[scrubbed published]"))
-      .printedWith(jsonPrettyPrinter()) // <1>
+      .printedAs(json()) // <1>
       .byFile()
     // end::pretty_print_json[]
   }
@@ -69,7 +69,7 @@ class JsonJacksonDocTest {
     approve(createdBlogPostJson)
       .scrubbedOf(uuids())
       .scrubbedOf(dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX"))
-      .printedWith(jsonStringPrettyPrinter()) // <1>
+      .printedAs(jsonString()) // <1>
       .byFile()
     // end::pretty_print_json_string[]
   }

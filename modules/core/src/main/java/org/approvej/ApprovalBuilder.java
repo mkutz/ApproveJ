@@ -15,6 +15,7 @@ import org.approvej.approve.FileApprover;
 import org.approvej.approve.InplaceApprover;
 import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviderBuilder;
+import org.approvej.print.MultiLinePrinter;
 import org.approvej.print.Printer;
 import org.approvej.review.FileReviewer;
 import org.approvej.review.ReviewResult;
@@ -31,11 +32,11 @@ import org.jspecify.annotations.Nullable;
  * <h2>Printing</h2>
  *
  * <p>Before approval, the value needs to be printed (turned into a {@link String}). You can use the
- * method {@link #printedWith(Printer)} to customize that. By default, the value's {@link
+ * method {@link #printedAs(Printer)} to customize that. By default, the value's {@link
  * Object#toString() toString method} will be called.
  *
  * <p>E.g. {@code approve(result).printWith(objectPrinter()).byFile();} prints the given object
- * using the given {@link org.approvej.print.ObjectPrinter}.
+ * using the given {@link MultiLinePrinter}.
  *
  * <h2>Scrubbing</h2>
  *
@@ -102,7 +103,7 @@ public class ApprovalBuilder<T> {
    *     String}
    * @return a new {@link ApprovalBuilder} with the printed value
    */
-  public ApprovalBuilder<String> printedWith(Function<T, String> printer) {
+  public ApprovalBuilder<String> printedAs(Function<T, String> printer) {
     return new ApprovalBuilder<>(printer.apply(receivedValue), name, DEFAULT_FILENAME_EXTENSION);
   }
 
@@ -112,11 +113,11 @@ public class ApprovalBuilder<T> {
    * @param printer the {@link Function} used to convert the {@link #receivedValue} to a {@link
    *     String}
    * @return a new {@link ApprovalBuilder} with the printed value
-   * @deprecated use {@link #printedWith(Function)}
+   * @deprecated use {@link #printedAs(Function)}
    */
   @Deprecated(since = "0.12", forRemoval = true)
   public ApprovalBuilder<String> printWith(Function<T, String> printer) {
-    return printedWith(printer);
+    return printedAs(printer);
   }
 
   /**
@@ -125,7 +126,7 @@ public class ApprovalBuilder<T> {
    * @param printer the printer used to convert the value to a {@link String}
    * @return a new {@link ApprovalBuilder} with the printed value
    */
-  public ApprovalBuilder<String> printedWith(Printer<T> printer) {
+  public ApprovalBuilder<String> printedAs(Printer<T> printer) {
     return new ApprovalBuilder<>(printer.apply(receivedValue), name, printer.filenameExtension());
   }
 
@@ -134,7 +135,7 @@ public class ApprovalBuilder<T> {
    *
    * @param printer the printer used to convert the value to a {@link String}
    * @return a new {@link ApprovalBuilder} with the printed value
-   * @deprecated use {@link #printedWith(Printer)}
+   * @deprecated use {@link #printedAs(Printer)}
    */
   @Deprecated(since = "0.12", forRemoval = true)
   public ApprovalBuilder<String> printWith(Printer<T> printer) {
@@ -146,11 +147,11 @@ public class ApprovalBuilder<T> {
    *
    * @return a new {@link ApprovalBuilder} with the printed value
    * @see Configuration#defaultPrinter()
-   * @see #printedWith(Printer)
+   * @see #printedAs(Printer)
    */
   public ApprovalBuilder<String> printed() {
     // noinspection unchecked
-    return printedWith((Printer<T>) configuration.defaultPrinter());
+    return printedAs((Printer<T>) configuration.defaultPrinter());
   }
 
   /**
@@ -158,7 +159,7 @@ public class ApprovalBuilder<T> {
    *
    * @return a new {@link ApprovalBuilder} with the printed value
    * @see Configuration#defaultPrinter()
-   * @see #printedWith(Printer)
+   * @see #printedAs(Printer)
    * @deprecated use {@link #printed()}
    */
   @Deprecated(since = "0.12", forRemoval = true)

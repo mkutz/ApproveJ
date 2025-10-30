@@ -1,7 +1,6 @@
 package org.approvej.json.jackson;
 
-import static org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter;
-import static org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter;
+import static org.approvej.json.jackson.JsonPrettyPrinter.json;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -14,7 +13,7 @@ class JsonPrettyPrinterTest {
   @Test
   void apply() {
     JsonMapper jsonMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
-    JsonPrettyPrinter<Object> jsonPrettyPrinter = jsonPrettyPrinter(jsonMapper);
+    JsonPrettyPrinter<Object> jsonPrettyPrinter = json(jsonMapper);
 
     assertThat(jsonPrettyPrinter.apply(new Person("Micha", LocalDate.of(1982, 2, 19))))
         .isEqualTo(
@@ -28,7 +27,7 @@ class JsonPrettyPrinterTest {
 
   @Test
   void filenameExtension() {
-    assertThat(jsonStringPrettyPrinter().filenameExtension()).isEqualTo("json");
+    assertThat(json().filenameExtension()).isEqualTo("json");
   }
 
   record Person(String name, LocalDate birthday) {}

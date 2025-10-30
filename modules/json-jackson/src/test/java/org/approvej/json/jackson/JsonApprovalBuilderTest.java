@@ -1,8 +1,8 @@
 package org.approvej.json.jackson;
 
 import static org.approvej.ApprovalBuilder.approve;
-import static org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter;
-import static org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter;
+import static org.approvej.json.jackson.JsonPrettyPrinter.json;
+import static org.approvej.json.jackson.JsonStringPrettyPrinter.jsonString;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
@@ -39,15 +39,13 @@ class JsonApprovalBuilderTest {
 
   @Test
   void approve_list() {
-    approve(List.of("a", "b", "c"))
-        .printedWith(jsonPrettyPrinter())
-        .byValue("[ \"a\", \"b\", \"c\" ]");
+    approve(List.of("a", "b", "c")).printedAs(json()).byValue("[ \"a\", \"b\", \"c\" ]");
   }
 
   @Test
   void approve_file() {
     approve(EXAMPLE_JSON)
-        .printedWith(jsonStringPrettyPrinter())
+        .printedAs(jsonString())
         .scrubbedOf(dateTimeFormat("yyyy-MM-dd").replaceWithRelativeDate())
         .scrubbedOf(uuids())
         .byFile();
@@ -56,7 +54,7 @@ class JsonApprovalBuilderTest {
   @Test
   void approve_with_scrubbers() {
     approve(EXAMPLE_JSON)
-        .printedWith(jsonStringPrettyPrinter())
+        .printedAs(jsonString())
         .scrubbedOf(dateTimeFormat("yyyy-MM-dd").replaceWithRelativeDate())
         .scrubbedOf(uuids())
         .byValue(SCRUBBED_JSON);

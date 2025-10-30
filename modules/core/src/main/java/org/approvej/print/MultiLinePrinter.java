@@ -27,7 +27,7 @@ import org.jspecify.annotations.Nullable;
  * @param <T> the type of the object to be printed
  */
 @NullMarked
-public class ObjectPrinter<T> implements Printer<T> {
+public class MultiLinePrinter<T> implements Printer<T> {
 
   /** A {@link Set} of classes that will be printed directly. */
   public static final Set<Class<?>> SIMPLE_TYPES =
@@ -47,23 +47,35 @@ public class ObjectPrinter<T> implements Printer<T> {
   private Comparator<Field> fieldComparator = (field1, field2) -> 0;
 
   /**
-   * Creates a new {@link ObjectPrinter} instance that prints the given object.
+   * Creates a new {@link MultiLinePrinter} instance that prints the given object.
    *
    * <p>This constructor is public to allow instantiation via reflection, e.g. in the {@link
    * org.approvej.Configuration} class.
    */
-  public ObjectPrinter() {
+  public MultiLinePrinter() {
     // No initialization needed
   }
 
   /**
-   * Creates a new {@link ObjectPrinter} instance.
+   * Creates a new {@link MultiLinePrinter} instance.
    *
-   * @return a new {@link ObjectPrinter} instance
+   * @return a new {@link MultiLinePrinter} instance
    * @param <T> the type of the object to be printed
    */
-  public static <T> ObjectPrinter<T> objectPrinter() {
-    return new ObjectPrinter<>();
+  public static <T> MultiLinePrinter<T> multiLineString() {
+    return new MultiLinePrinter<>();
+  }
+
+  /**
+   * Creates a new {@link MultiLinePrinter} instance.
+   *
+   * @return a new {@link MultiLinePrinter} instance
+   * @param <T> the type of the object to be printed
+   * @deprecated use {@link #multiLineString()}
+   */
+  @Deprecated(since = "0.12", forRemoval = true)
+  public static <T> MultiLinePrinter<T> objectPrinter() {
+    return new MultiLinePrinter<>();
   }
 
   /**
@@ -72,7 +84,7 @@ public class ObjectPrinter<T> implements Printer<T> {
    *
    * @return this
    */
-  public ObjectPrinter<T> sorted() {
+  public MultiLinePrinter<T> sorted() {
     fieldComparator = Comparator.comparing(Field::getName);
     return this;
   }

@@ -25,7 +25,7 @@ public class JsonStringPrettyPrinter implements JsonPrinter<String> {
    * @see ObjectMapper#reader()
    * @see ObjectMapper#writerWithDefaultPrettyPrinter()
    */
-  public static JsonStringPrettyPrinter jsonStringPrettyPrinter(ObjectMapper objectMapper) {
+  public static JsonStringPrettyPrinter jsonString(ObjectMapper objectMapper) {
     return new JsonStringPrettyPrinter(
         objectMapper.reader(), objectMapper.writerWithDefaultPrettyPrinter());
   }
@@ -35,8 +35,8 @@ public class JsonStringPrettyPrinter implements JsonPrinter<String> {
    *
    * @return a {@link JsonStringPrettyPrinter} using the default {@link JsonMapper}.
    */
-  public static JsonStringPrettyPrinter jsonStringPrettyPrinter() {
-    return jsonStringPrettyPrinter(JsonMapper.builder().addModule(new JavaTimeModule()).build());
+  public static JsonStringPrettyPrinter jsonString() {
+    return jsonString(JsonMapper.builder().addModule(new JavaTimeModule()).build());
   }
 
   private JsonStringPrettyPrinter(ObjectReader objectReader, ObjectWriter objectWriter) {
