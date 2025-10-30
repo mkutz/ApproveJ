@@ -139,7 +139,7 @@ public class ApprovalBuilder<T> {
    */
   @Deprecated(since = "0.12", forRemoval = true)
   public ApprovalBuilder<String> printWith(Printer<T> printer) {
-    return new ApprovalBuilder<>(printer.apply(receivedValue), name, printer.filenameExtension());
+    return printedAs(printer);
   }
 
   /**
@@ -204,8 +204,7 @@ public class ApprovalBuilder<T> {
    */
   @Deprecated(since = "0.12", forRemoval = true)
   public ApprovalBuilder<T> reviewWith(FileReviewer reviewer) {
-    this.fileReviewer = reviewer;
-    return this;
+    return reviewedWith(reviewer);
   }
 
   /**
@@ -235,7 +234,7 @@ public class ApprovalBuilder<T> {
    */
   @Deprecated(since = "0.12", forRemoval = true)
   public ApprovalBuilder<T> reviewWith(String script) {
-    return reviewedWith(script(script));
+    return reviewedWith(script);
   }
 
   /**
