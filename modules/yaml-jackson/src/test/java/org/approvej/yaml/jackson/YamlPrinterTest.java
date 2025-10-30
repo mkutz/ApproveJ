@@ -6,17 +6,11 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 class YamlPrinterTest {
-
-  @Test
-  void constructor() {
-    assertThat(yaml()).isNotNull();
-    assertThat(yaml(new ObjectMapper())).isNotNull();
-    assertThat(yaml(YAMLMapper.builder().build())).isNotNull();
-  }
 
   @Test
   void apply() {
@@ -31,11 +25,26 @@ class YamlPrinterTest {
 
   @Test
   void apply_failure() {
-    YamlPrinter<Object> yamlPrinterNoJavaTimeModule = yaml(new ObjectMapper());
     LocalDate someLocalDate = LocalDate.of(1982, 2, 19);
+
     assertThatExceptionOfType(YamlPrinterException.class)
-        .isThrownBy(() -> yamlPrinterNoJavaTimeModule.apply(someLocalDate))
+        .isThrownBy(() -> yaml().using(new ObjectMapper()).apply(someLocalDate))
         .withMessage("Failed to print %s".formatted(someLocalDate));
+  }
+
+  @Test
+  void using() {
+    LocalDate someLocalDate = LocalDate.of(1982, 2, 19);
+    YAMLMapper yamlMapper = YAMLMapper.builder().addModule(new JavaTimeModule()).build();
+
+    assertThat(yaml().using(yamlMapper).apply(someLocalDate))
+        .isEqualTo(
+            """
+            ---
+            - 1982
+            - 2
+            - 19
+            """);
   }
 
   @Test
