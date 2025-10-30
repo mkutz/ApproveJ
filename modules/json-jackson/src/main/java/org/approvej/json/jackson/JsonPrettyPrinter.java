@@ -15,9 +15,11 @@ import org.jspecify.annotations.NullMarked;
  * JSON.
  *
  * @param <T> the type of value to print
+ * @deprecated use {@link JsonPrinter}
  */
+@Deprecated(since = "0.12", forRemoval = true)
 @NullMarked
-public class JsonPrettyPrinter<T> implements JsonPrinter<T> {
+public class JsonPrettyPrinter<T> implements Printer<T> {
 
   private final ObjectWriter objectWriter;
 
@@ -28,24 +30,11 @@ public class JsonPrettyPrinter<T> implements JsonPrinter<T> {
    * @param <T> the type of value to print
    * @return a new {@link JsonPrettyPrinter} instance
    */
-  public static <T> JsonPrettyPrinter<T> json(ObjectWriter objectWriter) {
+  public static <T> JsonPrettyPrinter<T> jsonPrettyPrinter(ObjectWriter objectWriter) {
     return new JsonPrettyPrinter<>(objectWriter);
   }
 
   /**
-   * Creates a {@link JsonPrettyPrinter} using the given {@link ObjectWriter}.
-   *
-   * @param objectWriter the {@link ObjectWriter} that will be used for printing
-   * @param <T> the type of value to print
-   * @return a new {@link JsonPrettyPrinter} instance
-   * @deprecated use {@link #json(ObjectWriter)}
-   */
-  @Deprecated(since = "0.12", forRemoval = true)
-  public static <T> JsonPrettyPrinter<T> jsonPrettyPrinter(ObjectWriter objectWriter) {
-    return json(objectWriter);
-  }
-
-  /**
    * Creates a {@link JsonPrettyPrinter} using the given {@link ObjectMapper}.
    *
    * @param objectMapper the {@link ObjectMapper} used to create the {@link ObjectWriter}
@@ -53,46 +42,19 @@ public class JsonPrettyPrinter<T> implements JsonPrinter<T> {
    * @return a new {@link JsonPrettyPrinter} instance
    * @see ObjectMapper#writerWithDefaultPrettyPrinter()
    */
-  public static <T> JsonPrettyPrinter<T> json(ObjectMapper objectMapper) {
+  public static <T> JsonPrettyPrinter<T> jsonPrettyPrinter(ObjectMapper objectMapper) {
     return new JsonPrettyPrinter<>(objectMapper.writerWithDefaultPrettyPrinter());
   }
 
   /**
-   * Creates a {@link JsonPrettyPrinter} using the given {@link ObjectMapper}.
-   *
-   * @param objectMapper the {@link ObjectMapper} used to create the {@link ObjectWriter}
-   * @param <T> the type of value to print
-   * @return a new {@link JsonPrettyPrinter} instance
-   * @see ObjectMapper#writerWithDefaultPrettyPrinter()
-   * @deprecated use {@link #json(ObjectMapper)}
-   */
-  @Deprecated(since = "0.12", forRemoval = true)
-  public static <T> JsonPrettyPrinter<T> jsonPrettyPrinter(ObjectMapper objectMapper) {
-    return json(objectMapper);
-  }
-
-  /**
    * Creates a {@link JsonPrettyPrinter} using the default {@link JsonMapper}.
    *
    * @return a new {@link JsonPrettyPrinter} instance
    * @param <T> the type of value to print
    * @see JsonMapper.Builder#build()
    */
-  public static <T> JsonPrettyPrinter<T> json() {
-    return new JsonPrettyPrinter<>();
-  }
-
-  /**
-   * Creates a {@link JsonPrettyPrinter} using the default {@link JsonMapper}.
-   *
-   * @return a new {@link JsonPrettyPrinter} instance
-   * @param <T> the type of value to print
-   * @see JsonMapper.Builder#build()
-   * @deprecated use {@link #json()}
-   */
-  @Deprecated(since = "0.12", forRemoval = true)
   public static <T> JsonPrettyPrinter<T> jsonPrettyPrinter() {
-    return json();
+    return new JsonPrettyPrinter<>();
   }
 
   /**
@@ -118,7 +80,12 @@ public class JsonPrettyPrinter<T> implements JsonPrinter<T> {
     try {
       return objectWriter.writeValueAsString(value);
     } catch (JsonProcessingException e) {
-      throw new JsonPrettyPrinterException(value, e);
+      throw new JsonPrinterException(value, e);
     }
+  }
+
+  @Override
+  public String filenameExtension() {
+    return "json";
   }
 }

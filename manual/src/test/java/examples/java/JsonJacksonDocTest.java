@@ -7,8 +7,7 @@ import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.approve.Approvers.file;
 import static org.approvej.approve.PathProviderBuilder.nextToTest;
 import static org.approvej.json.jackson.JsonPointerScrubber.jsonPointer;
-import static org.approvej.json.jackson.JsonPrettyPrinter.json;
-import static org.approvej.json.jackson.JsonStringPrettyPrinter.jsonString;
+import static org.approvej.json.jackson.JsonPrinter.json;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
 
@@ -67,7 +66,7 @@ class JsonJacksonDocTest {
     approve(createdBlogPostJson)
         .scrubbedOf(uuids())
         .scrubbedOf(dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX"))
-        .printedAs(jsonString()) // <1>
+        .printedAs(json()) // <1>
         .byFile();
     // end::pretty_print_json_string[]
   }

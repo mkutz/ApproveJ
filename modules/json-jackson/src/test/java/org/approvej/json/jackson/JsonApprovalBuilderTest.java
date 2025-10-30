@@ -1,8 +1,7 @@
 package org.approvej.json.jackson;
 
 import static org.approvej.ApprovalBuilder.approve;
-import static org.approvej.json.jackson.JsonPrettyPrinter.json;
-import static org.approvej.json.jackson.JsonStringPrettyPrinter.jsonString;
+import static org.approvej.json.jackson.JsonPrinter.json;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
@@ -45,7 +44,7 @@ class JsonApprovalBuilderTest {
   @Test
   void approve_file() {
     approve(EXAMPLE_JSON)
-        .printedAs(jsonString())
+        .printedAs(json())
         .scrubbedOf(dateTimeFormat("yyyy-MM-dd").replaceWithRelativeDate())
         .scrubbedOf(uuids())
         .byFile();
@@ -54,7 +53,7 @@ class JsonApprovalBuilderTest {
   @Test
   void approve_with_scrubbers() {
     approve(EXAMPLE_JSON)
-        .printedAs(jsonString())
+        .printedAs(json())
         .scrubbedOf(dateTimeFormat("yyyy-MM-dd").replaceWithRelativeDate())
         .scrubbedOf(uuids())
         .byValue(SCRUBBED_JSON);

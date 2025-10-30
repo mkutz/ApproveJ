@@ -9,9 +9,14 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.approvej.print.Printer;
 import org.jspecify.annotations.NullMarked;
 
-/** A {@link Printer} for JSON strings that should be pretty-printed. */
+/**
+ * A {@link Printer} for JSON strings that should be pretty-printed.
+ *
+ * @deprecated use {@link JsonPrinter}
+ */
+@Deprecated(since = "0.12", forRemoval = true)
 @NullMarked
-public class JsonStringPrettyPrinter implements JsonPrinter<String> {
+public class JsonStringPrettyPrinter implements Printer<String> {
 
   private final ObjectReader objectReader;
   private final ObjectWriter objectWriter;
@@ -25,7 +30,7 @@ public class JsonStringPrettyPrinter implements JsonPrinter<String> {
    * @see ObjectMapper#reader()
    * @see ObjectMapper#writerWithDefaultPrettyPrinter()
    */
-  public static JsonStringPrettyPrinter jsonString(ObjectMapper objectMapper) {
+  public static JsonStringPrettyPrinter jsonStringPrettyPrinter(ObjectMapper objectMapper) {
     return new JsonStringPrettyPrinter(
         objectMapper.reader(), objectMapper.writerWithDefaultPrettyPrinter());
   }
@@ -35,8 +40,8 @@ public class JsonStringPrettyPrinter implements JsonPrinter<String> {
    *
    * @return a {@link JsonStringPrettyPrinter} using the default {@link JsonMapper}.
    */
-  public static JsonStringPrettyPrinter jsonString() {
-    return jsonString(JsonMapper.builder().addModule(new JavaTimeModule()).build());
+  public static JsonStringPrettyPrinter jsonStringPrettyPrinter() {
+    return jsonStringPrettyPrinter(JsonMapper.builder().addModule(new JavaTimeModule()).build());
   }
 
   private JsonStringPrettyPrinter(ObjectReader objectReader, ObjectWriter objectWriter) {
@@ -49,7 +54,12 @@ public class JsonStringPrettyPrinter implements JsonPrinter<String> {
     try {
       return objectWriter.writeValueAsString(objectReader.readTree(value));
     } catch (JsonProcessingException e) {
-      throw new JsonPrettyPrinterException(value, e);
+      throw new JsonPrinterException(value, e);
     }
+  }
+
+  @Override
+  public String filenameExtension() {
+    return "json";
   }
 }
