@@ -25,6 +25,7 @@ testing {
           implementation(project(":modules:core"))
           implementation(project(":modules:json-jackson"))
           implementation(project(":modules:yaml-jackson"))
+          implementation(project(":modules:http"))
 
           implementation(platform(libs.junit.bom))
           implementation(libs.junit.jupiter.api)
