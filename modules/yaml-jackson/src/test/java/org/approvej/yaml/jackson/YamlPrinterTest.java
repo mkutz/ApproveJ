@@ -26,9 +26,10 @@ class YamlPrinterTest {
   @Test
   void apply_failure() {
     LocalDate someLocalDate = LocalDate.of(1982, 2, 19);
+    YamlPrinter<Object> yamlPrinterWithoutJavaTime = yaml().using(new ObjectMapper());
 
     assertThatExceptionOfType(YamlPrinterException.class)
-        .isThrownBy(() -> yaml().using(new ObjectMapper()).apply(someLocalDate))
+        .isThrownBy(() -> yamlPrinterWithoutJavaTime.apply(someLocalDate))
         .withMessage("Failed to print %s".formatted(someLocalDate));
   }
 
