@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
 
+@Deprecated(since = "0.12", forRemoval = true)
 class JsonStringPrettyPrinterTest {
 
   @Test
@@ -30,7 +31,7 @@ class JsonStringPrettyPrinterTest {
     JsonStringPrettyPrinter jsonStringPrettyPrinter =
         jsonStringPrettyPrinter(JsonMapper.builder().addModule(new JavaTimeModule()).build());
 
-    assertThatExceptionOfType(JsonPrettyPrinterException.class)
+    assertThatExceptionOfType(JsonPrinterException.class)
         .isThrownBy(() -> jsonStringPrettyPrinter.apply("{"));
   }
 

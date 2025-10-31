@@ -4,7 +4,7 @@ import static org.approvej.Configuration.configuration;
 import static org.approvej.approve.Approvers.file;
 import static org.approvej.approve.Approvers.value;
 import static org.approvej.approve.PathProviderBuilder.approvedPath;
-import static org.approvej.print.Printer.DEFAULT_FILENAME_EXTENSION;
+import static org.approvej.print.PrintFormat.DEFAULT_FILENAME_EXTENSION;
 import static org.approvej.review.FileReviewerScript.script;
 
 import java.nio.file.Path;
@@ -15,6 +15,8 @@ import org.approvej.approve.FileApprover;
 import org.approvej.approve.InplaceApprover;
 import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviderBuilder;
+import org.approvej.print.MultiLineStringFormat;
+import org.approvej.print.PrintFormat;
 import org.approvej.print.Printer;
 import org.approvej.review.FileReviewer;
 import org.approvej.review.ReviewResult;
@@ -31,11 +33,11 @@ import org.jspecify.annotations.Nullable;
  * <h2>Printing</h2>
  *
  * <p>Before approval, the value needs to be printed (turned into a {@link String}). You can use the
- * method {@link #printWith(Printer)} to customize that. By default, the value's {@link
- * Object#toString() toString method} will be called.
+ * methods {@link #printedAs(PrintFormat)} and {@link #printedWith(Function)} to customize that. By
+ * default, the value's {@link Object#toString() toString method} will be used.
  *
- * <p>E.g. {@code approve(result).printWith(objectPrinter()).byFile();} prints the given object
- * using the given {@link org.approvej.print.ObjectPrinter}.
+ * <p>E.g. {@code approve(result).printedAs(multiLineString()).byFile();} prints the given object
+ * using the given {@link MultiLineStringFormat}.
  *
  * <h2>Scrubbing</h2>
  *
@@ -47,8 +49,8 @@ import org.jspecify.annotations.Nullable;
  *
  * <h2>Approving</h2>
  *
- * <p>The builder is concluded by specifying an approver to approve the value {@link #by(Function)}
- * by} ( {@link #byFile()} and {@link #byValue(String)}).
+ * <p>The builder is concluded by specifying an approver to approve the value {@link #by(Function)
+ * by} ({@link #byFile()} and {@link #byValue(String)}).
  *
  * <p>E.g. {@code approve(result).byFile();} approves the result with the content of a file next to
  * the test, while {@code approve(result).byValue(approved);} approves the result with the given
@@ -102,8 +104,33 @@ public class ApprovalBuilder<T> {
    *     String}
    * @return a new {@link ApprovalBuilder} with the printed value
    */
-  public ApprovalBuilder<String> printWith(Function<T, String> printer) {
+  public ApprovalBuilder<String> printedWith(Function<? super T, String> printer) {
     return new ApprovalBuilder<>(printer.apply(receivedValue), name, DEFAULT_FILENAME_EXTENSION);
+  }
+
+  /**
+   * Uses the given {@link Function} to convert the {@link #receivedValue} to a {@link String}.
+   *
+   * @param printer the {@link Function} used to convert the {@link #receivedValue} to a {@link
+   *     String}
+   * @return a new {@link ApprovalBuilder} with the printed value
+   * @deprecated use {@link #printedWith(Function)}
+   */
+  @Deprecated(since = "0.12", forRemoval = true)
+  public ApprovalBuilder<String> printWith(Function<? super T, String> printer) {
+    return printedWith(printer);
+  }
+
+  /**
+   * Uses the given {@link PrintFormat}'s printer to convert the {@link #receivedValue} to a {@link
+   * String}.
+   *
+   * @param printFormat the printer used to convert the value to a {@link String}
+   * @return a new {@link ApprovalBuilder} with the printed value
+   */
+  public ApprovalBuilder<String> printedAs(PrintFormat<? super T> printFormat) {
+    return new ApprovalBuilder<>(
+        printFormat.apply(receivedValue), name, printFormat.filenameExtension());
   }
 
   /**
@@ -111,21 +138,35 @@ public class ApprovalBuilder<T> {
    *
    * @param printer the printer used to convert the value to a {@link String}
    * @return a new {@link ApprovalBuilder} with the printed value
+   * @deprecated use {@link #printedAs(PrintFormat)} or {@link #printedWith(Function)}
    */
-  public ApprovalBuilder<String> printWith(Printer<T> printer) {
-    return new ApprovalBuilder<>(printer.apply(receivedValue), name, printer.filenameExtension());
+  @Deprecated(since = "0.12", forRemoval = true)
+  public ApprovalBuilder<String> printWith(Printer<? super T> printer) {
+    return printedWith(printer);
   }
 
   /**
-   * Uses the default {@link Printer} to convert the {@link #receivedValue} to a {@link String}.
+   * Uses the default {@link PrintFormat} to convert the {@link #receivedValue} to a {@link String}.
    *
    * @return a new {@link ApprovalBuilder} with the printed value
-   * @see Configuration#defaultPrinter()
-   * @see #printWith(Printer)
+   * @see Configuration#defaultPrintFormat()
+   * @see #printedAs(PrintFormat)
    */
+  public ApprovalBuilder<String> printed() {
+    return printedAs(configuration.defaultPrintFormat());
+  }
+
+  /**
+   * Uses the default {@link PrintFormat} to convert the {@link #receivedValue} to a {@link String}.
+   *
+   * @return a new {@link ApprovalBuilder} with the printed value
+   * @see Configuration#defaultPrintFormat()
+   * @see #printedAs(PrintFormat)
+   * @deprecated use {@link #printed()}
+   */
+  @Deprecated(since = "0.12", forRemoval = true)
   public ApprovalBuilder<String> print() {
-    // noinspection unchecked
-    return printWith((Printer<T>) configuration.defaultPrinter());
+    return printed();
   }
 
   /**
@@ -148,9 +189,24 @@ public class ApprovalBuilder<T> {
    * @see Configuration#defaultFileReviewer()
    * @see org.approvej.review.FileReviewerScript#script()
    */
-  public ApprovalBuilder<T> reviewWith(FileReviewer reviewer) {
+  public ApprovalBuilder<T> reviewedWith(FileReviewer reviewer) {
     this.fileReviewer = reviewer;
     return this;
+  }
+
+  /**
+   * Sets the given {@link FileReviewer} to trigger if the received value is not equal to the
+   * previously approved.
+   *
+   * @param reviewer the {@link FileReviewer} to be used
+   * @return this
+   * @see Configuration#defaultFileReviewer()
+   * @see org.approvej.review.FileReviewerScript#script()
+   * @deprecated use {@link #reviewedWith(FileReviewer)}
+   */
+  @Deprecated(since = "0.12", forRemoval = true)
+  public ApprovalBuilder<T> reviewWith(FileReviewer reviewer) {
+    return reviewedWith(reviewer);
   }
 
   /**
@@ -163,22 +219,38 @@ public class ApprovalBuilder<T> {
    * @see Configuration#defaultFileReviewer()
    * @see org.approvej.review.FileReviewerScript#script()
    */
+  public ApprovalBuilder<T> reviewedWith(String script) {
+    return reviewedWith(script(script));
+  }
+
+  /**
+   * Creates a {@link org.approvej.review.FileReviewerScript} from the given script {@link String}
+   * to trigger if the received value is not equal to the previously approved.
+   *
+   * @param script the script {@link String} to be used as a {@link
+   *     org.approvej.review.FileReviewerScript}
+   * @return this
+   * @see Configuration#defaultFileReviewer()
+   * @see org.approvej.review.FileReviewerScript#script()
+   * @deprecated use {@link #reviewedWith(String)}
+   */
+  @Deprecated(since = "0.12", forRemoval = true)
   public ApprovalBuilder<T> reviewWith(String script) {
-    return reviewWith(script(script));
+    return reviewedWith(script);
   }
 
   /**
    * Approves the {@link #receivedValue} by the given approver.
    *
    * <p>If necessary the {@link #receivedValue} is printed using the {@link
-   * Configuration#defaultPrinter()}.
+   * Configuration#defaultPrintFormat()}.
    *
    * @param approver a {@link Function} or an {@link Approver} implementation
    * @throws ApprovalError if the approval fails
    */
   public void by(final Function<String, ApprovalResult> approver) {
     if (!(receivedValue instanceof String)) {
-      print().by(approver);
+      printed().by(approver);
     }
     ApprovalResult result = approver.apply(String.valueOf(receivedValue));
     if (result.needsApproval()) {
@@ -222,8 +294,7 @@ public class ApprovalBuilder<T> {
    */
   public void byFile(PathProviderBuilder pathProviderBuilder) {
     if (!(receivedValue instanceof String)) {
-      // noinspection unchecked
-      printWith((Printer<T>) configuration.defaultPrinter()).byFile(pathProviderBuilder);
+      printed().byFile(pathProviderBuilder);
     } else {
       byFile(pathProviderBuilder.filenameAffix(name).filenameExtension(filenameExtension));
     }
@@ -232,7 +303,7 @@ public class ApprovalBuilder<T> {
   /**
    * Approves the receivedValue by a {@link FileApprover}, using a {@link
    * PathProviderBuilder#nextToTest() nextToTest PathProviderBuilder}, and the {@link
-   * Printer#filenameExtension() used Printer's filenameExtension}.
+   * PrintFormat#filenameExtension() used PrintFormat's filenameExtension}.
    *
    * @throws ApprovalError if the approval fails
    */

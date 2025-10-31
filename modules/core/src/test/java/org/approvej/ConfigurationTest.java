@@ -10,6 +10,7 @@ class ConfigurationTest {
   @Test
   void configuration() {
     assertThat(Configuration.configuration).isNotNull();
-    assertThat(Configuration.configuration.defaultPrinter()).isInstanceOf(ToStringPrinter.class);
+    assertThat(Configuration.configuration.defaultPrintFormat())
+        .isInstanceOf(ToStringPrinter.class);
   }
 }

@@ -3,9 +3,9 @@ package org.approvej.print;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-/** A simple {@link Printer} implementation that uses the {@link Object#toString()} method. */
+/** A simple {@link PrintFormat} implementation that uses the {@link Object#toString()} method. */
 @NullMarked
-public class ToStringPrinter implements Printer<Object> {
+public class ToStringPrinter implements PrintFormat<Object> {
 
   /**
    * Creates a new {@link ToStringPrinter}.

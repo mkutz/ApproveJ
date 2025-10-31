@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
-import org.approvej.print.Printer;
+import org.approvej.print.PrintFormat;
 import org.approvej.print.ToStringPrinter;
 import org.approvej.review.FileReviewer;
 import org.approvej.review.FileReviewerScript;
@@ -19,14 +19,16 @@ import org.jspecify.annotations.Nullable;
  * <p>All properties have a default value, which can be overwritten in your
  * src/test/resources/approvej.properties or ~/.config/approvej/approvej.properties.
  *
- * @param defaultPrinter the {@link Printer} that will be used if none is specified otherwise
+ * @param defaultPrintFormat the {@link PrintFormat} that will be used if none is specified
+ *     otherwise
  * @param defaultFileReviewer the {@link FileReviewer} that will be used if none is specified
  */
 @NullMarked
 public record Configuration(
-    Printer<Object> defaultPrinter, @Nullable FileReviewer defaultFileReviewer) {
+    PrintFormat<Object> defaultPrintFormat, @Nullable FileReviewer defaultFileReviewer) {
 
   private static final String DEFAULT_PRINTER_PROPERTY = "defaultPrinter";
+  private static final String DEFAULT_PRINT_FORMAT_PROPERTY = "defaultPrintFormat";
   private static final String DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY = "defaultFileReviewerScript";
 
   private static final Properties DEFAULTS = new Properties();
@@ -41,14 +43,18 @@ public record Configuration(
   private static Configuration loadConfiguration() {
     Properties properties = loadProperties();
 
-    String defaultPrinter = properties.getProperty(DEFAULT_PRINTER_PROPERTY);
-    Printer<Object> printer;
+    String defaultPrintFormat =
+        properties.getProperty(
+            DEFAULT_PRINT_FORMAT_PROPERTY, properties.getProperty(DEFAULT_PRINTER_PROPERTY));
+    PrintFormat<Object> printFormat;
     try {
       // noinspection unchecked
-      printer =
-          (Printer<Object>) Class.forName(defaultPrinter).getDeclaredConstructor().newInstance();
+      printFormat =
+          (PrintFormat<Object>)
+              Class.forName(defaultPrintFormat).getDeclaredConstructor().newInstance();
     } catch (ReflectiveOperationException e) {
-      throw new ConfigurationError("Failed to create printer %s".formatted(defaultPrinter), e);
+      throw new ConfigurationError(
+          "Failed to create print format %s".formatted(defaultPrintFormat), e);
     }
 
     String defaultFileReviewerScript =
@@ -58,7 +64,7 @@ public record Configuration(
       defaultFileReviewer = new FileReviewerScript(defaultFileReviewerScript);
     }
 
-    return new Configuration(printer, defaultFileReviewer);
+    return new Configuration(printFormat, defaultFileReviewer);
   }
 
   private static Properties loadProperties() {
