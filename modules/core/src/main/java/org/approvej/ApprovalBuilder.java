@@ -15,7 +15,7 @@ import org.approvej.approve.FileApprover;
 import org.approvej.approve.InplaceApprover;
 import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviderBuilder;
-import org.approvej.print.MultiLinePrinter;
+import org.approvej.print.MultiLineStringPrinter;
 import org.approvej.print.Printer;
 import org.approvej.review.FileReviewer;
 import org.approvej.review.ReviewResult;
@@ -35,8 +35,8 @@ import org.jspecify.annotations.Nullable;
  * method {@link #printedAs(Printer)} to customize that. By default, the value's {@link
  * Object#toString() toString method} will be called.
  *
- * <p>E.g. {@code approve(result).printWith(objectPrinter()).byFile();} prints the given object
- * using the given {@link MultiLinePrinter}.
+ * <p>E.g. {@code approve(result).printedAs(multiLineString()).byFile();} prints the given object
+ * using the given {@link MultiLineStringPrinter}.
  *
  * <h2>Scrubbing</h2>
  *
@@ -48,7 +48,7 @@ import org.jspecify.annotations.Nullable;
  *
  * <h2>Approving</h2>
  *
- * <p>The builder is concluded by specifying an approver to approve the value {@link #by(Function)}
+ * <p>The builder is concluded by specifying an approver to approve the value {@link #by(Function)
  * by} ({@link #byFile()} and {@link #byValue(String)}).
  *
  * <p>E.g. {@code approve(result).byFile();} approves the result with the content of a file next to
@@ -103,7 +103,7 @@ public class ApprovalBuilder<T> {
    *     String}
    * @return a new {@link ApprovalBuilder} with the printed value
    */
-  public ApprovalBuilder<String> printedAs(Function<? super T, String> printer) {
+  public ApprovalBuilder<String> printedWith(Function<? super T, String> printer) {
     return new ApprovalBuilder<>(printer.apply(receivedValue), name, DEFAULT_FILENAME_EXTENSION);
   }
 
@@ -113,11 +113,11 @@ public class ApprovalBuilder<T> {
    * @param printer the {@link Function} used to convert the {@link #receivedValue} to a {@link
    *     String}
    * @return a new {@link ApprovalBuilder} with the printed value
-   * @deprecated use {@link #printedAs(Function)}
+   * @deprecated use {@link #printedWith(Function)}
    */
   @Deprecated(since = "0.12", forRemoval = true)
   public ApprovalBuilder<String> printWith(Function<? super T, String> printer) {
-    return printedAs(printer);
+    return printedWith(printer);
   }
 
   /**

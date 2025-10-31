@@ -10,7 +10,7 @@ import java.time.LocalDate
 import org.approvej.ApprovalBuilder.approve
 import org.approvej.approve.PathProviderBuilder.nextToTest
 import org.approvej.approve.PathProviderBuilder.nextToTestInSubdirectory
-import org.approvej.print.MultiLinePrinter.multiLineString
+import org.approvej.print.MultiLineStringPrinter.multiLineString
 import org.approvej.print.Printer
 import org.approvej.scrub.Scrubbers.dateTimeFormat
 import org.approvej.scrub.Scrubbers.uuids

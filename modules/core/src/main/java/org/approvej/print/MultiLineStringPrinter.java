@@ -25,7 +25,7 @@ import org.jspecify.annotations.Nullable;
  * A generic printer for Java {@link Object}s that prints their properties and values one per line.
  */
 @NullMarked
-public class MultiLinePrinter implements Printer<Object> {
+public class MultiLineStringPrinter implements Printer<Object> {
 
   /** A {@link Set} of classes that will be printed directly. */
   public static final Set<Class<?>> SIMPLE_TYPES =
@@ -45,33 +45,33 @@ public class MultiLinePrinter implements Printer<Object> {
   private Comparator<Field> fieldComparator = (field1, field2) -> 0;
 
   /**
-   * Creates a new {@link MultiLinePrinter} instance that prints the given object.
+   * Creates a new {@link MultiLineStringPrinter} instance that prints the given object.
    *
    * <p>This constructor is public to allow instantiation via reflection, e.g. in the {@link
    * org.approvej.Configuration} class.
    */
-  public MultiLinePrinter() {
+  public MultiLineStringPrinter() {
     // No initialization needed
   }
 
   /**
-   * Creates a new {@link MultiLinePrinter} instance.
+   * Creates a new {@link MultiLineStringPrinter} instance.
    *
-   * @return a new {@link MultiLinePrinter} instance
+   * @return a new {@link MultiLineStringPrinter} instance
    */
-  public static MultiLinePrinter multiLineString() {
-    return new MultiLinePrinter();
+  public static MultiLineStringPrinter multiLineString() {
+    return new MultiLineStringPrinter();
   }
 
   /**
-   * Creates a new {@link MultiLinePrinter} instance.
+   * Creates a new {@link MultiLineStringPrinter} instance.
    *
-   * @return a new {@link MultiLinePrinter} instance
+   * @return a new {@link MultiLineStringPrinter} instance
    * @deprecated use {@link #multiLineString()}
    */
   @Deprecated(since = "0.12", forRemoval = true)
-  public static MultiLinePrinter objectPrinter() {
-    return new MultiLinePrinter();
+  public static MultiLineStringPrinter objectPrinter() {
+    return new MultiLineStringPrinter();
   }
 
   /**
@@ -80,7 +80,7 @@ public class MultiLinePrinter implements Printer<Object> {
    *
    * @return this
    */
-  public MultiLinePrinter sorted() {
+  public MultiLineStringPrinter sorted() {
     fieldComparator = Comparator.comparing(Field::getName);
     return this;
   }

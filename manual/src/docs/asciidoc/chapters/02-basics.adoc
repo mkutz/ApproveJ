@@ -115,9 +115,9 @@ However, if you have a lot of properties, it is much easier to read the result i
 In order to change the way objects are being transformed to strings, you can use the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`]'s `printWith` method and provide a link:{javadoc-url}/core/org/approvej/print/Printer.html[`Printer`]/`Function<T, String>` instance as an argument.
 
 
-=== Generic Multi Line Printer
+=== Generic Multi Line String Printer
 
-ApproveJ provides a generic link:{javadoc-url}/core/org/approvej/print/MultiLinePrinter.html[`MultiLinePrinter`] that will print the object with each of its properties on a new line to make comparing the result easier.
+ApproveJ provides a generic link:{javadoc-url}/core/org/approvej/print/MultiLineStringPrinter.html[`MultiLineStringPrinter`] that will print the object with each of its properties on a new line to make comparing the result easier.
 You can use this printer by calling the `printAs` method on the builder.
 
 [source,java,indent=0,role="primary"]
@@ -130,7 +130,7 @@ include::../../../test/java/examples/java/BasicsDocTest.java[tag=multi_line_stri
 ----
 include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=multi_line_string_printer]
 ----
-<1> applies the `MultiLinePrinter` and returns a new `ApprovalBuilder<String>`
+<1> applies the `MultiLineStringPrinter` and returns a new `ApprovalBuilder<String>`
 
 Now the approved file will look like this
 

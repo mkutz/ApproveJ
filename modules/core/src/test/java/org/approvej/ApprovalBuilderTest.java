@@ -7,7 +7,7 @@ import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.approve.Approvers.value;
 import static org.approvej.approve.PathProviderBuilder.approvedPath;
 import static org.approvej.approve.PathProviderBuilder.nextToTest;
-import static org.approvej.print.MultiLinePrinter.multiLineString;
+import static org.approvej.print.MultiLineStringPrinter.multiLineString;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -155,11 +155,11 @@ class ApprovalBuilderTest {
   }
 
   @Test
-  void approve_pojo_printedAs_function() {
+  void approve_pojo_printedWith_function() {
     Function<Person, String> personPrinter =
         person -> "id=%s%nname=%s%nbirthday=%s".formatted(person.id, person.name, person.birthday);
     approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
-        .printedAs(personPrinter)
+        .printedWith(personPrinter)
         .byValue("id=000000-0000-0000-00000001\nname=Micha\nbirthday=1982-02-19");
   }
 

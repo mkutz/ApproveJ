@@ -10,14 +10,19 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.approvej.print.Printer;
 
 /**
- * A {@link Printer} that prints values as pretty-printed JSON using {@link ObjectWriter#writeValueAsString(Object)}.
- * <p>
- * This printer handles both arbitrary Java objects and JSON strings:
+ * A {@link Printer} that prints values as pretty-printed JSON using {@link
+ * ObjectWriter#writeValueAsString(Object)}.
+ *
+ * <p>This printer handles both arbitrary Java objects and JSON strings:
+ *
  * <ul>
- *   <li>If the input is a Java object (other than {@link String}), it is serialized to pretty-printed JSON.</li>
- *   <li>If the input is a {@link String}, it is assumed to be a JSON string, which is parsed and then pretty-printed.
- *       If the string is not valid JSON, a {@link JsonPrinterException} is thrown.</li>
+ *   <li>If the input is a Java object (other than {@link String}), it is serialized to
+ *       pretty-printed JSON.
+ *   <li>If the input is a {@link String}, it is assumed to be a JSON string, which is parsed and
+ *       then pretty-printed. If the string is not valid JSON, a {@link JsonPrinterException} is
+ *       thrown.
  * </ul>
+ *
  * This special handling allows pretty-printing of raw JSON strings as well as Java objects.
  */
 public class JsonPrinter implements Printer<Object> {
