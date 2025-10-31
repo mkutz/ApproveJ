@@ -103,7 +103,7 @@ public class ApprovalBuilder<T> {
    *     String}
    * @return a new {@link ApprovalBuilder} with the printed value
    */
-  public ApprovalBuilder<String> printedAs(Function<T, String> printer) {
+  public ApprovalBuilder<String> printedAs(Function<? super T, String> printer) {
     return new ApprovalBuilder<>(printer.apply(receivedValue), name, DEFAULT_FILENAME_EXTENSION);
   }
 
@@ -116,7 +116,7 @@ public class ApprovalBuilder<T> {
    * @deprecated use {@link #printedAs(Function)}
    */
   @Deprecated(since = "0.12", forRemoval = true)
-  public ApprovalBuilder<String> printWith(Function<T, String> printer) {
+  public ApprovalBuilder<String> printWith(Function<? super T, String> printer) {
     return printedAs(printer);
   }
 
@@ -126,7 +126,7 @@ public class ApprovalBuilder<T> {
    * @param printer the printer used to convert the value to a {@link String}
    * @return a new {@link ApprovalBuilder} with the printed value
    */
-  public ApprovalBuilder<String> printedAs(Printer<T> printer) {
+  public ApprovalBuilder<String> printedAs(Printer<? super T> printer) {
     return new ApprovalBuilder<>(printer.apply(receivedValue), name, printer.filenameExtension());
   }
 
@@ -138,7 +138,7 @@ public class ApprovalBuilder<T> {
    * @deprecated use {@link #printedAs(Printer)}
    */
   @Deprecated(since = "0.12", forRemoval = true)
-  public ApprovalBuilder<String> printWith(Printer<T> printer) {
+  public ApprovalBuilder<String> printWith(Printer<? super T> printer) {
     return printedAs(printer);
   }
 
@@ -150,8 +150,7 @@ public class ApprovalBuilder<T> {
    * @see #printedAs(Printer)
    */
   public ApprovalBuilder<String> printed() {
-    // noinspection unchecked
-    return printedAs((Printer<T>) configuration.defaultPrinter());
+    return printedAs(configuration.defaultPrinter());
   }
 
   /**

@@ -13,11 +13,9 @@ import org.jspecify.annotations.NullMarked;
 /**
  * A {@link Printer} that uses {@link ObjectWriter#writeValueAsString(Object)} to print a value as
  * YAML.
- *
- * @param <T> the type of value to print
  */
 @NullMarked
-public class YamlPrinter<T> implements Printer<T> {
+public class YamlPrinter implements Printer<Object> {
 
   private ObjectWriter objectWriter;
 
@@ -25,53 +23,47 @@ public class YamlPrinter<T> implements Printer<T> {
    * Creates a {@link YamlPrinter} using the given {@link ObjectWriter}.
    *
    * @param objectWriter the {@link ObjectWriter} that will be used for printing
-   * @param <T> the type of value to print
    * @return a new {@link YamlPrinter} instance
    * @deprecated use {@link #yaml()} + {@link #using(ObjectWriter)}
    */
   @Deprecated(since = "0.12", forRemoval = true)
-  public static <T> YamlPrinter<T> yamlPrinter(ObjectWriter objectWriter) {
-    //noinspection unchecked
-    return (YamlPrinter<T>) yaml().using(objectWriter);
+  public static YamlPrinter yamlPrinter(ObjectWriter objectWriter) {
+    return yaml().using(objectWriter);
   }
 
   /**
    * Creates a {@link YamlPrinter} using the given {@link ObjectMapper}.
    *
    * @param objectMapper the {@link ObjectMapper} used to create the {@link ObjectWriter}
-   * @param <T> the type of value to print
    * @return a new {@link YamlPrinter} instance
    * @see ObjectMapper#writer()
    * @deprecated use {@link #yaml()} + {@link #using(ObjectMapper)}
    */
   @Deprecated(since = "0.12", forRemoval = true)
-  public static <T> YamlPrinter<T> yamlPrinter(ObjectMapper objectMapper) {
-    //noinspection unchecked
-    return (YamlPrinter<T>) yaml().using(objectMapper);
+  public static YamlPrinter yamlPrinter(ObjectMapper objectMapper) {
+    return yaml().using(objectMapper);
   }
 
   /**
    * Creates a {@link YamlPrinter} using the default {@link YAMLMapper}.
    *
    * @return a new {@link YamlPrinter} instance
-   * @param <T> the type of value to print
    * @see YAMLMapper.Builder#build()
    */
-  public static <T> YamlPrinter<T> yaml() {
-    return new YamlPrinter<>();
+  public static YamlPrinter yaml() {
+    return new YamlPrinter();
   }
 
   /**
    * Creates a {@link YamlPrinter} using the default {@link YAMLMapper}.
    *
    * @return a new {@link YamlPrinter} instance
-   * @param <T> the type of value to print
    * @see YAMLMapper.Builder#build()
    * @deprecated use {@link #yaml()}
    */
   @Deprecated(since = "0.12", forRemoval = true)
-  public static <T> YamlPrinter<T> yamlPrinter() {
-    return new YamlPrinter<>();
+  public static YamlPrinter yamlPrinter() {
+    return new YamlPrinter();
   }
 
   /** Creates a {@link YamlPrinter} using the default {@link YAMLMapper}. */
@@ -85,7 +77,7 @@ public class YamlPrinter<T> implements Printer<T> {
   }
 
   @Override
-  public String apply(T value) {
+  public String apply(Object value) {
     try {
       return objectWriter.writeValueAsString(value);
     } catch (JsonProcessingException e) {
@@ -99,7 +91,7 @@ public class YamlPrinter<T> implements Printer<T> {
    * @param objectWriter the {@link ObjectWriter} to be used
    * @return this
    */
-  public YamlPrinter<T> using(ObjectWriter objectWriter) {
+  public YamlPrinter using(ObjectWriter objectWriter) {
     this.objectWriter = objectWriter;
     return this;
   }
@@ -111,7 +103,7 @@ public class YamlPrinter<T> implements Printer<T> {
    * @param objectMapper the {@link ObjectMapper} used to create the {@link ObjectWriter}
    * @return this
    */
-  public YamlPrinter<T> using(ObjectMapper objectMapper) {
+  public YamlPrinter using(ObjectMapper objectMapper) {
     return using(objectMapper.writer());
   }
 

@@ -12,10 +12,8 @@ import org.approvej.print.Printer;
 /**
  * A {@link Printer} that uses {@link ObjectWriter#writeValueAsString(Object)} to print a value as
  * JSON.
- *
- * @param <T> the type of value to print
  */
-public class JsonPrinter<T> implements Printer<T> {
+public class JsonPrinter implements Printer<Object> {
 
   private ObjectMapper objectMapper;
 
@@ -23,10 +21,9 @@ public class JsonPrinter<T> implements Printer<T> {
    * Creates a {@link JsonPrinter} using the default {@link JsonMapper}.
    *
    * @return the new {@link JsonPrinter}
-   * @param <T> the type of value to print
    */
-  public static <T> JsonPrinter<T> json() {
-    return new JsonPrinter<>();
+  public static JsonPrinter json() {
+    return new JsonPrinter();
   }
 
   /** Creates a {@link JsonPrinter} using the default {@link JsonMapper}. */
@@ -56,7 +53,7 @@ public class JsonPrinter<T> implements Printer<T> {
    * @param objectMapper the {@link ObjectMapper} used to create the {@link ObjectWriter}
    * @return this
    */
-  public JsonPrinter<T> using(ObjectMapper objectMapper) {
+  public JsonPrinter using(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
     return this;
   }

@@ -73,7 +73,7 @@ class MultiLinePrinterTest {
         new SimpleExampleClass(
             UUID.fromString("00000000-0000-0000-0000-000000000001"), 42, true, null);
 
-    assertThat(((MultiLinePrinter<?>) multiLineString()).sorted().apply(exampleObject))
+    assertThat(multiLineString().sorted().apply(exampleObject))
         .isEqualTo(
             """
             SimpleExampleClass [

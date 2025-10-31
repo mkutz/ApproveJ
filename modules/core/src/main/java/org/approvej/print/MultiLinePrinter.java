@@ -23,11 +23,9 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * A generic printer for Java {@link Object}s that prints their properties and values one per line.
- *
- * @param <T> the type of the object to be printed
  */
 @NullMarked
-public class MultiLinePrinter<T> implements Printer<T> {
+public class MultiLinePrinter implements Printer<Object> {
 
   /** A {@link Set} of classes that will be printed directly. */
   public static final Set<Class<?>> SIMPLE_TYPES =
@@ -60,22 +58,20 @@ public class MultiLinePrinter<T> implements Printer<T> {
    * Creates a new {@link MultiLinePrinter} instance.
    *
    * @return a new {@link MultiLinePrinter} instance
-   * @param <T> the type of the object to be printed
    */
-  public static <T> MultiLinePrinter<T> multiLineString() {
-    return new MultiLinePrinter<>();
+  public static MultiLinePrinter multiLineString() {
+    return new MultiLinePrinter();
   }
 
   /**
    * Creates a new {@link MultiLinePrinter} instance.
    *
    * @return a new {@link MultiLinePrinter} instance
-   * @param <T> the type of the object to be printed
    * @deprecated use {@link #multiLineString()}
    */
   @Deprecated(since = "0.12", forRemoval = true)
-  public static <T> MultiLinePrinter<T> objectPrinter() {
-    return new MultiLinePrinter<>();
+  public static MultiLinePrinter objectPrinter() {
+    return new MultiLinePrinter();
   }
 
   /**
@@ -84,7 +80,7 @@ public class MultiLinePrinter<T> implements Printer<T> {
    *
    * @return this
    */
-  public MultiLinePrinter<T> sorted() {
+  public MultiLinePrinter sorted() {
     fieldComparator = Comparator.comparing(Field::getName);
     return this;
   }

@@ -37,7 +37,7 @@ class JsonPrinterTest {
 
   @Test
   void apply_string_invalid() {
-    JsonPrinter<Object> jsonPrinter = json();
+    JsonPrinter jsonPrinter = json();
     assertThatExceptionOfType(JsonPrinterException.class).isThrownBy(() -> jsonPrinter.apply("{"));
   }
 
