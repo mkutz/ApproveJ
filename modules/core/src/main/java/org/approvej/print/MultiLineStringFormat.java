@@ -22,10 +22,11 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
- * A generic printer for Java {@link Object}s that prints their properties and values one per line.
+ * A {@link PrintFormat} for Java {@link Object}s that prints their properties and values one per
+ * line.
  */
 @NullMarked
-public class MultiLineStringPrinter implements Printer<Object> {
+public class MultiLineStringFormat implements PrintFormat<Object> {
 
   /** A {@link Set} of classes that will be printed directly. */
   public static final Set<Class<?>> SIMPLE_TYPES =
@@ -45,33 +46,33 @@ public class MultiLineStringPrinter implements Printer<Object> {
   private Comparator<Field> fieldComparator = (field1, field2) -> 0;
 
   /**
-   * Creates a new {@link MultiLineStringPrinter} instance that prints the given object.
+   * Creates a new {@link MultiLineStringFormat} instance that prints the given object.
    *
    * <p>This constructor is public to allow instantiation via reflection, e.g. in the {@link
    * org.approvej.Configuration} class.
    */
-  public MultiLineStringPrinter() {
+  public MultiLineStringFormat() {
     // No initialization needed
   }
 
   /**
-   * Creates a new {@link MultiLineStringPrinter} instance.
+   * Creates a new {@link MultiLineStringFormat} instance.
    *
-   * @return a new {@link MultiLineStringPrinter} instance
+   * @return a new {@link MultiLineStringFormat} instance
    */
-  public static MultiLineStringPrinter multiLineString() {
-    return new MultiLineStringPrinter();
+  public static MultiLineStringFormat multiLineString() {
+    return new MultiLineStringFormat();
   }
 
   /**
-   * Creates a new {@link MultiLineStringPrinter} instance.
+   * Creates a new {@link MultiLineStringFormat} instance.
    *
-   * @return a new {@link MultiLineStringPrinter} instance
+   * @return a new {@link MultiLineStringFormat} instance
    * @deprecated use {@link #multiLineString()}
    */
   @Deprecated(since = "0.12", forRemoval = true)
-  public static MultiLineStringPrinter objectPrinter() {
-    return new MultiLineStringPrinter();
+  public static MultiLineStringFormat objectPrinter() {
+    return new MultiLineStringFormat();
   }
 
   /**
@@ -80,7 +81,7 @@ public class MultiLineStringPrinter implements Printer<Object> {
    *
    * @return this
    */
-  public MultiLineStringPrinter sorted() {
+  public MultiLineStringFormat sorted() {
     fieldComparator = Comparator.comparing(Field::getName);
     return this;
   }

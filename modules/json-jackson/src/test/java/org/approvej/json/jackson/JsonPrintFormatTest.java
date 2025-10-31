@@ -1,6 +1,6 @@
 package org.approvej.json.jackson;
 
-import static org.approvej.json.jackson.JsonPrinter.json;
+import static org.approvej.json.jackson.JsonPrintFormat.json;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -9,7 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
-class JsonPrinterTest {
+class JsonPrintFormatTest {
 
   @Test
   void apply_object() {
@@ -37,8 +37,9 @@ class JsonPrinterTest {
 
   @Test
   void apply_string_invalid() {
-    JsonPrinter jsonPrinter = json();
-    assertThatExceptionOfType(JsonPrinterException.class).isThrownBy(() -> jsonPrinter.apply("{"));
+    JsonPrintFormat jsonPrintFormat = json();
+    assertThatExceptionOfType(JsonPrinterException.class)
+        .isThrownBy(() -> jsonPrintFormat.apply("{"));
   }
 
   @Test

@@ -2,7 +2,7 @@ package examples.java;
 
 import static examples.ExampleClass.createPerson;
 import static org.approvej.ApprovalBuilder.approve;
-import static org.approvej.yaml.jackson.YamlPrinter.yaml;
+import static org.approvej.yaml.jackson.YamlPrintFormat.yaml;
 
 import examples.ExampleClass.Person;
 import java.time.LocalDate;

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.approvej.print.PrintFormat;
 import org.approvej.print.Printer;
 import org.jspecify.annotations.NullMarked;
 
@@ -15,59 +16,59 @@ import org.jspecify.annotations.NullMarked;
  * YAML.
  */
 @NullMarked
-public class YamlPrinter implements Printer<Object> {
+public class YamlPrintFormat implements PrintFormat<Object> {
 
   private ObjectWriter objectWriter;
 
   /**
-   * Creates a {@link YamlPrinter} using the given {@link ObjectWriter}.
+   * Creates a {@link YamlPrintFormat} using the given {@link ObjectWriter}.
    *
    * @param objectWriter the {@link ObjectWriter} that will be used for printing
-   * @return a new {@link YamlPrinter} instance
+   * @return a new {@link YamlPrintFormat} instance
    * @deprecated use {@link #yaml()} + {@link #using(ObjectWriter)}
    */
   @Deprecated(since = "0.12", forRemoval = true)
-  public static YamlPrinter yamlPrinter(ObjectWriter objectWriter) {
+  public static YamlPrintFormat yamlPrinter(ObjectWriter objectWriter) {
     return yaml().using(objectWriter);
   }
 
   /**
-   * Creates a {@link YamlPrinter} using the given {@link ObjectMapper}.
+   * Creates a {@link YamlPrintFormat} using the given {@link ObjectMapper}.
    *
    * @param objectMapper the {@link ObjectMapper} used to create the {@link ObjectWriter}
-   * @return a new {@link YamlPrinter} instance
+   * @return a new {@link YamlPrintFormat} instance
    * @see ObjectMapper#writer()
    * @deprecated use {@link #yaml()} + {@link #using(ObjectMapper)}
    */
   @Deprecated(since = "0.12", forRemoval = true)
-  public static YamlPrinter yamlPrinter(ObjectMapper objectMapper) {
+  public static YamlPrintFormat yamlPrinter(ObjectMapper objectMapper) {
     return yaml().using(objectMapper);
   }
 
   /**
-   * Creates a {@link YamlPrinter} using the default {@link YAMLMapper}.
+   * Creates a {@link YamlPrintFormat} using the default {@link YAMLMapper}.
    *
-   * @return a new {@link YamlPrinter} instance
+   * @return a new {@link YamlPrintFormat} instance
    * @see YAMLMapper.Builder#build()
    */
-  public static YamlPrinter yaml() {
-    return new YamlPrinter();
+  public static YamlPrintFormat yaml() {
+    return new YamlPrintFormat();
   }
 
   /**
-   * Creates a {@link YamlPrinter} using the default {@link YAMLMapper}.
+   * Creates a {@link YamlPrintFormat} using the default {@link YAMLMapper}.
    *
-   * @return a new {@link YamlPrinter} instance
+   * @return a new {@link YamlPrintFormat} instance
    * @see YAMLMapper.Builder#build()
    * @deprecated use {@link #yaml()}
    */
   @Deprecated(since = "0.12", forRemoval = true)
-  public static YamlPrinter yamlPrinter() {
-    return new YamlPrinter();
+  public static YamlPrintFormat yamlPrinter() {
+    return new YamlPrintFormat();
   }
 
-  /** Creates a {@link YamlPrinter} using the default {@link YAMLMapper}. */
-  public YamlPrinter() {
+  /** Creates a {@link YamlPrintFormat} using the default {@link YAMLMapper}. */
+  public YamlPrintFormat() {
     this.objectWriter =
         YAMLMapper.builder()
             .addModule(new JavaTimeModule())
@@ -91,7 +92,7 @@ public class YamlPrinter implements Printer<Object> {
    * @param objectWriter the {@link ObjectWriter} to be used
    * @return this
    */
-  public YamlPrinter using(ObjectWriter objectWriter) {
+  public YamlPrintFormat using(ObjectWriter objectWriter) {
     this.objectWriter = objectWriter;
     return this;
   }
@@ -103,7 +104,7 @@ public class YamlPrinter implements Printer<Object> {
    * @param objectMapper the {@link ObjectMapper} used to create the {@link ObjectWriter}
    * @return this
    */
-  public YamlPrinter using(ObjectMapper objectMapper) {
+  public YamlPrintFormat using(ObjectMapper objectMapper) {
     return using(objectMapper.writer());
   }
 

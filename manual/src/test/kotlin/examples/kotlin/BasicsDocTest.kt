@@ -10,8 +10,8 @@ import java.time.LocalDate
 import org.approvej.ApprovalBuilder.approve
 import org.approvej.approve.PathProviderBuilder.nextToTest
 import org.approvej.approve.PathProviderBuilder.nextToTestInSubdirectory
-import org.approvej.print.MultiLineStringPrinter.multiLineString
-import org.approvej.print.Printer
+import org.approvej.print.MultiLineStringFormat.multiLineString
+import org.approvej.print.PrintFormat
 import org.approvej.scrub.Scrubbers.dateTimeFormat
 import org.approvej.scrub.Scrubbers.uuids
 import org.assertj.core.api.Assumptions.assumeThat
@@ -179,7 +179,7 @@ class BasicsDocTest {
   }
 
   // tag::person_yaml_printer[]
-  class PersonYamlPrinter : Printer<Person> {
+  class PersonYamlPrinter : PrintFormat<Person> {
     override fun apply(person: Person) =
       """
         person:

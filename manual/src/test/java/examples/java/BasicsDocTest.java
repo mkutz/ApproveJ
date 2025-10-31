@@ -7,7 +7,7 @@ import static examples.ExampleClass.hello;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.approve.PathProviderBuilder.nextToTest;
 import static org.approvej.approve.PathProviderBuilder.nextToTestInSubdirectory;
-import static org.approvej.print.MultiLineStringPrinter.multiLineString;
+import static org.approvej.print.MultiLineStringFormat.multiLineString;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
 import static org.assertj.core.api.Assumptions.assumeThat;
@@ -17,7 +17,7 @@ import examples.ExampleClass.Contact;
 import examples.ExampleClass.Person;
 import java.io.IOException;
 import java.time.LocalDate;
-import org.approvej.print.Printer;
+import org.approvej.print.PrintFormat;
 import org.junit.jupiter.api.Test;
 
 class BasicsDocTest {
@@ -81,7 +81,7 @@ class BasicsDocTest {
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
     approve(person)
-        .printedAs(new PersonYamlPrinter()) // <1>
+        .printedAs(new PersonYamlPrintFormat()) // <1>
         .byFile();
     // end::custom_printer[]
   }
@@ -143,7 +143,7 @@ class BasicsDocTest {
     // tag::approve_file_nextToTestInSubdirectory[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
-    approve(person).printedAs(new PersonYamlPrinter()).byFile(nextToTestInSubdirectory());
+    approve(person).printedAs(new PersonYamlPrintFormat()).byFile(nextToTestInSubdirectory());
     // end::approve_file_nextToTestInSubdirectory[]
   }
 
@@ -162,7 +162,7 @@ class BasicsDocTest {
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
     approve(person)
-        .printedAs(new PersonYamlPrinter())
+        .printedAs(new PersonYamlPrintFormat())
         .byFile("src/test/resources/BasicExamples-approve file approved path.yaml"); // <1>
     // end::approve_file_approved_path[]
   }
@@ -174,14 +174,14 @@ class BasicsDocTest {
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
     approve(person)
-        .printedAs(new PersonYamlPrinter())
+        .printedAs(new PersonYamlPrintFormat())
         .reviewedWith("idea diff {receivedFile} {approvedFile}") // <1>
         .byFile(); // <2>
     // end::approve_reviewWith_fileReviewer[]
   }
 
   // tag::person_yaml_printer[]
-  public static class PersonYamlPrinter implements Printer<Person> {
+  public static class PersonYamlPrintFormat implements PrintFormat<Person> {
     @Override
     public String apply(Person person) {
       return """

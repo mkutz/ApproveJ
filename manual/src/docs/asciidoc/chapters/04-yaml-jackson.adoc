@@ -45,7 +45,7 @@ include::../../../test/java/examples/java/YamlJacksonDocTest.java[tag=print_yaml
 ----
 include::../../../test/kotlin/examples/kotlin/YamlJacksonDocTest.kt[tag=print_yaml]
 ----
-<1> applies the `YamlPrinter` to convert the `Person` object to a string
+<1> applies the `YamlPrintFormat` to convert the `Person` object to a string
 
 Creates the following approved file:
 

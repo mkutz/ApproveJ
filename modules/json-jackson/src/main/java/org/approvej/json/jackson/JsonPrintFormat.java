@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.approvej.print.PrintFormat;
 import org.approvej.print.Printer;
 
 /**
@@ -25,21 +26,21 @@ import org.approvej.print.Printer;
  *
  * This special handling allows pretty-printing of raw JSON strings as well as Java objects.
  */
-public class JsonPrinter implements Printer<Object> {
+public class JsonPrintFormat implements PrintFormat<Object> {
 
   private ObjectMapper objectMapper;
 
   /**
-   * Creates a {@link JsonPrinter} using the default {@link JsonMapper}.
+   * Creates a {@link JsonPrintFormat} using the default {@link JsonMapper}.
    *
-   * @return the new {@link JsonPrinter}
+   * @return the new {@link JsonPrintFormat}
    */
-  public static JsonPrinter json() {
-    return new JsonPrinter();
+  public static JsonPrintFormat json() {
+    return new JsonPrintFormat();
   }
 
-  /** Creates a {@link JsonPrinter} using the default {@link JsonMapper}. */
-  public JsonPrinter() {
+  /** Creates a {@link JsonPrintFormat} using the default {@link JsonMapper}. */
+  public JsonPrintFormat() {
     this.objectMapper =
         JsonMapper.builder()
             .addModule(new JavaTimeModule())
@@ -65,7 +66,7 @@ public class JsonPrinter implements Printer<Object> {
    * @param objectMapper the {@link ObjectMapper} used to create the {@link ObjectWriter}
    * @return this
    */
-  public JsonPrinter using(ObjectMapper objectMapper) {
+  public JsonPrintFormat using(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
     return this;
   }

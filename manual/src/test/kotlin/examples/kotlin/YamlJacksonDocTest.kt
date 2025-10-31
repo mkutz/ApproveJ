@@ -3,7 +3,7 @@ package examples.kotlin
 import examples.ExampleClass.createPerson
 import java.time.LocalDate
 import org.approvej.ApprovalBuilder.approve
-import org.approvej.yaml.jackson.YamlPrinter.yaml
+import org.approvej.yaml.jackson.YamlPrintFormat.yaml
 import org.junit.jupiter.api.Test
 
 class YamlJacksonDocTest {

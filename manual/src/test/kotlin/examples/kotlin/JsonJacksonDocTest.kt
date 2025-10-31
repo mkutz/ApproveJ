@@ -9,7 +9,7 @@ import org.approvej.ApprovalBuilder.approve
 import org.approvej.approve.Approvers.file
 import org.approvej.approve.PathProviderBuilder.nextToTest
 import org.approvej.json.jackson.JsonPointerScrubber.jsonPointer
-import org.approvej.json.jackson.JsonPrinter.json
+import org.approvej.json.jackson.JsonPrintFormat.json
 import org.approvej.scrub.Scrubbers.dateTimeFormat
 import org.approvej.scrub.Scrubbers.uuids
 import org.junit.jupiter.api.Test

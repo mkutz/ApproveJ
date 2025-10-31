@@ -7,7 +7,7 @@ import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.approve.Approvers.value;
 import static org.approvej.approve.PathProviderBuilder.approvedPath;
 import static org.approvej.approve.PathProviderBuilder.nextToTest;
-import static org.approvej.print.MultiLineStringPrinter.multiLineString;
+import static org.approvej.print.MultiLineStringFormat.multiLineString;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
 import static org.assertj.core.api.Assertions.assertThat;

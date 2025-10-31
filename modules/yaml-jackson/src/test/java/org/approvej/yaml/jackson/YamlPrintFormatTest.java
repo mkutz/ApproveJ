@@ -1,6 +1,6 @@
 package org.approvej.yaml.jackson;
 
-import static org.approvej.yaml.jackson.YamlPrinter.yaml;
+import static org.approvej.yaml.jackson.YamlPrintFormat.yaml;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -10,7 +10,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
-class YamlPrinterTest {
+class YamlPrintFormatTest {
 
   @Test
   void apply() {
@@ -26,10 +26,10 @@ class YamlPrinterTest {
   @Test
   void apply_failure() {
     LocalDate someLocalDate = LocalDate.of(1982, 2, 19);
-    YamlPrinter yamlPrinterWithoutJavaTime = yaml().using(new ObjectMapper());
+    YamlPrintFormat yamlPrintFormatWithoutJavaTime = yaml().using(new ObjectMapper());
 
     assertThatExceptionOfType(YamlPrinterException.class)
-        .isThrownBy(() -> yamlPrinterWithoutJavaTime.apply(someLocalDate))
+        .isThrownBy(() -> yamlPrintFormatWithoutJavaTime.apply(someLocalDate))
         .withMessage("Failed to print %s".formatted(someLocalDate));
   }
 

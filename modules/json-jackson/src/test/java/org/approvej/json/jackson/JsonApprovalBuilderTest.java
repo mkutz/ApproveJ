@@ -1,7 +1,7 @@
 package org.approvej.json.jackson;
 
 import static org.approvej.ApprovalBuilder.approve;
-import static org.approvej.json.jackson.JsonPrinter.json;
+import static org.approvej.json.jackson.JsonPrintFormat.json;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;

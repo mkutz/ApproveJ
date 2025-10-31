@@ -6,17 +6,18 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.approvej.print.PrintFormat;
 import org.approvej.print.Printer;
 import org.jspecify.annotations.NullMarked;
 
 /**
  * A {@link Printer} for JSON strings that should be pretty-printed.
  *
- * @deprecated use {@link JsonPrinter}
+ * @deprecated use {@link JsonPrintFormat}
  */
 @Deprecated(since = "0.12", forRemoval = true)
 @NullMarked
-public class JsonStringPrettyPrinter implements Printer<String> {
+public class JsonStringPrettyPrinter implements PrintFormat<String> {
 
   private final ObjectReader objectReader;
   private final ObjectWriter objectWriter;

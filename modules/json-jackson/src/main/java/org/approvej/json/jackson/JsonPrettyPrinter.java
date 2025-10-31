@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.approvej.print.PrintFormat;
 import org.approvej.print.Printer;
 import org.jspecify.annotations.NullMarked;
 
@@ -15,11 +16,11 @@ import org.jspecify.annotations.NullMarked;
  * JSON.
  *
  * @param <T> the type of value to print
- * @deprecated use {@link JsonPrinter}
+ * @deprecated use {@link JsonPrintFormat}
  */
 @Deprecated(since = "0.12", forRemoval = true)
 @NullMarked
-public class JsonPrettyPrinter<T> implements Printer<T> {
+public class JsonPrettyPrinter<T> implements PrintFormat<T> {
 
   private final ObjectWriter objectWriter;
 

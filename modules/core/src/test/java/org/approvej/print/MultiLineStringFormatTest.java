@@ -1,6 +1,6 @@
 package org.approvej.print;
 
-import static org.approvej.print.MultiLineStringPrinter.multiLineString;
+import static org.approvej.print.MultiLineStringFormat.multiLineString;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class MultiLineStringPrinterTest {
+class MultiLineStringFormatTest {
 
   @ParameterizedTest(name = "{displayName}({arguments})")
   @MethodSource("applySimpleArguments")
