@@ -83,6 +83,18 @@ public class DateTimeScrubber implements Scrubber<String> {
         regexScrubber.replacement(new RelativeDateReplacement(dateTimeFormatter)));
   }
 
+  /**
+   * Makes this use a {@link Replacements#relativeDateTime(String) realtiveDateTime} to replace
+   * matches of the date/time pattern.
+   *
+   * @return this
+   */
+  public DateTimeScrubber replaceWithRelativeDateTime() {
+    return new DateTimeScrubber(
+        dateTimeFormatter,
+        regexScrubber.replacement(new RelativeDateTimeReplacement(dateTimeFormatter)));
+  }
+
   @Override
   public String apply(String value) {
     return regexScrubber.apply(value);
