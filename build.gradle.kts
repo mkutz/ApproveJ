@@ -95,7 +95,7 @@ spotless {
   java {
     target("**/*.java")
     targetExclude("**/build/**/*")
-    googleJavaFormat().reflowLongStrings()
+    googleJavaFormat("1.28.0").reflowLongStrings()
     removeUnusedImports()
     leadingTabsToSpaces(2)
   }

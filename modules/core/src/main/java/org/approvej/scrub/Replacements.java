@@ -14,23 +14,34 @@ public class Replacements {
   private Replacements() {}
 
   /**
-   * Replaces with "<code>[label #]</code>" where <code>label</code> is the given label and '#' is
-   * the number of the distinct replacement.
+   * Replaces with "{@code [label #]}" where {@code label} is the given label and {@code #} is the
+   * number of the distinct replacement.
    *
    * @param label a String used to identify the replacement
-   * @return a replacement function that replaces with "[label #]"
+   * @return a replacement function that replaces with "{@code [label #]}"
    */
   public static Replacement numbered(String label) {
     return (match, count) -> String.format("[%s %d]", label, count);
   }
 
   /**
-   * Replaces each match with "[scrubbed #]" where '#' is the number of the distinct replacement.
+   * Replaces each match with "{@code [scrubbed #]}" where {@code #} is the number of the distinct
+   * replacement.
    *
-   * @return a replacement function that replaces with "[scrubbed #]"
+   * @return a replacement function that replaces with "{@code [scrubbed #]}"
    */
   public static Replacement numbered() {
     return numbered("scrubbed");
+  }
+
+  /**
+   * Replaces with "{@code [label]}" where "{@code label}" is the given label.
+   *
+   * @param label a String used to identify the replacement
+   * @return a replacement function that replaces with "{@code [label]}"
+   */
+  public static Replacement labeled(String label) {
+    return (match, count) -> String.format("[%s]", label);
   }
 
   /**
