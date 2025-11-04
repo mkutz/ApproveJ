@@ -46,7 +46,7 @@ class RelativeDateScrubberTest {
   }
 
   @ParameterizedTest
-  @ValueSource(ints = {2, 10, 10000})
+  @ValueSource(ints = {2, 10, 27})
   void apply_past(int daysAgo) {
     String unscrubbedValue =
         "It happened on %s at noon".formatted(TODAY.minusDays(daysAgo).format(ISO_LOCAL_DATE));
@@ -56,12 +56,12 @@ class RelativeDateScrubberTest {
   }
 
   @ParameterizedTest
-  @ValueSource(ints = {2, 10, 10000})
+  @ValueSource(ints = {2, 10, 27})
   void apply_future(int daysAhead) {
     String unscrubbedValue =
         "It happened on %s at noon".formatted(TODAY.plusDays(daysAhead).format(ISO_LOCAL_DATE));
     assertEquals(
-        "It happened on [" + daysAhead + " days from now] at noon",
+        "It happened on [in " + daysAhead + " days] at noon",
         isoLocalDates().replaceWithRelativeDate().apply(unscrubbedValue));
   }
 

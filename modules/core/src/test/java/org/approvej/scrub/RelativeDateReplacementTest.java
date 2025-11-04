@@ -38,20 +38,26 @@ class RelativeDateReplacementTest {
   }
 
   @ParameterizedTest
-  @ValueSource(ints = {2, 10, 10000})
-  void apply_past(int daysAgo) {
+  @ValueSource(ints = {2, 10, 27})
+  void apply_past_days(int daysAgo) {
     DateTimeFormatter format = ISO_LOCAL_DATE;
     String unscrubbedValue = TODAY.minusDays(daysAgo).format(format);
     assertEquals("[" + daysAgo + " days ago]", relativeDate(format).apply(unscrubbedValue, 1));
   }
 
   @ParameterizedTest
-  @ValueSource(ints = {2, 10, 10000})
-  void apply_future(int daysAhead) {
+  @ValueSource(ints = {2, 10, 27})
+  void apply_future_days(int daysAhead) {
     DateTimeFormatter format = ISO_LOCAL_DATE;
     String unscrubbedValue = TODAY.plusDays(daysAhead).format(format);
-    assertEquals(
-        "[" + daysAhead + " days from now]", relativeDate(format).apply(unscrubbedValue, 1));
+    assertEquals("[in " + daysAhead + " days]", relativeDate(format).apply(unscrubbedValue, 1));
+  }
+
+  @Test
+  void apply_future() {
+    DateTimeFormatter format = ISO_LOCAL_DATE;
+    String unscrubbedValue = TODAY.plusYears(1).plusMonths(2).plusDays(3).format(format);
+    assertEquals("[in 1 year 2 months 3 days]", relativeDate(format).apply(unscrubbedValue, 1));
   }
 
   @Test

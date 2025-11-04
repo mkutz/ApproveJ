@@ -55,8 +55,8 @@ public class Replacements {
   }
 
   /**
-   * Replaces each match of the given dateTimePattern (as defined by {@link DateTimeFormatter}) with
-   * a relative description, like {@code [today]}, {@code [yesterday]}, {@code [13 days from now]}.
+   * Replaces each match of the given {@link DateTimeFormatter} with a relative description, like
+   * {@code [today]}, {@code [yesterday]}, {@code [in 13 days]}, {@code [1 year 20 days ago]} .
    *
    * @param dateTimeFormatter the {@link DateTimeFormatter} to parse the date/time strings
    * @return a replacement function that returns a relative description for dates of the given
@@ -68,7 +68,8 @@ public class Replacements {
 
   /**
    * Replaces each match of the given dateTimePattern (as defined by {@link DateTimeFormatter}) with
-   * a relative description, like {@code [today]}, {@code [yesterday]}, {@code [13 days from now]}.
+   * a relative description, like {@code [today]}, {@code [yesterday]}, {@code [in 13 days]}, {@code
+   * [1 year 20 days ago]} .
    *
    * @param dateTimePattern a pattern as defined by {@link DateTimeFormatter}
    * @return a replacement function that returns a relative description for dates of the given
@@ -76,6 +77,30 @@ public class Replacements {
    */
   public static Replacement relativeDate(String dateTimePattern) {
     return relativeDate(DateTimeFormatter.ofPattern(dateTimePattern));
+  }
+
+  /**
+   * Replaces each match of the given {@link DateTimeFormatter} with a relative description, like
+   * {@code [now]}, {@code [in 1d 23h 59m 59s]}, {@code [10s ago]}.
+   *
+   * @param dateTimeFormatter the {@link DateTimeFormatter} to parse the date/time strings
+   * @return a replacement function that returns a relative description for dates of the given
+   *     dateTimePattern
+   */
+  public static Replacement relativeDateTime(DateTimeFormatter dateTimeFormatter) {
+    return new RelativeDateTimeReplacement(dateTimeFormatter);
+  }
+
+  /**
+   * Replaces each match of the given dateTimePattern (as defined by {@link DateTimeFormatter}) with
+   * a relative description, like {@code [now]}, {@code [in 1d 23h 59m 59s]}, {@code [10s ago]}.
+   *
+   * @param dateTimePattern a pattern as defined by {@link DateTimeFormatter}
+   * @return a replacement function that returns a relative description for dates of the given
+   *     dateTimePattern
+   */
+  public static Replacement relativeDateTime(String dateTimePattern) {
+    return relativeDateTime(DateTimeFormatter.ofPattern(dateTimePattern));
   }
 
   /**
