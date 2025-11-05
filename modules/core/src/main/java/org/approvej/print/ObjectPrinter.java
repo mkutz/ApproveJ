@@ -9,7 +9,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
@@ -18,6 +17,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Stream;
+import org.approvej.Configuration;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -30,7 +30,7 @@ import org.jspecify.annotations.Nullable;
 public class ObjectPrinter<T> implements Printer<T> {
 
   /** A {@link Set} of classes that will be printed directly. */
-  public static final Set<Class<?>> SIMPLE_TYPES =
+  private static final Set<Class<?>> SIMPLE_TYPES =
       Set.of(
           Boolean.class,
           Character.class,
@@ -44,23 +44,30 @@ public class ObjectPrinter<T> implements Printer<T> {
 
   private static final String PAIR_FORMAT = "%s=%s";
 
-  private Comparator<Field> fieldComparator = (field1, field2) -> 0;
+  private final Comparator<Field> fieldComparator;
+
+  /**
+   * @param fieldComparator a {@link Comparator} used to sort the printed value's {@link Field}s
+   */
+  ObjectPrinter(Comparator<Field> fieldComparator) {
+    this.fieldComparator = fieldComparator;
+  }
 
   /**
    * Creates a new {@link ObjectPrinter} instance that prints the given object.
    *
    * <p>This constructor is public to allow instantiation via reflection, e.g. in the {@link
-   * org.approvej.Configuration} class.
+   * Configuration} class.
    */
   public ObjectPrinter() {
-    // No initialization needed
+    this((field1, field2) -> 0);
   }
 
   /**
    * Creates a new {@link ObjectPrinter} instance.
    *
-   * @return a new {@link ObjectPrinter} instance
    * @param <T> the type of the object to be printed
+   * @return a new {@link ObjectPrinter} instance
    */
   public static <T> ObjectPrinter<T> objectPrinter() {
     return new ObjectPrinter<>();
@@ -73,8 +80,7 @@ public class ObjectPrinter<T> implements Printer<T> {
    * @return this
    */
   public ObjectPrinter<T> sorted() {
-    fieldComparator = Comparator.comparing(Field::getName);
-    return this;
+    return new ObjectPrinter<>(Comparator.comparing(Field::getName));
   }
 
   @Override
@@ -143,7 +149,7 @@ public class ObjectPrinter<T> implements Printer<T> {
 
   private Stream<Field> getFields(Object object) {
     return getTypes(object)
-        .flatMap(aClass -> Arrays.stream(aClass.getDeclaredFields()))
+        .flatMap(aClass -> stream(aClass.getDeclaredFields()))
         .filter(field -> !Modifier.isStatic(field.getModifiers()))
         .sorted(fieldComparator);
   }

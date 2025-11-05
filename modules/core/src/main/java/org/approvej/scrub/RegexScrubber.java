@@ -18,7 +18,7 @@ import org.jspecify.annotations.NullMarked;
 public class RegexScrubber implements Scrubber<String> {
 
   private final Pattern pattern;
-  private Replacement replacement;
+  private final Replacement replacement;
 
   /**
    * Creates a {@link RegexScrubber} with the given pattern and replacement {@link Function}.
@@ -52,8 +52,7 @@ public class RegexScrubber implements Scrubber<String> {
    * @return this
    */
   public RegexScrubber replacement(Replacement replacement) {
-    this.replacement = replacement;
-    return this;
+    return new RegexScrubber(pattern, replacement);
   }
 
   /**
@@ -63,7 +62,6 @@ public class RegexScrubber implements Scrubber<String> {
    * @return this
    */
   public RegexScrubber replacement(String staticReplacement) {
-    this.replacement = string(staticReplacement);
-    return this;
+    return replacement(string(staticReplacement));
   }
 }

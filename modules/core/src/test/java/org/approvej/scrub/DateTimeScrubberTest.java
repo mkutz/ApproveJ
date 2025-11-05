@@ -195,7 +195,7 @@ class DateTimeScrubberTest {
 
   @Test
   void isoZonedDateTimes() {
-    RegexScrubber isoZonedDateTimes = Scrubbers.isoZonedDateTimes();
+    DateTimeScrubber isoZonedDateTimes = Scrubbers.isoZonedDateTimes();
     assertThat(
             isoZonedDateTimes.apply(
                 "isoZonedDateTime: %s"
