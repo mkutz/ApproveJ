@@ -16,7 +16,7 @@ class YamlJacksonDocTest {
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
     approve(person)
-        .printWith(yamlPrinter()) // <1>
+        .printedBy(yamlPrinter()) // <1>
         .byFile();
     // end::print_yaml[]
   }

@@ -40,14 +40,14 @@ class JsonApprovalBuilderTest {
   @Test
   void approve_list() {
     approve(List.of("a", "b", "c"))
-        .printWith(jsonPrettyPrinter())
+        .printedBy(jsonPrettyPrinter())
         .byValue("[ \"a\", \"b\", \"c\" ]");
   }
 
   @Test
   void approve_file() {
     approve(EXAMPLE_JSON)
-        .printWith(jsonStringPrettyPrinter())
+        .printedBy(jsonStringPrettyPrinter())
         .scrubbedOf(dateTimeFormat("yyyy-MM-dd").replaceWithRelativeDate())
         .scrubbedOf(uuids())
         .byFile();
@@ -56,7 +56,7 @@ class JsonApprovalBuilderTest {
   @Test
   void approve_with_scrubbers() {
     approve(EXAMPLE_JSON)
-        .printWith(jsonStringPrettyPrinter())
+        .printedBy(jsonStringPrettyPrinter())
         .scrubbedOf(dateTimeFormat("yyyy-MM-dd").replaceWithRelativeDate())
         .scrubbedOf(uuids())
         .byValue(SCRUBBED_JSON);
