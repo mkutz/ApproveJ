@@ -304,6 +304,11 @@ public class Scrubbers {
    * @return a new {@link FieldScrubber} for the given field
    */
   public static <T> FieldScrubber<T> field(Class<T> type, String fieldName) {
-    return new FieldScrubber<>(type, fieldName);
+    try {
+      return new FieldScrubber<>(type.getDeclaredField(fieldName), null);
+    } catch (NoSuchFieldException e) {
+      throw new ScrubbingError(
+          "Cannot create FieldScrubber for field %s on %s".formatted(fieldName, type), e);
+    }
   }
 }

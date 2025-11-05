@@ -7,31 +7,16 @@ import org.jspecify.annotations.Nullable;
 /**
  * Generic {@link Scrubber} to set the value of a certain field via reflection.
  *
- * <p>Note that this requires that the field is generally mutable. Fields that are declared final
+ * <p>Note that this requires that the field is generally mutable. Immutable fields that
  * will cause a {@link ScrubbingError} when this is {@link #apply(Object) applied}.
  *
+ * @param field the {@link Field} to be scrubbed
  * @param <T> the type of value to scrub
  */
 @NullMarked
-public class FieldScrubber<T> implements Scrubber<T> {
-
-  private final Field field;
-  @Nullable private Object replacement;
-
-  /**
-   * Creates a new {@link FieldScrubber} for a field's value to be replaced with null.
-   *
-   * @param type the {@link Class} which should be scrubbed
-   * @param fieldName the name of the field to be scrubbed
-   */
-  FieldScrubber(Class<T> type, String fieldName) {
-    try {
-      this.field = type.getDeclaredField(fieldName);
-    } catch (NoSuchFieldException e) {
-      throw new ScrubbingError(
-          "Cannot create FieldScrubber for field %s on %s".formatted(fieldName, type), e);
-    }
-  }
+public record FieldScrubber<T>(
+    Field field, @Nullable Object replacement
+) implements Scrubber<T> {
 
   /**
    * Scrubs the given value.
@@ -59,7 +44,6 @@ public class FieldScrubber<T> implements Scrubber<T> {
    * @return this
    */
   public FieldScrubber<T> replacement(Object replacement) {
-    this.replacement = replacement;
-    return this;
+    return new FieldScrubber<>(field, replacement);
   }
 }
