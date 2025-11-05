@@ -24,6 +24,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * A generic printer for Java {@link Object}s that prints their properties and values one per line.
  *
+ * @param fieldComparator
  * @param <T> the type of the object to be printed
  */
 @NullMarked
@@ -65,13 +66,24 @@ public record ObjectPrinter<T>(Comparator<Field> fieldComparator) implements Pri
   }
 
   /**
+   * Causes the {@link Printer} to sort the printed object's fields by the given fieldComparator. By default, the
+   * fields will be printed in the order of their declaration.
+   *
+   * @param fieldComparator a {@link Comparator} to sort the object's {@link Field}s
+   * @return this
+   */
+  public ObjectPrinter<T> sorted(Comparator<Field> fieldComparator) {
+    return new ObjectPrinter<>(fieldComparator);
+  }
+
+  /**
    * Causes the {@link Printer} to sort the printed object's fields by their name. By default, the
    * fields will be printed in the order of their declaration.
    *
    * @return this
    */
   public ObjectPrinter<T> sorted() {
-    return new ObjectPrinter<>(Comparator.comparing(Field::getName));
+    return sorted(Comparator.comparing(Field::getName));
   }
 
   @Override
