@@ -10,11 +10,25 @@ import org.jspecify.annotations.Nullable;
  * <p>Note that this requires that the field is generally mutable. Immutable fields that will cause
  * a {@link ScrubbingError} when this is {@link #apply(Object) applied}.
  *
- * @param field the {@link Field} to be scrubbed
  * @param <T> the type of value to scrub
  */
 @NullMarked
-public record FieldScrubber<T>(Field field, @Nullable Object replacement) implements Scrubber<T> {
+public class FieldScrubber<T> implements Scrubber<T> {
+
+  private final Field field;
+  private final @Nullable Object replacement;
+
+  /**
+   * Creates a new {@link FieldScrubber} for a field's value to be replaced with the given
+   * replacement.
+   *
+   * @param field the {@link Field} to be scrubbed
+   * @param replacement the {@link Object} to replace the field's value with
+   */
+  public FieldScrubber(Field field, @Nullable Object replacement) {
+    this.field = field;
+    this.replacement = replacement;
+  }
 
   /**
    * Scrubs the given value.

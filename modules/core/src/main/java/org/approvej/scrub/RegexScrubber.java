@@ -13,13 +13,24 @@ import org.jspecify.annotations.NullMarked;
 /**
  * Scrubs a {@link String} by replacing all occurrences of a pattern by applying the given
  * replacement {@link Function} for each finding.
- *
- * @param pattern     the pattern matching the string to be scrubbed as {@link String}
- * @param replacement a {@link Replacement} function
- * @see Pattern#compile(String)
  */
 @NullMarked
-public record RegexScrubber(Pattern pattern, Replacement replacement) implements Scrubber<String> {
+public class RegexScrubber implements Scrubber<String> {
+
+  private final Pattern pattern;
+  private final Replacement replacement;
+
+  /**
+   * Creates a {@link RegexScrubber} with the given pattern and replacement {@link Function}.
+   *
+   * @param pattern the pattern matching the string to be scrubbed as {@link String}
+   * @param replacement a {@link Replacement} function
+   * @see Pattern#compile(String)
+   */
+  RegexScrubber(Pattern pattern, Replacement replacement) {
+    this.pattern = pattern;
+    this.replacement = replacement;
+  }
 
   @Override
   public String apply(String unscrubbedValue) {

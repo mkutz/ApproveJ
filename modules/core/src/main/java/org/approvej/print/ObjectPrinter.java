@@ -24,14 +24,13 @@ import org.jspecify.annotations.Nullable;
 /**
  * A generic printer for Java {@link Object}s that prints their properties and values one per line.
  *
- * @param fieldComparator
  * @param <T> the type of the object to be printed
  */
 @NullMarked
-public record ObjectPrinter<T>(Comparator<Field> fieldComparator) implements Printer<T> {
+public class ObjectPrinter<T> implements Printer<T> {
 
   /** A {@link Set} of classes that will be printed directly. */
-  public static final Set<Class<?>> SIMPLE_TYPES =
+  private static final Set<Class<?>> SIMPLE_TYPES =
       Set.of(
           Boolean.class,
           Character.class,
@@ -45,13 +44,22 @@ public record ObjectPrinter<T>(Comparator<Field> fieldComparator) implements Pri
 
   private static final String PAIR_FORMAT = "%s=%s";
 
+  private final Comparator<Field> fieldComparator;
+
+  /**
+   * @param fieldComparator a {@link Comparator} used to sort the printed value's {@link Field}s
+   */
+  ObjectPrinter(Comparator<Field> fieldComparator) {
+    this.fieldComparator = fieldComparator;
+  }
+
   /**
    * Creates a new {@link ObjectPrinter} instance that prints the given object.
    *
    * <p>This constructor is public to allow instantiation via reflection, e.g. in the {@link
    * Configuration} class.
    */
-  public ObjectPrinter() {
+  ObjectPrinter() {
     this((field1, field2) -> 0);
   }
 
@@ -66,24 +74,13 @@ public record ObjectPrinter<T>(Comparator<Field> fieldComparator) implements Pri
   }
 
   /**
-   * Causes the {@link Printer} to sort the printed object's fields by the given fieldComparator. By
-   * default, the fields will be printed in the order of their declaration.
-   *
-   * @param fieldComparator a {@link Comparator} to sort the object's {@link Field}s
-   * @return this
-   */
-  public ObjectPrinter<T> sorted(Comparator<Field> fieldComparator) {
-    return new ObjectPrinter<>(fieldComparator);
-  }
-
-  /**
    * Causes the {@link Printer} to sort the printed object's fields by their name. By default, the
    * fields will be printed in the order of their declaration.
    *
    * @return this
    */
   public ObjectPrinter<T> sorted() {
-    return sorted(Comparator.comparing(Field::getName));
+    return new ObjectPrinter<>(Comparator.comparing(Field::getName));
   }
 
   @Override

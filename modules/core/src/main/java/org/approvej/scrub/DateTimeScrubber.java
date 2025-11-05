@@ -16,22 +16,34 @@ import java.util.regex.Pattern;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * Scrubs a {@link String} of date/time strings described by a {@link DateTimeFormatter}
- * pattern like "yyyy-MM-dd" for local dates using the wrapped {@link RegexScrubber}.
+ * Scrubs a {@link String} of date/time strings described by a {@link DateTimeFormatter} pattern
+ * like "yyyy-MM-dd" for local dates using the wrapped {@link RegexScrubber}.
  */
 @NullMarked
-public record DateTimeScrubber(DateTimeFormatter dateTimeFormatter, RegexScrubber regexScrubber)
-    implements Scrubber<String> {
+public class DateTimeScrubber implements Scrubber<String> {
+
+  private final DateTimeFormatter dateTimeFormatter;
+  private final RegexScrubber regexScrubber;
+
+  /**
+   * Creates a {@link DateTimeScrubber} to scrub date/time strings of the given dateTimeFormatter.
+   *
+   * @param dateTimeFormatter a {@link DateTimeFormatter} for the pattern that should be scrubbed
+   * @param regexScrubber a wrapped {@link RegexScrubber} that does the actual scrubbing
+   */
+  DateTimeScrubber(DateTimeFormatter dateTimeFormatter, RegexScrubber regexScrubber) {
+    this.dateTimeFormatter = dateTimeFormatter;
+    this.regexScrubber = regexScrubber;
+  }
 
   /**
    * Creates a {@link DateTimeScrubber} to scrub date/time strings of the given dateTimePattern.
    *
-   * @param dateTimePattern a date/time pattern as used by {@link
-   *     java.time.format.DateTimeFormatter}
+   * @param dateTimePattern a date/time pattern as used by {@link DateTimeFormatter}
    * @param locale the {@link Locale} for the date/time pattern (influences names of months or
    *     weekdays for example)
    * @param replacement the {@link Replacement} function
-   * @see java.time.format.DateTimeFormatter
+   * @see DateTimeFormatter
    */
   DateTimeScrubber(String dateTimePattern, Locale locale, Replacement replacement) {
     this(
@@ -39,10 +51,22 @@ public record DateTimeScrubber(DateTimeFormatter dateTimeFormatter, RegexScrubbe
         new RegexScrubber(Pattern.compile(regexFor(dateTimePattern, locale)), replacement));
   }
 
+  /**
+   * Set the {@link Replacement} to be used.
+   *
+   * @param replacement a {@link Replacement} function
+   * @return this
+   */
   public DateTimeScrubber replacement(Replacement replacement) {
     return new DateTimeScrubber(dateTimeFormatter, regexScrubber.replacement(replacement));
   }
 
+  /**
+   * Set the replacement {@link Function} always returning the given staticReplacement.
+   *
+   * @param staticReplacement the static replacement {@link String}
+   * @return this
+   */
   public DateTimeScrubber replacement(String staticReplacement) {
     return new DateTimeScrubber(dateTimeFormatter, regexScrubber.replacement(staticReplacement));
   }
@@ -56,8 +80,7 @@ public record DateTimeScrubber(DateTimeFormatter dateTimeFormatter, RegexScrubbe
   public DateTimeScrubber replaceWithRelativeDate() {
     return new DateTimeScrubber(
         dateTimeFormatter,
-        regexScrubber.replacement(
-            new RelativeDateReplacement(dateTimeFormatter)));
+        regexScrubber.replacement(new RelativeDateReplacement(dateTimeFormatter)));
   }
 
   @Override
