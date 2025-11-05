@@ -59,7 +59,7 @@ public class ObjectPrinter<T> implements Printer<T> {
    * <p>This constructor is public to allow instantiation via reflection, e.g. in the {@link
    * Configuration} class.
    */
-  ObjectPrinter() {
+  public ObjectPrinter() {
     this((field1, field2) -> 0);
   }
 
