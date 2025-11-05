@@ -7,16 +7,14 @@ import org.jspecify.annotations.Nullable;
 /**
  * Generic {@link Scrubber} to set the value of a certain field via reflection.
  *
- * <p>Note that this requires that the field is generally mutable. Immutable fields that
- * will cause a {@link ScrubbingError} when this is {@link #apply(Object) applied}.
+ * <p>Note that this requires that the field is generally mutable. Immutable fields that will cause
+ * a {@link ScrubbingError} when this is {@link #apply(Object) applied}.
  *
  * @param field the {@link Field} to be scrubbed
  * @param <T> the type of value to scrub
  */
 @NullMarked
-public record FieldScrubber<T>(
-    Field field, @Nullable Object replacement
-) implements Scrubber<T> {
+public record FieldScrubber<T>(Field field, @Nullable Object replacement) implements Scrubber<T> {
 
   /**
    * Scrubs the given value.

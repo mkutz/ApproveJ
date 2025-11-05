@@ -8,13 +8,7 @@ import java.time.format.DateTimeFormatter;
  * Replaces each match of the given dateTimePattern (as defined by {@link DateTimeFormatter}) with a
  * relative description, like {@code [today]}, {@code [yesterday]}, {@code [13 days from now]}.
  */
-public class RelativeDateReplacement implements Replacement {
-
-  private final DateTimeFormatter dateTimeFormatter;
-
-  RelativeDateReplacement(DateTimeFormatter dateTimeFormatter) {
-    this.dateTimeFormatter = dateTimeFormatter;
-  }
+public record RelativeDateReplacement(DateTimeFormatter dateTimeFormatter) implements Replacement {
 
   @Override
   public String apply(String match, Integer count) {

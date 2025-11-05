@@ -66,8 +66,8 @@ public record ObjectPrinter<T>(Comparator<Field> fieldComparator) implements Pri
   }
 
   /**
-   * Causes the {@link Printer} to sort the printed object's fields by the given fieldComparator. By default, the
-   * fields will be printed in the order of their declaration.
+   * Causes the {@link Printer} to sort the printed object's fields by the given fieldComparator. By
+   * default, the fields will be printed in the order of their declaration.
    *
    * @param fieldComparator a {@link Comparator} to sort the object's {@link Field}s
    * @return this
