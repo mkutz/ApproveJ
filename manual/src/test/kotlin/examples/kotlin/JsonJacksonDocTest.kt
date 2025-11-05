@@ -51,7 +51,7 @@ class JsonJacksonDocTest {
     approve(jsonMapper.readTree(createdBlogPostJson))
       .scrubbedOf(jsonPointer("/id").replacement("[scrubbed id]"))
       .scrubbedOf(jsonPointer("/published").replacement("[scrubbed published]"))
-      .printWith(jsonPrettyPrinter()) // <1>
+      .printedBy(jsonPrettyPrinter()) // <1>
       .byFile()
     // end::pretty_print_json[]
   }
@@ -69,7 +69,7 @@ class JsonJacksonDocTest {
     approve(createdBlogPostJson)
       .scrubbedOf(uuids())
       .scrubbedOf(dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX"))
-      .printWith(jsonStringPrettyPrinter()) // <1>
+      .printedBy(jsonStringPrettyPrinter()) // <1>
       .byFile()
     // end::pretty_print_json_string[]
   }

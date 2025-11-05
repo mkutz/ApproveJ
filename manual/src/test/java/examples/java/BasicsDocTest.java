@@ -59,7 +59,7 @@ class BasicsDocTest {
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
     approve(person)
-        .printWith(objectPrinter()) // <1>
+        .printedBy(objectPrinter()) // <1>
         .byFile();
     // end::object_printer[]
   }
@@ -70,7 +70,7 @@ class BasicsDocTest {
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
     approve(person)
-        .printWith(it -> String.format("%s, born %s", it.name(), it.birthDate())) // <1>
+        .printedBy(it -> String.format("%s, born %s", it.name(), it.birthDate())) // <1>
         .byFile();
     // end::custom_printer_function[]
   }
@@ -81,7 +81,7 @@ class BasicsDocTest {
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
     approve(person)
-        .printWith(new PersonYamlPrinter()) // <1>
+        .printedBy(new PersonYamlPrinter()) // <1>
         .byFile();
     // end::custom_printer[]
   }
@@ -93,7 +93,7 @@ class BasicsDocTest {
         createBlogPost("Latest News", "Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
 
     approve(blogPost)
-        .printWith(objectPrinter())
+        .printedBy(objectPrinter())
         .scrubbedOf(dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX")) // <1>
         .scrubbedOf(uuids()) // <2>
         .byFile(); // <3>
@@ -106,7 +106,7 @@ class BasicsDocTest {
     Contact contact = createContact("Jane Doe", "jane@approvej.org", "+1 123 456 7890");
     approve(contact)
         .scrubbedOf(it -> new Contact(-1, it.name(), it.email(), it.phoneNumber())) // <1>
-        .printWith(objectPrinter())
+        .printedBy(objectPrinter())
         .byFile();
     // end::custom_scrubbing[]
   }
@@ -126,7 +126,7 @@ class BasicsDocTest {
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
     approve(person)
-        .printWith(
+        .printedBy(
             it ->
                 """
                 person:
@@ -143,7 +143,7 @@ class BasicsDocTest {
     // tag::approve_file_nextToTestInSubdirectory[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
-    approve(person).printWith(new PersonYamlPrinter()).byFile(nextToTestInSubdirectory());
+    approve(person).printedBy(new PersonYamlPrinter()).byFile(nextToTestInSubdirectory());
     // end::approve_file_nextToTestInSubdirectory[]
   }
 
@@ -162,7 +162,7 @@ class BasicsDocTest {
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
     approve(person)
-        .printWith(new PersonYamlPrinter())
+        .printedBy(new PersonYamlPrinter())
         .byFile("src/test/resources/BasicExamples-approve file approved path.yaml"); // <1>
     // end::approve_file_approved_path[]
   }
@@ -170,14 +170,14 @@ class BasicsDocTest {
   @Test
   void approve_reviewWith_fileReviewer() throws IOException, InterruptedException {
     assumeThat(new ProcessBuilder("which", "meld").start().waitFor()).isEqualTo(0);
-    // tag::approve_reviewWith_fileReviewer[]
+    // tag::approve_reviewedBy_fileReviewer[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
     approve(person)
-        .printWith(new PersonYamlPrinter())
-        .reviewWith("idea diff {receivedFile} {approvedFile}") // <1>
+        .printedBy(new PersonYamlPrinter())
+        .reviewedBy("idea diff {receivedFile} {approvedFile}") // <1>
         .byFile(); // <2>
-    // end::approve_reviewWith_fileReviewer[]
+    // end::approve_reviewedBy_fileReviewer[]
   }
 
   // tag::person_yaml_printer[]

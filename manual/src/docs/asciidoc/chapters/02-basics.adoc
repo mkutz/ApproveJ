@@ -112,13 +112,13 @@ While some `toString` implementations already are quite good, they typically ret
 This is fine as long as you only have a few properties.
 However, if you have a lot of properties, it is much easier to read the result if it is formatted nicely.
 
-In order to change the way objects are being transformed to strings, you can use the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`]'s `printWith` method and provide a link:{javadoc-url}/core/org/approvej/print/Printer.html[`Printer`]/`Function<T, String>` instance as an argument.
+In order to change the way objects are being transformed to strings, you can use the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`]'s `printedBy` method and provide a link:{javadoc-url}/core/org/approvej/print/Printer.html[`Printer`]/`Function<T, String>` instance as an argument.
 
 
 === Generic Object Printer
 
 ApproveJ provides a generic link:{javadoc-url}/core/org/approvej/print/ObjectPrinter.html[`ObjectPrinter`] that will print the object with each of its properties on a new line to make comparing the result easier.
-You can use this printer by calling the `printWith` method on the builder.
+You can use this printer by calling the `printedBy` method on the builder.
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -144,7 +144,7 @@ include::../../../test/java/examples/java/BasicsDocTest-object_printer-approved.
 [id=custom_printer_function]
 === Custom Printer Function
 
-You can provide a custom `Function<T, String>` to the builder's `printWith` method.
+You can provide a custom `Function<T, String>` to the builder's `printedBy` method.
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -482,17 +482,17 @@ So, after you merged the files or fixed the code, you need to run the test again
 
 === Choose Reviewer in Test
 
-You can choose the link:{javadoc-url}/core/org/approvej/review/FileReviewer.html[`FileReviewer`] to use in the test code by calling the `reviewWith` method on the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`].
+You can choose the link:{javadoc-url}/core/org/approvej/review/FileReviewer.html[`FileReviewer`] to use in the test code by calling the `reviewedBy` method on the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`].
 
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_reviewWith_fileReviewer]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_reviewedBy_fileReviewer]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_reviewWith_fileReviewer]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_reviewedBy_fileReviewer]
 ----
 <1> sets the given script to be executed to support the review
 <2> executes the review script if the received value differs from the approved value
@@ -512,5 +512,5 @@ include::../../../test/resources/approvej.properties[]
 
 Supported properties are:
 
-`defaultPrinter`:: the default printer class if none is specified via the `printWith` method (see <<printing>>)
+`defaultPrinter`:: the default printer class if none is specified via the `printedBy` method (see <<printing>>)
 `defaultFileReviewerScript`:: the script that should be executed to support a review of the differences between the previously approved and the actually received value (see <<reviewing>>)
