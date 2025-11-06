@@ -55,8 +55,7 @@ public class RelativeDateTimeReplacement implements Replacement {
       parts.add("%d%s".formatted(minutes, "m"));
     }
 
-    int nanos = absolute.toNanosPart();
-    int millis = absolute.toMillisPart() + (nanos >= 500_000_000 ? 1 : 0);
+    int millis = absolute.toMillisPart();
     int seconds = absolute.toSecondsPart() + (millis >= 500 ? 1 : 0);
     if (seconds != 0) {
       parts.add("%d%s".formatted(seconds, "s"));
