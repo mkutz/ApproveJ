@@ -1,6 +1,7 @@
 package org.approvej.scrub;
 
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.function.Function;
 import org.jspecify.annotations.NullMarked;
 
@@ -62,7 +63,7 @@ public class Replacements {
    * @return a replacement function that returns a relative description for dates of the given
    *     dateTimePattern
    */
-  public static Replacement relativeDate(DateTimeFormatter dateTimeFormatter) {
+  public static RelativeDateReplacement relativeDate(DateTimeFormatter dateTimeFormatter) {
     return new RelativeDateReplacement(dateTimeFormatter);
   }
 
@@ -75,7 +76,7 @@ public class Replacements {
    * @return a replacement function that returns a relative description for dates of the given
    *     dateTimePattern
    */
-  public static Replacement relativeDate(String dateTimePattern) {
+  public static RelativeDateReplacement relativeDate(String dateTimePattern) {
     return relativeDate(DateTimeFormatter.ofPattern(dateTimePattern));
   }
 
@@ -87,8 +88,8 @@ public class Replacements {
    * @return a replacement function that returns a relative description for dates of the given
    *     dateTimePattern
    */
-  public static Replacement relativeDateTime(DateTimeFormatter dateTimeFormatter) {
-    return new RelativeDateTimeReplacement(dateTimeFormatter);
+  public static RelativeDateTimeReplacement relativeDateTime(DateTimeFormatter dateTimeFormatter) {
+    return new RelativeDateTimeReplacement(dateTimeFormatter, ChronoUnit.SECONDS);
   }
 
   /**
@@ -99,7 +100,7 @@ public class Replacements {
    * @return a replacement function that returns a relative description for dates of the given
    *     dateTimePattern
    */
-  public static Replacement relativeDateTime(String dateTimePattern) {
+  public static RelativeDateTimeReplacement relativeDateTime(String dateTimePattern) {
     return relativeDateTime(DateTimeFormatter.ofPattern(dateTimePattern));
   }
 

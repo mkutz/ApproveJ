@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.joining;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.stream.Stream;
 
 /**
@@ -16,55 +17,68 @@ import java.util.stream.Stream;
  */
 public class RelativeDateTimeReplacement implements Replacement {
 
-  private static final Duration PRECISION = Duration.ofMillis(500);
   private final DateTimeFormatter dateTimeFormatter;
+  private final ChronoUnit roundToUnit;
 
-  RelativeDateTimeReplacement(DateTimeFormatter dateTimeFormatter) {
+  RelativeDateTimeReplacement(DateTimeFormatter dateTimeFormatter, ChronoUnit roundToUnit) {
     this.dateTimeFormatter = dateTimeFormatter;
+    this.roundToUnit = roundToUnit;
+  }
+
+  public RelativeDateTimeReplacement roundToWhole(ChronoUnit roundToUnit) {
+    return new RelativeDateTimeReplacement(dateTimeFormatter, roundToUnit);
   }
 
   @Override
   public String apply(String match, Integer count) {
     ZonedDateTime parsed = dateTimeFormatter.parse(match, ZonedDateTime::from);
-    ZonedDateTime now = ZonedDateTime.now();
-    Duration duration = Duration.between(now, parsed);
-    Duration absolute = duration.abs();
+    Duration rounded = roundToUnit(Duration.between(ZonedDateTime.now(), parsed), roundToUnit);
+    Duration absolute = rounded.abs();
 
-    if (absolute.minus(PRECISION).isNegative()) {
+    if (absolute.isZero()) {
       return "[now]";
     }
 
     Stream.Builder<String> parts = Stream.builder();
 
-    if (duration.isPositive()) {
+    if (rounded.isPositive()) {
       parts.add("in");
     }
 
-    long days = abs(duration.toDays());
+    int seconds = absolute.toSecondsPart();
+    int minutes = absolute.toMinutesPart();
+    int hours = absolute.toHoursPart();
+    long days = abs(rounded.toDaysPart());
+
     if (days != 0) {
       parts.add("%d%s".formatted(days, "d"));
     }
 
-    int hours = absolute.toHoursPart();
     if (hours != 0) {
       parts.add("%d%s".formatted(hours, "h"));
     }
 
-    int minutes = absolute.toMinutesPart();
     if (minutes != 0) {
       parts.add("%d%s".formatted(minutes, "m"));
     }
 
-    int millis = absolute.toMillisPart();
-    int seconds = absolute.toSecondsPart() + (millis >= 500 ? 1 : 0);
     if (seconds != 0) {
       parts.add("%d%s".formatted(seconds, "s"));
     }
 
-    if (duration.isNegative()) {
+    if (rounded.isNegative()) {
       parts.add("ago");
     }
 
     return "[%s]".formatted(parts.build().collect(joining(" ")));
+  }
+
+  private static Duration roundToUnit(Duration duration, ChronoUnit unit) {
+    Duration roundedAbsolute =
+        duration.abs().plus(unit.getDuration().dividedBy(2)).truncatedTo(unit);
+    if (duration.isNegative()) {
+      return roundedAbsolute.negated();
+    }
+    return roundedAbsolute;
   }
 }
