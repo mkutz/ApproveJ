@@ -84,7 +84,7 @@ public class DateTimeScrubber implements Scrubber<String> {
   }
 
   /**
-   * Makes this use a {@link Replacements#relativeDateTime(String) realtiveDateTime} to replace
+   * Makes this use a {@link Replacements#relativeDateTime(String) relativeDateTime} to replace
    * matches of the date/time pattern.
    *
    * @return this
