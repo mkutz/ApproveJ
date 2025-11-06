@@ -1,11 +1,15 @@
 package org.approvej.scrub;
 
-import static java.lang.Math.abs;
+import static java.time.temporal.ChronoUnit.DAYS;
+import static java.time.temporal.ChronoUnit.MONTHS;
+import static java.time.temporal.ChronoUnit.YEARS;
 import static java.util.stream.Collectors.joining;
 
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -24,35 +28,37 @@ public class RelativeDateReplacement implements Replacement {
   public String apply(String match, Integer count) {
     LocalDate parsed = dateTimeFormatter.parse(match, LocalDate::from);
     Period period = Period.between(LocalDate.now(), parsed);
+    Period absolute = period.isNegative() ? period.negated() : period;
+
     if (period.isZero()) return "[today]";
     if (period.equals(Period.ofDays(1))) return "[tomorrow]";
     if (period.equals(Period.ofDays(-1))) return "[yesterday]";
 
-    Stream.Builder<String> parts = Stream.builder();
+    return "[%s]"
+        .formatted(
+            Stream.of(
+                    !period.isNegative() ? "in" : null,
+                    printPart(absolute.getYears(), YEARS),
+                    printPart(absolute.getMonths(), MONTHS),
+                    printPart(absolute.getDays(), DAYS),
+                    period.isNegative() ? "ago" : null)
+                .filter(Objects::nonNull)
+                .collect(joining(" ")));
+  }
 
-    if (!period.isNegative()) {
-      parts.add("in");
+  private static String printPart(long value, ChronoUnit unit) {
+    if (value == 0) {
+      return null;
     }
-
-    long years = abs(period.getYears());
-    if (years != 0) {
-      parts.add("%d %s%s".formatted(years, "year", years == 1 ? "" : "s"));
-    }
-
-    long months = abs(period.getMonths());
-    if (months != 0) {
-      parts.add("%d %s%s".formatted(months, "month", months == 1 ? "" : "s"));
-    }
-
-    long days = abs(period.getDays());
-    if (days != 0) {
-      parts.add("%d %s%s".formatted(days, "day", days == 1 ? "" : "s"));
-    }
-
-    if (period.isNegative()) {
-      parts.add("ago");
-    }
-
-    return "[%s]".formatted(parts.build().collect(joining(" ")));
+    return "%d %s%s"
+        .formatted(
+            value,
+            switch (unit) {
+              case YEARS -> "year";
+              case MONTHS -> "month";
+              case DAYS -> "day";
+              default -> "";
+            },
+            value > 1 ? "s" : "");
   }
 }
