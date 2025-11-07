@@ -3,7 +3,6 @@ package org.approvej.scrub;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import static org.approvej.scrub.Replacements.relativeDate;
-import static org.approvej.scrub.Replacements.relativeDateTime;
 
 import java.time.DayOfWeek;
 import java.time.Month;
@@ -54,13 +53,16 @@ public class DateTimeScrubber implements Scrubber<String> {
   }
 
   /**
-   * Set the {@link Replacement} to be used.
+   * Set the {@link RelativeDateReplacement} to be used. Automatically sets the {@link
+   * RelativeDateReplacement#dateTimeFormatter(DateTimeFormatter)} to the one of this.
    *
-   * @param replacement a {@link Replacement} function
+   * @param replacement a {@link RelativeDateReplacement}
    * @return this
    */
-  public DateTimeScrubber replacement(Replacement replacement) {
-    return new DateTimeScrubber(dateTimeFormatter, regexScrubber.replacement(replacement));
+  public DateTimeScrubber replacement(RelativeDateReplacement replacement) {
+    return new DateTimeScrubber(
+        dateTimeFormatter,
+        regexScrubber.replacement(replacement.dateTimeFormatter(dateTimeFormatter)));
   }
 
   /**
@@ -74,25 +76,40 @@ public class DateTimeScrubber implements Scrubber<String> {
   }
 
   /**
+   * Set the {@link RelativeDateTimeReplacement} to be used. Automatically sets the {@link
+   * RelativeDateTimeReplacement#dateTimeFormatter(DateTimeFormatter)} to the one of this.
+   *
+   * @param replacement a {@link RelativeDateTimeReplacement}
+   * @return this
+   */
+  public DateTimeScrubber replacement(RelativeDateTimeReplacement replacement) {
+    return new DateTimeScrubber(
+        dateTimeFormatter,
+        regexScrubber.replacement(replacement.dateTimeFormatter(dateTimeFormatter)));
+  }
+
+  /**
+   * Set the {@link Replacement} to be used.
+   *
+   * @param replacement a {@link Replacement} function
+   * @return this
+   */
+  public DateTimeScrubber replacement(Replacement replacement) {
+    return new DateTimeScrubber(dateTimeFormatter, regexScrubber.replacement(replacement));
+  }
+
+  /**
    * Makes this use a {@link Replacements#relativeDate(String) relativeDate} to replace matches of
    * the date/time pattern.
    *
    * @return this
+   * @deprecated use {@link #replacement(RelativeDateReplacement)}
    */
+  @Deprecated(since = "0.12", forRemoval = true)
   public DateTimeScrubber replaceWithRelativeDate() {
     return new DateTimeScrubber(
-        dateTimeFormatter, regexScrubber.replacement(relativeDate(dateTimeFormatter)));
-  }
-
-  /**
-   * Makes this use a {@link Replacements#relativeDateTime(String) relativeDateTime} to replace
-   * matches of the date/time pattern.
-   *
-   * @return this
-   */
-  public DateTimeScrubber replaceWithRelativeDateTime() {
-    return new DateTimeScrubber(
-        dateTimeFormatter, regexScrubber.replacement(relativeDateTime(dateTimeFormatter)));
+        dateTimeFormatter,
+        regexScrubber.replacement(relativeDate().dateTimeFormatter(dateTimeFormatter)));
   }
 
   @Override

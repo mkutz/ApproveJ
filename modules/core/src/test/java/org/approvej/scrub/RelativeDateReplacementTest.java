@@ -20,21 +20,21 @@ class RelativeDateReplacementTest {
   void apply_today() {
     DateTimeFormatter format = ISO_LOCAL_DATE;
     String unscrubbedValue = TODAY.format(format);
-    assertEquals("[today]", relativeDate(format).apply(unscrubbedValue, 1));
+    assertEquals("[today]", relativeDate().dateTimeFormatter(format).apply(unscrubbedValue, 1));
   }
 
   @Test
   void apply_yesterday() {
     DateTimeFormatter format = ISO_LOCAL_DATE;
     String unscrubbedValue = TODAY.minusDays(1).format(format);
-    assertEquals("[yesterday]", relativeDate(format).apply(unscrubbedValue, 1));
+    assertEquals("[yesterday]", relativeDate().dateTimeFormatter(format).apply(unscrubbedValue, 1));
   }
 
   @Test
   void apply_tomorrow() {
     DateTimeFormatter format = ISO_LOCAL_DATE;
     String unscrubbedValue = TODAY.plusDays(1).format(format);
-    assertEquals("[tomorrow]", relativeDate(format).apply(unscrubbedValue, 1));
+    assertEquals("[tomorrow]", relativeDate().dateTimeFormatter(format).apply(unscrubbedValue, 1));
   }
 
   @ParameterizedTest
@@ -42,7 +42,9 @@ class RelativeDateReplacementTest {
   void apply_past_days(int daysAgo) {
     DateTimeFormatter format = ISO_LOCAL_DATE;
     String unscrubbedValue = TODAY.minusDays(daysAgo).format(format);
-    assertEquals("[" + daysAgo + " days ago]", relativeDate(format).apply(unscrubbedValue, 1));
+    assertEquals(
+        "[" + daysAgo + " days ago]",
+        relativeDate().dateTimeFormatter(format).apply(unscrubbedValue, 1));
   }
 
   @ParameterizedTest
@@ -50,34 +52,38 @@ class RelativeDateReplacementTest {
   void apply_future_days(int daysAhead) {
     DateTimeFormatter format = ISO_LOCAL_DATE;
     String unscrubbedValue = TODAY.plusDays(daysAhead).format(format);
-    assertEquals("[in " + daysAhead + " days]", relativeDate(format).apply(unscrubbedValue, 1));
+    assertEquals(
+        "[in " + daysAhead + " days]",
+        relativeDate().dateTimeFormatter(format).apply(unscrubbedValue, 1));
   }
 
   @Test
   void apply_future() {
     DateTimeFormatter format = ISO_LOCAL_DATE;
     String unscrubbedValue = TODAY.plusYears(1).plusMonths(2).plusDays(3).format(format);
-    assertEquals("[in 1 year 2 months 3 days]", relativeDate(format).apply(unscrubbedValue, 1));
+    assertEquals(
+        "[in 1 year 2 months 3 days]",
+        relativeDate().dateTimeFormatter(format).apply(unscrubbedValue, 1));
   }
 
   @Test
   void apply_basic_format() {
     DateTimeFormatter format = BASIC_ISO_DATE;
     String unscrubbedValue = TODAY.format(format);
-    assertEquals("[today]", relativeDate(format).apply(unscrubbedValue, 1));
+    assertEquals("[today]", relativeDate().dateTimeFormatter(format).apply(unscrubbedValue, 1));
   }
 
   @Test
   void apply_ISO_ordinal_format() {
     DateTimeFormatter format = ISO_ORDINAL_DATE;
     String unscrubbedValue = TODAY.format(format);
-    assertEquals("[today]", relativeDate(format).apply(unscrubbedValue, 1));
+    assertEquals("[today]", relativeDate().dateTimeFormatter(format).apply(unscrubbedValue, 1));
   }
 
   @Test
   void apply_custom_format() {
     DateTimeFormatter format = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy");
     String unscrubbedValue = TODAY.format(format);
-    assertEquals("[today]", relativeDate(format).apply(unscrubbedValue, 1));
+    assertEquals("[today]", relativeDate().dateTimeFormatter(format).apply(unscrubbedValue, 1));
   }
 }
