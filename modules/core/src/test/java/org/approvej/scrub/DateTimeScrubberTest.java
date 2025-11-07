@@ -1,8 +1,11 @@
 package org.approvej.scrub;
 
 import static java.time.ZoneOffset.UTC;
+import static org.approvej.scrub.Replacements.relativeDate;
+import static org.approvej.scrub.Replacements.relativeDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -263,5 +266,44 @@ class DateTimeScrubberTest {
                             DateTimeFormatter.RFC_1123_DATE_TIME.format(
                                 ZonedDateTime.now().withZoneSameInstant(ZoneId.of("GMT"))))))
         .isEqualTo("rfc1123DateTime: [rfc1123DateTime 1]");
+  }
+
+  @Test
+  void replaceWithRelativeDate() {
+    DateTimeFormatter format = DateTimeFormatter.ISO_DATE;
+    assertThat(
+            Scrubbers.isoDates()
+                .replacement(relativeDate())
+                .apply(
+                    "yesterday %s, today %s, tomorrow %s, next year %s, 2 months ago %s"
+                        .formatted(
+                            format.format(ZonedDateTime.now().minusDays(1)),
+                            format.format(ZonedDateTime.now()),
+                            format.format(ZonedDateTime.now().plusDays(1)),
+                            format.format(ZonedDateTime.now().plusYears(1)),
+                            format.format(ZonedDateTime.now().minusMonths(2)))))
+        .isEqualTo(
+            "yesterday [yesterday], today [today], tomorrow [tomorrow], next year [in 1 year], 2"
+                + " months ago [2 months ago]");
+  }
+
+  @Test
+  void replaceWithRelativeDateTime() {
+    String pattern = "yyyy-MM-dd'T'HH:mm:ssX";
+    DateTimeFormatter format = DateTimeFormatter.ofPattern(pattern);
+    assertThat(
+            Scrubbers.dateTimeFormat(pattern)
+                .replacement(relativeDateTime().roundedTo(Duration.ofSeconds(5)))
+                .apply(
+                    "one hour ago %s, now %s, tomorrow %s, in one hour 59 minutes %s, 5 seconds ago %s"
+                        .formatted(
+                            format.format(ZonedDateTime.now().minusHours(1)),
+                            format.format(ZonedDateTime.now()),
+                            format.format(ZonedDateTime.now().plusDays(1)),
+                            format.format(ZonedDateTime.now().plusHours(1).plusMinutes(59)),
+                            format.format(ZonedDateTime.now().minusSeconds(5)))))
+        .isEqualTo(
+            "one hour ago [1h ago], now [now], tomorrow [in 1d], in one hour 59 minutes [in 1h"
+                + " 59m], 5 seconds ago [5s ago]");
   }
 }

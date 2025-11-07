@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -22,6 +21,16 @@ public class RelativeDateReplacement implements Replacement {
 
   RelativeDateReplacement(DateTimeFormatter dateTimeFormatter) {
     this.dateTimeFormatter = dateTimeFormatter;
+  }
+
+  /**
+   * Creates and returns a copy of this with the given dateTimeFormatter.
+   *
+   * @param dateTimeFormatter the {@link DateTimeFormatter} to be used
+   * @return a copy of this with the given dateTimeFormatter
+   */
+  public RelativeDateReplacement dateTimeFormatter(DateTimeFormatter dateTimeFormatter) {
+    return new RelativeDateReplacement(dateTimeFormatter);
   }
 
   @Override
@@ -37,18 +46,18 @@ public class RelativeDateReplacement implements Replacement {
     return "[%s]"
         .formatted(
             Stream.of(
-                    !period.isNegative() ? "in" : null,
+                    !period.isNegative() ? "in" : "",
                     printPart(absolute.getYears(), YEARS),
                     printPart(absolute.getMonths(), MONTHS),
                     printPart(absolute.getDays(), DAYS),
-                    period.isNegative() ? "ago" : null)
-                .filter(Objects::nonNull)
+                    period.isNegative() ? "ago" : "")
+                .filter(string -> !string.isBlank())
                 .collect(joining(" ")));
   }
 
   private static String printPart(long value, ChronoUnit unit) {
     if (value == 0) {
-      return null;
+      return "";
     }
     return "%d %s%s"
         .formatted(

@@ -7,42 +7,51 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.stream.Collectors.joining;
 
 import java.time.Duration;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
  * Replaces each match of the given dateTimePattern (as defined by {@link DateTimeFormatter}) with a
  * relative description, like {@code [10m ago]}, {@code [in 2d 1h 3m 33s]}, {@code [13d ago]}.
  *
- * <p>The value is rounded to full seconds.
+ * <p>The value is rounded to the {@link #roundingDuration}.
  */
 public class RelativeDateTimeReplacement implements Replacement {
 
   private final DateTimeFormatter dateTimeFormatter;
-  private final ChronoUnit roundToUnit;
+  private final Duration roundingDuration;
 
-  RelativeDateTimeReplacement(DateTimeFormatter dateTimeFormatter, ChronoUnit roundToUnit) {
+  RelativeDateTimeReplacement(DateTimeFormatter dateTimeFormatter, Duration roundingDuration) {
     this.dateTimeFormatter = dateTimeFormatter;
-    this.roundToUnit = roundToUnit;
+    this.roundingDuration = roundingDuration;
   }
 
   /**
-   * Rounds the relative date to the wholes of the given unit.
+   * Creates and returns a copy of this with the given dateTimeFormatter.
    *
-   * @param unit the {@link ChronoUnit} to round to
+   * @param dateTimeFormatter the {@link DateTimeFormatter} to be used
+   * @return a copy of this with the given dateTimeFormatter
+   */
+  public RelativeDateTimeReplacement dateTimeFormatter(DateTimeFormatter dateTimeFormatter) {
+    return new RelativeDateTimeReplacement(dateTimeFormatter, roundingDuration);
+  }
+
+  /**
+   * Rounds the relative date/time the given roundingDuration.
+   *
+   * @param roundingDuration a {@link Duration} to round to
    * @return this
    */
-  public RelativeDateTimeReplacement roundToWhole(ChronoUnit unit) {
-    return new RelativeDateTimeReplacement(dateTimeFormatter, unit);
+  public RelativeDateTimeReplacement roundedTo(Duration roundingDuration) {
+    return new RelativeDateTimeReplacement(dateTimeFormatter, roundingDuration);
   }
 
   @Override
   public String apply(String match, Integer count) {
-    ZonedDateTime parsed = dateTimeFormatter.parse(match, ZonedDateTime::from);
-    Duration rounded = roundToUnit(Duration.between(ZonedDateTime.now(), parsed), roundToUnit);
+    Instant parsed = dateTimeFormatter.parse(match, Instant::from);
+    Duration rounded = roundToDuration(Duration.between(Instant.now(), parsed), roundingDuration);
     Duration absolute = rounded.abs();
 
     if (rounded.isZero()) {
@@ -52,28 +61,24 @@ public class RelativeDateTimeReplacement implements Replacement {
     return "[%s]"
         .formatted(
             Stream.of(
-                    rounded.isPositive() ? "in" : null,
+                    rounded.isPositive() ? "in" : "",
                     printPart(absolute.toDaysPart(), DAYS),
                     printPart(absolute.toHoursPart(), HOURS),
                     printPart(absolute.toMinutesPart(), MINUTES),
                     printPart(absolute.toSecondsPart(), SECONDS),
-                    rounded.isNegative() ? "ago" : null)
-                .filter(Objects::nonNull)
+                    rounded.isNegative() ? "ago" : "")
+                .filter(string -> !string.isBlank())
                 .collect(joining(" ")));
   }
 
-  private static Duration roundToUnit(Duration duration, ChronoUnit unit) {
-    Duration roundedAbsolute =
-        duration.abs().plus(unit.getDuration().dividedBy(2)).truncatedTo(unit);
-    if (duration.isNegative()) {
-      return roundedAbsolute.negated();
-    }
-    return roundedAbsolute;
+  private static Duration roundToDuration(Duration duration, Duration roundingDuration) {
+    long unitMillis = roundingDuration.toMillis();
+    return Duration.ofMillis(Math.round((double) duration.toMillis() / unitMillis) * unitMillis);
   }
 
   private static String printPart(long value, ChronoUnit unit) {
     if (value == 0) {
-      return null;
+      return "";
     }
     return "%d%s"
         .formatted(

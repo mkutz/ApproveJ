@@ -8,6 +8,7 @@ import static org.approvej.approve.Approvers.value;
 import static org.approvej.approve.PathProviderBuilder.approvedPath;
 import static org.approvej.approve.PathProviderBuilder.nextToTest;
 import static org.approvej.print.ObjectPrinter.objectPrinter;
+import static org.approvej.scrub.Replacements.relativeDate;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -126,7 +127,7 @@ class ApprovalBuilderTest {
         """;
 
     approve(received)
-        .scrubbedOf(dateTimeFormat("yyyy-MM-dd").replaceWithRelativeDate())
+        .scrubbedOf(dateTimeFormat("yyyy-MM-dd").replacement(relativeDate()))
         .scrubbedOf(uuids())
         .byValue(previouslyApprovedScrubbed);
   }
