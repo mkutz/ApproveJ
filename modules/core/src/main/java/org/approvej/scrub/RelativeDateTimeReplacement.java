@@ -39,7 +39,7 @@ public class RelativeDateTimeReplacement implements Replacement {
   }
 
   /**
-   * Rounds the relative date/time the given roundingDuration.
+   * Rounds the relative date/time to the given roundingDuration.
    *
    * @param roundingDuration a {@link Duration} to round to
    * @return this
