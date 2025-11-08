@@ -49,7 +49,7 @@ public class RegexScrubber implements Scrubber<String> {
    * Set the {@link Replacement} to be used.
    *
    * @param replacement a {@link Replacement} function
-   * @return this
+   * @return a copy of this using the given {@link #replacement}
    */
   public RegexScrubber replacement(Replacement replacement) {
     return new RegexScrubber(pattern, replacement);
@@ -59,7 +59,7 @@ public class RegexScrubber implements Scrubber<String> {
    * Set the replacement {@link Function} always returning the given staticReplacement.
    *
    * @param staticReplacement the static replacement {@link String}
-   * @return this
+   * @return a copy of this using the given {@link #replacement}
    */
   public RegexScrubber replacement(String staticReplacement) {
     return replacement(string(staticReplacement));

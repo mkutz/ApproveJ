@@ -31,6 +31,16 @@ public class FieldScrubber<T> implements Scrubber<T> {
   }
 
   /**
+   * Sets the replacement {@link Object}.
+   *
+   * @param replacement the new replacement {@link Object}
+   * @return a copy of this using the given {@link #replacement}
+   */
+  public FieldScrubber<T> replacement(Object replacement) {
+    return new FieldScrubber<>(field, replacement);
+  }
+
+  /**
    * Scrubs the given value.
    *
    * @param value the object to be scrubbed
@@ -47,15 +57,5 @@ public class FieldScrubber<T> implements Scrubber<T> {
           "Failed to scrub field %s on value %s".formatted(field.getName(), value), e);
     }
     return value;
-  }
-
-  /**
-   * Sets the replacement {@link Object}.
-   *
-   * @param replacement the new replacement {@link Object}
-   * @return this
-   */
-  public FieldScrubber<T> replacement(Object replacement) {
-    return new FieldScrubber<>(field, replacement);
   }
 }

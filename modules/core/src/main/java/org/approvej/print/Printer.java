@@ -13,8 +13,8 @@ public interface Printer<T> extends Function<T, String> {
   String DEFAULT_FILENAME_EXTENSION = "txt";
 
   /**
-   * Returns the suggested filename extension for the printed object. Defaults to "txt" if not
-   * overridden.
+   * Returns the suggested filename extension for the printed object. Defaults to {@value
+   * DEFAULT_FILENAME_EXTENSION} if not overridden.
    *
    * @return the suggested filename extension.
    */

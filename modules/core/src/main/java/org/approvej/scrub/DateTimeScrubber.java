@@ -57,7 +57,7 @@ public class DateTimeScrubber implements Scrubber<String> {
    * Set the {@link Replacement} to be used.
    *
    * @param replacement a {@link Replacement} function
-   * @return this
+   * @return a copy of this using the given replacement
    */
   public DateTimeScrubber replacement(Replacement replacement) {
     return new DateTimeScrubber(dateTimeFormatter, regexScrubber.replacement(replacement));
@@ -67,7 +67,7 @@ public class DateTimeScrubber implements Scrubber<String> {
    * Set the replacement {@link Function} always returning the given staticReplacement.
    *
    * @param staticReplacement the static replacement {@link String}
-   * @return this
+   * @return a copy of this using the given string as replacement
    */
   public DateTimeScrubber replacement(String staticReplacement) {
     return replacement(string(staticReplacement));
@@ -78,7 +78,7 @@ public class DateTimeScrubber implements Scrubber<String> {
    * RelativeDateReplacement#dateTimeFormatter(DateTimeFormatter)} to the one of this.
    *
    * @param replacement a {@link RelativeDateReplacement}
-   * @return this
+   * @return a copy of this using the given replacement
    */
   public DateTimeScrubber replacement(RelativeDateReplacement replacement) {
     return new DateTimeScrubber(
@@ -91,7 +91,7 @@ public class DateTimeScrubber implements Scrubber<String> {
    * RelativeDateTimeReplacement#dateTimeFormatter(DateTimeFormatter)} to the one of this.
    *
    * @param replacement a {@link RelativeDateTimeReplacement}
-   * @return this
+   * @return a copy of this using the given replacement
    */
   public DateTimeScrubber replacement(RelativeDateTimeReplacement replacement) {
     return new DateTimeScrubber(
@@ -103,7 +103,7 @@ public class DateTimeScrubber implements Scrubber<String> {
    * Makes this use a {@link Replacements#relativeDate() relativeDate} to replace matches of the
    * date/time pattern.
    *
-   * @return this
+   * @return a copy of this using the given replacement
    * @deprecated use {@link #replacement(RelativeDateReplacement)}
    */
   @Deprecated(since = "0.12", forRemoval = true)

@@ -75,13 +75,13 @@ public class ApprovalBuilder<T> {
   /**
    * Creates a new builder for the given value.
    *
-   * @param originalValue the value to approve
+   * @param value the value to approve
    * @return a new {@link ApprovalBuilder} for the given value
    * @param <T> the type of the value to approve
    */
-  public static <T> ApprovalBuilder<T> approve(T originalValue) {
+  public static <T> ApprovalBuilder<T> approve(T value) {
     return new ApprovalBuilder<>(
-        originalValue, "", DEFAULT_FILENAME_EXTENSION, configuration.defaultFileReviewer());
+        value, "", DEFAULT_FILENAME_EXTENSION, configuration.defaultFileReviewer());
   }
 
   /**
@@ -90,7 +90,7 @@ public class ApprovalBuilder<T> {
    * otherwise simply overwrite the first one.
    *
    * @param name the name for the current approval
-   * @return this
+   * @return a copy of this with the given {@link #name}
    */
   public ApprovalBuilder<T> named(String name) {
     return new ApprovalBuilder<>(value, name, filenameExtension, fileReviewer);
@@ -100,7 +100,7 @@ public class ApprovalBuilder<T> {
    * Uses the given {@link Function} to convert the {@link #value} to a {@link String}.
    *
    * @param printer the {@link Function} used to convert the {@link #value} to a {@link String}
-   * @return a new {@link ApprovalBuilder} with the printed value
+   * @return a copy of this with the printed {@link #value}
    */
   public ApprovalBuilder<String> printedBy(Function<T, String> printer) {
     return new ApprovalBuilder<>(printer.apply(value), name, filenameExtension, fileReviewer);
@@ -110,7 +110,7 @@ public class ApprovalBuilder<T> {
    * Uses the given {@link Function} to convert the {@link #value} to a {@link String}.
    *
    * @param printer the {@link Function} used to convert the {@link #value} to a {@link String}
-   * @return a new {@link ApprovalBuilder} with the printed value
+   * @return a copy of this with the printed {@link #value}
    * @deprecated use {@link #printedBy(Function)}
    */
   @Deprecated(since = "0.12", forRemoval = true)
@@ -122,7 +122,7 @@ public class ApprovalBuilder<T> {
    * Uses the given {@link Printer} to convert the {@link #value} to a {@link String}.
    *
    * @param printer the printer used to convert the value to a {@link String}
-   * @return a new {@link ApprovalBuilder} with the printed value
+   * @return a copy of this with the printed {@link #value}
    */
   public ApprovalBuilder<String> printedBy(Printer<T> printer) {
     return new ApprovalBuilder<>(
@@ -133,7 +133,7 @@ public class ApprovalBuilder<T> {
    * Uses the given {@link Printer} to convert the {@link #value} to a {@link String}.
    *
    * @param printer the printer used to convert the value to a {@link String}
-   * @return a new {@link ApprovalBuilder} with the printed value
+   * @return a copy of this with the printed {@link #value}
    * @deprecated use {@link #printedBy(Printer)}
    */
   @Deprecated(since = "0.12", forRemoval = true)
@@ -144,7 +144,7 @@ public class ApprovalBuilder<T> {
   /**
    * Uses the default {@link Printer} to convert the {@link #value} to a {@link String}.
    *
-   * @return a new {@link ApprovalBuilder} with the printed value
+   * @return a copy of this with the printed {@link #value}
    * @see Configuration#defaultPrinter()
    * @see #printedBy(Printer)
    */
@@ -156,7 +156,7 @@ public class ApprovalBuilder<T> {
   /**
    * Uses the default {@link Printer} to convert the {@link #value} to a {@link String}.
    *
-   * @return a new {@link ApprovalBuilder} with the printed value
+   * @return a copy of this with the printed {@link #value}
    * @see Configuration#defaultPrinter()
    * @see #printedBy(Printer)
    * @deprecated use {@link #printed()}
@@ -170,7 +170,7 @@ public class ApprovalBuilder<T> {
    * Applies the given scrubber to the current {@link #value}.
    *
    * @param scrubber the {@link UnaryOperator} or {@link Scrubber}
-   * @return this
+   * @return a copy of this with the scrubbed {@link #value}
    */
   public ApprovalBuilder<T> scrubbedOf(UnaryOperator<T> scrubber) {
     return new ApprovalBuilder<>(scrubber.apply(value), name, filenameExtension, fileReviewer);
@@ -181,7 +181,7 @@ public class ApprovalBuilder<T> {
    * previously approved.
    *
    * @param fileReviewer the {@link FileReviewer} to be used
-   * @return this
+   * @return a copy of this with the given {@link #fileReviewer}
    * @see Configuration#defaultFileReviewer()
    * @see org.approvej.review.FileReviewerScript#script()
    */
@@ -193,15 +193,15 @@ public class ApprovalBuilder<T> {
    * Sets the given {@link FileReviewer} to trigger if the received value is not equal to the
    * previously approved.
    *
-   * @param reviewer the {@link FileReviewer} to be used
-   * @return this
+   * @param fileReviewer the {@link FileReviewer} to be used
+   * @return a copy of this with the given {@link #fileReviewer}
    * @see Configuration#defaultFileReviewer()
    * @see org.approvej.review.FileReviewerScript#script()
    * @deprecated use {@link #reviewedBy(String)} (Function)}
    */
   @Deprecated(since = "0.12", forRemoval = true)
-  public ApprovalBuilder<T> reviewWith(FileReviewer reviewer) {
-    return reviewedBy(reviewer);
+  public ApprovalBuilder<T> reviewWith(FileReviewer fileReviewer) {
+    return reviewedBy(fileReviewer);
   }
 
   /**
@@ -210,7 +210,7 @@ public class ApprovalBuilder<T> {
    *
    * @param script the script {@link String} to be used as a {@link
    *     org.approvej.review.FileReviewerScript}
-   * @return this
+   * @return a copy of this with the given script as {@link #fileReviewer}
    * @see Configuration#defaultFileReviewer()
    * @see org.approvej.review.FileReviewerScript#script()
    */
@@ -224,7 +224,7 @@ public class ApprovalBuilder<T> {
    *
    * @param script the script {@link String} to be used as a {@link
    *     org.approvej.review.FileReviewerScript}
-   * @return this
+   * @return a copy of this with the given script as {@link #fileReviewer}
    * @see Configuration#defaultFileReviewer()
    * @see org.approvej.review.FileReviewerScript#script()
    * @deprecated use {@link #reviewedBy(String)}

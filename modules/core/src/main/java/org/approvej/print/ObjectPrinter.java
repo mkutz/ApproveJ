@@ -77,7 +77,7 @@ public class ObjectPrinter<T> implements Printer<T> {
    * Causes the {@link Printer} to sort the printed object's fields by their name. By default, the
    * fields will be printed in the order of their declaration.
    *
-   * @return this
+   * @return a copy of this sorting fields by name
    */
   public ObjectPrinter<T> sorted() {
     return new ObjectPrinter<>(Comparator.comparing(Field::getName));
