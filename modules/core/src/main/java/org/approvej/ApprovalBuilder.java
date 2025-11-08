@@ -59,16 +59,17 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class ApprovalBuilder<T> {
 
-  private T receivedValue;
-  private String name;
+  private final T value;
+  private final String name;
   private final String filenameExtension;
-  @Nullable private FileReviewer fileReviewer;
+  @Nullable private final FileReviewer fileReviewer;
 
-  private ApprovalBuilder(T originalValue, String name, String filenameExtension) {
-    this.receivedValue = originalValue;
+  private ApprovalBuilder(
+      T value, String name, String filenameExtension, @Nullable FileReviewer fileReviewer) {
+    this.value = value;
     this.name = name;
     this.filenameExtension = filenameExtension;
-    this.fileReviewer = configuration.defaultFileReviewer();
+    this.fileReviewer = fileReviewer;
   }
 
   /**
@@ -79,7 +80,8 @@ public class ApprovalBuilder<T> {
    * @param <T> the type of the value to approve
    */
   public static <T> ApprovalBuilder<T> approve(T originalValue) {
-    return new ApprovalBuilder<>(originalValue, "", DEFAULT_FILENAME_EXTENSION);
+    return new ApprovalBuilder<>(
+        originalValue, "", DEFAULT_FILENAME_EXTENSION, configuration.defaultFileReviewer());
   }
 
   /**
@@ -91,26 +93,23 @@ public class ApprovalBuilder<T> {
    * @return this
    */
   public ApprovalBuilder<T> named(String name) {
-    this.name = name;
-    return this;
+    return new ApprovalBuilder<>(value, name, filenameExtension, fileReviewer);
   }
 
   /**
-   * Uses the given {@link Function} to convert the {@link #receivedValue} to a {@link String}.
+   * Uses the given {@link Function} to convert the {@link #value} to a {@link String}.
    *
-   * @param printer the {@link Function} used to convert the {@link #receivedValue} to a {@link
-   *     String}
+   * @param printer the {@link Function} used to convert the {@link #value} to a {@link String}
    * @return a new {@link ApprovalBuilder} with the printed value
    */
   public ApprovalBuilder<String> printedBy(Function<T, String> printer) {
-    return new ApprovalBuilder<>(printer.apply(receivedValue), name, DEFAULT_FILENAME_EXTENSION);
+    return new ApprovalBuilder<>(printer.apply(value), name, filenameExtension, fileReviewer);
   }
 
   /**
-   * Uses the given {@link Function} to convert the {@link #receivedValue} to a {@link String}.
+   * Uses the given {@link Function} to convert the {@link #value} to a {@link String}.
    *
-   * @param printer the {@link Function} used to convert the {@link #receivedValue} to a {@link
-   *     String}
+   * @param printer the {@link Function} used to convert the {@link #value} to a {@link String}
    * @return a new {@link ApprovalBuilder} with the printed value
    * @deprecated use {@link #printedBy(Function)}
    */
@@ -120,17 +119,18 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Uses the given {@link Printer} to convert the {@link #receivedValue} to a {@link String}.
+   * Uses the given {@link Printer} to convert the {@link #value} to a {@link String}.
    *
    * @param printer the printer used to convert the value to a {@link String}
    * @return a new {@link ApprovalBuilder} with the printed value
    */
   public ApprovalBuilder<String> printedBy(Printer<T> printer) {
-    return new ApprovalBuilder<>(printer.apply(receivedValue), name, printer.filenameExtension());
+    return new ApprovalBuilder<>(
+        printer.apply(value), name, printer.filenameExtension(), fileReviewer);
   }
 
   /**
-   * Uses the given {@link Printer} to convert the {@link #receivedValue} to a {@link String}.
+   * Uses the given {@link Printer} to convert the {@link #value} to a {@link String}.
    *
    * @param printer the printer used to convert the value to a {@link String}
    * @return a new {@link ApprovalBuilder} with the printed value
@@ -142,7 +142,7 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Uses the default {@link Printer} to convert the {@link #receivedValue} to a {@link String}.
+   * Uses the default {@link Printer} to convert the {@link #value} to a {@link String}.
    *
    * @return a new {@link ApprovalBuilder} with the printed value
    * @see Configuration#defaultPrinter()
@@ -154,7 +154,7 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Uses the default {@link Printer} to convert the {@link #receivedValue} to a {@link String}.
+   * Uses the default {@link Printer} to convert the {@link #value} to a {@link String}.
    *
    * @return a new {@link ApprovalBuilder} with the printed value
    * @see Configuration#defaultPrinter()
@@ -167,28 +167,26 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Applies the given scrubber to the current {@link #receivedValue}.
+   * Applies the given scrubber to the current {@link #value}.
    *
    * @param scrubber the {@link UnaryOperator} or {@link Scrubber}
    * @return this
    */
   public ApprovalBuilder<T> scrubbedOf(UnaryOperator<T> scrubber) {
-    receivedValue = scrubber.apply(receivedValue);
-    return this;
+    return new ApprovalBuilder<>(scrubber.apply(value), name, filenameExtension, fileReviewer);
   }
 
   /**
    * Sets the given {@link FileReviewer} to trigger if the received value is not equal to the
    * previously approved.
    *
-   * @param reviewer the {@link FileReviewer} to be used
+   * @param fileReviewer the {@link FileReviewer} to be used
    * @return this
    * @see Configuration#defaultFileReviewer()
    * @see org.approvej.review.FileReviewerScript#script()
    */
-  public ApprovalBuilder<T> reviewedBy(FileReviewer reviewer) {
-    this.fileReviewer = reviewer;
-    return this;
+  public ApprovalBuilder<T> reviewedBy(FileReviewer fileReviewer) {
+    return new ApprovalBuilder<>(value, name, filenameExtension, fileReviewer);
   }
 
   /**
@@ -237,19 +235,18 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Approves the {@link #receivedValue} by the given approver.
+   * Approves the {@link #value} by the given approver.
    *
-   * <p>If necessary the {@link #receivedValue} is printed using the {@link
-   * Configuration#defaultPrinter()}.
+   * <p>If necessary the {@link #value} is printed using the {@link Configuration#defaultPrinter()}.
    *
    * @param approver a {@link Function} or an {@link Approver} implementation
    * @throws ApprovalError if the approval fails
    */
   public void by(final Function<String, ApprovalResult> approver) {
-    if (!(receivedValue instanceof String)) {
+    if (!(value instanceof String)) {
       printed().by(approver);
     }
-    ApprovalResult result = approver.apply(String.valueOf(receivedValue));
+    ApprovalResult result = approver.apply(String.valueOf(value));
     if (result.needsApproval()) {
       throw new ApprovalError(result.received(), result.previouslyApproved());
     }
@@ -272,11 +269,11 @@ public class ApprovalBuilder<T> {
    */
   public void byFile(PathProvider pathProvider) {
     FileApprover approver = file(pathProvider);
-    ApprovalResult approvalResult = approver.apply(String.valueOf(receivedValue));
+    ApprovalResult approvalResult = approver.apply(String.valueOf(value));
     if (approvalResult.needsApproval() && fileReviewer != null) {
       ReviewResult reviewResult = fileReviewer.apply(pathProvider);
       if (reviewResult.needsReapproval()) {
-        approvalResult = approver.apply(String.valueOf(receivedValue));
+        approvalResult = approver.apply(String.valueOf(value));
       }
     }
     approvalResult.throwIfNotApproved();
@@ -290,9 +287,8 @@ public class ApprovalBuilder<T> {
    * @throws ApprovalError if the approval fails
    */
   public void byFile(PathProviderBuilder pathProviderBuilder) {
-    if (!(receivedValue instanceof String)) {
-      // noinspection unchecked
-      printedBy((Printer<T>) configuration.defaultPrinter()).byFile(pathProviderBuilder);
+    if (!(value instanceof String)) {
+      printed().byFile(pathProviderBuilder);
     } else {
       byFile(pathProviderBuilder.filenameAffix(name).filenameExtension(filenameExtension));
     }
