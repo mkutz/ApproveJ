@@ -10,7 +10,7 @@ import java.util.function.Function;
 public interface Printer<T> extends Function<T, String> {
 
   /** The default filename extension for files that the printed value is written to. */
-  String DEFAULT_FILENAME_EXTENSION = "txt";
+  public String DEFAULT_FILENAME_EXTENSION = "txt";
 
   /**
    * Returns the suggested filename extension for the printed object. Defaults to {@value

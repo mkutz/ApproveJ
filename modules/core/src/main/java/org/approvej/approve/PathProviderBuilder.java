@@ -2,6 +2,7 @@ package org.approvej.approve;
 
 import static org.approvej.approve.StackTraceTestFinderUtil.currentTestMethod;
 import static org.approvej.approve.StackTraceTestFinderUtil.findTestSourcePath;
+import static org.approvej.print.Printer.DEFAULT_FILENAME_EXTENSION;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -11,7 +12,7 @@ import org.jspecify.annotations.NullMarked;
 
 /** A builder for creating {@link PathProvider} instances. */
 @NullMarked
-public class PathProviderBuilder {
+public class PathProviderBuilder implements PathProvider {
 
   /**
    * The infix of the file containing the latest received value that didn't match the previously
@@ -22,11 +23,13 @@ public class PathProviderBuilder {
   /** The infix of the file containing a previously approved value. */
   public static final String APPROVED = "approved";
 
+  private final Path directory;
+
   private final String baseFilename;
 
-  private Path directory = Path.of(".");
+  private final String filenameAffix;
 
-  private String filenameAffix = "";
+  private final String filenameExtension;
 
   /**
    * Creates a new {@link PathProvider} that uses the given approved {@link Path}.
@@ -67,8 +70,10 @@ public class PathProviderBuilder {
   public static PathProviderBuilder nextToTest() {
     TestMethod testMethod = currentTestMethod();
     return new PathProviderBuilder(
-            "%s-%s".formatted(testMethod.testClass().getSimpleName(), testMethod.testCaseName()))
-        .directory(findTestSourcePath(testMethod.method()).getParent());
+        "%s-%s".formatted(testMethod.testClass().getSimpleName(), testMethod.testCaseName()),
+        findTestSourcePath(testMethod.method()).getParent(),
+        "",
+        DEFAULT_FILENAME_EXTENSION);
   }
 
   /**
@@ -79,53 +84,73 @@ public class PathProviderBuilder {
    */
   public static PathProviderBuilder nextToTestInSubdirectory() {
     TestMethod testMethod = currentTestMethod();
-    return new PathProviderBuilder("%s".formatted(testMethod.testCaseName()))
-        .directory(
-            findTestSourcePath(testMethod.method())
-                .getParent()
-                .resolve(testMethod.testClass().getSimpleName()));
+    return new PathProviderBuilder(
+        "%s".formatted(testMethod.testCaseName()),
+        findTestSourcePath(testMethod.method())
+            .getParent()
+            .resolve(testMethod.testClass().getSimpleName()),
+        "",
+        DEFAULT_FILENAME_EXTENSION);
   }
 
-  private PathProviderBuilder(String baseFilename) {
+  PathProviderBuilder(
+      String baseFilename, Path directory, String filenameAffix, String filenameExtension) {
     this.baseFilename = baseFilename;
+    this.directory = directory;
+    this.filenameAffix = filenameAffix;
+    this.filenameExtension = filenameExtension;
   }
 
   /**
    * Set the directory where the approved and received files are stored.
    *
    * @param directory the directory where the approved and received files are stored
-   * @return this
+   * @return a copy of this with the given {@link #directory}
    */
   public PathProviderBuilder directory(Path directory) {
-    this.directory = directory;
-    return this;
+    return new PathProviderBuilder(baseFilename, directory, filenameAffix, filenameExtension);
+  }
+
+  @Override
+  public Path directory() {
+    return directory;
   }
 
   /**
    * Extends the {@link #baseFilename} with the given {@link String}.
    *
    * @param filenameAffix affix to add to the {@link #baseFilename}
-   * @return this
+   * @return a copy of this with the given {@link #filenameAffix}
    */
   public PathProviderBuilder filenameAffix(String filenameAffix) {
-    if (!filenameAffix.isBlank() && !filenameAffix.startsWith("-")) {
-      this.filenameAffix = "-%s".formatted(filenameAffix);
-    } else {
-      this.filenameAffix = filenameAffix;
-    }
-    return this;
+    return new PathProviderBuilder(
+        baseFilename,
+        directory,
+        !filenameAffix.isBlank() && !filenameAffix.startsWith("-")
+            ? "-" + filenameAffix
+            : filenameAffix,
+        filenameExtension);
   }
 
   /**
    * Creates a new {@link PathProvider} with the current values and the given filenameExtension.
    *
    * @param filenameExtension the filename extension to use
-   * @return a new {@link PathProvider} with the current values and the given filenameExtension
+   * @return a copy of this with the given {@link #filenameExtension}
    */
   public PathProvider filenameExtension(String filenameExtension) {
-    return new PathProviderRecord(
-        directory,
-        "%s%s-%s.%s".formatted(baseFilename, filenameAffix, APPROVED, filenameExtension),
+    return new PathProviderBuilder(baseFilename, directory, filenameAffix, filenameExtension);
+  }
+
+  @Override
+  public Path receivedPath() {
+    return directory.resolve(
         "%s%s-%s.%s".formatted(baseFilename, filenameAffix, RECEIVED, filenameExtension));
+  }
+
+  @Override
+  public Path approvedPath() {
+    return directory.resolve(
+        "%s%s-%s.%s".formatted(baseFilename, filenameAffix, APPROVED, filenameExtension));
   }
 }
