@@ -1,22 +1,33 @@
 package org.approvej.approve;
 
-import static org.approvej.approve.PathProviderBuilder.nextToTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
-class PathProviderBuilderTest {
+class PathProvidersTest {
 
   @Test
-  void paths() {
-    PathProvider pathProvider = PathProviderBuilder.nextToTest();
+  void approvedPath() {
+    String giveApprovedPath = "./src/test/resources/some file";
+    PathProvider pathProvider = PathProviders.approvedPath(giveApprovedPath);
+
+    assertThat(pathProvider.approvedPath())
+        .isEqualTo(Path.of(giveApprovedPath).toAbsolutePath().normalize());
+    assertThat(pathProvider.receivedPath())
+        .isEqualTo(Path.of("./src/test/resources/some file-received").toAbsolutePath().normalize());
+  }
+
+  @Test
+  void nextToTest() {
+    PathProvider pathProvider = PathProviders.nextToTest();
+
     assertThat(pathProvider.approvedPath())
         .isEqualTo(
             Path.of(
                     "./src/test/java/org/approvej/approve/"
-                        + "PathProviderBuilderTest"
-                        + "-paths"
+                        + "PathProvidersTest"
+                        + "-nextToTest"
                         + "-approved.txt")
                 .toAbsolutePath()
                 .normalize());
@@ -24,22 +35,22 @@ class PathProviderBuilderTest {
         .isEqualTo(
             Path.of(
                     "./src/test/java/org/approvej/approve/"
-                        + "PathProviderBuilderTest"
-                        + "-paths"
+                        + "PathProvidersTest"
+                        + "-nextToTest"
                         + "-received.txt")
                 .toAbsolutePath()
                 .normalize());
   }
 
   @Test
-  void paths_filenameExtension() {
-    PathProvider pathProvider = PathProviderBuilder.nextToTest().filenameExtension("json");
+  void nextToTest_filenameExtension() {
+    PathProvider pathProvider = PathProviders.nextToTest().filenameExtension("json");
     assertThat(pathProvider.approvedPath())
         .isEqualTo(
             Path.of(
                     "./src/test/java/org/approvej/approve/"
-                        + "PathProviderBuilderTest"
-                        + "-paths_filenameExtension"
+                        + "PathProvidersTest"
+                        + "-nextToTest_filenameExtension"
                         + "-approved.json")
                 .toAbsolutePath()
                 .normalize());
@@ -47,22 +58,22 @@ class PathProviderBuilderTest {
         .isEqualTo(
             Path.of(
                     "./src/test/java/org/approvej/approve/"
-                        + "PathProviderBuilderTest"
-                        + "-paths_filenameExtension"
+                        + "PathProvidersTest"
+                        + "-nextToTest_filenameExtension"
                         + "-received.json")
                 .toAbsolutePath()
                 .normalize());
   }
 
   @Test
-  void paths_nextToTestInSubdirectory() {
-    PathProvider pathProvider = PathProviderBuilder.nextToTestInSubdirectory();
+  void nextToTestInSubdirectory() {
+    PathProvider pathProvider = PathProviders.nextToTestInSubdirectory();
     assertThat(pathProvider.approvedPath())
         .isEqualTo(
             Path.of(
                     "./src/test/java/org/approvej/approve/"
-                        + "PathProviderBuilderTest/"
-                        + "paths_nextToTestInSubdirectory"
+                        + "PathProvidersTest/"
+                        + "nextToTestInSubdirectory"
                         + "-approved.txt")
                 .toAbsolutePath()
                 .normalize());
@@ -70,45 +81,40 @@ class PathProviderBuilderTest {
         .isEqualTo(
             Path.of(
                     "./src/test/java/org/approvej/approve/"
-                        + "PathProviderBuilderTest/"
-                        + "paths_nextToTestInSubdirectory"
+                        + "PathProvidersTest/"
+                        + "nextToTestInSubdirectory"
                         + "-received.txt")
                 .toAbsolutePath()
                 .normalize());
   }
 
   @Test
-  void paths_directory() {
-    PathProvider pathProvider = PathProviderBuilder.nextToTest().directory(Path.of("/tmp"));
+  void nextToTest_directory() {
+    Path directory = Path.of("./src/test/resources");
+    PathProvider pathProvider = PathProviders.nextToTest().directory(directory);
     assertThat(pathProvider.approvedPath())
         .isEqualTo(
-            Path.of(
-                    "/tmp/"
-                        + "PathProviderBuilderTest"
-                        + "-paths_directory"
-                        + "-approved.txt")
+            directory
+                .resolve("PathProvidersTest" + "-nextToTest_directory" + "-approved.txt")
                 .toAbsolutePath()
                 .normalize());
     assertThat(pathProvider.receivedPath())
         .isEqualTo(
-            Path.of(
-                    "/tmp/"
-                        + "PathProviderBuilderTest"
-                        + "-paths_directory"
-                        + "-received.txt")
+            directory
+                .resolve("PathProvidersTest" + "-nextToTest_directory" + "-received.txt")
                 .toAbsolutePath()
                 .normalize());
   }
+
   @Test
-  void paths_filenameAffix() {
-    PathProvider pathProvider =
-        nextToTest().filenameAffix("additional info");
+  void nextToTest_filenameAffix() {
+    PathProvider pathProvider = PathProviders.nextToTest().filenameAffix("additional info");
     assertThat(pathProvider.approvedPath())
         .isEqualTo(
             Path.of(
                     "./src/test/java/org/approvej/approve/"
-                        + "PathProviderBuilderTest"
-                        + "-paths_filenameAffix"
+                        + "PathProvidersTest"
+                        + "-nextToTest_filenameAffix"
                         + "-additional info"
                         + "-approved.txt")
                 .toAbsolutePath()
@@ -117,8 +123,8 @@ class PathProviderBuilderTest {
         .isEqualTo(
             Path.of(
                     "./src/test/java/org/approvej/approve/"
-                        + "PathProviderBuilderTest"
-                        + "-paths_filenameAffix"
+                        + "PathProvidersTest"
+                        + "-nextToTest_filenameAffix"
                         + "-additional info"
                         + "-received.txt")
                 .toAbsolutePath()

@@ -8,8 +8,8 @@ import examples.ExampleClass.createPerson
 import examples.ExampleClass.hello
 import java.time.LocalDate
 import org.approvej.ApprovalBuilder.approve
-import org.approvej.approve.PathProviderBuilder.nextToTest
-import org.approvej.approve.PathProviderBuilder.nextToTestInSubdirectory
+import org.approvej.approve.PathProviders.nextToTest
+import org.approvej.approve.PathProviders.nextToTestInSubdirectory
 import org.approvej.print.ObjectPrinter.objectPrinter
 import org.approvej.print.Printer
 import org.approvej.scrub.Scrubbers.dateTimeFormat

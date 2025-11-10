@@ -3,7 +3,8 @@ package org.approvej;
 import static org.approvej.Configuration.configuration;
 import static org.approvej.approve.Approvers.file;
 import static org.approvej.approve.Approvers.value;
-import static org.approvej.approve.PathProviderBuilder.approvedPath;
+import static org.approvej.approve.PathProviders.approvedPath;
+import static org.approvej.approve.PathProviders.nextToTest;
 import static org.approvej.print.Printer.DEFAULT_FILENAME_EXTENSION;
 import static org.approvej.review.FileReviewerScript.script;
 
@@ -14,7 +15,7 @@ import org.approvej.approve.Approver;
 import org.approvej.approve.FileApprover;
 import org.approvej.approve.InplaceApprover;
 import org.approvej.approve.PathProvider;
-import org.approvej.approve.PathProviderBuilder;
+import org.approvej.approve.PathProviders;
 import org.approvej.print.Printer;
 import org.approvej.review.FileReviewer;
 import org.approvej.review.ReviewResult;
@@ -268,10 +269,15 @@ public class ApprovalBuilder<T> {
    * @throws ApprovalError if the approval fails
    */
   public void byFile(PathProvider pathProvider) {
-    FileApprover approver = file(pathProvider);
+    PathProvider updatedPathProvider =
+        pathProvider.filenameAffix(name).filenameExtension(filenameExtension);
+    if (!(value instanceof String)) {
+      printed().byFile(updatedPathProvider);
+    }
+    FileApprover approver = file(updatedPathProvider);
     ApprovalResult approvalResult = approver.apply(String.valueOf(value));
     if (approvalResult.needsApproval() && fileReviewer != null) {
-      ReviewResult reviewResult = fileReviewer.apply(pathProvider);
+      ReviewResult reviewResult = fileReviewer.apply(updatedPathProvider);
       if (reviewResult.needsReapproval()) {
         approvalResult = approver.apply(String.valueOf(value));
       }
@@ -280,34 +286,19 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Approves the receivedValue by a {@link FileApprover} with the given {@link
-   * PathProviderBuilder}.
-   *
-   * @param pathProviderBuilder the provider for the paths of the approved and received files
-   * @throws ApprovalError if the approval fails
-   */
-  public void byFile(PathProviderBuilder pathProviderBuilder) {
-    if (!(value instanceof String)) {
-      printed().byFile(pathProviderBuilder);
-    } else {
-      byFile(pathProviderBuilder.filenameAffix(name).filenameExtension(filenameExtension));
-    }
-  }
-
-  /**
-   * Approves the receivedValue by a {@link FileApprover}, using a {@link
-   * PathProviderBuilder#nextToTest() nextToTest PathProviderBuilder}, and the {@link
-   * Printer#filenameExtension() used Printer's filenameExtension}.
+   * Approves the receivedValue by a {@link FileApprover}, using a {@link PathProviders#nextToTest()
+   * nextToTest PathProviderBuilder}, and the {@link Printer#filenameExtension() used Printer's
+   * filenameExtension}.
    *
    * @throws ApprovalError if the approval fails
    */
   public void byFile() {
-    byFile(PathProviderBuilder.nextToTest());
+    byFile(nextToTest());
   }
 
   /**
    * Approves the receivedValue by a {@link FileApprover} with an {@link
-   * PathProviderBuilder#approvedPath(Path)} with the given {@link Path} to the approved file.
+   * PathProviders#approvedPath(Path)} with the given {@link Path} to the approved file.
    *
    * <p>Note: the {@link Printer}'s filenameExtension is ignored.
    *
@@ -320,7 +311,7 @@ public class ApprovalBuilder<T> {
 
   /**
    * Approves the receivedValue by a {@link FileApprover} with an {@link
-   * PathProviderBuilder#approvedPath(Path)} with the given path to the approved file.
+   * PathProviders#approvedPath(Path)} with the given path to the approved file.
    *
    * <p>Note: the {@link Printer}'s filenameExtension is ignored.
    *
@@ -328,6 +319,6 @@ public class ApprovalBuilder<T> {
    * @throws ApprovalError if the approval fails
    */
   public void byFile(String approvedPath) {
-    byFile(approvedPath(Path.of(approvedPath)));
+    byFile(Path.of(approvedPath));
   }
 }

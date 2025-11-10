@@ -1,7 +1,7 @@
 package org.approvej.review;
 
 import static java.nio.file.Files.writeString;
-import static org.approvej.approve.PathProviderBuilder.approvedPath;
+import static org.approvej.approve.PathProviders.approvedPath;
 import static org.approvej.review.FileReviewerScript.script;
 import static org.assertj.core.api.Assertions.assertThat;
 

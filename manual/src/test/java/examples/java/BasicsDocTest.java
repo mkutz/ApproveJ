@@ -5,8 +5,8 @@ import static examples.ExampleClass.createContact;
 import static examples.ExampleClass.createPerson;
 import static examples.ExampleClass.hello;
 import static org.approvej.ApprovalBuilder.approve;
-import static org.approvej.approve.PathProviderBuilder.nextToTest;
-import static org.approvej.approve.PathProviderBuilder.nextToTestInSubdirectory;
+import static org.approvej.approve.PathProviders.nextToTest;
+import static org.approvej.approve.PathProviders.nextToTestInSubdirectory;
 import static org.approvej.print.ObjectPrinter.objectPrinter;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
@@ -169,7 +169,7 @@ class BasicsDocTest {
 
   @Test
   void approve_reviewWith_fileReviewer() throws IOException, InterruptedException {
-    assumeThat(new ProcessBuilder("which", "meld").start().waitFor()).isEqualTo(0);
+    assumeThat(new ProcessBuilder("which", "idea").start().waitFor()).isEqualTo(0);
     // tag::approve_reviewedBy_fileReviewer[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 

@@ -5,8 +5,8 @@ import static java.nio.file.Files.writeString;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.approve.Approvers.value;
-import static org.approvej.approve.PathProviderBuilder.approvedPath;
-import static org.approvej.approve.PathProviderBuilder.nextToTest;
+import static org.approvej.approve.PathProviders.approvedPath;
+import static org.approvej.approve.PathProviders.nextToTest;
 import static org.approvej.print.ObjectPrinter.objectPrinter;
 import static org.approvej.scrub.Replacements.relativeDate;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
@@ -21,7 +21,6 @@ import java.time.LocalDate;
 import java.util.UUID;
 import java.util.function.Function;
 import org.approvej.approve.PathProvider;
-import org.approvej.approve.PathProviderBuilder;
 import org.approvej.review.FileReviewResult;
 import org.approvej.review.FileReviewer;
 import org.approvej.review.ReviewResult;
@@ -59,7 +58,7 @@ class ApprovalBuilderTest {
 
   @Test
   void approve_string_byFile_custom_pathProviderBuilder() throws IOException {
-    PathProviderBuilder pathProviderBuilder = nextToTest();
+    PathProvider pathProviderBuilder = nextToTest();
     String received = "Some text";
     writeString(pathProviderBuilder.filenameExtension("txt").approvedPath(), received);
 
