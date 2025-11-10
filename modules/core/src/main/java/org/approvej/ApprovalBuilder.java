@@ -35,8 +35,8 @@ import org.jspecify.annotations.Nullable;
  * method {@link #printedBy(Printer)} to customize that. By default, the value's {@link
  * Object#toString() toString method} will be called.
  *
- * <p>E.g. {@code approve(result).printWith(objectPrinter()).byFile();} prints the given object
- * using the given {@link org.approvej.print.ObjectPrinter}.
+ * <p>E.g. {@code approve(result).printBy(objectPrinter()).byFile();} prints the given object using
+ * the given {@link org.approvej.print.ObjectPrinter}.
  *
  * <h2>Scrubbing</h2>
  *
@@ -48,8 +48,8 @@ import org.jspecify.annotations.Nullable;
  *
  * <h2>Approving</h2>
  *
- * <p>The builder is concluded by specifying an approver to approve the value {@link #by(Function)}
- * by} ( {@link #byFile()} and {@link #byValue(String)}).
+ * <p>The builder is concluded by specifying an approver to approve the value {@link #by(Function)
+ * by} ({@link #byFile()} and {@link #byValue(String)}).
  *
  * <p>E.g. {@code approve(result).byFile();} approves the result with the content of a file next to
  * the test, while {@code approve(result).byValue(approved);} approves the result with the given
@@ -103,7 +103,7 @@ public class ApprovalBuilder<T> {
    * @param printer the {@link Function} used to convert the {@link #value} to a {@link String}
    * @return a copy of this with the printed {@link #value}
    */
-  public ApprovalBuilder<String> printedBy(Function<T, String> printer) {
+  public ApprovalBuilder<String> printedBy(Function<? super T, String> printer) {
     return new ApprovalBuilder<>(printer.apply(value), name, filenameExtension, fileReviewer);
   }
 
@@ -115,7 +115,7 @@ public class ApprovalBuilder<T> {
    * @deprecated use {@link #printedBy(Function)}
    */
   @Deprecated(since = "0.12", forRemoval = true)
-  public ApprovalBuilder<String> printWith(Function<T, String> printer) {
+  public ApprovalBuilder<String> printWith(Function<? super T, String> printer) {
     return printedBy(printer);
   }
 
@@ -125,7 +125,7 @@ public class ApprovalBuilder<T> {
    * @param printer the printer used to convert the value to a {@link String}
    * @return a copy of this with the printed {@link #value}
    */
-  public ApprovalBuilder<String> printedBy(Printer<T> printer) {
+  public ApprovalBuilder<String> printedBy(Printer<? super T> printer) {
     return new ApprovalBuilder<>(
         printer.apply(value), name, printer.filenameExtension(), fileReviewer);
   }
@@ -138,7 +138,7 @@ public class ApprovalBuilder<T> {
    * @deprecated use {@link #printedBy(Printer)}
    */
   @Deprecated(since = "0.12", forRemoval = true)
-  public ApprovalBuilder<String> printWith(Printer<T> printer) {
+  public ApprovalBuilder<String> printWith(Printer<? super T> printer) {
     return printedBy(printer);
   }
 
@@ -150,8 +150,7 @@ public class ApprovalBuilder<T> {
    * @see #printedBy(Printer)
    */
   public ApprovalBuilder<String> printed() {
-    // noinspection unchecked
-    return printedBy((Printer<T>) configuration.defaultPrinter());
+    return printedBy(configuration.defaultPrinter());
   }
 
   /**
