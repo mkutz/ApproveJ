@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
-public class LabelReplacementTest {
+class LabelReplacementTest {
 
   @Test
   void apply() {
