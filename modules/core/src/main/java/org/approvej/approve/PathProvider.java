@@ -1,9 +1,9 @@
 package org.approvej.approve;
 
-import static org.approvej.print.Printer.DEFAULT_FILENAME_EXTENSION;
+import static org.approvej.print.PrintFormat.DEFAULT_FILENAME_EXTENSION;
 
 import java.nio.file.Path;
-import org.approvej.print.Printer;
+import org.approvej.print.PrintFormat;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -64,7 +64,7 @@ public record PathProvider(
   /**
    * Creates a new {@link PathProvider} with the current values and the given filenameExtension,
    * <em>unless</em> the currently set {@link #filenameExtension} is not empty and given is the
-   * default {@value Printer#DEFAULT_FILENAME_EXTENSION}.
+   * default {@value PrintFormat#DEFAULT_FILENAME_EXTENSION}.
    *
    * @param filenameExtension the filename extension to use
    * @return a copy of this with using the given filenameExtension

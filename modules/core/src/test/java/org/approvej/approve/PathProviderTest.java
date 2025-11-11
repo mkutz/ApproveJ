@@ -1,6 +1,6 @@
 package org.approvej.approve;
 
-import static org.approvej.print.Printer.DEFAULT_FILENAME_EXTENSION;
+import static org.approvej.print.PrintFormat.DEFAULT_FILENAME_EXTENSION;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;

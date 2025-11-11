@@ -17,7 +17,7 @@ import org.jspecify.annotations.NullMarked;
  * @param <T> the type of value to print
  */
 @NullMarked
-public class JsonPrettyPrinter<T> implements JsonPrinter<T> {
+public class JsonPrettyPrinter<T> implements Printer<T> {
 
   private final ObjectWriter objectWriter;
 
@@ -27,7 +27,9 @@ public class JsonPrettyPrinter<T> implements JsonPrinter<T> {
    * @param objectWriter the {@link ObjectWriter} that will be used for printing
    * @param <T> the type of value to print
    * @return a new {@link JsonPrettyPrinter} instance
+   * @deprecated use {@link JsonPrintFormat#json(ObjectMapper)}
    */
+  @Deprecated(since = "0.12", forRemoval = true)
   public static <T> JsonPrettyPrinter<T> jsonPrettyPrinter(ObjectWriter objectWriter) {
     return new JsonPrettyPrinter<>(objectWriter);
   }
@@ -39,7 +41,9 @@ public class JsonPrettyPrinter<T> implements JsonPrinter<T> {
    * @param <T> the type of value to print
    * @return a new {@link JsonPrettyPrinter} instance
    * @see ObjectMapper#writerWithDefaultPrettyPrinter()
+   * @deprecated use {@link JsonPrintFormat#json(ObjectMapper)}
    */
+  @Deprecated(since = "0.12", forRemoval = true)
   public static <T> JsonPrettyPrinter<T> jsonPrettyPrinter(ObjectMapper objectMapper) {
     return new JsonPrettyPrinter<>(objectMapper.writerWithDefaultPrettyPrinter());
   }
@@ -50,7 +54,9 @@ public class JsonPrettyPrinter<T> implements JsonPrinter<T> {
    * @return a new {@link JsonPrettyPrinter} instance
    * @param <T> the type of value to print
    * @see JsonMapper.Builder#build()
+   * @deprecated use {@link JsonPrintFormat#json()}
    */
+  @Deprecated(since = "0.12", forRemoval = true)
   public static <T> JsonPrettyPrinter<T> jsonPrettyPrinter() {
     return new JsonPrettyPrinter<>();
   }
@@ -78,7 +84,7 @@ public class JsonPrettyPrinter<T> implements JsonPrinter<T> {
     try {
       return objectWriter.writeValueAsString(value);
     } catch (JsonProcessingException e) {
-      throw new JsonPrettyPrinterException(value, e);
+      throw new JsonPrinterException(value, e);
     }
   }
 }

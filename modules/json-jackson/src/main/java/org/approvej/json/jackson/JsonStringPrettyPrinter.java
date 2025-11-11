@@ -11,7 +11,7 @@ import org.jspecify.annotations.NullMarked;
 
 /** A {@link Printer} for JSON strings that should be pretty-printed. */
 @NullMarked
-public class JsonStringPrettyPrinter implements JsonPrinter<String> {
+public class JsonStringPrettyPrinter implements Printer<String> {
 
   private final ObjectReader objectReader;
   private final ObjectWriter objectWriter;
@@ -24,7 +24,9 @@ public class JsonStringPrettyPrinter implements JsonPrinter<String> {
    * @return a {@link JsonStringPrettyPrinter} using the given {@link ObjectMapper}
    * @see ObjectMapper#reader()
    * @see ObjectMapper#writerWithDefaultPrettyPrinter()
+   * @deprecated use {@link JsonPrintFormat#json(ObjectMapper)}
    */
+  @Deprecated(since = "0.12", forRemoval = true)
   public static JsonStringPrettyPrinter jsonStringPrettyPrinter(ObjectMapper objectMapper) {
     return new JsonStringPrettyPrinter(
         objectMapper.reader(), objectMapper.writerWithDefaultPrettyPrinter());
@@ -34,7 +36,9 @@ public class JsonStringPrettyPrinter implements JsonPrinter<String> {
    * Creates a {@link JsonStringPrettyPrinter} using the default {@link JsonMapper}.
    *
    * @return a {@link JsonStringPrettyPrinter} using the default {@link JsonMapper}.
+   * @deprecated use {@link JsonPrintFormat#json()}
    */
+  @Deprecated(since = "0.12", forRemoval = true)
   public static JsonStringPrettyPrinter jsonStringPrettyPrinter() {
     return jsonStringPrettyPrinter(JsonMapper.builder().addModule(new JavaTimeModule()).build());
   }
@@ -49,7 +53,7 @@ public class JsonStringPrettyPrinter implements JsonPrinter<String> {
     try {
       return objectWriter.writeValueAsString(objectReader.readTree(value));
     } catch (JsonProcessingException e) {
-      throw new JsonPrettyPrinterException(value, e);
+      throw new JsonPrinterException(value, e);
     }
   }
 }

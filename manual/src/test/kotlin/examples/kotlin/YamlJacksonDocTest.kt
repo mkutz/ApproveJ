@@ -3,7 +3,7 @@ package examples.kotlin
 import examples.ExampleClass.createPerson
 import java.time.LocalDate
 import org.approvej.ApprovalBuilder.approve
-import org.approvej.yaml.jackson.YamlPrinter.yamlPrinter
+import org.approvej.yaml.jackson.YamlPrintFormat.yaml
 import org.junit.jupiter.api.Test
 
 class YamlJacksonDocTest {
@@ -14,7 +14,7 @@ class YamlJacksonDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printedBy(yamlPrinter()) // <1>
+      .printedAs(yaml()) // <1>
       .byFile()
     // end::print_yaml[]
   }

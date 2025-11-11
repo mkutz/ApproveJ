@@ -63,7 +63,7 @@ include::../../../test/java/examples/java/JsonJacksonDocTest-scrub_json_pointer-
 
 In the example above, the JSON persisted in a one-liner.
 Even for the simple example, this is not very readable, let alone easily comparable to a slightly different JSON.
-To improve this, you can use the link:{javadoc-url}/json-jackson/org/approvej/json/jackson/JsonPrettyPrinter.html[`JsonPrettyPrinter`].
+To improve this, you can use the link:{javadoc-url}/json-jackson/org/approvej/json/jackson/JsonPrintFormat.html[`JsonPrintFormat`].
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -75,7 +75,7 @@ include::../../../test/java/examples/java/JsonJacksonDocTest.java[tag=pretty_pri
 ----
 include::../../../test/kotlin/examples/kotlin/JsonJacksonDocTest.kt[tag=pretty_print_json]
 ----
-<1> applies the `JsonPrettyPrinter` to convert the `JsonNode` object to a string
+<1> applies the `JsonPrintFormat` to convert the `JsonNode` object to a string
 
 Now the approved file is much more readable.
 
@@ -88,8 +88,9 @@ include::../../../test/java/examples/java/JsonJacksonDocTest-pretty_print_json-a
 
 == Pretty Print JSON Strings
 
-Sometimes you might not need/want to parse a received JSON string into a `JsonNode` object.
-In this case, you can use the `JsonStringPrettyPrinter` to pretty print a JSON string directly.
+It is not necessary to parse the JSON string before printing it.
+If the value is a string, `JsonPrintFormat` automatically pretty prints it.
+The only downside is, that you can not use JSON-specific scrubbers.
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -101,7 +102,7 @@ include::../../../test/java/examples/java/JsonJacksonDocTest.java[tag=pretty_pri
 ----
 include::../../../test/kotlin/examples/kotlin/JsonJacksonDocTest.kt[tag=pretty_print_json_string]
 ----
-<1> applies the `JsonPrettyPrinter` to convert the `JsonNode` object to a string
+<1> applies the `JsonPrinter` to convert the `JsonNode` object to a string
 
 [source,json]
 .Approved file

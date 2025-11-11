@@ -123,12 +123,12 @@ You can use this printer by calling the `printedBy` method on the builder.
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=object_printer]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=multi_line_string_format]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=object_printer]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=multi_line_string_format]
 ----
 <1> applies the `ObjectPrinter` and returns a new `ApprovalBuilder<String>`
 
@@ -137,7 +137,7 @@ Now the approved file will look like this
 [source,text]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicsDocTest-object_printer-approved.txt[]
+include::../../../test/java/examples/java/BasicsDocTest-multi_line_string_format-approved.txt[]
 ----
 
 
@@ -181,12 +181,12 @@ E.g. the following implementation will print a `Person` as a YAML string.
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=person_yaml_printer]
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=person_yaml_print_format]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=person_yaml_printer]
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=person_yaml_print_format]
 ----
 
 The resulting file will look like this
@@ -194,7 +194,7 @@ The resulting file will look like this
 [source,yaml]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicsDocTest-custom_printer-approved.yaml[]
+include::../../../test/java/examples/java/BasicsDocTest-custom_print_format-approved.yaml[]
 ----
 
 
@@ -503,7 +503,7 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_revie
 
 Optionally you can configure the default behaviors of ApproveJ by putting an `approvej.properties` file into your home directory at `~/.config/approvej/approvej.properties` or into the resource folder of your test suite (e.g. `src/test/resources/approvej.properties`).
 
-The home directory properties will be overridden by those in the resources directory.
+The home directory properties will be overridden by those in the resource directory.
 
 .Example `approvej.properties`
 ----
@@ -512,5 +512,7 @@ include::../../../test/resources/approvej.properties[]
 
 Supported properties are:
 
-`defaultPrinter`:: the default printer class if none is specified via the `printedBy` method (see <<printing>>)
+`defaultPrintFormat`:: the default print format class if none is specified via the `printedAs` method (see <<printing>>)
 `defaultFileReviewerScript`:: the script that should be executed to support a review of the differences between the previously approved and the actually received value (see <<reviewing>>)
+
+NOTE:: The former property `defaultPrinter` is deprecated and using it will cause an exception!

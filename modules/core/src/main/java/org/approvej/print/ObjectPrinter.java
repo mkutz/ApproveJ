@@ -17,7 +17,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Stream;
-import org.approvej.Configuration;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -27,7 +26,7 @@ import org.jspecify.annotations.Nullable;
  * @param <T> the type of the object to be printed
  */
 @NullMarked
-public class ObjectPrinter<T> implements Printer<T> {
+class ObjectPrinter<T> implements Printer<T> {
 
   /** A {@link Set} of classes that will be printed directly. */
   private static final Set<Class<?>> SIMPLE_TYPES =
@@ -53,13 +52,8 @@ public class ObjectPrinter<T> implements Printer<T> {
     this.fieldComparator = fieldComparator;
   }
 
-  /**
-   * Creates a new {@link ObjectPrinter} instance that prints the given object.
-   *
-   * <p>This constructor is public to allow instantiation via reflection, e.g. in the {@link
-   * Configuration} class.
-   */
-  public ObjectPrinter() {
+  /** Creates a new {@link ObjectPrinter} instance that prints the given object. */
+  ObjectPrinter() {
     this((field1, field2) -> 0);
   }
 
@@ -68,7 +62,9 @@ public class ObjectPrinter<T> implements Printer<T> {
    *
    * @param <T> the type of the object to be printed
    * @return a new {@link ObjectPrinter} instance
+   * @deprecated use {@link MultiLineStringPrintFormat#multiLineString()}
    */
+  @Deprecated(since = "0.12", forRemoval = true)
   public static <T> ObjectPrinter<T> objectPrinter() {
     return new ObjectPrinter<>();
   }

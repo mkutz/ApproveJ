@@ -10,7 +10,8 @@ import java.time.LocalDate
 import org.approvej.ApprovalBuilder.approve
 import org.approvej.approve.PathProviders.nextToTest
 import org.approvej.approve.PathProviders.nextToTestInSubdirectory
-import org.approvej.print.ObjectPrinter.objectPrinter
+import org.approvej.print.MultiLineStringPrintFormat.multiLineString
+import org.approvej.print.PrintFormat
 import org.approvej.print.Printer
 import org.approvej.scrub.Scrubbers.dateTimeFormat
 import org.approvej.scrub.Scrubbers.uuids
@@ -40,7 +41,7 @@ class BasicsDocTest {
   }
 
   @Test
-  fun approve_named() {
+  fun `approve named`() {
     // tag::approve_named[]
     val jane = createPerson("Jane Doe", LocalDate.of(1990, 1, 1))
     val john = createPerson("John Doe", LocalDate.of(2012, 6, 2))
@@ -51,14 +52,14 @@ class BasicsDocTest {
   }
 
   @Test
-  fun `object printer`() {
-    // tag::object_printer[]
+  fun `multi line string format`() {
+    // tag::multi_line_string_format[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printedBy(objectPrinter()) // <1>
+      .printedAs(multiLineString()) // <1>
       .byFile()
-    // end::object_printer[]
+    // end::multi_line_string_format[]
   }
 
   @Test
@@ -73,14 +74,14 @@ class BasicsDocTest {
   }
 
   @Test
-  fun `custom printer`() {
-    // tag::custom_printer[]
+  fun `custom print format`() {
+    // tag::custom_print_format[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printedBy(PersonYamlPrinter()) // <1>
+      .printedAs(PersonYamlPrinter()) // <1>
       .byFile()
-    // end::custom_printer[]
+    // end::custom_print_format[]
   }
 
   @Test
@@ -90,7 +91,7 @@ class BasicsDocTest {
       createBlogPost("Latest News", "Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
 
     approve(blogPost)
-      .printedBy(objectPrinter())
+      .printedAs(multiLineString())
       .scrubbedOf(dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX")) // <1>
       .scrubbedOf(uuids()) // <2>
       .byFile()
@@ -104,7 +105,7 @@ class BasicsDocTest {
 
     approve(contact)
       .scrubbedOf { Contact(-1, it.name, it.email, it.phoneNumber) } // <1>
-      .printedBy(objectPrinter())
+      .printedAs(multiLineString())
       .byFile()
     // end::custom_scrubbing[]
   }
@@ -141,7 +142,7 @@ class BasicsDocTest {
     // tag::approve_file_nextToTestInSubdirectory[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
-    approve(person).printedBy(PersonYamlPrinter()).byFile(nextToTestInSubdirectory())
+    approve(person).printedAs(PersonYamlPrinter()).byFile(nextToTestInSubdirectory())
     // end::approve_file_nextToTestInSubdirectory[]
   }
 
@@ -160,7 +161,7 @@ class BasicsDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printedBy(PersonYamlPrinter())
+      .printedAs(PersonYamlPrinter())
       .byFile("src/test/resources/BasicExamples-approve file approved path.yaml") // <1>
     // end::approve_file_approved_path[]
   }
@@ -172,23 +173,25 @@ class BasicsDocTest {
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 
     approve(person)
-      .printedBy(PersonYamlPrinter())
+      .printedAs(PersonYamlPrinter())
       .reviewedBy("meld \"{receivedFile}\" \"{approvedFile}\"") // <1>
       .byFile() // <2>
     // end::approve_reviewedBy_fileReviewer[]
   }
 
-  // tag::person_yaml_printer[]
-  class PersonYamlPrinter : Printer<Person> {
-    override fun apply(person: Person) =
-      """
-        person:
-          name: "${person.name}"
-          birthDate: "${person.birthDate}"
+  // tag::person_yaml_print_format[]
+  class PersonYamlPrinter : PrintFormat<Person> {
+    override fun printer() =
+      Printer<Person> { person ->
         """
-        .trimIndent()
+      person:
+        name: "${person.name}"
+        birthDate: "${person.birthDate}"
+      """
+          .trimIndent()
+      }
 
     override fun filenameExtension() = "yaml"
   }
-  // end::person_yaml_printer[]
+  // end::person_yaml_print_format[]
 }

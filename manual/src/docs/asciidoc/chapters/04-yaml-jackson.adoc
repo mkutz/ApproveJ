@@ -33,7 +33,7 @@ implementation("org.approvej:yaml-jackson:{revnumber}")
 
 == Print as YAML
 
-The link:{javadoc-url}/yaml-jackson/org/approvej/yaml/jackson/YamlPrinter.html[`YamlPrinter`] allows to print any object in YAML format.
+The link:{javadoc-url}/yaml-jackson/org/approvej/yaml/jackson/YamlPrintFormat.html[`YamlPrintFormat`] allows to print any object in YAML format.
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -45,7 +45,7 @@ include::../../../test/java/examples/java/YamlJacksonDocTest.java[tag=print_yaml
 ----
 include::../../../test/kotlin/examples/kotlin/YamlJacksonDocTest.kt[tag=print_yaml]
 ----
-<1> applies the `YamlPrinter` to convert the `Person` object to a string
+<1> applies the `YamlPrintFormat` to convert the `Person` object to a string
 
 Creates the following approved file:
 

@@ -7,7 +7,7 @@ import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.approve.Approvers.value;
 import static org.approvej.approve.PathProviders.approvedPath;
 import static org.approvej.approve.PathProviders.nextToTest;
-import static org.approvej.print.ObjectPrinter.objectPrinter;
+import static org.approvej.print.MultiLineStringPrintFormat.multiLineString;
 import static org.approvej.scrub.Replacements.relativeDate;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
@@ -166,7 +166,7 @@ class ApprovalBuilderTest {
   @Test
   void approve_pojo_printedBy_printer() {
     approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
-        .printedBy(objectPrinter())
+        .printedAs(multiLineString())
         .byValue(
             """
             Person [

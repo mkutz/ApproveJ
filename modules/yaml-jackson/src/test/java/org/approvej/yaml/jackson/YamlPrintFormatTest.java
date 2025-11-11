@@ -1,6 +1,6 @@
 package org.approvej.yaml.jackson;
 
-import static org.approvej.yaml.jackson.YamlPrinter.yamlPrinter;
+import static org.approvej.yaml.jackson.YamlPrintFormat.yaml;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -9,18 +9,23 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
-class YamlPrinterTest {
+class YamlPrintFormatTest {
 
   @Test
-  void constructor() {
-    assertThat(yamlPrinter()).isNotNull();
-    assertThat(yamlPrinter(new ObjectMapper())).isNotNull();
-    assertThat(yamlPrinter(YAMLMapper.builder().build())).isNotNull();
+  void constructors() {
+    assertThat(new YamlPrintFormat<>()).isNotNull();
   }
 
   @Test
-  void apply() {
-    assertThat(yamlPrinter().apply(new Person("Micha", LocalDate.of(1982, 2, 19))))
+  void initializers() {
+    assertThat(yaml()).isNotNull();
+    assertThat(yaml(YAMLMapper.builder().build().writer())).isNotNull();
+    assertThat(yaml(YAMLMapper.builder().build())).isNotNull();
+  }
+
+  @Test
+  void printer() {
+    assertThat(yaml().printer().apply(new Person("Micha", LocalDate.of(1982, 2, 19))))
         .isEqualTo(
             """
             ---
@@ -30,17 +35,17 @@ class YamlPrinterTest {
   }
 
   @Test
-  void apply_failure() {
-    YamlPrinter<Object> yamlPrinterNoJavaTimeModule = yamlPrinter(new ObjectMapper());
+  void printer_failure() {
+    YamlPrintFormat<Object> yamlPrinterNoJavaTimeModule = yaml(new ObjectMapper());
     LocalDate someLocalDate = LocalDate.of(1982, 2, 19);
     assertThatExceptionOfType(YamlPrinterException.class)
-        .isThrownBy(() -> yamlPrinterNoJavaTimeModule.apply(someLocalDate))
+        .isThrownBy(() -> yamlPrinterNoJavaTimeModule.printer().apply(someLocalDate))
         .withMessage("Failed to print %s".formatted(someLocalDate));
   }
 
   @Test
   void filenameExtension() {
-    assertThat(yamlPrinter().filenameExtension()).isEqualTo("yaml");
+    assertThat(yaml().filenameExtension()).isEqualTo("yaml");
   }
 
   record Person(String name, LocalDate birthday) {}

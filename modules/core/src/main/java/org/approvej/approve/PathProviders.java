@@ -4,7 +4,7 @@ import static java.util.Objects.requireNonNullElse;
 import static org.approvej.approve.PathProvider.APPROVED;
 import static org.approvej.approve.StackTraceTestFinderUtil.currentTestMethod;
 import static org.approvej.approve.StackTraceTestFinderUtil.findTestSourcePath;
-import static org.approvej.print.Printer.DEFAULT_FILENAME_EXTENSION;
+import static org.approvej.print.PrintFormat.DEFAULT_FILENAME_EXTENSION;
 
 import java.nio.file.Path;
 import java.util.regex.Matcher;

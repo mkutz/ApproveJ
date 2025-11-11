@@ -1,8 +1,7 @@
 package org.approvej.json.jackson;
 
 import static org.approvej.ApprovalBuilder.approve;
-import static org.approvej.json.jackson.JsonPrettyPrinter.jsonPrettyPrinter;
-import static org.approvej.json.jackson.JsonStringPrettyPrinter.jsonStringPrettyPrinter;
+import static org.approvej.json.jackson.JsonPrintFormat.json;
 import static org.approvej.scrub.Replacements.relativeDate;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
@@ -40,15 +39,13 @@ class JsonApprovalBuilderTest {
 
   @Test
   void approve_list() {
-    approve(List.of("a", "b", "c"))
-        .printedBy(jsonPrettyPrinter())
-        .byValue("[ \"a\", \"b\", \"c\" ]");
+    approve(List.of("a", "b", "c")).printedAs(json()).byValue("[ \"a\", \"b\", \"c\" ]");
   }
 
   @Test
   void approve_file() {
     approve(EXAMPLE_JSON)
-        .printedBy(jsonStringPrettyPrinter())
+        .printedAs(json())
         .scrubbedOf(dateTimeFormat("yyyy-MM-dd").replacement(relativeDate()))
         .scrubbedOf(uuids())
         .byFile();
@@ -57,7 +54,7 @@ class JsonApprovalBuilderTest {
   @Test
   void approve_with_scrubbers() {
     approve(EXAMPLE_JSON)
-        .printedBy(jsonStringPrettyPrinter())
+        .printedAs(json())
         .scrubbedOf(dateTimeFormat("yyyy-MM-dd").replacement(relativeDate()))
         .scrubbedOf(uuids())
         .byValue(SCRUBBED_JSON);
