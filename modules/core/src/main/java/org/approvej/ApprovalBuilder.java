@@ -138,9 +138,9 @@ public class ApprovalBuilder<T> {
    * @return a copy of this with the printed {@link #value}
    * @deprecated use {@link #printedAs(PrintFormat)}
    */
+  @SuppressWarnings("removal")
   @Deprecated(since = "0.12", forRemoval = true)
   public ApprovalBuilder<String> printWith(Printer<? super T> printer) {
-    //noinspection removal
     return new ApprovalBuilder<>(
         printer.apply(value), name, printer.filenameExtension(), fileReviewer);
   }

@@ -1,11 +1,16 @@
 package org.approvej.print;
 
+import org.approvej.Configuration;
 import org.jspecify.annotations.NonNull;
 
-/*
- * A generic printer for Java {@link Object}s that prints that uses the {@link Object#toString()} method.
+/**
+ * A generic print format for Java {@link Object}s that prints that uses the {@link
+ * Object#toString()} method.
  */
 public final class SingleLineStringPrintFormat implements PrintFormat<Object> {
+
+  /** Default constructor to be used in {@link Configuration}. */
+  public SingleLineStringPrintFormat() {}
 
   @Override
   @NonNull
