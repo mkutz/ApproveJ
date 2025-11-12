@@ -276,6 +276,7 @@ public class ApprovalBuilder<T> {
         pathProvider.filenameAffix(name).filenameExtension(filenameExtension);
     if (!(value instanceof String)) {
       printed().byFile(updatedPathProvider);
+      return;
     }
     FileApprover approver = file(updatedPathProvider);
     ApprovalResult approvalResult = approver.apply(String.valueOf(value));
