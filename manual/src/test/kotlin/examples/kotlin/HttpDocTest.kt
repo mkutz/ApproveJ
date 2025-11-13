@@ -7,7 +7,7 @@ import org.approvej.ApprovalBuilder.approve
 import org.approvej.http.HttpScrubbers.hostHeaderValue
 import org.approvej.http.HttpScrubbers.userAgentHeaderValue
 import org.approvej.http.HttpStubServer
-import org.approvej.http.ReceivedHttpRequestPrinter.httpRequestPrinter
+import org.approvej.http.ReceivedHttpRequestPrintFormat.httpRequest
 import org.approvej.http.StubbedHttpResponse.response
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AutoClose
@@ -31,13 +31,13 @@ class HttpDocTest {
       .named("cheeeper")
       .scrubbedOf(hostHeaderValue())
       .scrubbedOf(userAgentHeaderValue())
-      .printWith(httpRequestPrinter())
+      .printedAs(httpRequest())
       .byFile()
     approve(prycyStub.lastReceivedRequest())
       .named("prycy")
       .scrubbedOf(hostHeaderValue())
       .scrubbedOf(userAgentHeaderValue())
-      .printWith(httpRequestPrinter())
+      .printedAs(httpRequest())
       .byFile()
     // end::approve_http_request[]
   }
