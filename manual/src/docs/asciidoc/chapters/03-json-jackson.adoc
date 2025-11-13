@@ -102,7 +102,7 @@ include::../../../test/java/examples/java/JsonJacksonDocTest.java[tag=pretty_pri
 ----
 include::../../../test/kotlin/examples/kotlin/JsonJacksonDocTest.kt[tag=pretty_print_json_string]
 ----
-<1> applies the `JsonPrinter` to convert the `JsonNode` object to a string
+<1> applies the `JsonPrintFormat` to pretty print the given JSON string
 
 [source,json]
 .Approved file

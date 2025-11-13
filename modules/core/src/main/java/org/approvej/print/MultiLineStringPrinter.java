@@ -26,7 +26,7 @@ import org.jspecify.annotations.Nullable;
  * @param <T> the type of the object to be printed
  */
 @NullMarked
-class ObjectPrinter<T> implements Printer<T> {
+class MultiLineStringPrinter<T> implements Printer<T> {
 
   /** A {@link Set} of classes that will be printed directly. */
   private static final Set<Class<?>> SIMPLE_TYPES =
@@ -48,25 +48,13 @@ class ObjectPrinter<T> implements Printer<T> {
   /**
    * @param fieldComparator a {@link Comparator} used to sort the printed value's {@link Field}s
    */
-  ObjectPrinter(Comparator<Field> fieldComparator) {
+  MultiLineStringPrinter(Comparator<Field> fieldComparator) {
     this.fieldComparator = fieldComparator;
   }
 
-  /** Creates a new {@link ObjectPrinter} instance that prints the given object. */
-  ObjectPrinter() {
+  /** Creates a new {@link MultiLineStringPrinter} instance that prints the given object. */
+  MultiLineStringPrinter() {
     this((field1, field2) -> 0);
-  }
-
-  /**
-   * Creates a new {@link ObjectPrinter} instance.
-   *
-   * @param <T> the type of the object to be printed
-   * @return a new {@link ObjectPrinter} instance
-   * @deprecated use {@link MultiLineStringPrintFormat#multiLineString()}
-   */
-  @Deprecated(since = "0.12", forRemoval = true)
-  public static <T> ObjectPrinter<T> objectPrinter() {
-    return new ObjectPrinter<>();
   }
 
   /**
@@ -75,8 +63,8 @@ class ObjectPrinter<T> implements Printer<T> {
    *
    * @return a copy of this sorting fields by name
    */
-  public ObjectPrinter<T> sorted() {
-    return new ObjectPrinter<>(Comparator.comparing(Field::getName));
+  public MultiLineStringPrinter<T> sorted() {
+    return new MultiLineStringPrinter<>(Comparator.comparing(Field::getName));
   }
 
   @Override

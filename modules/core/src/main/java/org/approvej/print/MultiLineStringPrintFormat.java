@@ -9,18 +9,18 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class MultiLineStringPrintFormat implements PrintFormat<Object> {
 
-  private final ObjectPrinter<Object> printer;
+  private final MultiLineStringPrinter<Object> printer;
 
   /**
    * @param printer the printer implementing this format
    */
-  MultiLineStringPrintFormat(ObjectPrinter<Object> printer) {
+  MultiLineStringPrintFormat(MultiLineStringPrinter<Object> printer) {
     this.printer = printer;
   }
 
   /** Default constructor to be used in {@link Configuration}. */
   public MultiLineStringPrintFormat() {
-    this(new ObjectPrinter<>());
+    this(new MultiLineStringPrinter<>());
   }
 
   @Override

@@ -66,37 +66,6 @@ public class Replacements {
   }
 
   /**
-   * Replaces each match of the given {@link DateTimeFormatter} with a relative description, like
-   * {@code [today]}, {@code [yesterday]}, {@code [in 13 days]}, {@code [1 year 20 days ago]}.
-   *
-   * @param dateTimeFormatter the {@link DateTimeFormatter} to parse the date/time strings
-   * @return a replacement function that returns a relative description for dates of the given
-   *     dateTimePattern
-   * @deprecated use {@link #relativeDate()} and {@link
-   *     RelativeDateReplacement#dateTimeFormatter(DateTimeFormatter)}
-   */
-  @Deprecated(since = "0.12")
-  public static RelativeDateReplacement relativeDate(DateTimeFormatter dateTimeFormatter) {
-    return relativeDate().dateTimeFormatter(dateTimeFormatter);
-  }
-
-  /**
-   * Replaces each match of the given dateTimePattern (as defined by {@link DateTimeFormatter}) with
-   * a relative description, like {@code [today]}, {@code [yesterday]}, {@code [in 13 days]}, {@code
-   * [1 year 20 days ago]}.
-   *
-   * @param dateTimePattern a pattern as defined by {@link DateTimeFormatter}
-   * @return a replacement function that returns a relative description for dates of the given
-   *     dateTimePattern
-   * @deprecated use {@link #relativeDate()} and {@link
-   *     RelativeDateReplacement#dateTimeFormatter(DateTimeFormatter)}
-   */
-  @Deprecated(since = "0.12")
-  public static RelativeDateReplacement relativeDate(String dateTimePattern) {
-    return relativeDate().dateTimeFormatter(DateTimeFormatter.ofPattern(dateTimePattern));
-  }
-
-  /**
    * Replaces each match of the {@link DateTimeScrubber} with a relative duration, like {@code
    * [now]}, {@code [in 1d 23h 59m 59s]}, {@code [10s ago]}.
    *

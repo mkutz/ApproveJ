@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
-import java.util.logging.Logger;
 import org.approvej.print.PrintFormat;
-import org.approvej.print.Printer;
 import org.approvej.print.SingleLineStringPrintFormat;
 import org.approvej.review.FileReviewer;
 import org.approvej.review.FileReviewerScript;
@@ -29,9 +27,6 @@ import org.jspecify.annotations.Nullable;
 public record Configuration(
     PrintFormat<Object> defaultPrintFormat, @Nullable FileReviewer defaultFileReviewer) {
 
-  private static final Logger log = Logger.getLogger(Configuration.class.getSimpleName());
-
-  private static final String DEFAULT_PRINTER_PROPERTY = "defaultPrinter";
   private static final String DEFAULT_PRINT_FORMAT_PROPERTY = "defaultPrintFormat";
   private static final String DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY = "defaultFileReviewerScript";
 
@@ -49,17 +44,8 @@ public record Configuration(
     Properties properties = loadProperties();
 
     String defaultPrintFormat = properties.getProperty(DEFAULT_PRINT_FORMAT_PROPERTY);
-    String defaultPrinter = properties.getProperty(DEFAULT_PRINTER_PROPERTY);
 
-    PrintFormat<Object> printFormat;
-    if (defaultPrinter != null && defaultPrintFormat == null) {
-      log.warning(
-          "Deprecated property %s was used. Please use new %s."
-              .formatted(DEFAULT_PRINTER_PROPERTY, DEFAULT_PRINT_FORMAT_PROPERTY));
-      printFormat = createPrintFormatFromPrinter(defaultPrinter);
-    } else {
-      printFormat = createPrintFormat(defaultPrintFormat);
-    }
+    PrintFormat<Object> printFormat = createPrintFormat(defaultPrintFormat);
 
     String defaultFileReviewerScript =
         properties.getProperty(DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY);
@@ -81,32 +67,6 @@ public record Configuration(
     } catch (ReflectiveOperationException e) {
       throw new ConfigurationError(
           "Failed to create print format %s".formatted(defaultPrintFormat), e);
-    }
-    return printFormat;
-  }
-
-  @SuppressWarnings("unchecked")
-  private static PrintFormat<Object> createPrintFormatFromPrinter(String defaultPrinter) {
-    PrintFormat<Object> printFormat;
-    try {
-      Printer<Object> printer =
-          (Printer<Object>) Class.forName(defaultPrinter).getDeclaredConstructor().newInstance();
-      printFormat =
-          new PrintFormat<>() {
-            @Override
-            public Printer<Object> printer() {
-              return printer;
-            }
-
-            @SuppressWarnings("removal")
-            @Override
-            public String filenameExtension() {
-              return printer.filenameExtension();
-            }
-          };
-    } catch (ReflectiveOperationException e) {
-      throw new ConfigurationError(
-          "Failed to create print format from printer %s".formatted(defaultPrinter), e);
     }
     return printFormat;
   }

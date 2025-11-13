@@ -109,18 +109,6 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Uses the given {@link Function} to convert the {@link #value} to a {@link String}.
-   *
-   * @param printer the {@link Function} used to convert the {@link #value} to a {@link String}
-   * @return a copy of this with the printed {@link #value}
-   * @deprecated use {@link #printedBy(Function)}
-   */
-  @Deprecated(since = "0.12", forRemoval = true)
-  public ApprovalBuilder<String> printWith(Function<? super T, String> printer) {
-    return printedBy(printer);
-  }
-
-  /**
    * Uses the given {@link Printer} to convert the {@link #value} to a {@link String}.
    *
    * @param printFormat the printer used to convert the value to a {@link String}
@@ -132,20 +120,6 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Uses the given {@link Printer} to convert the {@link #value} to a {@link String}.
-   *
-   * @param printer the printer used to convert the value to a {@link String}
-   * @return a copy of this with the printed {@link #value}
-   * @deprecated use {@link #printedAs(PrintFormat)}
-   */
-  @SuppressWarnings("removal")
-  @Deprecated(since = "0.12", forRemoval = true)
-  public ApprovalBuilder<String> printWith(Printer<? super T> printer) {
-    return new ApprovalBuilder<>(
-        printer.apply(value), name, printer.filenameExtension(), fileReviewer);
-  }
-
-  /**
    * Uses the default {@link PrintFormat} to convert the {@link #value} to a {@link String}.
    *
    * @return a copy of this with the printed {@link #value}
@@ -154,19 +128,6 @@ public class ApprovalBuilder<T> {
    */
   public ApprovalBuilder<String> printed() {
     return printedAs(configuration.defaultPrintFormat());
-  }
-
-  /**
-   * Uses the default {@link Printer} to convert the {@link #value} to a {@link String}.
-   *
-   * @return a copy of this with the printed {@link #value}
-   * @see Configuration#defaultPrintFormat()
-   * @see #printedAs(PrintFormat)
-   * @deprecated use {@link #printed()}
-   */
-  @Deprecated(since = "0.12", forRemoval = true)
-  public ApprovalBuilder<String> print() {
-    return printed();
   }
 
   /**
@@ -193,21 +154,6 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Sets the given {@link FileReviewer} to trigger if the received value is not equal to the
-   * previously approved.
-   *
-   * @param fileReviewer the {@link FileReviewer} to be used
-   * @return a copy of this with the given {@link #fileReviewer}
-   * @see Configuration#defaultFileReviewer()
-   * @see org.approvej.review.FileReviewerScript#script()
-   * @deprecated use {@link #reviewedBy(String)} (Function)}
-   */
-  @Deprecated(since = "0.12", forRemoval = true)
-  public ApprovalBuilder<T> reviewWith(FileReviewer fileReviewer) {
-    return reviewedBy(fileReviewer);
-  }
-
-  /**
    * Creates a {@link org.approvej.review.FileReviewerScript} from the given script {@link String}
    * to trigger if the received value is not equal to the previously approved.
    *
@@ -218,22 +164,6 @@ public class ApprovalBuilder<T> {
    * @see org.approvej.review.FileReviewerScript#script()
    */
   public ApprovalBuilder<T> reviewedBy(String script) {
-    return reviewedBy(script(script));
-  }
-
-  /**
-   * Creates a {@link org.approvej.review.FileReviewerScript} from the given script {@link String}
-   * to trigger if the received value is not equal to the previously approved.
-   *
-   * @param script the script {@link String} to be used as a {@link
-   *     org.approvej.review.FileReviewerScript}
-   * @return a copy of this with the given script as {@link #fileReviewer}
-   * @see Configuration#defaultFileReviewer()
-   * @see org.approvej.review.FileReviewerScript#script()
-   * @deprecated use {@link #reviewedBy(String)}
-   */
-  @Deprecated(since = "0.12", forRemoval = true)
-  public ApprovalBuilder<T> reviewWith(String script) {
     return reviewedBy(script(script));
   }
 

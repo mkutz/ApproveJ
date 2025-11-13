@@ -1,38 +1,63 @@
 package org.approvej.json.jackson;
 
-import static org.approvej.json.jackson.JsonPrinter.DEFAULT_JSON_MAPPER;
+import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.approvej.Configuration;
 import org.approvej.print.PrintFormat;
 import org.approvej.print.Printer;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * A generic printer for Java {@link Object}s that uses an {@link ObjectMapper}.
+ * A {@link PrintFormat} that uses {@link ObjectWriter#writeValueAsString(Object)} to print a value
+ * as JSON.
  *
  * @param <T> the type of the object to print
  */
 @NullMarked
 public final class JsonPrintFormat<T> implements PrintFormat<T> {
-  private final Printer<T> printer;
 
-  JsonPrintFormat(Printer<T> printer) {
-    this.printer = printer;
+  private static final ObjectMapper DEFAULT_JSON_MAPPER =
+      JsonMapper.builder().addModule(new JavaTimeModule()).build();
+
+  private final ObjectWriter objectWriter;
+  private final ObjectReader objectReader;
+
+  /**
+   * Creates a {@link JsonPrintFormat} using the given {@link ObjectWriter} and {@link
+   * ObjectReader}.
+   *
+   * @param objectWriter the {@link ObjectWriter} that will be used for printing
+   * @param objectReader the {@link ObjectReader} that will be used to parse raw JSON {@link
+   *     String}s for re-printing
+   */
+  JsonPrintFormat(ObjectWriter objectWriter, ObjectReader objectReader) {
+    this.objectWriter = objectWriter.without(WRITE_DATES_AS_TIMESTAMPS);
+    this.objectReader = objectReader;
   }
 
   /** Default constructor to be used in {@link Configuration}. */
   public JsonPrintFormat() {
-    this(
-        new JsonPrinter<>(
-            DEFAULT_JSON_MAPPER.writerWithDefaultPrettyPrinter(), DEFAULT_JSON_MAPPER.reader()));
+    this(DEFAULT_JSON_MAPPER.writerWithDefaultPrettyPrinter(), DEFAULT_JSON_MAPPER.reader());
   }
 
   @Override
   public Printer<T> printer() {
-    return printer;
+    return (T value) -> {
+      try {
+        if (value instanceof String string) {
+          return objectWriter.writeValueAsString(objectReader.readTree(string));
+        }
+        return objectWriter.writeValueAsString(value);
+      } catch (JsonProcessingException e) {
+        throw new JsonPrinterException(value, e);
+      }
+    };
   }
 
   @Override
@@ -41,23 +66,23 @@ public final class JsonPrintFormat<T> implements PrintFormat<T> {
   }
 
   /**
-   * Creates a {@link JsonPrinter} using the given {@link ObjectMapper}.
+   * Creates a {@link JsonPrintFormat} using the given {@link ObjectMapper}.
    *
    * @param objectMapper the {@link ObjectMapper} used to create the {@link ObjectWriter}
    * @param <T> the type of value to print
-   * @return a new {@link JsonPrinter} instance
+   * @return a new {@link JsonPrintFormat} instance
    * @see ObjectMapper#writerWithDefaultPrettyPrinter()
    */
   public static <T> JsonPrintFormat<T> json(ObjectMapper objectMapper) {
     return new JsonPrintFormat<>(
-        new JsonPrinter<>(objectMapper.writerWithDefaultPrettyPrinter(), objectMapper.reader()));
+        objectMapper.writerWithDefaultPrettyPrinter(), objectMapper.reader());
   }
 
   /**
-   * Creates a {@link JsonPrinter} using the default {@link JsonMapper}.
+   * Creates a {@link JsonPrintFormat} using the default {@link JsonMapper}.
    *
    * @param <T> the type of value to print
-   * @return a new {@link JsonPrinter} instance
+   * @return a new {@link JsonPrintFormat} instance
    * @see JsonMapper.Builder#build()
    */
   public static <T> JsonPrintFormat<T> json() {

@@ -2,7 +2,6 @@ package org.approvej.scrub;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
-import static org.approvej.scrub.Replacements.relativeDate;
 import static org.approvej.scrub.Replacements.string;
 
 import java.time.DayOfWeek;
@@ -97,20 +96,6 @@ public class DateTimeScrubber implements Scrubber<String> {
     return new DateTimeScrubber(
         dateTimeFormatter,
         regexScrubber.replacement(replacement.dateTimeFormatter(dateTimeFormatter)));
-  }
-
-  /**
-   * Makes this use a {@link Replacements#relativeDate() relativeDate} to replace matches of the
-   * date/time pattern.
-   *
-   * @return a copy of this using the given replacement
-   * @deprecated use {@link #replacement(RelativeDateReplacement)}
-   */
-  @Deprecated(since = "0.12", forRemoval = true)
-  public DateTimeScrubber replaceWithRelativeDate() {
-    return new DateTimeScrubber(
-        dateTimeFormatter,
-        regexScrubber.replacement(relativeDate().dateTimeFormatter(dateTimeFormatter)));
   }
 
   @Override

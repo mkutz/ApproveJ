@@ -130,7 +130,7 @@ include::../../../test/java/examples/java/BasicsDocTest.java[tag=multi_line_stri
 ----
 include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=multi_line_string_format]
 ----
-<1> applies the `ObjectPrinter` and returns a new `ApprovalBuilder<String>`
+<1> applies the `MultiLineStringPrinter` and returns a new `ApprovalBuilder<String>`
 
 Now the approved file will look like this
 
@@ -344,7 +344,7 @@ include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_file_ne
 ----
 include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_next_to_test]
 ----
-<1> defines the `PathProviderBuilder` explicitly, same as just calling `byFile()`
+<1> defines the `PathProvider` explicitly, same as just calling `byFile()`
 
 
 .File structure
@@ -454,7 +454,7 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_
 
 You can also define your own link:{javadoc-url}/core/org/approvej/approve/PathProvider.html[`PathProvider`] and pass it to the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byFile(org.approvej.approve.PathProvider)[`byFile`] method.
 
-Or you can create a method that returns a link:{javadoc-url}/core/org/approvej/approve/PathProviderBuilder.html[`PathProviderBuilder`] and pass it to the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byFile(org.approvej.approve.PathProviderBuilder)[`byFile`] method.
+Or you can create a method that returns a link:{javadoc-url}/core/org/approvej/approve/PathProviderBuilder.html[`PathProviderBuilder`] and pass it to the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byFile(org.approvej.approve.PathProvider)[`byFile`] method.
 That way the filename extension of the used `Printer` is set just before approval.
 
 In that case, you might want to take advantage of the link:{javadoc-url}/core/org/approvej/approve/StackTraceTestFinderUtil.html[`StackTraceTestFinderUtil`] class to find the test source path or the current test method based on the current stack trace.
