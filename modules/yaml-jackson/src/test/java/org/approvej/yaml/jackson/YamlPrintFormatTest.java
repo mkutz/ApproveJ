@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import java.time.LocalDate;
+import org.approvej.print.Printer;
 import org.junit.jupiter.api.Test;
 
 class YamlPrintFormatTest {
@@ -36,10 +37,10 @@ class YamlPrintFormatTest {
 
   @Test
   void printer_failure() {
-    YamlPrintFormat<Object> yamlPrinterNoJavaTimeModule = yaml(new ObjectMapper());
+    Printer<Object> yamlPrinterNoJavaTimeModule = yaml(new ObjectMapper()).printer();
     LocalDate someLocalDate = LocalDate.of(1982, 2, 19);
     assertThatExceptionOfType(YamlPrinterException.class)
-        .isThrownBy(() -> yamlPrinterNoJavaTimeModule.printer().apply(someLocalDate))
+        .isThrownBy(() -> yamlPrinterNoJavaTimeModule.apply(someLocalDate))
         .withMessage("Failed to print %s".formatted(someLocalDate));
   }
 

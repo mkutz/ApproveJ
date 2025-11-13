@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.time.LocalDate;
+import org.approvej.print.Printer;
 import org.junit.jupiter.api.Test;
 
 class JsonPrintFormatTest {
@@ -46,9 +47,9 @@ class JsonPrintFormatTest {
   }
 
   @Test
-  void apply_invalid() {
-    assertThatExceptionOfType(JsonPrinterException.class)
-        .isThrownBy(() -> json().printer().apply("{"));
+  void printer_invalid() {
+    Printer<Object> printer = json().printer();
+    assertThatExceptionOfType(JsonPrinterException.class).isThrownBy(() -> printer.apply("{"));
   }
 
   @Test

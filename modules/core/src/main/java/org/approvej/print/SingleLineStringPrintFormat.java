@@ -10,7 +10,9 @@ import org.jspecify.annotations.NonNull;
 public final class SingleLineStringPrintFormat implements PrintFormat<Object> {
 
   /** Default constructor to be used in {@link Configuration}. */
-  public SingleLineStringPrintFormat() {}
+  public SingleLineStringPrintFormat() {
+    // no initialization needed
+  }
 
   @Override
   @NonNull
