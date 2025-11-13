@@ -3,7 +3,7 @@ package examples.java;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.http.HttpScrubbers.headerValue;
 import static org.approvej.http.HttpScrubbers.hostHeaderValue;
-import static org.approvej.http.ReceivedHttpRequestPrinter.httpRequestPrinter;
+import static org.approvej.http.ReceivedHttpRequestPrintFormat.httpRequest;
 import static org.approvej.http.StubbedHttpResponse.response;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,13 +45,13 @@ class HttpDocTest {
         .named("cheeper")
         .scrubbedOf(hostHeaderValue())
         .scrubbedOf(headerValue("User-agent"))
-        .printWith(httpRequestPrinter())
+        .printedAs(httpRequest())
         .byFile();
     approve(prycyStub.lastReceivedRequest())
         .named("prycy")
         .scrubbedOf(hostHeaderValue())
         .scrubbedOf(headerValue("User-agent"))
-        .printWith(httpRequestPrinter())
+        .printedAs(httpRequest())
         .byFile();
     // end::approve_http_request[]
   }
