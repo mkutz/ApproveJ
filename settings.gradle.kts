@@ -5,26 +5,18 @@ rootProject.name = "approvej"
 include("bom")
 
 include("modules:core")
+include("modules:image")
+include("modules:json-jackson")
+include("modules:json-jackson3")
+include("modules:yaml-jackson")
+include("modules:yaml-jackson3")
+include("modules:http")
+include("modules:http-wiremock")
+include("modules:database-jdbc")
 
 include("plugins:approvej-gradle-plugin")
-
 include("plugins:approvej-maven-plugin")
-
 include("plugins:approvej-intellij-plugin")
-
-include("modules:json-jackson")
-
-include("modules:json-jackson3")
-
-include("modules:yaml-jackson")
-
-include("modules:yaml-jackson3")
-
-include("modules:http")
-
-include("modules:http-wiremock")
-
-include("modules:database-jdbc")
 
 include("manual")
 
