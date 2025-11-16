@@ -6,6 +6,8 @@ include("bom")
 
 include("modules:core")
 
+include("modules:image")
+
 include("modules:json-jackson")
 
 include("modules:json-jackson3")
