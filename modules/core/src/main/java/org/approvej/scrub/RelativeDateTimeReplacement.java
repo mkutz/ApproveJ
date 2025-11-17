@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
  * relative description, like {@code [10m ago]}, {@code [in 2d 1h 3m 33s]}, {@code [13d ago]}.
  *
  * <p>To avoid flaky results, the value is always rounded to a certain {@link Duration} (e.g. 1s).
- * This duration can be adjustest via {@link #roundedTo(Duration)}.
+ * This duration can be adjusted via {@link #roundedTo(Duration)}.
  */
 public interface RelativeDateTimeReplacement extends Replacement {
 
