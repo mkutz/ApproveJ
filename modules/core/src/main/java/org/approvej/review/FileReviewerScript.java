@@ -3,6 +3,7 @@ package org.approvej.review;
 import java.io.IOException;
 import java.util.logging.Logger;
 import org.approvej.approve.PathProvider;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A {@link FileReviewer} implementation that executes the given script.
@@ -10,6 +11,7 @@ import org.approvej.approve.PathProvider;
  * @param script the script to be executed with placeholders <code>{@value RECEIVED_PLACEHOLDER}
  *     </code> and <code>{@value APPROVED_PLACEHOLDER}</code>
  */
+@NullMarked
 public record FileReviewerScript(String script) implements FileReviewer {
 
   private static final String RECEIVED_PLACEHOLDER = "{receivedFile}";
