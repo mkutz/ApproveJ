@@ -81,7 +81,7 @@ public class StackTraceTestFinderUtil {
           .map(Path::normalize)
           .orElseThrow(() -> new FileApproverError("Could not locate test source file"));
     } catch (IOException e) {
-      throw new FileApproverError(e);
+      throw new FileApproverError("Could not traverse code directory", e);
     }
   }
 }

@@ -12,8 +12,4 @@ class FileApproverError extends RuntimeException {
   public FileApproverError(String message, Throwable cause) {
     super(message, cause);
   }
-
-  public FileApproverError(Throwable cause) {
-    super("Failed to approve file", cause);
-  }
 }
