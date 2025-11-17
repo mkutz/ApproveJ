@@ -27,7 +27,7 @@ class FileApproverTest {
   @Test
   void apply() throws IOException {
     PathProvider pathProvider = approvedPath(tempDir.resolve("apply-approved.txt"));
-    FileApprover fileApprover = file(pathProvider);
+    Approver fileApprover = file(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
 
     ApprovalResult result = fileApprover.apply("Some approved text");
@@ -41,7 +41,7 @@ class FileApproverTest {
   void apply_previously_accepted_differs() throws IOException {
     PathProvider pathProvider =
         approvedPath(tempDir.resolve("apply_previously_accepted_differs-approved.txt"));
-    FileApprover fileApprover = file(pathProvider);
+    Approver fileApprover = file(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text\n", StandardOpenOption.CREATE);
 
     ApprovalResult result = fileApprover.apply("Some other text");
@@ -77,7 +77,7 @@ class FileApproverTest {
         approvedPath(
             tempDir.resolve(
                 "apply_previously_accepted_different_filename_extension-approved.json"));
-    FileApprover fileApprover = file(pathProvider);
+    Approver fileApprover = file(pathProvider);
 
     ApprovalResult result = fileApprover.apply("Some approved text");
 
@@ -93,7 +93,7 @@ class FileApproverTest {
   void apply_previously_received() throws IOException {
     PathProvider pathProvider =
         approvedPath(tempDir.resolve("apply_previously_received-approved.txt"));
-    FileApprover fileApprover = file(pathProvider);
+    Approver fileApprover = file(pathProvider);
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
     writeString(pathProvider.receivedPath(), "Some received text", StandardOpenOption.CREATE);
 
@@ -111,7 +111,7 @@ class FileApproverTest {
   void apply_no_previously_accepted() {
     PathProvider pathProvider =
         approvedPath(tempDir.resolve("apply_no_previously_accepted-approved.txt"));
-    FileApprover fileApprover = file(pathProvider);
+    Approver fileApprover = file(pathProvider);
 
     ApprovalResult result = fileApprover.apply("Some text");
 
@@ -122,7 +122,7 @@ class FileApproverTest {
 
   @Test
   void apply_no_write_access() {
-    FileApprover fileApprover = file(approvedPath("/does/not/exist.txt"));
+    Approver fileApprover = file(approvedPath("/does/not/exist.txt"));
 
     assertThatExceptionOfType(FileApproverError.class)
         .isThrownBy(() -> fileApprover.apply("Some text"))
@@ -135,7 +135,7 @@ class FileApproverTest {
         approvedPath(tempDir.resolve("apply_file_not_readable-approved.txt"));
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
     setPosixFilePermissions(pathProvider.approvedPath(), Set.of());
-    FileApprover fileApprover = file(pathProvider);
+    Approver fileApprover = file(pathProvider);
 
     assertThatExceptionOfType(FileApproverError.class)
         .isThrownBy(() -> fileApprover.apply("Some text"))
@@ -149,7 +149,7 @@ class FileApproverTest {
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
     createFile(pathProvider.receivedPath());
     setPosixFilePermissions(pathProvider.receivedPath(), Set.of(PosixFilePermission.OWNER_READ));
-    FileApprover fileApprover = file(pathProvider);
+    Approver fileApprover = file(pathProvider);
 
     assertThatExceptionOfType(FileApproverError.class)
         .isThrownBy(() -> fileApprover.apply("Some text"))

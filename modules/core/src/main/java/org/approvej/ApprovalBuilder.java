@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import org.approvej.approve.Approver;
-import org.approvej.approve.FileApprover;
 import org.approvej.approve.InplaceApprover;
 import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviders;
@@ -196,7 +195,7 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Approves the receivedValue by a {@link FileApprover} with the given {@link PathProvider}.
+   * Approves the receivedValue by a file defined by the given {@link PathProvider}.
    *
    * @param pathProvider the provider for the paths of the approved and received files
    * @throws ApprovalError if the approval fails
@@ -208,7 +207,7 @@ public class ApprovalBuilder<T> {
       printed().byFile(updatedPathProvider);
       return;
     }
-    FileApprover approver = file(updatedPathProvider);
+    Approver approver = file(updatedPathProvider);
     ApprovalResult approvalResult = approver.apply(String.valueOf(value));
     if (approvalResult.needsApproval() && fileReviewer != null) {
       ReviewResult reviewResult = fileReviewer.apply(updatedPathProvider);
@@ -220,9 +219,9 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Approves the receivedValue by a {@link FileApprover}, using a {@link PathProviders#nextToTest()
-   * nextToTest PathProviderBuilder}, and the {@link PrintFormat#filenameExtension() used
-   * PrintFormat's filenameExtension}.
+   * Approves the receivedValue by a file, using a {@link PathProviders#nextToTest() nextToTest
+   * PathProvider}, and the {@link PrintFormat#filenameExtension() used PrintFormat's
+   * filenameExtension}.
    *
    * @throws ApprovalError if the approval fails
    */
@@ -231,10 +230,10 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Approves the receivedValue by a {@link FileApprover} with an {@link
-   * PathProviders#approvedPath(Path)} with the given {@link Path} to the approved file.
+   * Approves the receivedValue by a file with an {@link PathProviders#approvedPath(Path)} with the
+   * given {@link Path} to the approved file.
    *
-   * <p>Note: the {@link Printer}'s filenameExtension is ignored.
+   * <p>Note: the {@link PrintFormat}'s filenameExtension is ignored.
    *
    * @param approvedPath the {@link Path} to the approved file
    * @throws ApprovalError if the approval fails
@@ -244,10 +243,10 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Approves the receivedValue by a {@link FileApprover} with an {@link
-   * PathProviders#approvedPath(Path)} with the given path to the approved file.
+   * Approves the receivedValue by a {@link Approver} with an {@link
+   * PathProviders#approvedPath(Path)} with the given path {@link String} to the approved file.
    *
-   * <p>Note: the {@link Printer}'s filenameExtension is ignored.
+   * <p>Note: the {@link PrintFormat}'s filenameExtension is ignored.
    *
    * @param approvedPath the path to the approved file
    * @throws ApprovalError if the approval fails

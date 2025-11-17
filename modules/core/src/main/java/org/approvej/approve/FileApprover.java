@@ -29,22 +29,12 @@ import org.jspecify.annotations.NullMarked;
  * {@link Approver} that compares the received value with the approved value stored in a file. If
  * the values differ, it creates a new file with the received value and throws an {@link
  * ApprovalError}.
+ *
+ * @param pathProvider a {@link PathProvider} to determine the paths of the approved and received
+ *     files
  */
 @NullMarked
-public class FileApprover implements Approver {
-
-  private final PathProvider pathProvider;
-
-  /**
-   * Creates a new {@link FileApprover} that uses the given {@link PathProvider} to determine the
-   * paths of the approved and received files.
-   *
-   * @param pathProvider a {@link PathProvider} to determine the paths of the approved and received
-   *     files
-   */
-  FileApprover(PathProvider pathProvider) {
-    this.pathProvider = pathProvider;
-  }
+record FileApprover(PathProvider pathProvider) implements Approver {
 
   @Override
   public ApprovalResult apply(String received) {

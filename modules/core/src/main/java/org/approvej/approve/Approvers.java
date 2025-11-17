@@ -25,7 +25,7 @@ public class Approvers {
    * @param pathProvider the provider for the paths of the approved and received files
    * @return a new {@link FileApprover} that uses the given {@link PathProvider}
    */
-  public static FileApprover file(PathProvider pathProvider) {
+  public static Approver file(PathProvider pathProvider) {
     return new FileApprover(pathProvider);
   }
 }
