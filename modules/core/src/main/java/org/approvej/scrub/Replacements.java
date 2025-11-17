@@ -69,7 +69,7 @@ public class Replacements {
    * Replaces each match of the {@link DateTimeScrubber} with a relative duration, like {@code
    * [now]}, {@code [in 1d 23h 59m 59s]}, {@code [10s ago]}.
    *
-   * @return a new {@link RelativeDateReplacement}
+   * @return a new {@link RelativeDateTimeReplacement}
    */
   public static RelativeDateTimeReplacement relativeDateTime() {
     return new RelativeDateTimeReplacementRecord(
