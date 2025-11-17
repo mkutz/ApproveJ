@@ -30,7 +30,7 @@ public class Scrubbers {
    * @return a {@link RegexScrubber} for all given strings
    */
   public static RegexScrubber strings(String first, String... more) {
-    return new RegexScrubber(
+    return new RegexScrubberRecord(
         Pattern.compile(
             Stream.concat(Stream.of(first), Arrays.stream(more))
                 .map(Pattern::quote)
@@ -45,7 +45,7 @@ public class Scrubbers {
    * @return a {@link RegexScrubber} with the given pattern
    */
   public static RegexScrubber stringsMatching(Pattern pattern) {
-    return new RegexScrubber(pattern, numbered());
+    return new RegexScrubberRecord(pattern, numbered());
   }
 
   /**
@@ -70,7 +70,7 @@ public class Scrubbers {
    * @see DateTimeFormatter
    */
   public static DateTimeScrubber dateTimeFormat(String dateTimePattern, Locale locale) {
-    return new DateTimeScrubber(dateTimePattern, locale, numbered("datetime"));
+    return new DateTimeScrubberRecord(dateTimePattern, locale, numbered("datetime"));
   }
 
   /**
@@ -305,7 +305,7 @@ public class Scrubbers {
    */
   public static <T> FieldScrubber<T> field(Class<T> type, String fieldName) {
     try {
-      return new FieldScrubber<>(type.getDeclaredField(fieldName), null);
+      return new FieldScrubberRecord<>(type.getDeclaredField(fieldName), null);
     } catch (NoSuchFieldException e) {
       throw new ScrubbingError(
           "Cannot create FieldScrubber for field %s on %s".formatted(fieldName, type), e);
