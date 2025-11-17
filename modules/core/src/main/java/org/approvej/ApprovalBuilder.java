@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import org.approvej.approve.Approver;
-import org.approvej.approve.InplaceApprover;
 import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviders;
 import org.approvej.print.PrintFormat;
@@ -186,7 +185,7 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Approves the value by an {@link InplaceApprover} with the given previouslyApproved value.
+   * Approves the value by the given previouslyApproved value.
    *
    * @param previouslyApproved the approved value
    */
