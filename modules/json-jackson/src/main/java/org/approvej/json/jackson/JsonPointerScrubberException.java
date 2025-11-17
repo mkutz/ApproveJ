@@ -2,9 +2,11 @@ package org.approvej.json.jackson;
 
 import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.jspecify.annotations.NullMarked;
 
 /** Exception thrown when scrubbing a JSON node defined by {@link JsonPointer} fails. */
-public class JsonPointerScrubberException extends RuntimeException {
+@NullMarked
+class JsonPointerScrubberException extends RuntimeException {
 
   /**
    * Creates a new JsonPointerScrubberException.
