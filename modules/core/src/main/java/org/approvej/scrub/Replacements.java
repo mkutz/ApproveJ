@@ -62,17 +62,18 @@ public class Replacements {
    * @return a new {@link RelativeDateReplacement}
    */
   public static RelativeDateReplacement relativeDate() {
-    return new RelativeDateReplacement(DateTimeFormatter.ISO_DATE);
+    return new RelativeDateReplacementRecord(DateTimeFormatter.ISO_DATE);
   }
 
   /**
    * Replaces each match of the {@link DateTimeScrubber} with a relative duration, like {@code
    * [now]}, {@code [in 1d 23h 59m 59s]}, {@code [10s ago]}.
    *
-   * @return a new {@link RelativeDateTimeReplacement}
+   * @return a new {@link RelativeDateReplacement}
    */
   public static RelativeDateTimeReplacement relativeDateTime() {
-    return new RelativeDateTimeReplacement(DateTimeFormatter.ISO_DATE_TIME, Duration.ofSeconds(1));
+    return new RelativeDateTimeReplacementRecord(
+        DateTimeFormatter.ISO_DATE_TIME, Duration.ofSeconds(1));
   }
 
   /**

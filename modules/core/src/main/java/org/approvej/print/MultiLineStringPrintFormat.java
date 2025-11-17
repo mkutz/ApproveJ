@@ -22,6 +22,8 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * A generic printer for Java {@link Object}s that prints their properties and values one per line.
+ *
+ * @param printer the printer implementing this format
  */
 @NullMarked
 public record MultiLineStringPrintFormat(Printer<Object> printer) implements PrintFormat<Object> {

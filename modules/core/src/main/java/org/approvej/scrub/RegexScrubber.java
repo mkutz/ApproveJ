@@ -1,49 +1,12 @@
 package org.approvej.scrub;
 
-import static org.approvej.scrub.Replacements.string;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
-import java.util.regex.MatchResult;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.jspecify.annotations.NullMarked;
 
 /**
  * Scrubs a {@link String} by replacing all occurrences of a pattern by applying the given
  * replacement {@link Function} for each finding.
  */
-@NullMarked
-public class RegexScrubber implements Scrubber<String> {
-
-  private final Pattern pattern;
-  private final Replacement replacement;
-
-  /**
-   * Creates a {@link RegexScrubber} with the given pattern and replacement {@link Function}.
-   *
-   * @param pattern the pattern matching the string to be scrubbed as {@link String}
-   * @param replacement a {@link Replacement} function
-   * @see Pattern#compile(String)
-   */
-  RegexScrubber(Pattern pattern, Replacement replacement) {
-    this.pattern = pattern;
-    this.replacement = replacement;
-  }
-
-  @Override
-  public String apply(String unscrubbedValue) {
-    Matcher matcher = pattern.matcher(unscrubbedValue);
-    Map<String, Integer> findings = new HashMap<>();
-    Function<MatchResult, String> replacer =
-        result -> {
-          String group = result.group();
-          findings.putIfAbsent(group, findings.size() + 1);
-          return replacement.apply(group, findings.get(group));
-        };
-    return matcher.replaceAll(replacer);
-  }
+public interface RegexScrubber extends Scrubber<String> {
 
   /**
    * Set the {@link Replacement} to be used.
@@ -51,9 +14,7 @@ public class RegexScrubber implements Scrubber<String> {
    * @param replacement a {@link Replacement} function
    * @return a copy of this using the given {@link #replacement}
    */
-  public RegexScrubber replacement(Replacement replacement) {
-    return new RegexScrubber(pattern, replacement);
-  }
+  RegexScrubber replacement(Replacement replacement);
 
   /**
    * Set the replacement {@link Function} always returning the given staticReplacement.
@@ -61,7 +22,5 @@ public class RegexScrubber implements Scrubber<String> {
    * @param staticReplacement the static replacement {@link String}
    * @return a copy of this using the given {@link #replacement}
    */
-  public RegexScrubber replacement(String staticReplacement) {
-    return replacement(string(staticReplacement));
-  }
+  RegexScrubber replacement(String staticReplacement);
 }
