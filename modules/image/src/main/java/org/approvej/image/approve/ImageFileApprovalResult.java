@@ -3,8 +3,6 @@ package org.approvej.image.approve;
 import static org.approvej.image.approve.AnalysedImage.analyse;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 import org.approvej.approve.PathProvider;
 import org.approvej.image.ImageApprovalError;
 import org.approvej.image.ImageApprovalResult;
@@ -15,7 +13,8 @@ import org.approvej.image.ImageApprovalResult;
  * @param pathProvider the {@link PathProvider} providing the paths to the received an approved
  *     files
  */
-public record ImageFileApprovalResult(BufferedImage previouslyApproved, BufferedImage received, PathProvider pathProvider)
+public record ImageFileApprovalResult(
+    BufferedImage previouslyApproved, BufferedImage received, PathProvider pathProvider)
     implements ImageApprovalResult {
 
   @Override
