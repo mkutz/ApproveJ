@@ -2,7 +2,6 @@ package org.approvej.image.approve;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 import static java.nio.file.Files.createDirectories;
-import static java.nio.file.Files.createFile;
 import static java.nio.file.Files.deleteIfExists;
 import static java.nio.file.Files.exists;
 import static java.nio.file.Files.getLastModifiedTime;
@@ -18,7 +17,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.List;
@@ -68,7 +66,10 @@ public class ImageFileApprover implements ImageApprover {
     if (notExists(approvedPath)) {
       try {
         BufferedImage missingApprovedImage = new BufferedImage(width, height, TYPE_INT_ARGB);
-        ImageIO.write(missingApprovedImage, pathProvider.filenameExtension(), Files.newOutputStream(approvedPath, CREATE));
+        ImageIO.write(
+            missingApprovedImage,
+            pathProvider.filenameExtension(),
+            Files.newOutputStream(approvedPath, CREATE));
       } catch (IOException e) {
         throw new ImageFileApproverError(
             "Creating approved file %s failed".formatted(approvedPath), e);
@@ -131,13 +132,18 @@ public class ImageFileApprover implements ImageApprover {
   }
 
   private ImageApprovalResult check(BufferedImage previouslyApproved, BufferedImage received) {
-    ImageFileApprovalResult result = new ImageFileApprovalResult(previouslyApproved, received, pathProvider);
+    ImageFileApprovalResult result =
+        new ImageFileApprovalResult(previouslyApproved, received, pathProvider);
     Path receivedPath = pathProvider.receivedPath();
     if (result.needsApproval()) {
       try {
-        ImageIO.write(received, pathProvider.filenameExtension(), Files.newOutputStream(receivedPath, CREATE, TRUNCATE_EXISTING));
+        ImageIO.write(
+            received,
+            pathProvider.filenameExtension(),
+            Files.newOutputStream(receivedPath, CREATE, TRUNCATE_EXISTING));
       } catch (IOException e) {
-        throw new ImageFileApproverError("Writing received to %s failed".formatted(receivedPath), e);
+        throw new ImageFileApproverError(
+            "Writing received to %s failed".formatted(receivedPath), e);
       }
     }
     return result;
