@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
  * <p>To avoid flaky results, the value is always rounded to a certain {@link Duration} (e.g. 1s).
  * This duration can be adjusted via {@link #roundedTo(Duration)}.
  */
-public interface RelativeDateTimeReplacement extends Replacement {
+public interface RelativeDateTimeReplacement extends Replacement<String> {
 
   /**
    * Creates and returns a copy of this with the given {@link DateTimeFormatter}.

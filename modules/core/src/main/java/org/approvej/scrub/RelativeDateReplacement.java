@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
  * Replaces each match of the given dateTimePattern (as defined by {@link DateTimeFormatter}) with a
  * relative description, like {@code [today]}, {@code [yesterday]}, {@code [13 days from now]}.
  */
-public interface RelativeDateReplacement extends Replacement {
+public interface RelativeDateReplacement extends Replacement<String> {
 
   /**
    * Creates and returns a copy of this with the given dateTimeFormatter.

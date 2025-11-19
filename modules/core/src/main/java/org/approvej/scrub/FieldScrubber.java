@@ -8,13 +8,4 @@ package org.approvej.scrub;
  *
  * @param <T> the type of value to scrub
  */
-public interface FieldScrubber<T> extends Scrubber<T> {
-
-  /**
-   * Sets the replacement {@link Object}.
-   *
-   * @param replacement the new replacement {@link Object}
-   * @return a copy of this using the given replacement
-   */
-  FieldScrubber<T> replacement(Object replacement);
-}
+public interface FieldScrubber<T> extends Scrubber<FieldScrubber<T>, T, Object> {}

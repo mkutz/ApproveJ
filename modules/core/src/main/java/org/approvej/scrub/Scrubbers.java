@@ -20,16 +20,16 @@ public class Scrubbers {
       Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
 
   /**
-   * Creates a {@link RegexScrubber} for all given strings.
+   * Creates a {@link StringScrubber} for all given strings.
    *
    * <p>This type of {@link Scrubber} is particularly useful if dynamic parts of the value are
    * known. E.g. if they were part of the import parameters of the method under test.
    *
    * @param first the first {@link String} that should be scrubbed
    * @param more more {@link String}s that should be scrubbed
-   * @return a {@link RegexScrubber} for all given strings
+   * @return a {@link StringScrubber} for all given strings
    */
-  public static RegexScrubber strings(String first, String... more) {
+  public static StringScrubber strings(String first, String... more) {
     return new RegexScrubberRecord(
         Pattern.compile(
             Stream.concat(Stream.of(first), Arrays.stream(more))
@@ -39,23 +39,23 @@ public class Scrubbers {
   }
 
   /**
-   * Creates a {@link RegexScrubber} with the given pattern.
+   * Creates a {@link StringScrubber} with the given pattern.
    *
    * @param pattern the {@link Pattern} matching the strings to be scrubbed
-   * @return a {@link RegexScrubber} with the given pattern
+   * @return a {@link StringScrubber} with the given pattern
    */
-  public static RegexScrubber stringsMatching(Pattern pattern) {
+  public static StringScrubber stringsMatching(Pattern pattern) {
     return new RegexScrubberRecord(pattern, numbered());
   }
 
   /**
-   * Creates a {@link RegexScrubber} with the given pattern.
+   * Creates a {@link StringScrubber} with the given pattern.
    *
    * @param pattern the pattern matching the string to be scrubbed as {@link String}
-   * @return a {@link RegexScrubber} with the given pattern
+   * @return a {@link StringScrubber} with the given pattern
    * @see Pattern#compile(String)
    */
-  public static RegexScrubber stringsMatching(String pattern) {
+  public static StringScrubber stringsMatching(String pattern) {
     return stringsMatching(Pattern.compile(pattern));
   }
 
@@ -286,11 +286,11 @@ public class Scrubbers {
   }
 
   /**
-   * Creates a {@link RegexScrubber} for UUIDs.
+   * Creates a {@link StringScrubber} for UUIDs.
    *
-   * @return a {@link RegexScrubber} that replaces all UUIDs
+   * @return a {@link StringScrubber} that replaces all UUIDs
    */
-  public static RegexScrubber uuids() {
+  public static StringScrubber uuids() {
     return stringsMatching(UUID_PATTERN).replacement(numbered("uuid"));
   }
 
@@ -305,7 +305,7 @@ public class Scrubbers {
    */
   public static <T> FieldScrubber<T> field(Class<T> type, String fieldName) {
     try {
-      return new FieldScrubberRecord<>(type.getDeclaredField(fieldName), null);
+      return new FieldScrubberRecord<>(type.getDeclaredField(fieldName), (match, count) -> null);
     } catch (NoSuchFieldException e) {
       throw new ScrubbingError(
           "Cannot create FieldScrubber for field %s on %s".formatted(fieldName, type), e);

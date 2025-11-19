@@ -21,7 +21,7 @@ public class Replacements {
    * @param label a String used to identify the replacement
    * @return a replacement function that replaces with "{@code [label #]}"
    */
-  public static Replacement numbered(String label) {
+  public static Replacement<String> numbered(String label) {
     return (match, count) -> String.format("[%s %d]", label, count);
   }
 
@@ -31,7 +31,7 @@ public class Replacements {
    *
    * @return a replacement function that replaces with "{@code [scrubbed #]}"
    */
-  public static Replacement numbered() {
+  public static Replacement<String> numbered() {
     return numbered("scrubbed");
   }
 
@@ -41,7 +41,7 @@ public class Replacements {
    * @param label a String used to identify the replacement
    * @return a replacement function that replaces with "{@code [label]}"
    */
-  public static Replacement labeled(String label) {
+  public static Replacement<String> labeled(String label) {
     return (match, count) -> String.format("[%s]", label);
   }
 
@@ -51,7 +51,7 @@ public class Replacements {
    * @param replacement the static replacement string
    * @return a replacement function that always returns the same string
    */
-  public static Replacement string(String replacement) {
+  public static Replacement<String> string(String replacement) {
     return (match, count) -> replacement;
   }
 
@@ -87,7 +87,7 @@ public class Replacements {
    *
    * @return a replacement function replaces each character with a generic one
    */
-  public static Replacement masking() {
+  public static Replacement<String> masking() {
     return (match, count) ->
         match
             .replaceAll("\\p{M}", "")

@@ -1,9 +1,14 @@
 package org.approvej.scrub;
 
 import java.util.function.BiFunction;
+import org.jspecify.annotations.Nullable;
 
-/** A {@link BiFunction}, that defines how a match in the {@link RegexScrubber} is replaced. */
-public interface Replacement extends BiFunction<String, Integer, String> {
+/**
+ * A {@link BiFunction}, that defines how a match is replaced.
+ *
+ * @param <R> the type of the replaced value
+ */
+public interface Replacement<R> extends BiFunction<R, Integer, R> {
 
   /**
    * Will return a replacement for the given match and count.
@@ -27,5 +32,5 @@ public interface Replacement extends BiFunction<String, Integer, String> {
    * @return the replacement
    */
   @Override
-  String apply(String match, Integer count);
+  @Nullable R apply(R match, Integer count);
 }
