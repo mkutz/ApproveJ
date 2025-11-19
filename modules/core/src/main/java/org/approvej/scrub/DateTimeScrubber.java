@@ -1,29 +1,12 @@
 package org.approvej.scrub;
 
 import java.time.format.DateTimeFormatter;
-import java.util.function.Function;
 
 /**
  * Scrubs a {@link String} of date/time strings described by a {@link DateTimeFormatter} pattern
- * like "yyyy-MM-dd" for local dates using the wrapped {@link RegexScrubber}.
+ * like "yyyy-MM-dd" for local dates using the wrapped {@link StringScrubber}.
  */
-public interface DateTimeScrubber extends Scrubber<String> {
-
-  /**
-   * Set the {@link Replacement} to be used.
-   *
-   * @param replacement a {@link Replacement} function
-   * @return a copy of this using the given replacement
-   */
-  DateTimeScrubber replacement(Replacement replacement);
-
-  /**
-   * Set the replacement {@link Function} always returning the given staticReplacement.
-   *
-   * @param staticReplacement the static replacement {@link String}
-   * @return a copy of this using the given string as replacement
-   */
-  DateTimeScrubber replacement(String staticReplacement);
+public interface DateTimeScrubber extends Scrubber<DateTimeScrubber, String, String> {
 
   /**
    * Set the {@link RelativeDateTimeReplacement} to be used. Automatically sets the {@link

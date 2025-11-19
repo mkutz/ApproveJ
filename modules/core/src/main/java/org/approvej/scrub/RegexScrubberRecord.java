@@ -1,7 +1,5 @@
 package org.approvej.scrub;
 
-import static org.approvej.scrub.Replacements.string;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -11,7 +9,8 @@ import java.util.regex.Pattern;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-record RegexScrubberRecord(Pattern pattern, Replacement replacement) implements RegexScrubber {
+record RegexScrubberRecord(Pattern pattern, Replacement<String> replacement)
+    implements StringScrubber {
 
   @Override
   public String apply(String unscrubbedValue) {
@@ -21,18 +20,13 @@ record RegexScrubberRecord(Pattern pattern, Replacement replacement) implements 
         result -> {
           String group = result.group();
           findings.putIfAbsent(group, findings.size() + 1);
-          return replacement.apply(group, findings.get(group));
+          return String.valueOf(replacement.apply(group, findings.get(group)));
         };
     return matcher.replaceAll(replacer);
   }
 
   @Override
-  public RegexScrubber replacement(Replacement replacement) {
-    return new org.approvej.scrub.RegexScrubberRecord(pattern, replacement);
-  }
-
-  @Override
-  public RegexScrubber replacement(String staticReplacement) {
-    return replacement(string(staticReplacement));
+  public StringScrubber replacement(Replacement<String> replacement) {
+    return new RegexScrubberRecord(pattern, replacement);
   }
 }

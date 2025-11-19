@@ -2,22 +2,21 @@ package org.approvej.scrub;
 
 import java.lang.reflect.Field;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 @NullMarked
-record FieldScrubberRecord<T>(Field field, @Nullable Object replacement)
+record FieldScrubberRecord<T>(Field field, Replacement<Object> replacement)
     implements FieldScrubber<T> {
 
   @Override
-  public FieldScrubber<T> replacement(Object replacement) {
-    return new org.approvej.scrub.FieldScrubberRecord<>(field, replacement);
+  public FieldScrubber<T> replacement(Replacement<Object> replacement) {
+    return new FieldScrubberRecord<>(field, replacement);
   }
 
   @Override
   public T apply(T value) {
     try {
-      field.setAccessible(true); // NOSONAR this accessibility update is needed for the use case
-      field.set(value, replacement); // NOSONAR this accessibility bypass is needed for the use case
+      field.setAccessible(true); // NOSONAR
+      field.set(value, replacement.apply(field.get(value), 1)); // NOSONAR
     } catch (IllegalAccessException e) {
       throw new ScrubbingError(
           "Failed to scrub field %s on value %s".formatted(field.getName(), value), e);

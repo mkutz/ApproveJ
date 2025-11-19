@@ -2,7 +2,6 @@ package org.approvej.scrub;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
-import static org.approvej.scrub.Replacements.string;
 
 import java.time.DayOfWeek;
 import java.time.Month;
@@ -17,23 +16,18 @@ import java.util.regex.Pattern;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-record DateTimeScrubberRecord(DateTimeFormatter dateTimeFormatter, RegexScrubber regexScrubber)
+record DateTimeScrubberRecord(DateTimeFormatter dateTimeFormatter, StringScrubber regexScrubber)
     implements DateTimeScrubber {
 
-  DateTimeScrubberRecord(String dateTimePattern, Locale locale, Replacement replacement) {
+  DateTimeScrubberRecord(String dateTimePattern, Locale locale, Replacement<String> replacement) {
     this(
         DateTimeFormatter.ofPattern(dateTimePattern, locale),
         new RegexScrubberRecord(Pattern.compile(regexFor(dateTimePattern, locale)), replacement));
   }
 
   @Override
-  public DateTimeScrubber replacement(Replacement replacement) {
+  public DateTimeScrubber replacement(Replacement<String> replacement) {
     return new DateTimeScrubberRecord(dateTimeFormatter, regexScrubber.replacement(replacement));
-  }
-
-  @Override
-  public DateTimeScrubber replacement(String staticReplacement) {
-    return replacement(string(staticReplacement));
   }
 
   @Override
