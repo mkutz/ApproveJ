@@ -22,11 +22,7 @@ public record ImageFileApprovalResult(
     AnalysedImage previouslyApprovedAnalysed = analyse(previouslyApproved);
     AnalysedImage receivedAnalysed = analyse(received);
 
-    if (!previouslyApprovedAnalysed.dimensions().equals(receivedAnalysed.dimensions())) {
-      return true;
-    }
-
-    return previouslyApprovedAnalysed.difference(receivedAnalysed) > 0.01;
+    return previouslyApprovedAnalysed.isMoreDifferentThan(receivedAnalysed, 0.01);
   }
 
   @Override
