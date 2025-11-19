@@ -1,52 +1,45 @@
 package org.approvej.image.approve;
 
-import static org.approvej.image.approve.AnalysedImage.Coordinates.at;
-
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public record AnalysedImage(Dimensions dimensions, Map<Coordinates, Pixel> pixels) {
+public record AnalysedImage(BufferedImage image, int width, int height, int size) {
 
   public static AnalysedImage analyse(BufferedImage image) {
-    Dimensions dimensions = Dimensions.of(image.getWidth(), image.getHeight());
-    Map<Coordinates, Pixel> pixels = new HashMap<>();
-    for (int y = 0; y < dimensions.height; y++) {
-      for (int x = 0; x < dimensions.width; x++) {
-        pixels.put(at(x, y), Pixel.of(image.getRGB(x, y)));
-      }
-    }
-    return new AnalysedImage(dimensions, pixels);
+    int width = image.getWidth();
+    int height = image.getHeight();
+    return new AnalysedImage(image, width, height, width * height);
   }
 
-  public Pixel pixel(Coordinates coordinates) {
-    return pixels.getOrDefault(coordinates, Pixel.missing());
+  public Pixel pixel(int x, int y) {
+    if (x >= image.getWidth() || y >= image.getHeight()) return Pixel.missing();
+    return Pixel.of(image.getRGB(x, y));
   }
 
   public double difference(AnalysedImage other) {
     double difference = 0.0;
-    for (int y = 0; y < dimensions.height; y++) {
-      for (int x = 0; x < dimensions.width; x++) {
-        Pixel thisPixel = pixel(at(x, y));
-        Pixel otherPixel = other.pixel(at(x, y));
+    for (int y = 0; y < image.getHeight(); y++) {
+      for (int x = 0; x < image.getWidth(); x++) {
+        Pixel thisPixel = pixel(x, y);
+        Pixel otherPixel = other.pixel(x, y);
         difference += thisPixel.difference(otherPixel);
       }
     }
-    return difference / (double) this.pixels.size();
+    return difference / (double) (image.getWidth() * image.getHeight());
   }
 
-  public record Dimensions(int width, int height) {
-    public static Dimensions of(int width, int height) {
-      return new Dimensions(width, height);
+  public boolean isMoreDifferentThan(AnalysedImage other, double maxDifference) {
+    double difference = 0.0;
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        Pixel thisPixel = pixel(x, y);
+        Pixel otherPixel = other.pixel(x, y);
+        difference += thisPixel.difference(otherPixel) / size;
+        if (difference > maxDifference) return true;
+      }
     }
-  }
-
-  public record Coordinates(int x, int y) {
-    public static Coordinates at(int x, int y) {
-      return new Coordinates(x, y);
-    }
+    return false;
   }
 
   public interface Pixel {
@@ -61,11 +54,6 @@ public record AnalysedImage(Dimensions dimensions, Map<Coordinates, Pixel> pixel
           (argb >> 16) & MAX_VALUE,
           (argb >> 8) & MAX_VALUE,
           argb & MAX_VALUE);
-    }
-
-    static Pixel of(int alpha, int red, int green, int blue) {
-      return new ArgbPixel(
-          (alpha << 24) | (red << 16) | (green << 8) | blue, alpha, red, green, blue);
     }
 
     static Pixel missing() {
