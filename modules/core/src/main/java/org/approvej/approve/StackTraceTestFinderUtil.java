@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.jspecify.annotations.NullMarked;
@@ -27,25 +26,22 @@ public class StackTraceTestFinderUtil {
   public static TestMethod currentTestMethod() {
     StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
     return stream(stackTrace)
-        .map(
+        .flatMap(
             element -> {
               try {
                 String methodName =
                     element.getMethodName().replaceAll("^lambda\\$([^$]+)\\$\\d$", "$1");
                 return stream(Class.forName(element.getClassName()).getDeclaredMethods())
-                    .filter(method -> method.getName().equals(methodName))
-                    .findFirst()
-                    .orElse(null);
+                    .filter(method -> method.getName().equals(methodName));
               } catch (NoClassDefFoundError | ClassNotFoundException e) {
-                return null;
+                return Stream.empty();
               }
             })
-        .filter(Objects::nonNull)
         .map(TestMethod::create)
         .filter(Optional::isPresent)
+        .map(Optional::get)
         .findFirst()
-        .orElseThrow()
-        .orElseThrow();
+        .orElseThrow(() -> new TestMethodNotFoundInStackTraceError(stackTrace));
   }
 
   /**
