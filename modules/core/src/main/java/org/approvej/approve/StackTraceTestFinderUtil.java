@@ -30,10 +30,13 @@ public class StackTraceTestFinderUtil {
         .map(
             element -> {
               try {
-                return Class.forName(element.getClassName())
-                    .getDeclaredMethod(
-                        element.getMethodName().replaceAll("^lambda\\$([^$]+)\\$\\d$", "$1"));
-              } catch (NoClassDefFoundError | ClassNotFoundException | NoSuchMethodException e) {
+                String methodName =
+                    element.getMethodName().replaceAll("^lambda\\$([^$]+)\\$\\d$", "$1");
+                return stream(Class.forName(element.getClassName()).getDeclaredMethods())
+                    .filter(method -> method.getName().equals(methodName))
+                    .findFirst()
+                    .orElse(null);
+              } catch (NoClassDefFoundError | ClassNotFoundException e) {
                 return null;
               }
             })
