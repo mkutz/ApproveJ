@@ -10,4 +10,6 @@ include("modules:json-jackson")
 
 include("modules:yaml-jackson")
 
+include("modules:http")
+
 include("manual")
