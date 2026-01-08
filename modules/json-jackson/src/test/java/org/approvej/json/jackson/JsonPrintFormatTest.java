@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.time.LocalDate;
+import java.time.Period;
 import org.approvej.print.Printer;
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +25,8 @@ class JsonPrintFormatTest {
 
   @Test
   void printer() {
+    record Person(String name, LocalDate birthday) {}
+
     assertThat(json().printer().apply(new Person("Micha", LocalDate.of(1982, 2, 19))))
         .isEqualTo(
             """
@@ -47,6 +50,38 @@ class JsonPrintFormatTest {
   }
 
   @Test
+  void printer_getter() {
+    //noinspection unused
+    record Person(String name, LocalDate birthday) {
+      public String getDisplayString() {
+        return "%s (%d)".formatted(name, getAge());
+      }
+
+      public boolean isBirthdayToday() {
+        LocalDate today = LocalDate.now();
+        return birthday.getDayOfMonth() == today.getDayOfMonth()
+            && birthday.getMonth() == today.getMonth();
+      }
+
+      public int getAge() {
+        return Period.between(birthday, LocalDate.now()).getYears();
+      }
+    }
+
+    assertThat(json().printer().apply(new Person("Micha", LocalDate.of(1982, 2, 19))))
+        .isEqualTo(
+            """
+            {
+              "name" : "Micha",
+              "birthday" : "1982-02-19",
+              "age" : 43,
+              "birthdayToday" : false,
+              "displayString" : "Micha (43)"
+            }\
+            """);
+  }
+
+  @Test
   void printer_invalid() {
     Printer<Object> printer = json().printer();
     assertThatExceptionOfType(JsonPrinterException.class).isThrownBy(() -> printer.apply("{"));
@@ -56,6 +91,4 @@ class JsonPrintFormatTest {
   void filenameExtension() {
     assertThat(json().filenameExtension()).isEqualTo("json");
   }
-
-  record Person(String name, LocalDate birthday) {}
 }
