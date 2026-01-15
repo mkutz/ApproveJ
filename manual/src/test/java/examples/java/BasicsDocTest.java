@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import org.approvej.print.PrintFormat;
 import org.approvej.print.Printer;
+import org.approvej.review.Reviewers;
 import org.junit.jupiter.api.Test;
 
 class BasicsDocTest {
@@ -179,6 +180,18 @@ class BasicsDocTest {
         .reviewedBy("idea diff {receivedFile} {approvedFile}") // <1>
         .byFile(); // <2>
     // end::approve_reviewedBy_fileReviewer[]
+  }
+
+  @Test
+  void approve_reviewWith_automatic() throws IOException, InterruptedException {
+    // tag::approve_reviewedBy_automatic[]
+    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+
+    approve(person)
+        .printedAs(new PersonYamlPrintFormat())
+        .reviewedBy(Reviewers.automatic())
+        .byFile();
+    // end::approve_reviewedBy_automatic[]
   }
 
   // tag::person_yaml_print_format[]

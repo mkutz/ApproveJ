@@ -1,13 +1,12 @@
 package org.approvej;
 
-import static java.nio.file.Files.copy;
 import static java.nio.file.Files.writeString;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.approve.Approvers.value;
 import static org.approvej.approve.PathProviders.approvedPath;
 import static org.approvej.approve.PathProviders.nextToTest;
 import static org.approvej.print.MultiLineStringPrintFormat.multiLineString;
+import static org.approvej.review.Reviewers.automatic;
 import static org.approvej.scrub.Replacements.relativeDate;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
@@ -21,9 +20,6 @@ import java.time.LocalDate;
 import java.util.UUID;
 import java.util.function.Function;
 import org.approvej.approve.PathProvider;
-import org.approvej.review.FileReviewResult;
-import org.approvej.review.FileReviewer;
-import org.approvej.review.ReviewResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -178,10 +174,13 @@ class ApprovalBuilderTest {
   }
 
   @Test
-  void approve_reviewedBy_fileReviewer() {
-    PathProvider pathProvider =
-        approvedPath(tempDir.resolve("approve_reviewWith_fileReviewer-approved.txt"));
-    approve("Some text").reviewedBy(new AutoAcceptFileReviewer()).byFile(pathProvider);
+  void approve_reviewedBy_automatic() {
+    PathProvider pathProvider = approvedPath(tempDir.resolve("approve_reviewedBy_automatic.txt"));
+
+    approve("Some text").reviewedBy(automatic()).byFile(pathProvider);
+
+    assertThat(pathProvider.approvedPath()).content().isEqualTo("Some text\n");
+    assertThat(pathProvider.receivedPath()).doesNotExist();
   }
 
   @Test
@@ -208,19 +207,6 @@ class ApprovalBuilderTest {
   record Person(String id, String name, LocalDate birthday) {
     Person(String name, LocalDate birthday) {
       this(UUID.randomUUID().toString(), name, birthday);
-    }
-  }
-
-  static class AutoAcceptFileReviewer implements FileReviewer {
-
-    @Override
-    public ReviewResult apply(PathProvider pathProvider) {
-      try {
-        copy(pathProvider.receivedPath(), pathProvider.approvedPath(), REPLACE_EXISTING);
-        return new FileReviewResult(true);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
     }
   }
 }

@@ -6,7 +6,7 @@ import static org.approvej.approve.Approvers.value;
 import static org.approvej.approve.PathProviders.approvedPath;
 import static org.approvej.approve.PathProviders.nextToTest;
 import static org.approvej.print.PrintFormat.DEFAULT_FILENAME_EXTENSION;
-import static org.approvej.review.FileReviewerScript.script;
+import static org.approvej.review.Reviewers.script;
 
 import java.nio.file.Path;
 import java.util.function.Function;
