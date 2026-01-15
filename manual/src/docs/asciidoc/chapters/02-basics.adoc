@@ -500,6 +500,27 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_revie
 <2> executes the review script if the received value differs from the approved value
 
 
+=== Automatic Review
+
+If you have a lot of approvals that need to be updated, you might want to just accept all the updates automatically.
+In that case, you can use the link:{javadoc-url}/core/org/approvej/review/Reviewers.html#automatic()[`automatic`] link:{javadoc-url}/core/org/approvej/review/FileReviewer.html[`FileReviewer`].
+It simply writes the received value into the approved file without checking them at all.
+
+WARN:: This will overwrite your approved file(s).
+  You will probably want to check the changed files before committing them to version control!
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_reviewedBy_automatic]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_reviewedBy_automatic]
+----
+
+
 [id="configuration"]
 == Configuration
 

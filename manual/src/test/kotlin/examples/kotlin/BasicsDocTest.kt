@@ -13,6 +13,7 @@ import org.approvej.approve.PathProviders.nextToTestInSubdirectory
 import org.approvej.print.MultiLineStringPrintFormat.multiLineString
 import org.approvej.print.PrintFormat
 import org.approvej.print.Printer
+import org.approvej.review.Reviewers
 import org.approvej.scrub.Scrubbers.dateTimeFormat
 import org.approvej.scrub.Scrubbers.uuids
 import org.assertj.core.api.Assumptions.assumeThat
@@ -177,6 +178,15 @@ class BasicsDocTest {
       .reviewedBy("meld \"{receivedFile}\" \"{approvedFile}\"") // <1>
       .byFile() // <2>
     // end::approve_reviewedBy_fileReviewer[]
+  }
+
+  @Test
+  fun `approve reviewWith automatic`() {
+    // tag::approve_reviewedBy_automatic[]
+    val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
+
+    approve(person).printedAs(PersonYamlPrinter()).reviewedBy(Reviewers.automatic()).byFile()
+    // end::approve_reviewedBy_automatic[]
   }
 
   // tag::person_yaml_print_format[]

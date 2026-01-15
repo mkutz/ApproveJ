@@ -14,8 +14,8 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public record FileReviewerScript(String script) implements FileReviewer {
 
-  private static final String RECEIVED_PLACEHOLDER = "{receivedFile}";
-  private static final String APPROVED_PLACEHOLDER = "{approvedFile}";
+  static final String RECEIVED_PLACEHOLDER = "{receivedFile}";
+  static final String APPROVED_PLACEHOLDER = "{approvedFile}";
   private static final Logger LOGGER = Logger.getLogger(FileReviewerScript.class.getName());
 
   /**
@@ -24,7 +24,9 @@ public record FileReviewerScript(String script) implements FileReviewer {
    * @param script the script to be executed with placeholders <code>{@value RECEIVED_PLACEHOLDER}
    *     </code> and <code>{@value APPROVED_PLACEHOLDER}</code>
    * @return the new {@link FileReviewerScript}
+   * @deprecated use {@link Reviewers#script(String)} instead
    */
+  @Deprecated(forRemoval = true, since = "1.1")
   public static FileReviewerScript script(String script) {
     return new FileReviewerScript(script);
   }
