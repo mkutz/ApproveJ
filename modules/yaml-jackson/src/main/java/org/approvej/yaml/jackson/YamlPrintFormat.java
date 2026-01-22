@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.approvej.Configuration;
+import org.approvej.configuration.Configuration;
 import org.approvej.print.PrintFormat;
 import org.approvej.print.Printer;
 import org.jspecify.annotations.NullMarked;

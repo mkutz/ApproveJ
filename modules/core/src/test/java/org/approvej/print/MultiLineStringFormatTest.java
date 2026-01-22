@@ -20,6 +20,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class MultiLineStringFormatTest {
 
+  @Test
+  void constructor() {
+    assertThat(new MultiLineStringPrintFormat()).isNotNull();
+  }
+
   @ParameterizedTest(name = "{displayName}({arguments})")
   @MethodSource("printerSimpleArguments")
   void printer_simple(Object value) {

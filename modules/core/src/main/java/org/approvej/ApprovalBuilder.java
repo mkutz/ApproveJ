@@ -1,10 +1,10 @@
 package org.approvej;
 
-import static org.approvej.Configuration.configuration;
 import static org.approvej.approve.Approvers.file;
 import static org.approvej.approve.Approvers.value;
 import static org.approvej.approve.PathProviders.approvedPath;
 import static org.approvej.approve.PathProviders.nextToTest;
+import static org.approvej.configuration.Configuration.configuration;
 import static org.approvej.print.PrintFormat.DEFAULT_FILENAME_EXTENSION;
 import static org.approvej.review.Reviewers.script;
 
@@ -121,7 +121,7 @@ public class ApprovalBuilder<T> {
    * Uses the default {@link PrintFormat} to convert the {@link #value} to a {@link String}.
    *
    * @return a copy of this with the printed {@link #value}
-   * @see Configuration#defaultPrintFormat()
+   * @see org.approvej.configuration.Configuration#defaultPrintFormat()
    * @see #printedAs(PrintFormat)
    */
   public ApprovalBuilder<String> printed() {
@@ -144,7 +144,7 @@ public class ApprovalBuilder<T> {
    *
    * @param fileReviewer the {@link FileReviewer} to be used
    * @return a copy of this with the given {@link #fileReviewer}
-   * @see Configuration#defaultFileReviewer()
+   * @see org.approvej.configuration.Configuration#defaultFileReviewer()
    * @see org.approvej.review.FileReviewerScript#script()
    */
   public ApprovalBuilder<T> reviewedBy(FileReviewer fileReviewer) {
@@ -158,7 +158,7 @@ public class ApprovalBuilder<T> {
    * @param script the script {@link String} to be used as a {@link
    *     org.approvej.review.FileReviewerScript}
    * @return a copy of this with the given script as {@link #fileReviewer}
-   * @see Configuration#defaultFileReviewer()
+   * @see org.approvej.configuration.Configuration#defaultFileReviewer()
    * @see org.approvej.review.FileReviewerScript#script()
    */
   public ApprovalBuilder<T> reviewedBy(String script) {
@@ -169,7 +169,7 @@ public class ApprovalBuilder<T> {
    * Approves the {@link #value} by the given approver.
    *
    * <p>If necessary the {@link #value} is printed using the {@link
-   * Configuration#defaultPrintFormat()}.
+   * org.approvej.configuration.Configuration#defaultPrintFormat()}.
    *
    * @param approver a {@link Function} or an {@link Approver} implementation
    * @throws ApprovalError if the approval fails
