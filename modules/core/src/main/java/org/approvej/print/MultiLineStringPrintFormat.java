@@ -28,6 +28,10 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public record MultiLineStringPrintFormat(Printer<Object> printer) implements PrintFormat<Object> {
 
+  public MultiLineStringPrintFormat() {
+    this(new MultiLineStringPrinter<>((field1, field2) -> 0));
+  }
+
   /**
    * Sort the printed object's fields alphabetically by their name. By default, the fields will be
    * printed in the order of their declaration.
@@ -45,7 +49,7 @@ public record MultiLineStringPrintFormat(Printer<Object> printer) implements Pri
    * @return a new {@link MultiLineStringPrintFormat}
    */
   public static MultiLineStringPrintFormat multiLineString() {
-    return new MultiLineStringPrintFormat(new MultiLineStringPrinter<>((field1, field2) -> 0));
+    return new MultiLineStringPrintFormat();
   }
 
   /**

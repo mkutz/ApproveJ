@@ -1,6 +1,10 @@
-package org.approvej;
+package org.approvej.configuration;
 
-/** An error that occurs when there is an issue with loading the {@link Configuration}. */
+/**
+ * An error that occurs when there is an issue with loading the configuration.
+ *
+ * @see Configuration
+ */
 public class ConfigurationError extends RuntimeException {
 
   /**
@@ -11,14 +15,5 @@ public class ConfigurationError extends RuntimeException {
    */
   public ConfigurationError(String message, Throwable cause) {
     super(message, cause);
-  }
-
-  /**
-   * Creates a new {@link ConfigurationError} with the given message.
-   *
-   * @param message a message describing the error
-   */
-  public ConfigurationError(String message) {
-    super(message);
   }
 }

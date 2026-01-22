@@ -524,18 +524,41 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_revie
 [id="configuration"]
 == Configuration
 
-Optionally you can configure the default behaviors of ApproveJ by putting an `approvej.properties` file into your home directory at `~/.config/approvej/approvej.properties` or into the resource folder of your test suite (e.g. `src/test/resources/approvej.properties`).
+Optionally you can configure the default behaviors of ApproveJ through multiple mechanisms.
+Configuration values are resolved in the following order (highest to lowest priority):
 
-The home directory properties will be overridden by those in the resource directory.
+1. Environment variables - e.g., `APPROVEJ_DEFAULT_PRINT_FORMAT`
+2. Project properties file - `src/test/resources/approvej.properties`
+3. User home properties file at `~/.config/approvej/approvej.properties`
+4. Default values
+
+This allows you to set global defaults in your home directory, override them per project, and further override them via environment variables (useful for CI/CD pipelines).
 
 .Example `approvej.properties`
 ----
 include::../../../test/resources/approvej.properties[]
 ----
 
-Supported properties are:
+
+=== Supported Properties
 
 `defaultPrintFormat`:: the default print format class if none is specified via the `printedAs` method (see <<printing>>)
 `defaultFileReviewerScript`:: the script that should be executed to support a review of the differences between the previously approved and the actually received value (see <<reviewing>>)
+
+
+=== Environment Variables
+
+Environment variables use the `APPROVEJ_` prefix and convert camelCase property names to SCREAMING_SNAKE_CASE:
+
+[cols="1,1"]
+|===
+|Property Name |Environment Variable
+
+|`defaultPrintFormat`
+|`APPROVEJ_DEFAULT_PRINT_FORMAT`
+
+|`defaultFileReviewerScript`
+|`APPROVEJ_DEFAULT_FILE_REVIEWER_SCRIPT`
+|===
 
 NOTE:: The former property `defaultPrinter` is deprecated and using it will cause an exception!
