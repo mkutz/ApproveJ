@@ -183,7 +183,7 @@ class BasicsDocTest {
   }
 
   @Test
-  void approve_reviewWith_automatic() throws IOException, InterruptedException {
+  void approve_reviewWith_automatic() {
     // tag::approve_reviewedBy_automatic[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 

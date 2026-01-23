@@ -12,7 +12,7 @@ import org.approvej.approve.PathProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-public class NoneFileReviewerTest {
+class NoneFileReviewerTest {
 
   @TempDir private Path tempDir;
 
