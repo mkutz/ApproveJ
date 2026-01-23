@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import java.util.Map;
 import java.util.Properties;
 import org.approvej.print.SingleLineStringPrintFormat;
+import org.approvej.review.FileReviewer;
 import org.junit.jupiter.api.Test;
 
 class ConfigurationTest {
@@ -23,6 +24,7 @@ class ConfigurationTest {
     Configuration config = Configuration.loadConfiguration(loader);
 
     assertThat(config.defaultPrintFormat()).isInstanceOf(SingleLineStringPrintFormat.class);
+    assertThat(config.defaultFileReviewer()).isInstanceOf(FileReviewer.class);
   }
 
   @Test
@@ -34,6 +36,7 @@ class ConfigurationTest {
     Configuration config = Configuration.loadConfiguration(loader);
 
     assertThat(config.defaultPrintFormat()).isInstanceOf(SingleLineStringPrintFormat.class);
+    assertThat(config.defaultFileReviewer()).isInstanceOf(FileReviewer.class);
   }
 
   @Test

@@ -20,7 +20,6 @@ import org.approvej.review.FileReviewer;
 import org.approvej.review.ReviewResult;
 import org.approvej.scrub.Scrubber;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 /**
  * A builder to configure an approval for a given value.
@@ -62,10 +61,10 @@ public class ApprovalBuilder<T> {
   private final T value;
   private final String name;
   private final String filenameExtension;
-  @Nullable private final FileReviewer fileReviewer;
+  private final FileReviewer fileReviewer;
 
   private ApprovalBuilder(
-      T value, String name, String filenameExtension, @Nullable FileReviewer fileReviewer) {
+      T value, String name, String filenameExtension, FileReviewer fileReviewer) {
     this.value = value;
     this.name = name;
     this.filenameExtension = filenameExtension;
@@ -145,21 +144,21 @@ public class ApprovalBuilder<T> {
    * @param fileReviewer the {@link FileReviewer} to be used
    * @return a copy of this with the given {@link #fileReviewer}
    * @see org.approvej.configuration.Configuration#defaultFileReviewer()
-   * @see org.approvej.review.FileReviewerScript#script()
+   * @see org.approvej.review.Reviewers
    */
   public ApprovalBuilder<T> reviewedBy(FileReviewer fileReviewer) {
     return new ApprovalBuilder<>(value, name, filenameExtension, fileReviewer);
   }
 
   /**
-   * Creates a {@link org.approvej.review.FileReviewerScript} from the given script {@link String}
-   * to trigger if the received value is not equal to the previously approved.
+   * Creates a {@link org.approvej.review.FileReviewer} from the given script {@link String} to
+   * trigger if the received value is not equal to the previously approved.
    *
    * @param script the script {@link String} to be used as a {@link
-   *     org.approvej.review.FileReviewerScript}
+   *     org.approvej.review.Reviewers#script(String) script}
    * @return a copy of this with the given script as {@link #fileReviewer}
    * @see org.approvej.configuration.Configuration#defaultFileReviewer()
-   * @see org.approvej.review.FileReviewerScript#script()
+   * @see org.approvej.review.Reviewers#script(String)
    */
   public ApprovalBuilder<T> reviewedBy(String script) {
     return reviewedBy(script(script));
@@ -208,7 +207,7 @@ public class ApprovalBuilder<T> {
     }
     Approver approver = file(updatedPathProvider);
     ApprovalResult approvalResult = approver.apply(String.valueOf(value));
-    if (approvalResult.needsApproval() && fileReviewer != null) {
+    if (approvalResult.needsApproval()) {
       ReviewResult reviewResult = fileReviewer.apply(updatedPathProvider);
       if (reviewResult.needsReapproval()) {
         approvalResult = approver.apply(String.valueOf(value));
