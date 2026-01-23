@@ -3,7 +3,7 @@ package org.approvej.configuration;
 import org.approvej.print.PrintFormat;
 import org.approvej.print.SingleLineStringPrintFormat;
 import org.approvej.review.FileReviewer;
-import org.approvej.review.FileReviewerScript;
+import org.approvej.review.Reviewers;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -26,7 +26,7 @@ import org.jspecify.annotations.Nullable;
  */
 @NullMarked
 public record Configuration(
-    PrintFormat<Object> defaultPrintFormat, @Nullable FileReviewer defaultFileReviewer) {
+    PrintFormat<Object> defaultPrintFormat, FileReviewer defaultFileReviewer) {
 
   private static final String DEFAULT_PRINT_FORMAT_PROPERTY = "defaultPrintFormat";
   private static final String DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY = "defaultFileReviewerScript";
@@ -41,10 +41,10 @@ public record Configuration(
     PrintFormat<Object> printFormat = createPrintFormat(defaultPrintFormatClass);
 
     String defaultFileReviewerScript = loader.get(DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY, null);
-    FileReviewerScript defaultFileReviewer = null;
-    if (defaultFileReviewerScript != null) {
-      defaultFileReviewer = new FileReviewerScript(defaultFileReviewerScript);
-    }
+    FileReviewer defaultFileReviewer =
+        defaultFileReviewerScript != null
+            ? Reviewers.script(defaultFileReviewerScript)
+            : Reviewers.none();
 
     return new Configuration(printFormat, defaultFileReviewer);
   }

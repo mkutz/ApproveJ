@@ -1,27 +1,30 @@
 package org.approvej.review;
 
-import static java.nio.file.Files.move;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-
-import java.io.IOException;
 import org.jspecify.annotations.NullMarked;
 
 /** Collection of static methods to create {@link FileReviewer} instances. */
 @NullMarked
 public class Reviewers {
 
+  private static final FileReviewer NONE = pathProvider -> new FileReviewResult(false);
+  private static final AutomaticFileReviewer AUTOMATIC = new AutomaticFileReviewer();
+
   private Reviewers() {}
+
+  public static FileReviewer none() {
+    return NONE;
+  }
 
   /**
    * A {@link FileReviewer} that executes the given script.
    *
    * @param script the script to be executed with placeholders <code>
-   *     {@value FileReviewerScript#RECEIVED_PLACEHOLDER}
-   *     </code> and <code>{@value FileReviewerScript#APPROVED_PLACEHOLDER}</code>
-   * @return the new {@link FileReviewerScript}
+   *     {@value ScriptFileReviewer#RECEIVED_PLACEHOLDER}
+   *     </code> and <code>{@value ScriptFileReviewer#APPROVED_PLACEHOLDER}</code>
+   * @return the new {@link ScriptFileReviewer}
    */
   public static FileReviewer script(String script) {
-    return new FileReviewerScript(script);
+    return new ScriptFileReviewer(script);
   }
 
   /**
@@ -35,13 +38,6 @@ public class Reviewers {
    * @return a {@link FileReviewer} that accepts any received value automatically
    */
   public static FileReviewer automatic() {
-    return pathProvider -> {
-      try {
-        move(pathProvider.receivedPath(), pathProvider.approvedPath(), REPLACE_EXISTING);
-        return new FileReviewResult(true);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-    };
+    return AUTOMATIC;
   }
 }

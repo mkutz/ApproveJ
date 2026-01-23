@@ -12,23 +12,23 @@ import org.jspecify.annotations.NullMarked;
  *     </code> and <code>{@value APPROVED_PLACEHOLDER}</code>
  */
 @NullMarked
-public record FileReviewerScript(String script) implements FileReviewer {
+record ScriptFileReviewer(String script) implements FileReviewer {
 
   static final String RECEIVED_PLACEHOLDER = "{receivedFile}";
   static final String APPROVED_PLACEHOLDER = "{approvedFile}";
-  private static final Logger LOGGER = Logger.getLogger(FileReviewerScript.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(ScriptFileReviewer.class.getName());
 
   /**
    * A {@link FileReviewer} implementation that executes the given script.
    *
    * @param script the script to be executed with placeholders <code>{@value RECEIVED_PLACEHOLDER}
    *     </code> and <code>{@value APPROVED_PLACEHOLDER}</code>
-   * @return the new {@link FileReviewerScript}
+   * @return the new {@link ScriptFileReviewer}
    * @deprecated use {@link Reviewers#script(String)} instead
    */
   @Deprecated(forRemoval = true, since = "1.1")
-  public static FileReviewerScript script(String script) {
-    return new FileReviewerScript(script);
+  public static ScriptFileReviewer script(String script) {
+    return new ScriptFileReviewer(script);
   }
 
   @Override

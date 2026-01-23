@@ -4,7 +4,6 @@ import static java.nio.file.Files.writeString;
 import static org.approvej.approve.PathProviders.approvedPath;
 import static org.approvej.review.Reviewers.automatic;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -13,7 +12,7 @@ import org.approvej.approve.PathProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class AutoAcceptFileReviewerTest {
+class AutomaticFileReviewerTest {
 
   @TempDir private Path tempDir;
 
