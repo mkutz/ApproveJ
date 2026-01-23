@@ -39,10 +39,14 @@ record ScriptFileReviewer(String script) implements FileReviewer {
               .replace(RECEIVED_PLACEHOLDER, "%s".formatted(pathProvider.receivedPath()))
               .replace(APPROVED_PLACEHOLDER, "%s".formatted(pathProvider.approvedPath()));
 
-      Process process = new ProcessBuilder().command("sh", "-c", command).inheritIO().start();
-      process.waitFor();
+      ProcessBuilder processBuilder = new ProcessBuilder();
+      if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+        processBuilder.command("cmd.exe", "/c", command); // NOSONAR
+      } else {
+        processBuilder.command("sh", "-c", command); // NOSONAR
+      }
 
-      return new FileReviewResult(process.exitValue() == 0);
+      return new FileReviewResult(processBuilder.inheritIO().start().waitFor() == 0);
     } catch (IOException e) {
       LOGGER.info("Review by %s failed with exception %s".formatted(getClass().getSimpleName(), e));
     } catch (InterruptedException e) {

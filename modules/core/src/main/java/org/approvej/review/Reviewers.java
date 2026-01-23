@@ -11,6 +11,11 @@ public class Reviewers {
 
   private Reviewers() {}
 
+  /**
+   * A {@link FileReviewer} that does nothing and never triggers a reapproval.
+   *
+   * @return a {@link FileReviewer} that does nothing
+   */
   public static FileReviewer none() {
     return NONE;
   }

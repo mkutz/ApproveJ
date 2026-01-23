@@ -28,6 +28,7 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public record MultiLineStringPrintFormat(Printer<Object> printer) implements PrintFormat<Object> {
 
+  /** Default constructor using a {@link MultiLineStringPrinter} with no sorting. */
   public MultiLineStringPrintFormat() {
     this(new MultiLineStringPrinter<>((field1, field2) -> 0));
   }
