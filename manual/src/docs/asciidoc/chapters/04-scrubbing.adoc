@@ -16,7 +16,7 @@ include::../../../testFixtures/java/examples/ExampleClass.java[tag=blog_post_poj
 <1> the `id` is a UUID that's being generated randomly, and
 <2> the `published` is a `LocalDateTime` set to now.
 
-In the flowing example, the two dynamic properties are scrubbed with the built-in Scrubbers for link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html#uuids()[`uuids`] and link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html#instants(java.time.format.DateTimeFormatter)[`instants`].
+In the following example, the two dynamic properties are scrubbed with the built-in Scrubbers for link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html#uuids()[`uuids`] and link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html#instants(java.time.format.DateTimeFormatter)[`instants`].
 
 [source,java,indent=0,role="primary"]
 .Java
