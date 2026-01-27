@@ -156,7 +156,7 @@ include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_file_ap
 ----
 include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_approved_path]
 ----
-<1> this will expect the approved file at this path, the received file will be created next to it at `src/test/resources/BasicsDocTest-approve_file_approved_path-reveived.yaml`
+<1> this will expect the approved file at this path, the received file will be created next to it at `src/test/resources/BasicsDocTest-approve_file_approved_path-received.yaml`
 
 .File structure with given path
 ----
