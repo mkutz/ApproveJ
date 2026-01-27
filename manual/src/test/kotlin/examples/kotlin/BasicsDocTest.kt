@@ -6,6 +6,7 @@ import examples.ExampleClass.createBlogPost
 import examples.ExampleClass.createContact
 import examples.ExampleClass.createPerson
 import examples.ExampleClass.hello
+import examples.java.ScreamingPrintFormat
 import java.time.LocalDate
 import org.approvej.ApprovalBuilder.approve
 import org.approvej.approve.PathProviders.nextToTest
@@ -83,6 +84,17 @@ class BasicsDocTest {
       .printedAs(PersonYamlPrinter()) // <1>
       .byFile()
     // end::custom_print_format[]
+  }
+
+  @Test
+  fun custom_print_format_provider() {
+    // tag::custom_print_format_provider[]
+    val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
+
+    approve(person)
+      .printedAs(ScreamingPrintFormat()) // <1>
+      .byFile()
+    // end::custom_print_format_provider[]
   }
 
   @Test
@@ -168,7 +180,7 @@ class BasicsDocTest {
   }
 
   @Test
-  fun `approve reviewWith fileReviewer`() {
+  fun `approve reviewedBy fileReviewer`() {
     assumeThat(ProcessBuilder("which", "meld").start().waitFor()).isEqualTo(0)
     // tag::approve_reviewedBy_fileReviewer[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
@@ -181,7 +193,7 @@ class BasicsDocTest {
   }
 
   @Test
-  fun `approve reviewWith automatic`() {
+  fun `approve reviewedBy automatic`() {
     // tag::approve_reviewedBy_automatic[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 

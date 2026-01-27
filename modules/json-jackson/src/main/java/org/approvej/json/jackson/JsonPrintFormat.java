@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.approvej.configuration.Configuration;
 import org.approvej.print.PrintFormat;
+import org.approvej.print.PrintFormatProvider;
 import org.approvej.print.Printer;
 import org.jspecify.annotations.NullMarked;
 
@@ -20,7 +21,7 @@ import org.jspecify.annotations.NullMarked;
  * @param <T> the type of the object to print
  */
 @NullMarked
-public final class JsonPrintFormat<T> implements PrintFormat<T> {
+public final class JsonPrintFormat<T> implements PrintFormat<T>, PrintFormatProvider<T> {
 
   private static final ObjectMapper DEFAULT_JSON_MAPPER =
       JsonMapper.builder().addModule(new JavaTimeModule()).build();
@@ -63,6 +64,16 @@ public final class JsonPrintFormat<T> implements PrintFormat<T> {
   @Override
   public String filenameExtension() {
     return "json";
+  }
+
+  @Override
+  public String alias() {
+    return "json";
+  }
+
+  @Override
+  public PrintFormat<T> create() {
+    return json();
   }
 
   /**

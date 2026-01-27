@@ -1,0 +1,79 @@
+[id=scrubbing]
+= Scrubbing -- make random parts static
+
+Sometimes you might not be able to control the exact output of the object you want to approve.
+For example, if the result object contains a timestamp or a generated ID, you might want to ignore these for the approval.
+
+You can do this by using the `scrubbedOf` method of the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`] and provide a link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber`]/`UnaryOperator<T>` implementation.
+
+For instance, in the following `BlogPost` POJO there are two generated fields:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../testFixtures/java/examples/ExampleClass.java[tag=blog_post_pojo]
+----
+<1> the `id` is a UUID that's being generated randomly, and
+<2> the `published` is a `LocalDateTime` set to now.
+
+In the following example, the two dynamic properties are scrubbed with the built-in Scrubbers for link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html#uuids()[`uuids`] and link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html#instants(java.time.format.DateTimeFormatter)[`instants`].
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=scrubbing]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=scrubbing]
+----
+<1> replaces the published date with a numbered placeholder
+<2> replaces the id UUID with a numbered placeholder
+<3> so that the approved result looks like this
+
+[source]
+.Approved file
+----
+include::../../../test/java/examples/java/BasicsDocTest-scrubbing-approved.txt[]
+----
+
+Generally a built-in `Scrubber` uses a replacement function that replaces all matches with a numbered placeholder in the form of `[<label> <counter>]` (e.g. `[uuid 1]`, `[date 2]`, …).
+Note that two matches of the same (e.g. the same UUID in two places) will be replaced with the same placeholder, so you can still see that two scrubbed values were equal.
+
+
+== Custom `Scrubber`
+
+The link:{javadoc-url}/core/org/approvej/scrub/RegexScrubber.html[`RegexScrubber`] already allows for a lot of special custom cases.
+In case this isn't enough, you can also provide a custom link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber<T>`]/`UnaryOperator<T>` implementation to the builder's `scrubbedOf` method.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=custom_scrubbing]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=custom_scrubbing]
+----
+<1> this custom `Scrubber` specifically replaces the number property of the `Contact` with a constant
+
+[source]
+.Approved file
+----
+include::../../../test/java/examples/java/BasicsDocTest-custom_scrubbing-approved.txt[]
+----
+
+Note that this `Scrubber` is a `Scrubber<Contact>` and not a `Scrubber<String>`.
+Hence, it is necessary to apply it _before_ the `Printer` is applied.
+
+In case you want to reuse the `Scrubber`, you can also define in a separate class implementing the link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber<T>`] interface.
+
+
+== Built-In `Scrubbers` & `Replacements`
+
+All built-in link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber`] implementations are available via the link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html[`Scrubbers`] utility class.
+
+Note that link:{javadoc-url}/core/org/approvej/scrub/RegexScrubber.html[RegexScrubber] implementations also allow to change the link:{javadoc-url}/core/org/approvej/scrub/Replacement.html[`Replacement`] function.
+Built-in implementation can be found in the link:{javadoc-url}/core/org/approvej/scrub/Replacements.html[`Replacements`] utility class.

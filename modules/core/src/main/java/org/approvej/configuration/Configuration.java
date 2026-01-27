@@ -20,6 +20,14 @@ import org.jspecify.annotations.Nullable;
  *   <li>Default values
  * </ol>
  *
+ * <p>Print formats and reviewers can be configured using either:
+ *
+ * <ul>
+ *   <li>Aliases (e.g., "json", "yaml", "singleLineString", "multiLineString" for print formats;
+ *       "none", "automatic" for reviewers)
+ *   <li>Fully-qualified class names (for backward compatibility and custom implementations)
+ * </ul>
+ *
  * @param defaultPrintFormat the {@link PrintFormat} that will be used if none is specified
  *     otherwise
  * @param defaultFileReviewer the {@link FileReviewer} that will be used if none is specified
@@ -29,6 +37,7 @@ public record Configuration(
     PrintFormat<Object> defaultPrintFormat, FileReviewer defaultFileReviewer) {
 
   private static final String DEFAULT_PRINT_FORMAT_PROPERTY = "defaultPrintFormat";
+  private static final String DEFAULT_FILE_REVIEWER_PROPERTY = "defaultFileReviewer";
   private static final String DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY = "defaultFileReviewerScript";
 
   /** The loaded {@link Configuration} object. */
@@ -36,33 +45,28 @@ public record Configuration(
       loadConfiguration(ConfigurationLoader.createDefault());
 
   static Configuration loadConfiguration(ConfigurationLoader loader) {
-    String defaultPrintFormatClass =
-        loader.get(DEFAULT_PRINT_FORMAT_PROPERTY, SingleLineStringPrintFormat.class.getName());
-    PrintFormat<Object> printFormat = createPrintFormat(defaultPrintFormatClass);
+    String printFormatConfig = loader.get(DEFAULT_PRINT_FORMAT_PROPERTY, "singleLineString");
+    PrintFormat<Object> printFormat = resolvePrintFormat(printFormatConfig);
 
-    String defaultFileReviewerScript = loader.get(DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY, null);
-    FileReviewer defaultFileReviewer =
-        defaultFileReviewerScript != null
-            ? Reviewers.script(defaultFileReviewerScript)
-            : Reviewers.none();
+    FileReviewer fileReviewer = resolveFileReviewer(loader);
 
-    return new Configuration(printFormat, defaultFileReviewer);
+    return new Configuration(printFormat, fileReviewer);
   }
 
   @SuppressWarnings("unchecked")
-  private static PrintFormat<Object> createPrintFormat(@Nullable String defaultPrintFormat) {
-    if (defaultPrintFormat == null) {
+  private static PrintFormat<Object> resolvePrintFormat(@Nullable String aliasOrClassName) {
+    if (aliasOrClassName == null) {
       return new SingleLineStringPrintFormat();
     }
-    PrintFormat<Object> printFormat;
-    try {
-      printFormat =
-          (PrintFormat<Object>)
-              Class.forName(defaultPrintFormat).getDeclaredConstructor().newInstance();
-    } catch (ReflectiveOperationException e) {
-      throw new ConfigurationError(
-          "Failed to create print format %s".formatted(defaultPrintFormat), e);
+    return Registry.resolve(aliasOrClassName, PrintFormat.class);
+  }
+
+  private static FileReviewer resolveFileReviewer(ConfigurationLoader loader) {
+    String fileReviewerScript = loader.get(DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY);
+    if (fileReviewerScript != null) {
+      return Reviewers.script(fileReviewerScript);
     }
-    return printFormat;
+
+    return Registry.resolve(loader.get(DEFAULT_FILE_REVIEWER_PROPERTY, "none"), FileReviewer.class);
   }
 }

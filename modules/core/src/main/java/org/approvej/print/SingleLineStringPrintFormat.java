@@ -1,17 +1,28 @@
 package org.approvej.print;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A generic print format for Java {@link Object}s that prints that uses the {@link
  * Object#toString()} method.
  */
-public record SingleLineStringPrintFormat() implements PrintFormat<Object> {
+@NullMarked
+public record SingleLineStringPrintFormat()
+    implements PrintFormat<Object>, PrintFormatProvider<Object> {
 
   @Override
-  @NonNull
   public Printer<Object> printer() {
     return "%s"::formatted;
+  }
+
+  @Override
+  public String alias() {
+    return "singleLineString";
+  }
+
+  @Override
+  public PrintFormat<Object> create() {
+    return new SingleLineStringPrintFormat();
   }
 
   /**
@@ -19,7 +30,6 @@ public record SingleLineStringPrintFormat() implements PrintFormat<Object> {
    *
    * @return a new {@link SingleLineStringPrintFormat}
    */
-  @NonNull
   public static SingleLineStringPrintFormat singleLineString() {
     return new SingleLineStringPrintFormat();
   }

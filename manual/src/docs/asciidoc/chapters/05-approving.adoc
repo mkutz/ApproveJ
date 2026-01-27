@@ -1,0 +1,179 @@
+[id=approving]
+= Approving -- adjust the verification
+
+You conclude the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`] by specifying `by` which link:{javadoc-url}/core/org/approvej/approve/Approver.html[`Approver`] the received value should be approved.
+
+
+[id=approve_by_value]
+== Approve by Value
+
+The link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byValue(java.lang.String)[`ApprovalBuilder.byValue()`] method will use an link:{javadoc-url}/core/org/approvej/approve/InplaceApprover.html[`InplaceApprover`] to approve the received value by comparison with a directly provided previously approved value.
+That way, the approved value is plainly visible in the test code.
+However, this might not be practical for large objects.
+It also does not allow to use a diff tool to compare the result with the previously approved value.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_inplace]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_inplace]
+----
+
+
+[id=approve_by_file]
+== Approve by File
+
+The link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byFile()[`ApprovalBuilder.byFile()`] method will use a link:{javadoc-url}/core/org/approvej/approve/FileApprover.html[`FileApprover`] to approve the received value by comparison a previously approved value stored in a file.
+It is used in most of the examples above.
+
+If no approved file exists, it will be created as an empty _approved_ file.
+The received value will be written to another _received_ file.
+
+If there are approved files with the correct base name, but a different filename extension, these will be automatically deleted.
+The most recently modified one is renamed with the correct filename extension, if no file of that name exists yet.
+
+If the approved file exists, it will be compared with the received value.
+If they are equal, the test will pass.
+Any existing received file will be deleted automatically in that case.
+
+If the files are not equal, the test will fail.
+The received value will be persisted in a received file.
+Any existing received value will be overwritten by this.
+
+You can use a diff tool of your choice to compare the two files and merge values that you want to approve.
+
+
+=== Next to Test
+
+By default, the `FileApprover` will put the received and approved files next to the test class and name them like the test case method.
+
+You can make this explicit by using the link:{javadoc-url}/core/org/approvej/approve/PathProviderBuilder.html#nextToTest()[`PathProviderBuilder.nextToTest()`] method.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_file_next_to_test]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_next_to_test]
+----
+<1> defines the `PathProvider` explicitly, same as just calling `byFile()`
+
+
+.File structure
+----
+.
+└── 📁src/test/java/…
+    ├── 📄 <TestClass>.java
+    ├── 📄 <TestClass>-<testMethod>-approved.txt
+    └── 📄 <TestClass>-<testMethod>-received.txt
+----
+
+
+=== Custom Filename Extension
+
+The link:{javadoc-url}/core/org/approvej/approve/PathProviderBuilder.html#filenameExtension(java.lang.String)[`PathProviderBuilder.filenameExtension`] method gives you the opportunity to use a different file extension for the approved and received files.
+
+NOTE:: most of the time you probably want to do this because you're using a special printer that creates a specific format (e.g. JSON, XML, YAML, …).
+In that case, you might want to provide a <<custom_print_format>> and override the `filenameExtension` method of the `Printer` instead of changing the filename extension here.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_file_custom_extension]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_custom_extension]
+----
+<1> this printer will create a YAML version of the object
+<2> so it makes sense to change the filename extension, so your IDE will apply appropriate syntax highlighting
+
+.File structure with custom filename extension
+----
+.
+└── 📁src/test/java/…
+    ├── 📄 <TestClass>.java
+    ├── 📄 <TestClass>-<testMethod>-approved.<filenameExtension>
+    └── 📄 <TestClass>-<testMethod>-received.<filenameExtension>
+----
+
+
+=== In a Subdirectory
+
+If you have test classes with a lot of approval tests, there a quite a lot of files created next to the test class.
+In that case, you can use the link:{javadoc-url}/core/org/approvej/approve/PathProviderBuilder.html#nextToTestInSubdirectory()[`PathProviderBuilder.nextToTestInSubdirectory`] to put all the files in a subdirectory named after the test class.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_file_nextToTestInSubdirectory]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_nextToTestInSubdirectory]
+----
+
+.File structure with subdirectory
+----
+.
+└── 📁src/test/java/…
+    ├── 📁 <TestClass>
+    │   ├── 📄 <testMethod>-approved.txt
+    │   └── 📄 <testMethod>-received.txt
+    └── 📄 <TestClass>.java
+----
+
+
+=== Given Path
+
+Alternatively, you can simply specify the path of the approved file.
+If the given approved file path contains the word `approved` just before the filename extension, it will be replaced with `received` in the to determine the received file path.
+Otherwise, the word `received` will be added at the end of the filename.
+
+For example
+
+- `src/test/resources/BasicsDocTest-approve_file_approved_path-approved.yaml` ->
+`src/test/resources/BasicsDocTest-approve_file_approved_path-received.yaml`
+- `src/test/resources/BasicsDocTest-approve_file_approved_path.yaml` ->
+`src/test/resources/BasicsDocTest-approve_file_approved_path-received.yaml`.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_file_approved_path]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_approved_path]
+----
+<1> this will expect the approved file at this path, the received file will be created next to it at `src/test/resources/BasicsDocTest-approve_file_approved_path-received.yaml`
+
+.File structure with given path
+----
+.
+└── 📁src/test/java/…
+│   └── 📄 <TestClass>.java
+└── 📁src/test/resources
+    ├── 📄 src/test/resources/BasicExamples-approve_file_approved_path.yaml
+    └── 📄 src/test/resources/BasicExamples-approve_file_approved_path-received.yaml
+----
+
+
+=== Custom `PathProvider`/`PathProviderBuilder`
+
+You can also define your own link:{javadoc-url}/core/org/approvej/approve/PathProvider.html[`PathProvider`] and pass it to the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byFile(org.approvej.approve.PathProvider)[`byFile`] method.
+
+Or you can create a method that returns a link:{javadoc-url}/core/org/approvej/approve/PathProviderBuilder.html[`PathProviderBuilder`] and pass it to the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byFile(org.approvej.approve.PathProvider)[`byFile`] method.
+That way the filename extension of the used `Printer` is set just before approval.
+
+In that case, you might want to take advantage of the link:{javadoc-url}/core/org/approvej/approve/StackTraceTestFinderUtil.html[`StackTraceTestFinderUtil`] class to find the test source path or the current test method based on the current stack trace.
