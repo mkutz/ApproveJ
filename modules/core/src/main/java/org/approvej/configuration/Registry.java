@@ -82,15 +82,14 @@ public final class Registry {
       }
       return (T) instance;
     } catch (ReflectiveOperationException e) {
-      throw new ConfigurationError("Failed to create %s %s".formatted(toHumanReadable(type), className), e);
+      throw new ConfigurationError(
+          "Failed to create %s %s".formatted(toHumanReadable(type), className), e);
     }
   }
 
   private static String toHumanReadable(Class<?> type) {
     String simpleName = type.getSimpleName();
     // Convert camelCase to "camel case" (e.g., PrintFormat -> print format)
-    return simpleName
-        .replaceAll("([a-z])([A-Z])", "$1 $2")
-        .toLowerCase();
+    return simpleName.replaceAll("([a-z])([A-Z])", "$1 $2").toLowerCase();
   }
 }

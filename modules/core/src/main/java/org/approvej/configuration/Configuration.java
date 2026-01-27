@@ -69,6 +69,7 @@ public record Configuration(
       return Reviewers.script(fileReviewerScript);
     }
 
-    return Registry.resolve(loader.get(DEFAULT_FILE_REVIEWER_PROPERTY, NoneFileReviewer.ALIAS), FileReviewer.class);
+    return Registry.resolve(
+        loader.get(DEFAULT_FILE_REVIEWER_PROPERTY, NoneFileReviewer.ALIAS), FileReviewer.class);
   }
 }

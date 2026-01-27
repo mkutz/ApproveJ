@@ -7,6 +7,7 @@ import examples.ExampleClass.createContact
 import examples.ExampleClass.createPerson
 import examples.ExampleClass.hello
 import examples.java.ScreamingPrintFormat
+import java.time.LocalDate
 import org.approvej.ApprovalBuilder.approve
 import org.approvej.approve.PathProviders.nextToTest
 import org.approvej.approve.PathProviders.nextToTestInSubdirectory
@@ -18,7 +19,6 @@ import org.approvej.scrub.Scrubbers.dateTimeFormat
 import org.approvej.scrub.Scrubbers.uuids
 import org.assertj.core.api.Assumptions.assumeThat
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
 
 class BasicsDocTest {
 
@@ -96,7 +96,6 @@ class BasicsDocTest {
       .byFile()
     // end::custom_print_format_provider[]
   }
-
 
   @Test
   fun scrubbing() {
