@@ -18,7 +18,7 @@ junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", vers
 junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version = "6.0.2" }
 spock = { module = "org.spockframework:spock-core", version = "2.4-M7-groovy-5.0" }
-testng = { module = "org.testng:testng", version = "7.11.0" }
+testng = { module = "org.testng:testng", version = "7.12.0" }
 
 [plugins]
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version = "4.0.5" }
