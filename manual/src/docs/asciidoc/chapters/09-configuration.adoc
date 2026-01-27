@@ -104,7 +104,7 @@ Alternatively, using fully-qualified class names:
 defaultPrintFormat = org.approvej.json.jackson.JsonPrintFormat
 ----
 
-NOTE:: When using fully-qualified class names, the refenced class needs to provide a public default constructor.
+NOTE:: When using fully-qualified class names, the referenced class needs to provide a public default constructor.
 
 
 [id="configuration_environment_variables"]
