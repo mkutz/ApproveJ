@@ -3,7 +3,7 @@
 
 If the received value differs from the previously approved, ApproveJ will by default simply fail the test.
 You then need to review the differences and decide if these are to be approved or actually were not intended.
-This can simply be done by find the failing test and compare the received and approved files within you IDE or with an external tool.
+This can simply be done by finding the failing test and compare the received and approved files within your IDE or with an external tool.
 To help you with that process, ApproveJ allows to configure a script or a Reviewer instance that will open such a tool automatically.
 
 
