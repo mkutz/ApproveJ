@@ -1,0 +1,98 @@
+[id="printing"]
+= Printing -- customize how values are turned into Strings
+
+While some `toString` implementations already are quite good, they typically return a one-liner.
+This is fine as long as you only have a few properties.
+However, if you have a lot of properties, it is much easier to read the result if it is formatted nicely.
+
+In order to change the way objects are being transformed to strings, you can use the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#printedBy(java.util.function.Function)[`ApprovalBuilder`'s `printedBy` method] with a link:{javadoc-url}/core/org/approvej/print/Printer.html[`Printer`]/`Function<T, String>`, or its link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#printedAs(org.approvej.print.PrintFormat))[`printedAs` method] with a  link:{javadoc-url}/core/org/approvej/print/PrintFormat.html[`PrintFormat`].
+
+In addition to the printing method, the `Printer`, the `PrinterFormat` also provides a filename extension, that will be used if the value is written to a file (see <<approve_by_file>>).
+
+
+== Generic Multi Line String Print Format
+
+ApproveJ provides a generic link:{javadoc-url}/core/org/approvej/print/MultiLineStringPrintFormat.html[`MultiLineStringPrintFormat`] that will print the object with each of its properties on a new line to make comparing the result easier.
+You can use this format by calling the `printedAs` method on the builder.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=multi_line_string_format]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=multi_line_string_format]
+----
+<1> applies the `MultiLineStringPrinter` and returns a new `ApprovalBuilder<String>`
+
+Now the approved file will look like this
+
+[source,text]
+.Approved file
+----
+include::../../../test/java/examples/java/BasicsDocTest-multi_line_string_format-approved.txt[]
+----
+
+
+[id=custom_printer_function]
+== Custom Printer Function
+
+You can provide a custom `Function<T, String>` to the builder's `printedBy` method.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=custom_printer_function]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=custom_printer_function]
+----
+<1> applies the given `Function` and returns a new `ApprovalBuilder<String>`
+
+So the content of the approved file will look like this
+
+[source]
+.Approved file
+----
+include::../../../test/java/examples/java/BasicsDocTest-custom_printer_function-approved.txt[]
+----
+
+
+[id=custom_print_format]
+== Custom Printer Format
+
+For more complex cases, you can implement your own link:{javadoc-url}/core/org/approvej/print/PrinterFormat.html[`PrinterFormat`].
+
+This will allow you to also override the `filenameExtension` method.
+If you use a link:{javadoc-url}/core/org/approvej/approve/FileApprover.html[`FileApprover`] (see <<approve_by_file>>), it will be used to determine the files' filename extension.
+This is useful, if your `Printer` creates a certain format (e.g. JSON, XML, YAML, …).
+
+E.g. the following format will print a `Person` as a YAML string.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=person_yaml_print_format]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=person_yaml_print_format]
+----
+
+The resulting file will look like this
+
+[source,yaml]
+.Approved file
+----
+include::../../../test/java/examples/java/BasicsDocTest-custom_print_format-approved.yaml[]
+----
+
+
+== Configure the Default Print Format Globally
+
+See <<configuration>> on how to configure a global default print format.

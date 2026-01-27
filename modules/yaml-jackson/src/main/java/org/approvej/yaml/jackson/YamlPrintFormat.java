@@ -9,6 +9,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.approvej.configuration.Configuration;
 import org.approvej.print.PrintFormat;
+import org.approvej.print.PrintFormatProvider;
 import org.approvej.print.Printer;
 import org.jspecify.annotations.NullMarked;
 
@@ -16,22 +17,22 @@ import org.jspecify.annotations.NullMarked;
  * A {@link PrintFormat} that uses {@link ObjectWriter#writeValueAsString(Object)} to print a value
  * as YAML.
  *
+ * @param objectWriter the {@link ObjectWriter} that will be used for printing
  * @param <T> the type of the object to print
  */
 @NullMarked
-public final class YamlPrintFormat<T> implements PrintFormat<T> {
+public record YamlPrintFormat<T>(ObjectWriter objectWriter)
+    implements PrintFormat<T>, PrintFormatProvider<T> {
 
   private static final YAMLMapper DEFAULT_YAML_MAPPER =
       YAMLMapper.builder().addModule(new JavaTimeModule()).build();
-
-  private final ObjectWriter objectWriter;
 
   /**
    * Creates a {@link YamlPrintFormat} using the given {@link ObjectWriter}.
    *
    * @param objectWriter the {@link ObjectWriter} that will be used for printing
    */
-  YamlPrintFormat(ObjectWriter objectWriter) {
+  public YamlPrintFormat(ObjectWriter objectWriter) {
     this.objectWriter = objectWriter.without(WRITE_DATES_AS_TIMESTAMPS);
   }
 
@@ -54,6 +55,16 @@ public final class YamlPrintFormat<T> implements PrintFormat<T> {
   @Override
   public String filenameExtension() {
     return "yaml";
+  }
+
+  @Override
+  public String alias() {
+    return "yaml";
+  }
+
+  @Override
+  public PrintFormat<T> create() {
+    return yaml();
   }
 
   /**

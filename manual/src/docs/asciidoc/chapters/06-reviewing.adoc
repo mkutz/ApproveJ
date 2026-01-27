@@ -1,0 +1,62 @@
+[id="reviewing"]
+= Reviewing -- check differences
+
+If the received value differs from the previously approved, ApproveJ will by default simply fail the test.
+You then need to review the differences and decide if these are to be approved or actually were not intended.
+This can simply be done by find the failing test and compare the received and approved files within you IDE or with an external tool.
+To help you with that process, ApproveJ allows to configure a script or a Reviewer instance that will open such a tool automatically.
+
+
+== Blocking/Non-Blocking Review
+
+Some link:{javadoc-url}/core/org/approvej/review/FileReviewer.html[`FileReviewers`] are blocking.
+They trigger the diff/merge tool and wait for you to close it again.
+This gives you the opportunity to merge the content of the two files before the test finishes, so the test does not fail due to your given approval.
+
+Other implementations are non-blocking.
+These simply display the differences between the two files, but will fail the test immediately.
+So, after you merged the files or fixed the code, you need to run the test again.
+
+
+== Choose Reviewer in Test
+
+You can choose the link:{javadoc-url}/core/org/approvej/review/FileReviewer.html[`FileReviewer`] to use in the test code by calling the `reviewedBy` method on the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`].
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_reviewedBy_fileReviewer]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_reviewedBy_fileReviewer]
+----
+<1> sets the given script to be executed to support the review
+<2> executes the review script if the received value differs from the approved value
+
+
+== Automatic Review
+
+If you have a lot of approvals that need to be updated, you might want to just accept all the updates automatically.
+In that case, you can use the link:{javadoc-url}/core/org/approvej/review/Reviewers.html#automatic()[`automatic`] link:{javadoc-url}/core/org/approvej/review/FileReviewer.html[`FileReviewer`].
+It simply writes the received value into the approved file without checking them at all.
+
+WARN:: This will overwrite your approved file(s).
+You will probably want to check the changed files before committing them to version control!
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_reviewedBy_automatic]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_reviewedBy_automatic]
+----
+
+
+== Configure the Default Reviewer Globally
+
+See <<configuration>> on how to configure a global default reviewer.

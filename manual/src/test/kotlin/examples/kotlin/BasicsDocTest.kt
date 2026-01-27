@@ -6,7 +6,7 @@ import examples.ExampleClass.createBlogPost
 import examples.ExampleClass.createContact
 import examples.ExampleClass.createPerson
 import examples.ExampleClass.hello
-import java.time.LocalDate
+import examples.java.ScreamingPrintFormat
 import org.approvej.ApprovalBuilder.approve
 import org.approvej.approve.PathProviders.nextToTest
 import org.approvej.approve.PathProviders.nextToTestInSubdirectory
@@ -18,6 +18,7 @@ import org.approvej.scrub.Scrubbers.dateTimeFormat
 import org.approvej.scrub.Scrubbers.uuids
 import org.assertj.core.api.Assumptions.assumeThat
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class BasicsDocTest {
 
@@ -84,6 +85,18 @@ class BasicsDocTest {
       .byFile()
     // end::custom_print_format[]
   }
+
+  @Test
+  fun custom_print_format_provider() {
+    // tag::custom_print_format_provider[]
+    val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
+
+    approve(person)
+      .printedAs(ScreamingPrintFormat()) // <1>
+      .byFile()
+    // end::custom_print_format_provider[]
+  }
+
 
   @Test
   fun scrubbing() {
@@ -168,7 +181,7 @@ class BasicsDocTest {
   }
 
   @Test
-  fun `approve reviewWith fileReviewer`() {
+  fun `approve reviewedBy fileReviewer`() {
     assumeThat(ProcessBuilder("which", "meld").start().waitFor()).isEqualTo(0)
     // tag::approve_reviewedBy_fileReviewer[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
@@ -181,7 +194,7 @@ class BasicsDocTest {
   }
 
   @Test
-  fun `approve reviewWith automatic`() {
+  fun `approve reviewedBy automatic`() {
     // tag::approve_reviewedBy_automatic[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
 

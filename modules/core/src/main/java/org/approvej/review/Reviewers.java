@@ -6,7 +6,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class Reviewers {
 
-  private static final FileReviewer NONE = pathProvider -> new FileReviewResult(false);
+  private static final NoneFileReviewer NONE = new NoneFileReviewer();
   private static final AutomaticFileReviewer AUTOMATIC = new AutomaticFileReviewer();
 
   private Reviewers() {}

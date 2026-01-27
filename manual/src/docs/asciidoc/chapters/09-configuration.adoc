@@ -1,0 +1,224 @@
+[id=configuration]
+= Configuration
+
+ApproveJ can be configured through multiple mechanisms to customize its default behavior.
+This allows you to set global defaults, override them per project, and further override them via environment variables.
+
+
+[id="configuration_sources"]
+== Configuration Sources
+
+Configuration values are resolved in the following order (highest to lowest priority):
+
+1. *Environment variables* - e.g., `APPROVEJ_DEFAULT_PRINT_FORMAT`
+2. *Project properties file* - `src/test/resources/approvej.properties`
+3. *User home properties file* - `~/.config/approvej/approvej.properties`
+4. *Default values*
+
+This hierarchy allows you to:
+
+- Set global defaults in your home directory
+- Override them per project in the project's properties file
+- Further override them via environment variables (useful for CI/CD pipelines)
+
+
+[id="configuration_properties"]
+== Supported Properties
+
+The following properties can be configured:
+
+[cols="1,2,1"]
+|===
+|Property |Description |Default
+
+|`defaultPrintFormat`
+|The default print format to use if none is specified via the `printedAs` method.
+Can be an alias (e.g., `json`, `yaml`) or a fully-qualified class name.
+|`singleLineString`
+
+|`defaultFileReviewer`
+|The default file reviewer to use.
+Can be an alias (e.g., `none`, `automatic`), a fully-qualified class name, or a script with placeholders.
+|`none`
+
+|`defaultFileReviewerScript`
+|The script to execute for reviewing differences.
+This implicitly sets the `defaultFileReviewer` to script
+|_(none)_
+|===
+
+
+[id="configuration_aliases"]
+== Built-in Aliases
+
+ApproveJ provides built-in aliases for commonly used print formats and reviewers:
+
+.Print Format Aliases
+[cols="1,2"]
+|===
+|Alias |Class
+
+|`singleLineString`
+|`org.approvej.print.SingleLineStringPrintFormat`
+
+|`multiLineString`
+|`org.approvej.print.MultiLineStringPrintFormat`
+
+|`json`
+|`org.approvej.json.jackson.JsonPrintFormat` (requires `approvej-json-jackson` module)
+
+|`yaml`
+|`org.approvej.yaml.jackson.YamlPrintFormat` (requires `approvej-yaml-jackson` module)
+|===
+
+.File Reviewer Aliases
+[cols="1,2"]
+|===
+|Alias |Description
+
+|`none`
+|Does nothing, test simply fails if values differ
+
+|`automatic`
+|Automatically accepts all received values (overwrites approved files)
+|===
+
+
+[id="configuration_example"]
+== Example Configuration
+
+.`src/test/resources/approvej.properties`
+[source,properties]
+----
+# Use JSON as the default print format (requires approvej-json-jackson module)
+defaultPrintFormat = json
+
+# Configure a diff tool for reviewing
+defaultFileReviewer = idea diff --wait "{receivedFile}" "{approvedFile}"
+----
+
+Alternatively, using fully-qualified class names:
+
+[source,properties]
+----
+defaultPrintFormat = org.approvej.json.jackson.JsonPrintFormat
+----
+
+NOTE:: When using fully-qualified class names, the refenced class needs to provide a public default constructor.
+
+
+[id="configuration_environment_variables"]
+== Environment Variables
+
+Environment variables use the `APPROVEJ_` prefix and convert camelCase property names to SCREAMING_SNAKE_CASE:
+
+[cols="1,1"]
+|===
+|Property Name |Environment Variable
+
+|`defaultPrintFormat`
+|`APPROVEJ_DEFAULT_PRINT_FORMAT`
+
+|`defaultFileReviewer`
+|`APPROVEJ_DEFAULT_FILE_REVIEWER`
+|===
+
+.Example: Set default print format via environment variable
+[source,bash]
+----
+export APPROVEJ_DEFAULT_PRINT_FORMAT=json
+----
+
+
+[id="configuration_reviewer_script"]
+== Configuring a Review Script
+
+When the received value differs from the approved value, ApproveJ can automatically open a diff tool to help you review the changes.
+
+The script can contain the following placeholders:
+
+- `{receivedFile}` - will be replaced with the path to the received file
+- `{approvedFile}` - will be replaced with the path to the approved file
+
+.Example diff tool configuration for IntelliJ IDEA
+[source,properties]
+----
+# IntelliJ IDEA (blocking)
+defaultFileReviewerScript = idea diff --wait "{receivedFile}" "{approvedFile}"
+----
+
+TIP:: Use `--wait` or similar flags if your diff tool supports them to make the review blocking.
+This allows you to approve changes before the test finishes.
+
+
+[id="custom_extensions"]
+== Custom Extensions
+
+ApproveJ uses a Service Provider Interface (SPI) mechanism that allows you to register custom print formats and reviewers.
+These can then be referenced by alias in the configuration.
+
+
+[id="custom_print_format_provider"]
+=== Custom Print Format Provider
+
+To create a custom print format that can be configured via alias:
+
+1. Implement `PrintFormat<T>` and `PrintFormatProvider<T>`
+2. Register it via `META-INF/services/org.approvej.configuration.Provider`
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/ScreamingPrintFormat.java[]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/ScreamingPrintFormat.kt[]
+----
+
+.`src/test/resources/META-INF/services/org.approvej.configuration.Provider`
+[source]
+----
+examples.java.ScreamingPrintFormat
+----
+
+Now you can use it in configuration:
+
+[source,properties]
+----
+defaultPrintFormat = screaming
+----
+
+
+[id="custom_reviewer_provider"]
+=== Custom File Reviewer Provider
+
+To create a custom file reviewer that can be configured via alias:
+
+1. Implement `FileReviewer` and `FileReviewerProvider`
+2. Register it via `META-INF/services/org.approvej.configuration.Provider`
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/LoggingFileReviewer.java[]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/LoggingFileReviewer.kt[]
+----
+
+.`META-INF/services/org.approvej.configuration.Provider`
+[source]
+----
+examples.java.LoggingFileReviewer
+----
+
+Now you can use it in configuration:
+
+[source,properties]
+----
+defaultFileReviewer = logging
+----

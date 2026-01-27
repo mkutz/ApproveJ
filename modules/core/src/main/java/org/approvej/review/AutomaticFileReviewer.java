@@ -18,7 +18,10 @@ import org.jspecify.annotations.NullMarked;
  * committing them to version control!
  */
 @NullMarked
-record AutomaticFileReviewer() implements FileReviewer {
+public record AutomaticFileReviewer() implements FileReviewer, FileReviewerProvider {
+
+  /** The alias for this reviewer used in configuration. */
+  public static final String ALIAS = "automatic";
 
   private static final Logger LOGGER = Logger.getLogger(AutomaticFileReviewer.class.getName());
 
@@ -35,5 +38,15 @@ record AutomaticFileReviewer() implements FileReviewer {
               .formatted(approvedPath, receivedPath, e));
     }
     return new FileReviewResult(false);
+  }
+
+  @Override
+  public String alias() {
+    return ALIAS;
+  }
+
+  @Override
+  public FileReviewer create() {
+    return new AutomaticFileReviewer();
   }
 }

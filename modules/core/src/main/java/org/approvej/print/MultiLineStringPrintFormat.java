@@ -26,7 +26,8 @@ import org.jspecify.annotations.Nullable;
  * @param printer the printer implementing this format
  */
 @NullMarked
-public record MultiLineStringPrintFormat(Printer<Object> printer) implements PrintFormat<Object> {
+public record MultiLineStringPrintFormat(Printer<Object> printer)
+    implements PrintFormat<Object>, PrintFormatProvider<Object> {
 
   /** Default constructor using a {@link MultiLineStringPrinter} with no sorting. */
   public MultiLineStringPrintFormat() {
@@ -42,6 +43,16 @@ public record MultiLineStringPrintFormat(Printer<Object> printer) implements Pri
   public MultiLineStringPrintFormat sorted() {
     return new MultiLineStringPrintFormat(
         new MultiLineStringPrinter<>(Comparator.comparing(Field::getName)));
+  }
+
+  @Override
+  public String alias() {
+    return "multiLineString";
+  }
+
+  @Override
+  public PrintFormat<Object> create() {
+    return new MultiLineStringPrintFormat();
   }
 
   /**

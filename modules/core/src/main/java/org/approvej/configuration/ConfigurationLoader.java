@@ -23,14 +23,22 @@ final class ConfigurationLoader {
     this.sources = List.copyOf(sources);
   }
 
-  @Nullable String get(String key, @Nullable String defaultValue) {
+  @Nullable String get(String key) {
     for (ConfigurationSource source : sources) {
       String value = source.getValue(key);
       if (value != null) {
         return value;
       }
     }
-    return defaultValue;
+    return null;
+  }
+
+  String get(String key, String defaultValue) {
+    String value = get(key);
+    if (value == null) {
+      return defaultValue;
+    }
+    return value;
   }
 
   static ConfigurationLoader createDefault() {

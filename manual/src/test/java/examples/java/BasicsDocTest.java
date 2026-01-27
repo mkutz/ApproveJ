@@ -89,6 +89,17 @@ class BasicsDocTest {
   }
 
   @Test
+  void custom_print_format_provider() {
+    // tag::custom_print_format_provider[]
+    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+
+    approve(person)
+        .printedAs(new ScreamingPrintFormat()) // <1>
+        .byFile();
+    // end::custom_print_format_provider[]
+  }
+
+  @Test
   void scrubbing() {
     // tag::scrubbing[]
     BlogPost blogPost =
@@ -170,7 +181,7 @@ class BasicsDocTest {
   }
 
   @Test
-  void approve_reviewWith_fileReviewer() throws IOException, InterruptedException {
+  void approve_reviewedBy_fileReviewer() throws IOException, InterruptedException {
     assumeThat(new ProcessBuilder("which", "idea").start().waitFor()).isEqualTo(0);
     // tag::approve_reviewedBy_fileReviewer[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
@@ -183,7 +194,7 @@ class BasicsDocTest {
   }
 
   @Test
-  void approve_reviewWith_automatic() {
+  void approve_reviewedBy_automatic() {
     // tag::approve_reviewedBy_automatic[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
 
