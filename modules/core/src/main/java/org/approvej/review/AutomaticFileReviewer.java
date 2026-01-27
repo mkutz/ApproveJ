@@ -20,9 +20,6 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public record AutomaticFileReviewer() implements FileReviewer, FileReviewerProvider {
 
-  /** The alias for this reviewer used in configuration. */
-  public static final String ALIAS = "automatic";
-
   private static final Logger LOGGER = Logger.getLogger(AutomaticFileReviewer.class.getName());
 
   @Override
@@ -42,7 +39,7 @@ public record AutomaticFileReviewer() implements FileReviewer, FileReviewerProvi
 
   @Override
   public String alias() {
-    return ALIAS;
+    return "automatic";
   }
 
   @Override

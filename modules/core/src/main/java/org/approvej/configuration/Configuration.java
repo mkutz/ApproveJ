@@ -3,7 +3,6 @@ package org.approvej.configuration;
 import org.approvej.print.PrintFormat;
 import org.approvej.print.SingleLineStringPrintFormat;
 import org.approvej.review.FileReviewer;
-import org.approvej.review.NoneFileReviewer;
 import org.approvej.review.Reviewers;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -46,8 +45,7 @@ public record Configuration(
       loadConfiguration(ConfigurationLoader.createDefault());
 
   static Configuration loadConfiguration(ConfigurationLoader loader) {
-    String printFormatConfig =
-        loader.get(DEFAULT_PRINT_FORMAT_PROPERTY, SingleLineStringPrintFormat.ALIAS);
+    String printFormatConfig = loader.get(DEFAULT_PRINT_FORMAT_PROPERTY, "singleLineString");
     PrintFormat<Object> printFormat = resolvePrintFormat(printFormatConfig);
 
     FileReviewer fileReviewer = resolveFileReviewer(loader);
@@ -60,7 +58,7 @@ public record Configuration(
     if (aliasOrClassName == null) {
       return new SingleLineStringPrintFormat();
     }
-    return (PrintFormat<Object>) Registry.resolve(aliasOrClassName, PrintFormat.class);
+    return Registry.resolve(aliasOrClassName, PrintFormat.class);
   }
 
   private static FileReviewer resolveFileReviewer(ConfigurationLoader loader) {
@@ -69,7 +67,6 @@ public record Configuration(
       return Reviewers.script(fileReviewerScript);
     }
 
-    return Registry.resolve(
-        loader.get(DEFAULT_FILE_REVIEWER_PROPERTY, NoneFileReviewer.ALIAS), FileReviewer.class);
+    return Registry.resolve(loader.get(DEFAULT_FILE_REVIEWER_PROPERTY, "none"), FileReviewer.class);
   }
 }

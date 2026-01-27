@@ -10,9 +10,6 @@ import org.jspecify.annotations.NullMarked;
 public record SingleLineStringPrintFormat()
     implements PrintFormat<Object>, PrintFormatProvider<Object> {
 
-  /** The alias for this print format used in configuration. */
-  public static final String ALIAS = "singleLineString";
-
   @Override
   public Printer<Object> printer() {
     return "%s"::formatted;
@@ -20,7 +17,7 @@ public record SingleLineStringPrintFormat()
 
   @Override
   public String alias() {
-    return ALIAS;
+    return "singleLineString";
   }
 
   @Override

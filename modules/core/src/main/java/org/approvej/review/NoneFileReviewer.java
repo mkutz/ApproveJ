@@ -7,9 +7,6 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public record NoneFileReviewer() implements FileReviewer, FileReviewerProvider {
 
-  /** The alias for this reviewer used in configuration. */
-  public static final String ALIAS = "none";
-
   @Override
   public ReviewResult apply(PathProvider pathProvider) {
     return new FileReviewResult(false);
@@ -17,7 +14,7 @@ public record NoneFileReviewer() implements FileReviewer, FileReviewerProvider {
 
   @Override
   public String alias() {
-    return ALIAS;
+    return "none";
   }
 
   @Override
