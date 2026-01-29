@@ -31,10 +31,33 @@ public final class Registry {
   private static void loadProviders() {
     ServiceLoader<Provider> loader = ServiceLoader.load(Provider.class);
     for (Provider<?> provider : loader) {
-      providersByType
-          .computeIfAbsent(provider.type(), k -> new HashMap<>())
-          .put(provider.alias(), provider);
+      registerProvider(providersByType, provider);
     }
+  }
+
+  /**
+   * Registers a provider, throwing an error if a provider with the same alias already exists.
+   *
+   * <p>Package-private for testing.
+   */
+  static void registerProvider(
+      Map<Class<?>, Map<String, Provider<?>>> registry, Provider<?> provider) {
+    Map<String, Provider<?>> providers =
+        registry.computeIfAbsent(provider.type(), k -> new HashMap<>());
+    String alias = provider.alias();
+    if (providers.containsKey(alias)) {
+      Provider<?> existing = providers.get(alias);
+      throw new ConfigurationError(
+          "Duplicate provider alias '%s' for type %s: %s and %s. "
+                  .formatted(
+                      alias,
+                      provider.type().getSimpleName(),
+                      existing.getClass().getName(),
+                      provider.getClass().getName())
+              + "Remove one of the conflicting dependencies from your classpath.",
+          null);
+    }
+    providers.put(alias, provider);
   }
 
   /**
@@ -83,13 +106,7 @@ public final class Registry {
       return (T) instance;
     } catch (ReflectiveOperationException e) {
       throw new ConfigurationError(
-          "Failed to create %s %s".formatted(toHumanReadable(type), className), e);
+          "Failed to create %s %s".formatted(type.getSimpleName(), className), e);
     }
-  }
-
-  private static String toHumanReadable(Class<?> type) {
-    String simpleName = type.getSimpleName();
-    // Convert camelCase to "camel case" (e.g., PrintFormat -> print format)
-    return simpleName.replaceAll("([a-z])([A-Z])", "$1 $2").toLowerCase();
   }
 }

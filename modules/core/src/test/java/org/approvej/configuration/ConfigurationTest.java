@@ -77,7 +77,7 @@ class ConfigurationTest {
 
     assertThatExceptionOfType(ConfigurationError.class)
         .isThrownBy(() -> Configuration.loadConfiguration(loader))
-        .withMessageContaining("Failed to create print format")
+        .withMessageContaining("Failed to create PrintFormat")
         .withMessageContaining("org.nonexistent.InvalidFormat");
   }
 

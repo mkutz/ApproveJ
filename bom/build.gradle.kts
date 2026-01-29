@@ -12,8 +12,11 @@ dependencies {
       .sortedBy { it.name }
       .forEach { api(it) }
 
-    api(libs.jackson.databind)
-    api(libs.jackson.jsr310)
-    api(libs.jackson.dataformat.yaml)
+    api(libs.jackson2.databind)
+    api(libs.jackson2.jsr310)
+    api(libs.jackson2.dataformat.yaml)
+
+    api(libs.jackson3.databind)
+    api(libs.jackson3.dataformat.yaml)
   }
 }

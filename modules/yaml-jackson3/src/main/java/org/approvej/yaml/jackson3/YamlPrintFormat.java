@@ -1,17 +1,14 @@
-package org.approvej.yaml.jackson;
+package org.approvej.yaml.jackson3;
 
-import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.approvej.configuration.Configuration;
 import org.approvej.print.PrintFormat;
 import org.approvej.print.PrintFormatProvider;
 import org.approvej.print.Printer;
 import org.jspecify.annotations.NullMarked;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.dataformat.yaml.YAMLMapper;
 
 /**
  * A {@link PrintFormat} that uses {@link ObjectWriter#writeValueAsString(Object)} to print a value
@@ -26,24 +23,24 @@ public record YamlPrintFormat<T>(ObjectWriter objectWriter)
 
   static {
     try {
-      Class.forName("com.fasterxml.jackson.dataformat.yaml.YAMLMapper");
+      Class.forName("tools.jackson.dataformat.yaml.YAMLMapper");
     } catch (ClassNotFoundException e) {
       throw new IllegalStateException(
-          "Jackson YAML is required but not found on classpath. Add"
-              + " com.fasterxml.jackson.dataformat:jackson-dataformat-yaml to your dependencies.");
+          "Jackson 3 YAML is required but not found on classpath. "
+              + "Add tools.jackson.dataformat:jackson-dataformat-yaml to your dependencies.");
     }
   }
 
-  private static final YAMLMapper DEFAULT_YAML_MAPPER =
-      YAMLMapper.builder().addModule(new JavaTimeModule()).build();
+  // Note: Jackson 3 has Java date/time support built-in, no need for JavaTimeModule
+  private static final YAMLMapper DEFAULT_YAML_MAPPER = YAMLMapper.builder().build();
 
   /**
    * Creates a {@link YamlPrintFormat} using the given {@link ObjectWriter}.
    *
    * @param objectWriter the {@link ObjectWriter} that will be used for printing
    */
-  public YamlPrintFormat(ObjectWriter objectWriter) {
-    this.objectWriter = objectWriter.without(WRITE_DATES_AS_TIMESTAMPS);
+  public YamlPrintFormat {
+    // Note: Jackson 3 defaults to WRITE_DATES_AS_TIMESTAMPS=false, so no need to disable it
   }
 
   /** Default constructor to be used in {@link Configuration}. */
@@ -56,7 +53,7 @@ public record YamlPrintFormat<T>(ObjectWriter objectWriter)
     return (T value) -> {
       try {
         return objectWriter.writeValueAsString(value);
-      } catch (JsonProcessingException e) {
+      } catch (JacksonException e) {
         throw new YamlPrinterException(value, e);
       }
     };
@@ -94,7 +91,7 @@ public record YamlPrintFormat<T>(ObjectWriter objectWriter)
    * @param objectMapper the {@link ObjectMapper} used to create the {@link ObjectWriter}
    * @param <T> the type of value to print
    * @return a new {@link YamlPrintFormat} instance
-   * @see ObjectMapper#writer()
+   * @see ObjectMapper#writerWithDefaultPrettyPrinter()
    */
   public static <T> YamlPrintFormat<T> yaml(ObjectMapper objectMapper) {
     return yaml(objectMapper.writer());

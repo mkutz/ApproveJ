@@ -19,8 +19,9 @@ dependencies {
   api(project(":modules:core"))
   api(libs.jspecify)
 
-  compileOnly(libs.jackson2.databind)
-  compileOnly(libs.jackson2.jsr310)
+  // Jackson 3 as provided dependency
+  compileOnly(libs.jackson3.databind)
+  compileOnly(libs.jackson3.dataformat.yaml)
 }
 
 testing {
@@ -29,8 +30,9 @@ testing {
       getting(JvmTestSuite::class) {
         useJUnitJupiter()
         dependencies {
-          implementation(libs.jackson2.databind)
-          implementation(libs.jackson2.jsr310)
+          // Tests need Jackson
+          implementation(libs.jackson3.databind)
+          implementation(libs.jackson3.dataformat.yaml)
 
           implementation(platform(libs.junit.bom))
           implementation(libs.junit.jupiter.api)

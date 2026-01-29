@@ -1,9 +1,21 @@
 = YAML with Jackson
 
-The `yaml-jackson` module provides several YAML-related features implemented with https://github.com/FasterXML/jackson[Jackson].
+ApproveJ provides YAML support via https://github.com/FasterXML/jackson[Jackson] in two modules:
 
-To use it, you need to add it as a dependency to your project.
-Since Jackson is a provided dependency, you also need to add Jackson explicitly.
+* `yaml-jackson` for Jackson 2.x
+* `yaml-jackson3` for Jackson 3.x
+
+Both modules provide the same functionality with identical APIs.
+Choose the one matching your project's Jackson version.
+
+IMPORTANT: Use only one of these modules in your project, not both.
+Both modules register with the same alias `"yaml"`, and having both on the classpath will cause an error at runtime.
+
+Since Jackson is a provided dependency, you need to add it explicitly.
+
+== Dependencies
+
+=== Jackson 2.x
 
 .Gradle
 [source,groovy,subs=attributes+,role="primary"]
@@ -24,35 +36,83 @@ implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.0")
 .Maven
 [source,xml,subs=attributes+,role="secondary"]
 ----
-<project>
-  <!-- … -->
-  <dependencies>
-    <dependency>
-      <groupId>org.approvej</groupId>
-      <artifactId>yaml-jackson</artifactId>
-      <version>{revnumber}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>2.18.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-yaml</artifactId>
-      <version>2.18.0</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-jsr310</artifactId>
-      <version>2.18.0</version>
-    </dependency>
-  </dependencies>
-  <!-- … -->
-</project>
+<dependency>
+  <groupId>org.approvej</groupId>
+  <artifactId>yaml-jackson</artifactId>
+  <version>{revnumber}</version>
+</dependency>
+<dependency>
+  <groupId>com.fasterxml.jackson.core</groupId>
+  <artifactId>jackson-databind</artifactId>
+  <version>2.18.0</version>
+</dependency>
+<dependency>
+  <groupId>com.fasterxml.jackson.dataformat</groupId>
+  <artifactId>jackson-dataformat-yaml</artifactId>
+  <version>2.18.0</version>
+</dependency>
+<dependency>
+  <groupId>com.fasterxml.jackson.datatype</groupId>
+  <artifactId>jackson-datatype-jsr310</artifactId>
+  <version>2.18.0</version>
+</dependency>
+----
+
+=== Jackson 3.x
+
+.Gradle
+[source,groovy,subs=attributes+,role="primary"]
+----
+implementation 'org.approvej:yaml-jackson3:{revnumber}'
+implementation 'tools.jackson.core:jackson-databind:3.0.0'
+implementation 'tools.jackson.dataformat:jackson-dataformat-yaml:3.0.0'
+----
+.Gradle.kts
+[source,kotlin,subs=attributes+,role="secondary"]
+----
+implementation("org.approvej:yaml-jackson3:{revnumber}")
+implementation("tools.jackson.core:jackson-databind:3.0.0")
+implementation("tools.jackson.dataformat:jackson-dataformat-yaml:3.0.0")
+----
+.Maven
+[source,xml,subs=attributes+,role="secondary"]
+----
+<dependency>
+  <groupId>org.approvej</groupId>
+  <artifactId>yaml-jackson3</artifactId>
+  <version>{revnumber}</version>
+</dependency>
+<dependency>
+  <groupId>tools.jackson.core</groupId>
+  <artifactId>jackson-databind</artifactId>
+  <version>3.0.0</version>
+</dependency>
+<dependency>
+  <groupId>tools.jackson.dataformat</groupId>
+  <artifactId>jackson-dataformat-yaml</artifactId>
+  <version>3.0.0</version>
+</dependency>
 ----
 
 TIP: If you use the ApproveJ BOM, you can omit the Jackson version numbers as the BOM provides recommended versions.
+
+NOTE: Jackson 3 has Java date/time support built-in, so no separate `jackson-datatype-jsr310` dependency is needed.
+
+=== Import Differences
+
+The API is identical between both modules.
+Only the import statements differ:
+
+[cols="1,1"]
+|===
+| Jackson 2.x | Jackson 3.x
+
+| `org.approvej.yaml.jackson.*`
+| `org.approvej.yaml.jackson3.*`
+
+| `com.fasterxml.jackson.dataformat.yaml.*`
+| `tools.jackson.dataformat.yaml.*`
+|===
 
 
 == Print as YAML

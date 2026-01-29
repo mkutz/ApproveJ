@@ -19,9 +19,9 @@ dependencies {
   api(project(":modules:core"))
   api(libs.jspecify)
 
-  compileOnly(libs.jackson.databind)
-  compileOnly(libs.jackson.dataformat.yaml)
-  compileOnly(libs.jackson.jsr310)
+  compileOnly(libs.jackson2.databind)
+  compileOnly(libs.jackson2.dataformat.yaml)
+  compileOnly(libs.jackson2.jsr310)
 }
 
 testing {
@@ -30,9 +30,9 @@ testing {
       getting(JvmTestSuite::class) {
         useJUnitJupiter()
         dependencies {
-          implementation(libs.jackson.databind)
-          implementation(libs.jackson.dataformat.yaml)
-          implementation(libs.jackson.jsr310)
+          implementation(libs.jackson2.databind)
+          implementation(libs.jackson2.dataformat.yaml)
+          implementation(libs.jackson2.jsr310)
 
           implementation(platform(libs.junit.bom))
           implementation(libs.junit.jupiter.api)

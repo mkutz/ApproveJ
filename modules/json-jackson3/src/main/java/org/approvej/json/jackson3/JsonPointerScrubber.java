@@ -1,11 +1,11 @@
-package org.approvej.json.jackson;
+package org.approvej.json.jackson3;
 
 import static org.approvej.scrub.Replacements.string;
 
-import com.fasterxml.jackson.core.JsonPointer;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.approvej.scrub.Scrubber;
 import org.jspecify.annotations.NullMarked;
+import tools.jackson.core.JsonPointer;
+import tools.jackson.databind.JsonNode;
 
 /**
  * A {@link Scrubber} that scrubs a JSON node at a specific {@link JsonPointer} by replacing its
