@@ -42,7 +42,7 @@ If you have a lot of approvals that need to be updated, you might want to just a
 In that case, you can use the link:{javadoc-url}/core/org/approvej/review/Reviewers.html#automatic()[`automatic`] link:{javadoc-url}/core/org/approvej/review/FileReviewer.html[`FileReviewer`].
 It simply writes the received value into the approved file without checking them at all.
 
-WARN:: This will overwrite your approved file(s).
+WARN: This will overwrite your approved file(s).
 You will probably want to check the changed files before committing them to version control!
 
 [source,java,indent=0,role="primary"]

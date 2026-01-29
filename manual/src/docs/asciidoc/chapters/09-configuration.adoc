@@ -104,7 +104,7 @@ Alternatively, using fully-qualified class names:
 defaultPrintFormat = org.approvej.json.jackson.JsonPrintFormat
 ----
 
-NOTE:: When using fully-qualified class names, the referenced class needs to provide a public default constructor.
+NOTE: When using fully-qualified class names, the referenced class needs to provide a public default constructor.
 
 
 [id="configuration_environment_variables"]
@@ -147,7 +147,7 @@ The script can contain the following placeholders:
 defaultFileReviewerScript = idea diff --wait "{receivedFile}" "{approvedFile}"
 ----
 
-TIP:: Use `--wait` or similar flags if your diff tool supports them to make the review blocking.
+TIP: Use `--wait` or similar flags if your diff tool supports them to make the review blocking.
 This allows you to approve changes before the test finishes.
 
 

@@ -3,16 +3,23 @@
 The `yaml-jackson` module provides several YAML-related features implemented with https://github.com/FasterXML/jackson[Jackson].
 
 To use it, you need to add it as a dependency to your project.
+Since Jackson is a provided dependency, you also need to add Jackson explicitly.
 
 .Gradle
 [source,groovy,subs=attributes+,role="primary"]
 ----
 implementation 'org.approvej:yaml-jackson:{revnumber}'
+implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.0'
+implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.0'
+implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.0'
 ----
 .Gradle.kts
 [source,kotlin,subs=attributes+,role="secondary"]
 ----
 implementation("org.approvej:yaml-jackson:{revnumber}")
+implementation("com.fasterxml.jackson.core:jackson-databind:2.18.0")
+implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.0")
+implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.0")
 ----
 .Maven
 [source,xml,subs=attributes+,role="secondary"]
@@ -25,10 +32,27 @@ implementation("org.approvej:yaml-jackson:{revnumber}")
       <artifactId>yaml-jackson</artifactId>
       <version>{revnumber}</version>
     </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.18.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+      <version>2.18.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>2.18.0</version>
+    </dependency>
   </dependencies>
   <!-- … -->
 </project>
 ----
+
+TIP: If you use the ApproveJ BOM, you can omit the Jackson version numbers as the BOM provides recommended versions.
 
 
 == Print as YAML
