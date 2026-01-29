@@ -26,6 +26,10 @@ testing {
           implementation(project(":modules:json-jackson"))
           implementation(project(":modules:yaml-jackson"))
 
+          implementation(libs.jackson.databind)
+          implementation(libs.jackson.dataformat.yaml)
+          implementation(libs.jackson.jsr310)
+
           implementation(platform(libs.junit.bom))
           implementation(libs.junit.jupiter.api)
           implementation(libs.junit.jupiter.params)
