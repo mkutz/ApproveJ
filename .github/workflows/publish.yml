@@ -7,11 +7,6 @@ on:
         description: 'Version to publish'
         required: true
 
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-
 jobs:
   publish:
 
@@ -24,6 +19,10 @@ jobs:
       JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
       JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_USERNAME }}
       JRELEASER_MAVENCENTRAL_TOKEN: ${{ secrets.JRELEASER_MAVENCENTRAL_TOKEN }}
+
+    permissions:
+      contents: write
+      id-token: write
 
     steps:
 
@@ -47,6 +46,8 @@ jobs:
         if: always()
 
   update-pages:
+    permissions:
+      pages: write
     needs: publish
     uses: ./.github/workflows/update-pages.yml
     with:
