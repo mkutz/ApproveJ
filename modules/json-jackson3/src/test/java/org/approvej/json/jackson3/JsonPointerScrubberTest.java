@@ -34,7 +34,7 @@ class JsonPointerScrubberTest {
     JsonPointerScrubber idScrubber = jsonPointer("/id");
     JsonNode scrubbedJsonNode = idScrubber.apply(jsonNode);
 
-    assertThat(scrubbedJsonNode.at("/id").textValue()).isEqualTo("[scrubbed]");
+    assertThat(scrubbedJsonNode.at("/id").stringValue()).isEqualTo("[scrubbed]");
   }
 
   @Test
@@ -44,7 +44,7 @@ class JsonPointerScrubberTest {
     JsonPointerScrubber itemScrubber = jsonPointer("/items/0/itemId");
     JsonNode scrubbedJsonNode = itemScrubber.apply(jsonNode);
 
-    assertThat(scrubbedJsonNode.at("/items/0/itemId").textValue()).isEqualTo("[scrubbed]");
+    assertThat(scrubbedJsonNode.at("/items/0/itemId").stringValue()).isEqualTo("[scrubbed]");
   }
 
   @Test
@@ -54,7 +54,7 @@ class JsonPointerScrubberTest {
     JsonPointerScrubber itemScrubber = jsonPointer("/items/0");
     JsonNode scrubbedJsonNode = itemScrubber.apply(jsonNode);
 
-    assertThat(scrubbedJsonNode.at("/items/0").textValue()).isEqualTo("[scrubbed]");
+    assertThat(scrubbedJsonNode.at("/items/0").stringValue()).isEqualTo("[scrubbed]");
   }
 
   @Test
@@ -75,7 +75,7 @@ class JsonPointerScrubberTest {
 
     JsonNode scrubbedJsonNode = enrollmentDateScrubber.apply(jsonNode);
 
-    assertThat(scrubbedJsonNode.at("/enrollmentDate").textValue())
+    assertThat(scrubbedJsonNode.at("/enrollmentDate").stringValue())
         .isEqualTo("[scrubbed enrollment date]");
   }
 
@@ -87,6 +87,6 @@ class JsonPointerScrubberTest {
 
     JsonNode scrubbedJsonNode = enrollmentDateScrubber.apply(jsonNode);
 
-    assertThat(scrubbedJsonNode.at("/enrollmentDate").textValue()).isEqualTo("<enrollmentDate>");
+    assertThat(scrubbedJsonNode.at("/enrollmentDate").stringValue()).isEqualTo("<enrollmentDate>");
   }
 }
