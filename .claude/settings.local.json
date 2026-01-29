@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:blog.gradle.org)",
+      "Bash(ls:*)",
+      "WebFetch(domain:docs.gradle.org)",
+      "WebFetch(domain:github.com)",
+      "Bash(./gradlew :spotlessApply:*)",
+      "Bash(./gradlew build:*)",
+      "Bash(./gradlew:*)"
+    ]
+  }
+}

@@ -24,6 +24,16 @@ import org.jspecify.annotations.NullMarked;
 public record YamlPrintFormat<T>(ObjectWriter objectWriter)
     implements PrintFormat<T>, PrintFormatProvider<T> {
 
+  static {
+    try {
+      Class.forName("com.fasterxml.jackson.dataformat.yaml.YAMLMapper");
+    } catch (ClassNotFoundException e) {
+      throw new IllegalStateException(
+          "Jackson YAML is required but not found on classpath. Add"
+              + " com.fasterxml.jackson.dataformat:jackson-dataformat-yaml to your dependencies.");
+    }
+  }
+
   private static final YAMLMapper DEFAULT_YAML_MAPPER =
       YAMLMapper.builder().addModule(new JavaTimeModule()).build();
 

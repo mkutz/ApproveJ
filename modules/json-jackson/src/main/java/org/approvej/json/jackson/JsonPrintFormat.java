@@ -23,6 +23,16 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class JsonPrintFormat<T> implements PrintFormat<T>, PrintFormatProvider<T> {
 
+  static {
+    try {
+      Class.forName("com.fasterxml.jackson.databind.ObjectMapper");
+    } catch (ClassNotFoundException e) {
+      throw new IllegalStateException(
+          "Jackson is required but not found on classpath. "
+              + "Add com.fasterxml.jackson.core:jackson-databind to your dependencies.");
+    }
+  }
+
   private static final ObjectMapper DEFAULT_JSON_MAPPER =
       JsonMapper.builder().addModule(new JavaTimeModule()).build();
 
