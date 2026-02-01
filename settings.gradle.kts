@@ -16,4 +16,6 @@ include("modules:yaml-jackson3")
 
 include("modules:http")
 
+include("modules:http-wiremock")
+
 include("manual")

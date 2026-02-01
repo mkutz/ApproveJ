@@ -2,7 +2,6 @@ package org.approvej.http;
 
 import static java.lang.String.join;
 
-import org.approvej.Configuration;
 import org.approvej.print.PrintFormat;
 import org.approvej.print.Printer;
 import org.jspecify.annotations.NullMarked;
@@ -30,7 +29,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class ReceivedHttpRequestPrintFormat implements PrintFormat<ReceivedHttpRequest> {
 
-  /** Default constructor to be used in {@link Configuration}. */
+  /** Default constructor. */
   public ReceivedHttpRequestPrintFormat() {
     // No initialization needed
   }

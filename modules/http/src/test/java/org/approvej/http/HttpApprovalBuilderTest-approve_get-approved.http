@@ -3,5 +3,5 @@ Connection: Upgrade, HTTP2-Settings
 Host: {{Host}}
 Http2-settings: AAEAAEAAAAIAAAAAAAMAAAAAAAQBAAAAAAUAAEAAAAYABgAA
 Upgrade: h2c
-User-agent: Java-http-client/21.0.8
+User-agent: Java-http-client/21.0.9
 X-my-header: some header value

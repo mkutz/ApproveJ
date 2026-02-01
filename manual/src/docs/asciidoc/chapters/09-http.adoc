@@ -50,7 +50,7 @@ include::../../../test/kotlin/examples/kotlin/HttpDocTest.kt[tag=initialize]
 The server automatically stores all received requests as a list of link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequest.html[`ReceivedHttpRequest`].
 
 In the following test code, two requests are performed by the `PriceComparator`.
-Both can be retrieved from the stubs which were used instead of the actual services and approved after being printed by an link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequestPrinter.html[`ReceivedHttpRequestPrinter`].
+Both can be retrieved from the stubs which were used instead of the actual services and approved after being printed by an link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequestPrintFormat.html[`ReceivedHttpRequestPrintFormat`].
 
 [source,java,indent=0,role="primary"]
 .Java
