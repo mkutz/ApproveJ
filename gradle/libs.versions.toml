@@ -2,7 +2,7 @@
 junit = "6.0.2"
 assertj = "3.27.7"
 jackson2 = "2.21.0"
-jackson3 = "3.0.0"
+jackson3 = "3.0.4"
 
 [libraries]
 asciidoctor-block-switch = { module = "io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch", version = "0.6.3" }
