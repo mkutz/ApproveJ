@@ -66,7 +66,7 @@ include::../../../test/kotlin/examples/kotlin/HttpDocTest.kt[tag=approve_http_re
 The approved files will look like this
 
 [source,httprequest,indent=0]
-.Simple GET request for Cheepter
+.Simple GET request for Cheeepter
 ----
 include::../../../test/java/examples/java/HttpDocTest-approve_http_request-cheeper-approved.http[]
 ----
