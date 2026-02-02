@@ -14,7 +14,7 @@ import org.jspecify.annotations.NullMarked;
 
 /**
  * A simple stub for an HTTP server. It wraps a {@link HttpServer} bound to a random port on
- * localhost and simply handles each received request by storing in as a {@link ReceivedHttpRequest}
+ * localhost and simply handles each received request by storing it as a {@link ReceivedHttpRequest}
  * object that can then be approved.
  *
  * <p>If your use case requires the stubbed service to return a specific response, you can specify
