@@ -42,7 +42,7 @@ The link:{javadoc-url}/http/org/approvej/http/HttpScrubbers.html[`HttpScrubbers`
 
 == `HttpStubServer`
 
-The link:{javadoc-url}/http/org/approvej/http/HttpStubServer.html[`HttpStubServer`] is a simple HTTP server based on the JVM's built-in link:https://docs.oracle.com/en/java/javase/21/docs/api//jdk.httpserver/com/sun/net/httpserver/package-summary.html[HttpServer].
+The link:{javadoc-url}/http/org/approvej/http/HttpStubServer.html[`HttpStubServer`] is a simple HTTP server based on the JVM's built-in link:https://docs.oracle.com/en/java/javase/21/docs/api/jdk.httpserver/com/sun/net/httpserver/package-summary.html[HttpServer].
 It automatically records all received requests.
 
 
