@@ -17,4 +17,6 @@ mkdir pages/javadoc
 ./gradlew javadoc -Pversion=$VERSION
 mv modules/core/build/docs/javadoc pages/javadoc/core
 mv modules/json-jackson/build/docs/javadoc pages/javadoc/json-jackson
+mv modules/json-jackson3/build/docs/javadoc pages/javadoc/json-jackson3
 mv modules/yaml-jackson/build/docs/javadoc pages/javadoc/yaml-jackson
+mv modules/yaml-jackson3/build/docs/javadoc pages/javadoc/yaml-jackson3
