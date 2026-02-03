@@ -122,3 +122,22 @@ spotless {
 
   freshmark { target("*.md") }
 }
+
+val updatePages by
+  tasks.registering(Sync::class) {
+    group = "documentation"
+    description = "Assembles the website with manual and Javadoc"
+
+    into(layout.buildDirectory.dir("pages"))
+
+    // Favicon
+    from("favicon.png") { into("img") }
+
+    // AsciiDoc manual
+    from(project(":manual").tasks.named("asciidoctor"))
+
+    // Javadoc for each module
+    project(":modules").subprojects.forEach { module ->
+      from(module.tasks.named("javadoc")) { into("javadoc/${module.name}") }
+    }
+  }

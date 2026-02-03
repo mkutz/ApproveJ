@@ -34,9 +34,6 @@ jobs:
 
       - uses: actions/checkout@v6
 
-      - name: Ensure base directory
-        run: mkdir -p pages/docs
-
       - uses: actions/setup-java@v5
         with:
           java-version: 21
@@ -44,14 +41,14 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@cd4b95f1dffd155d6d8f6b8c195a3ff2f9f77a5d
 
-      - name: Update AsciiDoc
-        run: ./update-pages "${{ github.event.inputs.version }}"
+      - name: Build pages
+        run: ./gradlew updatePages -Pversion="${{ github.event.inputs.version }}"
 
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: ./pages
+          path: ./build/pages
 
       - id: deployment
         uses: actions/deploy-pages@v4
