@@ -7,18 +7,15 @@ fi
 
 VERSION="$1"
 
-rm -rf pages/$VERSION
-mkdir -p pages/$VERSION
+rm -rf pages/*
+mkdir -p pages/img
+cp favicon.png pages/img/
 ./gradlew asciidoc -Pversion=$VERSION
 mv manual/build/docs/asciidoc/* pages/
 
-rm -rf pages/javadoc
 mkdir pages/javadoc
 ./gradlew javadoc -Pversion=$VERSION
-mv modules/core/build/docs/javadoc pages/javadoc/core
-mv modules/json-jackson/build/docs/javadoc pages/javadoc/json-jackson
-mv modules/json-jackson3/build/docs/javadoc pages/javadoc/json-jackson3
-mv modules/yaml-jackson/build/docs/javadoc pages/javadoc/yaml-jackson
-mv modules/yaml-jackson3/build/docs/javadoc pages/javadoc/yaml-jackson3
-mv modules/http/build/docs/javadoc pages/javadoc/http
-mv modules/http-wiremock/build/docs/javadoc pages/javadoc/http-wiremock
+for javadoc_dir in modules/*/build/docs/javadoc; do
+  module_name=$(basename "$(dirname "$(dirname "$(dirname "$javadoc_dir")")")")
+  mv "$javadoc_dir" "pages/javadoc/$module_name"
+done
