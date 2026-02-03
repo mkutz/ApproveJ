@@ -17,7 +17,7 @@ import org.jspecify.annotations.NullMarked;
  * @param replacement the replacement function for the header value
  */
 @NullMarked
-public record HttpHeaderValueScrubber(String headerName, Replacement<String> replacement)
+record HttpHeaderValueScrubber(String headerName, Replacement<String> replacement)
     implements Scrubber<HttpHeaderValueScrubber, ReceivedHttpRequest, String> {
 
   /**
