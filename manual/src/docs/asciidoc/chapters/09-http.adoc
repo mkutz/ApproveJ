@@ -1,7 +1,52 @@
-= HTTP Server
+= HTTP
 
-The `http` module contains various capabilities to approval test the HTTP interactions of your software component.
+ApproveJ provides capabilities to approval test HTTP requests sent by your software component.
+The core concept is the link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequest.html[`ReceivedHttpRequest`] record, which captures the method, URI, headers, and body of an HTTP request.
 
+There are two ways to capture HTTP requests for approval:
+
+* **`HttpStubServer`** – A lightweight stub server included in the `http` module.
+Use this when you need a simple way to capture requests without additional dependencies.
+* **WireMock Adapter** – An adapter in the `http-wiremock` module that converts WireMock requests.
+Use this when you already have WireMock in your test setup.
+
+
+== Common Concepts
+
+
+=== `ReceivedHttpRequest`
+
+The link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequest.html[`ReceivedHttpRequest`] is a record that holds the captured request data:
+
+* `method()` – The HTTP method (GET, POST, etc.)
+* `uri()` – The request URI including path and query parameters
+* `headers()` – A sorted map of header names to values
+* `body()` – The request body as a string
+
+
+=== `ReceivedHttpRequestPrintFormat`
+
+The link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequestPrintFormat.html[`ReceivedHttpRequestPrintFormat`] prints requests in the https://www.jetbrains.com/help/idea/exploring-http-syntax.html[HTTP request file format], which is readable and supported by many IDEs.
+
+Files are saved with the `.http` extension.
+
+
+=== HTTP Scrubbers
+
+The link:{javadoc-url}/http/org/approvej/http/HttpScrubbers.html[`HttpScrubbers`] utility provides scrubbers for common dynamic HTTP headers:
+
+* `hostHeaderValue()` – Scrubs the `Host` header (varies by port)
+* `userAgentHeaderValue()` – Scrubs the `User-agent` header (varies by JVM version)
+* `headerValue(name)` – Scrubs any header by name
+
+
+== `HttpStubServer`
+
+The link:{javadoc-url}/http/org/approvej/http/HttpStubServer.html[`HttpStubServer`] is a simple HTTP server based on the JVM's built-in link:https://docs.oracle.com/en/java/javase/21/docs/api//jdk.httpserver/com/sun/net/httpserver/package-summary.html[HttpServer].
+It automatically records all received requests.
+
+
+=== Dependency
 
 .Gradle
 [source,groovy,subs=attributes+,role="primary"]
@@ -16,25 +61,17 @@ implementation("org.approvej:http:{revnumber}")
 .Maven
 [source,xml,subs=attributes+,role="secondary"]
 ----
-<project>
-  <!-- … -->
-  <dependencies>
-    <dependency>
-      <groupId>org.approvej</groupId>
-      <artifactId>http</artifactId>
-      <version>{revnumber}</version>
-    </dependency>
-  </dependencies>
-  <!-- … -->
-</project>
+<dependency>
+  <groupId>org.approvej</groupId>
+  <artifactId>http</artifactId>
+  <version>{revnumber}</version>
+</dependency>
 ----
 
 
-== Receive Requests via `HttpStubServer`
+=== Usage
 
-The link:{javadoc-url}/http/org/approvej/http/HttpStubServer.html[`HttpStubServer`] is a simple HTTP server based upon the JVM's own link:https://docs.oracle.com/en/java/javase/21/docs/api//jdk.httpserver/com/sun/net/httpserver/package-summary.html[HttpServer].
-
-Once initialized you can configure your software component to use its address instead of another service it depends on.
+Initialize the server and configure your component to use its address:
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -47,10 +84,8 @@ include::../../../test/java/examples/java/HttpDocTest.java[tag=initialize]
 include::../../../test/kotlin/examples/kotlin/HttpDocTest.kt[tag=initialize]
 ----
 
-The server automatically stores all received requests as a list of link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequest.html[`ReceivedHttpRequest`].
-
-In the following test code, two requests are performed by the `PriceComparator`.
-Both can be retrieved from the stubs which were used instead of the actual services and approved after being printed by an link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequestPrintFormat.html[`ReceivedHttpRequestPrintFormat`].
+The server stores all received requests.
+You can retrieve and approve them:
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -63,16 +98,91 @@ include::../../../test/java/examples/java/HttpDocTest.java[tag=approve_http_requ
 include::../../../test/kotlin/examples/kotlin/HttpDocTest.kt[tag=approve_http_request]
 ----
 
-The approved files will look like this
+The approved files look like this:
 
 [source,httprequest,indent=0]
-.Simple GET request for Cheeepter
+.Simple GET request
 ----
 include::../../../test/java/examples/java/HttpDocTest-approve_http_request-cheeper-approved.http[]
 ----
 
 [source,httprequest,indent=0]
-.POST request with Authorization header for Prycy
+.POST request with Authorization header
 ----
 include::../../../test/java/examples/java/HttpDocTest-approve_http_request-prycy-approved.http[]
 ----
+
+
+== WireMock Adapter
+
+If you already use https://wiremock.org/[WireMock] in your tests, the `http-wiremock` module provides a utility to convert WireMock requests to `ReceivedHttpRequest` for approval.
+
+
+=== Dependency
+
+The adapter requires both the `http` module and WireMock.
+
+.Gradle
+[source,groovy,subs=attributes+,role="primary"]
+----
+implementation 'org.approvej:http-wiremock:{revnumber}'
+implementation 'org.wiremock:wiremock:3.10.0'
+----
+.Gradle.kts
+[source,kotlin,subs=attributes+,role="secondary"]
+----
+implementation("org.approvej:http-wiremock:{revnumber}")
+implementation("org.wiremock:wiremock:3.10.0")
+----
+.Maven
+[source,xml,subs=attributes+,role="secondary"]
+----
+<dependency>
+  <groupId>org.approvej</groupId>
+  <artifactId>http</artifactId>
+  <version>{revnumber}</version>
+</dependency>
+<dependency>
+  <groupId>org.approvej</groupId>
+  <artifactId>http-wiremock</artifactId>
+  <version>{revnumber}</version>
+</dependency>
+<dependency>
+  <groupId>org.wiremock</groupId>
+  <artifactId>wiremock</artifactId>
+  <version>3.10.0</version>
+</dependency>
+----
+
+
+=== Usage
+
+Use link:{javadoc-url}/http-wiremock/org/approvej/http/wiremock/WireMockRequests.html[`WireMockRequests.toReceivedHttpRequest()`] to convert WireMock's `Request` objects:
+
+[source,java,indent=0]
+----
+import static org.approvej.http.wiremock.WireMockRequests.toReceivedHttpRequest;
+import static org.approvej.http.ReceivedHttpRequestPrintFormat.httpRequest;
+import static org.approvej.ApprovalBuilder.approve;
+
+// Get the request from WireMock
+Request request = wireMockServer.getAllServeEvents().getFirst().getRequest();
+
+// Convert and approve
+approve(toReceivedHttpRequest(request))
+    .scrubbedOf(hostHeaderValue())
+    .printedAs(httpRequest())
+    .byFile();
+----
+
+To approve multiple requests:
+
+[source,java,indent=0]
+----
+wireMockServer.getAllServeEvents().stream()
+    .map(event -> toReceivedHttpRequest(event.getRequest()))
+    .forEach(request -> approve(request).named(request.uri().getPath()).byFile());
+----
+
+NOTE: WireMock's `getAllServeEvents()` returns events in reverse chronological order (most recent first).
+If you need chronological order, reverse the list.
