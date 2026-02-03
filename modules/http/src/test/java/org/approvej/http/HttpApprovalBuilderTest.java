@@ -6,6 +6,7 @@ import static java.net.http.HttpResponse.BodyHandlers.discarding;
 import static java.net.http.HttpResponse.BodyHandlers.ofString;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.http.HttpScrubbers.hostHeaderValue;
+import static org.approvej.http.HttpScrubbers.userAgentHeaderValue;
 import static org.approvej.http.ReceivedHttpRequestPrintFormat.httpRequest;
 import static org.approvej.http.StubbedHttpResponse.response;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,6 +41,7 @@ class HttpApprovalBuilderTest {
 
     approve(server.lastReceivedRequest())
         .scrubbedOf(hostHeaderValue())
+        .scrubbedOf(userAgentHeaderValue())
         .printedAs(httpRequest())
         .byFile();
   }
@@ -55,6 +57,7 @@ class HttpApprovalBuilderTest {
 
     approve(server.lastReceivedRequest())
         .scrubbedOf(hostHeaderValue())
+        .scrubbedOf(userAgentHeaderValue())
         .printedAs(httpRequest())
         .byFile();
   }

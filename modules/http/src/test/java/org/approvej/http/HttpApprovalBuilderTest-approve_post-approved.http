@@ -5,6 +5,6 @@ Content-type: application/json
 Host: {{Host}}
 Http2-settings: AAEAAEAAAAIAAAAAAAMAAAAAAAQBAAAAAAUAAEAAAAYABgAA
 Upgrade: h2c
-User-agent: Java-http-client/21.0.9
+User-agent: {{User-agent}}
 
 {"some":"value"}
