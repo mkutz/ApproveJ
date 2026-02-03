@@ -20,6 +20,7 @@ import org.jspecify.annotations.NullMarked;
 public record ReceivedHttpRequest(
     String method, URI uri, SortedMap<String, List<String>> headers, String body) {
 
+  /** Compact constructor to ensure immutability of the {@link #headers}. */
   public ReceivedHttpRequest {
     headers = Collections.unmodifiableSortedMap(new TreeMap<>(headers));
   }
