@@ -27,7 +27,7 @@ class HttpStubServerTest {
 
   @BeforeEach
   void resetServer() {
-    server.resetReceivedResponses();
+    server.resetReceivedRequests();
   }
 
   @Test
@@ -68,7 +68,7 @@ class HttpStubServerTest {
   }
 
   @Test
-  void resetReceivedResponses() throws IOException, InterruptedException {
+  void resetReceivedRequests() throws IOException, InterruptedException {
     client.send(
         HttpRequest.newBuilder(URI.create(server.address()).resolve("/api/hello"))
             .GET()
@@ -77,7 +77,7 @@ class HttpStubServerTest {
         ofString());
     assertThat(server.receivedRequests()).isNotEmpty();
 
-    server.resetReceivedResponses();
+    server.resetReceivedRequests();
 
     assertThat(server.receivedRequests()).isEmpty();
   }

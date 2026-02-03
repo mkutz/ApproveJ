@@ -75,7 +75,7 @@ public class HttpStubServer implements AutoCloseable {
 
   /**
    * Returns the {@link List} of {@link ReceivedHttpRequest} in the order they were received since
-   * the server was started, or until the last call of {@link #resetReceivedResponses()}.
+   * the server was started, or until the last call of {@link #resetReceivedRequests()}.
    *
    * @return the {@link ReceivedHttpRequest}s
    */
@@ -109,7 +109,7 @@ public class HttpStubServer implements AutoCloseable {
    *
    * @return this
    */
-  public HttpStubServer resetReceivedResponses() {
+  public HttpStubServer resetReceivedRequests() {
     receivedRequests.clear();
     return this;
   }
