@@ -16,6 +16,7 @@ mv manual/build/docs/asciidoc/* pages/
 mkdir pages/javadoc
 ./gradlew javadoc -Pversion=$VERSION
 for javadoc_dir in modules/*/build/docs/javadoc; do
-  module_name=$(basename "$(dirname "$(dirname "$(dirname "$javadoc_dir")")")")
+  module_path=${javadoc_dir#modules/}
+  module_name=${module_path%%/*}
   mv "$javadoc_dir" "pages/javadoc/$module_name"
 done
