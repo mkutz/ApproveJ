@@ -23,25 +23,28 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
-import org.approvej.approve.FileApprover;
 import org.approvej.approve.PathProvider;
 import org.approvej.image.ImageApprovalResult;
+import org.approvej.image.compare.ImageComparator;
+import org.approvej.image.compare.ImageComparisonResult;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class ImageFileApprover implements ImageApprover {
 
   private final PathProvider pathProvider;
+  private final ImageComparator comparator;
 
   /**
-   * Creates a new {@link FileApprover} that uses the given {@link PathProvider} to determine the
-   * paths of the approved and received files.
+   * Creates a new image file approver.
    *
    * @param pathProvider a {@link PathProvider} to determine the paths of the approved and received
    *     files
+   * @param comparator the {@link ImageComparator} to use for comparing images
    */
-  ImageFileApprover(PathProvider pathProvider) {
+  ImageFileApprover(PathProvider pathProvider, ImageComparator comparator) {
     this.pathProvider = pathProvider;
+    this.comparator = comparator;
   }
 
   @Override
@@ -132,8 +135,8 @@ public class ImageFileApprover implements ImageApprover {
   }
 
   private ImageApprovalResult check(BufferedImage previouslyApproved, BufferedImage received) {
-    ImageFileApprovalResult result =
-        new ImageFileApprovalResult(previouslyApproved, received, pathProvider);
+    ImageComparisonResult comparisonResult = comparator.compare(previouslyApproved, received);
+    ImageFileApprovalResult result = new ImageFileApprovalResult(comparisonResult, pathProvider);
     Path receivedPath = pathProvider.receivedPath();
     if (result.needsApproval()) {
       try {
@@ -149,7 +152,7 @@ public class ImageFileApprover implements ImageApprover {
     return result;
   }
 
-  public static ImageFileApprover imageFile(PathProvider pathProvider) {
-    return new ImageFileApprover(pathProvider);
+  public static ImageFileApprover imageFile(PathProvider pathProvider, ImageComparator comparator) {
+    return new ImageFileApprover(pathProvider, comparator);
   }
 }

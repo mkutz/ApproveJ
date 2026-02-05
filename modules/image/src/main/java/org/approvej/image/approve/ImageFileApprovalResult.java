@@ -1,34 +1,30 @@
 package org.approvej.image.approve;
 
-import static org.approvej.image.approve.AnalysedImage.analyse;
-
-import java.awt.image.BufferedImage;
 import org.approvej.approve.PathProvider;
 import org.approvej.image.ImageApprovalError;
 import org.approvej.image.ImageApprovalResult;
+import org.approvej.image.compare.ImageComparisonResult;
 
 /**
  * {@link ImageApprovalResult} for image files.
  *
- * @param pathProvider the {@link PathProvider} providing the paths to the received an approved
+ * @param comparisonResult the result of comparing the images
+ * @param pathProvider the {@link PathProvider} providing the paths to the received and approved
  *     files
  */
 public record ImageFileApprovalResult(
-    BufferedImage previouslyApproved, BufferedImage received, PathProvider pathProvider)
+    ImageComparisonResult comparisonResult, PathProvider pathProvider)
     implements ImageApprovalResult {
 
   @Override
   public boolean needsApproval() {
-    AnalysedImage previouslyApprovedAnalysed = analyse(previouslyApproved);
-    AnalysedImage receivedAnalysed = analyse(received);
-
-    return previouslyApprovedAnalysed.isMoreDifferentThan(receivedAnalysed, 0.01);
+    return !comparisonResult.isMatch();
   }
 
   @Override
   public void throwIfNotApproved() {
     if (needsApproval()) {
-      throw new ImageApprovalError(null);
+      throw new ImageApprovalError(comparisonResult.description());
     }
   }
 }

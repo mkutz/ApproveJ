@@ -2,6 +2,7 @@ package org.approvej.image.approve;
 
 import static java.util.Objects.requireNonNull;
 import static org.approvej.approve.PathProviders.nextToTest;
+import static org.approvej.image.compare.ImageComparators.perceptualHash;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.awt.*;
@@ -13,9 +14,9 @@ class ImageFileApproverTest {
 
   @Test
   public void apply() throws IOException {
-    Image image = ImageIO.read(requireNonNull(getClass().getResourceAsStream("/example.png")));
+    Image image = ImageIO.read(requireNonNull(getClass().getResourceAsStream("/screenshot.png")));
 
-    ImageFileApprover approver = new ImageFileApprover(nextToTest());
+    ImageFileApprover approver = new ImageFileApprover(nextToTest(), perceptualHash());
 
     // approver.apply(image);
   }

@@ -1,14 +1,13 @@
 package org.approvej.image;
 
-import java.awt.*;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-/** An {@link AssertionError} thrown when an approval fails. */
+/** An {@link AssertionError} thrown when an image approval fails. */
 @NullMarked
 public class ImageApprovalError extends AssertionError {
 
-  public ImageApprovalError(@Nullable Image previouslyApproved) {
-    super(previouslyApproved == null ? "Missing approval for received" : "Approval mismatch");
+  public ImageApprovalError(@Nullable String description) {
+    super(description == null ? "Missing approval for received image" : description);
   }
 }
