@@ -148,6 +148,13 @@ public class ImageFileApprover implements ImageApprover {
         throw new ImageFileApproverError(
             "Writing received to %s failed".formatted(receivedPath), e);
       }
+    } else {
+      try {
+        deleteIfExists(receivedPath);
+      } catch (IOException e) {
+        throw new ImageFileApproverError(
+            "Deleting received file %s failed".formatted(receivedPath), e);
+      }
     }
     return result;
   }
