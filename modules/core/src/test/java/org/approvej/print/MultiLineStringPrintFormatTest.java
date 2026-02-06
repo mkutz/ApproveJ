@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class MultiLineStringFormatTest {
+class MultiLineStringPrintFormatTest {
 
   @Test
   void constructor() {
@@ -73,7 +73,7 @@ class MultiLineStringFormatTest {
   }
 
   @Test
-  void sorted_printer() {
+  void printer_sorted() {
     SimpleExampleClass exampleObject =
         new SimpleExampleClass(
             UUID.fromString("00000000-0000-0000-0000-000000000001"), 42, true, null);

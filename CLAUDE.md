@@ -72,9 +72,38 @@ Package structure: `org.approvej` for core, `org.approvej.<format>.<library>` fo
 
 - JUnit 5 with AssertJ for assertions
 - Tests must contain at least one assertion
-- Test method naming: `<methodName>[_<case>]` (e.g., `apply_empty_string`)
 - Avoid mocks; use real objects or Nullable Infrastructure components
 - Local variables in tests should NOT be declared final (unlike production code)
+
+### Test Class Naming
+
+Test classes are named `<ClassUnderTest>Test` (e.g., `ImageScrubbersTest`).
+This keeps the subject under test clearly visible in the filesystem.
+
+### Test Method Naming
+
+Test method names use underscores as separators.
+Each name starts with a clear reference to the thing being tested:
+
+- For a **method**: use the method's name (e.g., `apply`, `divide`, `region`).
+- For a **constructor**: use `constructor`, optionally followed by distinguishing parameters (e.g., `constructor_person_address`).
+- For an **HTTP endpoint**: use the HTTP method and path (e.g., `GET_article`).
+
+If there is only **one test case** for a thing, the name is just the reference itself (e.g., `divide`).
+If there are **multiple cases**, append a description of how the case differs from the base case (e.g., `divide_0_divisor`).
+
+Examples:
+
+- `divide` — single/base case
+- `divide_0_divisor` — additional case with zero divisor
+- `GET_article` — base case calling `GET /api/article/{id}` with a valid ID
+- `GET_article_unknown` — case with an unknown ID
+
+### Test Method Ordering
+
+Test methods follow the order of the things under test as defined in the production code.
+Cases about the same thing are grouped together and roughly sorted by difference from the base case.
+The more complex the setup, the later the case should appear.
 
 
 ## Commit Messages

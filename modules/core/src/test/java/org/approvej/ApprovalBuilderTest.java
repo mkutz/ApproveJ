@@ -28,84 +28,43 @@ class ApprovalBuilderTest {
   @TempDir private Path tempDir;
 
   @Test
-  void approve_string_inplace() {
-    approve("Some text").byValue("Some text");
-  }
-
-  @Test
-  void approve_string_by_approver() {
-    approve("Some text").by(value("Some text"));
-  }
-
-  @Test
-  void approve_string_byFile() {
-    approve("Some text").byFile();
-  }
-
-  @Test
-  void approve_string_byFile_custom_pathProvider() throws IOException {
-    PathProvider pathProvider =
-        approvedPath(tempDir.resolve("approve_string_byFile_custom_pathProvider-approved.txt"));
-    String received = "Some text";
-    writeString(pathProvider.approvedPath(), received);
-
-    approve(received).byFile(pathProvider);
-  }
-
-  @Test
-  void approve_string_byFile_custom_pathProviderBuilder() throws IOException {
-    PathProvider pathProviderBuilder = nextToTest();
-    String received = "Some text";
-    writeString(pathProviderBuilder.filenameExtension("txt").approvedPath(), received);
-
-    approve(received).byFile(pathProviderBuilder);
-  }
-
-  @Test
-  void approve_string_byFile_custom_pathProviderBuilder_path() throws IOException {
-    Path path =
-        tempDir.resolve("approve_string_byFile_custom_pathProviderBuilder_path-approved.txt");
-    String received = "Some text";
-    writeString(path, received);
-
-    approve(received).byFile(path);
-  }
-
-  @Test
-  void approve_string_byFile_custom_pathProviderBuilder_path_string() throws IOException {
-    Path path =
-        tempDir.resolve(
-            "approve_string_byFile_custom_pathProviderBuilder_path_string-approved.txt");
-    String received = "Some text";
-    writeString(path, received);
-
-    approve(received).byFile(path.toString());
-  }
-
-  @Test
-  void approve_string_byValue() {
-    approve("Some text").byValue("Some text");
-  }
-
-  @Test
-  void approve_multiple_named() {
+  void named() {
     approve("Some text").named("first").byFile();
     approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
         .named("second")
         .byFile();
 
-    assertThat(
-            Path.of(
-                "src/test/java/org/approvej/ApprovalBuilderTest-approve_multiple_named-first-approved.txt"))
+    assertThat(Path.of("src/test/java/org/approvej/ApprovalBuilderTest-named-first-approved.txt"))
         .exists();
-    assertThat(
-            Path.of(
-                "src/test/java/org/approvej/ApprovalBuilderTest-approve_multiple_named-second-approved.txt"))
+    assertThat(Path.of("src/test/java/org/approvej/ApprovalBuilderTest-named-second-approved.txt"))
         .exists();
   }
 
   @Test
-  void approve_string_scrubbedOf() {
+  void printedBy() {
+    Function<Person, String> personPrinter =
+        person -> "id=%s%nname=%s%nbirthday=%s".formatted(person.id, person.name, person.birthday);
+    approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
+        .printedBy(personPrinter)
+        .byValue("id=000000-0000-0000-00000001\nname=Micha\nbirthday=1982-02-19");
+  }
+
+  @Test
+  void printedAs() {
+    approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
+        .printedAs(multiLineString())
+        .byValue(
+            """
+            Person [
+              id=<inaccessible>,
+              name=<inaccessible>,
+              birthday=<inaccessible>
+            ]\
+            """);
+  }
+
+  @Test
+  void scrubbedOf() {
     String received =
         """
         This is my example text with a date: %s.
@@ -128,7 +87,36 @@ class ApprovalBuilderTest {
   }
 
   @Test
-  void approve_string_mismatch() {
+  void scrubbedOf_pre_and_post_printed() {
+    approve(new Person("Micha", LocalDate.of(1982, 2, 19)))
+        .scrubbedOf(person -> new Person("[scrubbed id]", person.name, person.birthday))
+        .printedBy(Object::toString)
+        .scrubbedOf(dateTimeFormat("yyyy-MM-dd"))
+        .byFile();
+  }
+
+  @Test
+  void reviewedBy() {
+    PathProvider pathProvider = approvedPath(tempDir.resolve("reviewedBy.txt"));
+
+    approve("Some text").reviewedBy(automatic()).byFile(pathProvider);
+
+    assertThat(pathProvider.approvedPath()).content().isEqualTo("Some text\n");
+    assertThat(pathProvider.receivedPath()).doesNotExist();
+  }
+
+  @Test
+  void by() {
+    approve("Some text").by(value("Some text"));
+  }
+
+  @Test
+  void byValue() {
+    approve("Some text").byValue("Some text");
+  }
+
+  @Test
+  void byValue_mismatch() {
     String received = "Some text";
     String previouslyApproved = "This is not the same text.";
     assertThatExceptionOfType(AssertionError.class)
@@ -145,55 +133,55 @@ class ApprovalBuilderTest {
   }
 
   @Test
-  void approve_pojo_default_printer() {
+  void byValue_pojo() {
     approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
         .byValue("Person[id=000000-0000-0000-00000001, name=Micha, birthday=1982-02-19]");
   }
 
   @Test
-  void approve_pojo_printedBy_function() {
-    Function<Person, String> personPrinter =
-        person -> "id=%s%nname=%s%nbirthday=%s".formatted(person.id, person.name, person.birthday);
-    approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
-        .printedBy(personPrinter)
-        .byValue("id=000000-0000-0000-00000001\nname=Micha\nbirthday=1982-02-19");
+  void byFile() {
+    approve("Some text").byFile();
   }
 
   @Test
-  void approve_pojo_printedBy_printer() {
-    approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
-        .printedAs(multiLineString())
-        .byValue(
-            """
-            Person [
-              id=<inaccessible>,
-              name=<inaccessible>,
-              birthday=<inaccessible>
-            ]\
-            """);
+  void byFile_custom_pathProvider() throws IOException {
+    PathProvider pathProvider =
+        approvedPath(tempDir.resolve("byFile_custom_pathProvider-approved.txt"));
+    String received = "Some text";
+    writeString(pathProvider.approvedPath(), received);
+
+    approve(received).byFile(pathProvider);
   }
 
   @Test
-  void approve_reviewedBy_automatic() {
-    PathProvider pathProvider = approvedPath(tempDir.resolve("approve_reviewedBy_automatic.txt"));
+  void byFile_custom_pathProviderBuilder() throws IOException {
+    PathProvider pathProviderBuilder = nextToTest();
+    String received = "Some text";
+    writeString(pathProviderBuilder.filenameExtension("txt").approvedPath(), received);
 
-    approve("Some text").reviewedBy(automatic()).byFile(pathProvider);
-
-    assertThat(pathProvider.approvedPath()).content().isEqualTo("Some text\n");
-    assertThat(pathProvider.receivedPath()).doesNotExist();
+    approve(received).byFile(pathProviderBuilder);
   }
 
   @Test
-  void approve_pojo_byFile_pre_and_post_printed_scrubbing() {
-    approve(new Person("Micha", LocalDate.of(1982, 2, 19)))
-        .scrubbedOf(person -> new Person("[scrubbed id]", person.name, person.birthday))
-        .printedBy(Object::toString)
-        .scrubbedOf(dateTimeFormat("yyyy-MM-dd"))
-        .byFile();
+  void byFile_path() throws IOException {
+    Path path = tempDir.resolve("byFile_path-approved.txt");
+    String received = "Some text";
+    writeString(path, received);
+
+    approve(received).byFile(path);
   }
 
   @Test
-  void approve_byFile_in_lambda() {
+  void byFile_path_string() throws IOException {
+    Path path = tempDir.resolve("byFile_path_string-approved.txt");
+    String received = "Some text";
+    writeString(path, received);
+
+    approve(received).byFile(path.toString());
+  }
+
+  @Test
+  void byFile_in_lambda() {
     await()
         .untilAsserted(
             () ->
