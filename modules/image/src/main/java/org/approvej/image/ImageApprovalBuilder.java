@@ -4,11 +4,11 @@ import static org.approvej.configuration.Configuration.configuration;
 import static org.approvej.image.approve.ImageFileApprover.imageFile;
 import static org.approvej.image.compare.ImageComparators.perceptualHash;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.function.UnaryOperator;
 import javax.imageio.ImageIO;
 import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviders;
@@ -17,7 +17,6 @@ import org.approvej.image.compare.ImageComparator;
 import org.approvej.review.FileReviewer;
 import org.approvej.review.ReviewResult;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class ImageApprovalBuilder {
@@ -25,14 +24,14 @@ public class ImageApprovalBuilder {
   private final BufferedImage value;
   private final String name;
   private final String filenameExtension;
-  @Nullable private final FileReviewer fileReviewer;
+  private final FileReviewer fileReviewer;
   private final ImageComparator comparator;
 
   private ImageApprovalBuilder(
       BufferedImage image,
       String name,
       String filenameExtension,
-      @Nullable FileReviewer fileReviewer,
+      FileReviewer fileReviewer,
       ImageComparator comparator) {
     this.value = image;
     this.name = name;
@@ -91,6 +90,29 @@ public class ImageApprovalBuilder {
   }
 
   /**
+   * Applies a scrubber to mask regions of the image before comparison.
+   *
+   * <p>This is useful for hiding dynamic content like version numbers, timestamps, or ads that
+   * would otherwise cause approval tests to fail.
+   *
+   * <p>Example:
+   *
+   * <pre>{@code
+   * approveImage(screenshot)
+   *     .scrubbedOf(region(10, 50, 100, 20))
+   *     .byFile();
+   * }</pre>
+   *
+   * @param scrubber a function that modifies the image to mask dynamic regions
+   * @return a new builder with the scrubbed image
+   * @see org.approvej.image.scrub.ImageScrubbers
+   */
+  public ImageApprovalBuilder scrubbedOf(UnaryOperator<BufferedImage> scrubber) {
+    return new ImageApprovalBuilder(
+        scrubber.apply(value), name, filenameExtension, fileReviewer, comparator);
+  }
+
+  /**
    * Approves the image by comparing it to a file next to the test class.
    *
    * <p>This is equivalent to calling {@code byFile(PathProviders.nextToTest())}.
@@ -112,7 +134,7 @@ public class ImageApprovalBuilder {
         pathProvider.filenameAffix(name).filenameExtension(filenameExtension);
     ImageFileApprover approver = imageFile(updatedPathProvider, comparator);
     ImageApprovalResult approvalResult = approver.apply(value);
-    if (approvalResult.needsApproval() && fileReviewer != null) {
+    if (approvalResult.needsApproval()) {
       ReviewResult reviewResult = fileReviewer.apply(updatedPathProvider);
       if (reviewResult.needsReapproval()) {
         approvalResult = approver.apply(value);
