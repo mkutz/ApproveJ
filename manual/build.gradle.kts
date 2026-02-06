@@ -23,9 +23,13 @@ testing {
         useJUnitJupiter()
         dependencies {
           implementation(project(":modules:core"))
+          implementation(project(":modules:image"))
           implementation(project(":modules:json-jackson"))
           implementation(project(":modules:yaml-jackson"))
           implementation(project(":modules:http"))
+
+          implementation(libs.playwright)
+          implementation(libs.selenium)
 
           implementation(libs.jackson2.databind)
           implementation(libs.jackson2.dataformat.yaml)
