@@ -16,3 +16,16 @@ Approval testing is especially useful for testing complex objects or large data 
 ApproveJ is a Java implementation of approval testing with a builder-based fluent API, several built-in tools, and optional extension points.
 
 To review the code, file issues or suggest changes, please visit the project's link:https://github.com/mkutz/approvej[GitHub page].
+
+
+== API Reference
+
+Javadoc for each module is available here:
+
+- link:{javadoc-url}/core/index.html[core] -- core framework
+- link:{javadoc-url}/http/index.html[http] -- HTTP stub server
+- link:{javadoc-url}/http-wiremock/index.html[http-wiremock] -- WireMock adapter
+- link:{javadoc-url}/json-jackson/index.html[json-jackson] -- JSON support (Jackson 2.x)
+- link:{javadoc-url}/json-jackson3/index.html[json-jackson3] -- JSON support (Jackson 3.x)
+- link:{javadoc-url}/yaml-jackson/index.html[yaml-jackson] -- YAML support (Jackson 2.x)
+- link:{javadoc-url}/yaml-jackson3/index.html[yaml-jackson3] -- YAML support (Jackson 3.x)

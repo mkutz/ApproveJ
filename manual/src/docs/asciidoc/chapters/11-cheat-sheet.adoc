@@ -1,0 +1,295 @@
+= Cheat Sheet
+
+Quick reference for the ApproveJ public API, organized by the approval flow.
+
+
+== Entry Point
+
+[cols="2,3"]
+|===
+|Method |Description
+
+|`ApprovalBuilder.approve(T value)`
+|Start building an approval for a value
+
+|`.named(String name)`
+|Set a custom name for the approval (used in filenames)
+
+|`.printedAs(PrintFormat<T> printFormat)`
+|Convert value to string using a `PrintFormat`
+
+|`.printedBy(Function<T, String> printer)`
+|Convert value to string using a custom function
+
+|`.printed()`
+|Convert value to string using the default print format
+
+|`.scrubbedOf(UnaryOperator<T> scrubber)`
+|Apply a scrubber to remove dynamic data
+
+|`.reviewedBy(FileReviewer fileReviewer)`
+|Set the file reviewer for this approval
+
+|`.reviewedBy(String script)`
+|Set a review script for this approval
+
+|`.byValue(String previouslyApproved)`
+|Approve against an inline string
+
+|`.byFile()`
+|Approve against a file next to the test
+
+|`.byFile(PathProvider pathProvider)`
+|Approve against a file at a custom path
+
+|`.byFile(Path approvedPath)`
+|Approve against a file at the given path
+
+|`.byFile(String approvedPath)`
+|Approve against a file at the given path string
+
+|`.by(Function<String, ApprovalResult> approver)`
+|Approve using a custom approver function
+|===
+
+
+== Print Formats
+
+[cols="2,3"]
+|===
+|Factory Method |Description
+
+|`SingleLineStringPrintFormat.singleLineString()`
+|Print via `toString()` on a single line (default)
+
+|`MultiLineStringPrintFormat.multiLineString()`
+|Print each property on a new line
+
+|`multiLineString().sorted()`
+|Same as above but with sorted properties
+
+|`JsonPrintFormat.json()`
+|Pretty print as JSON (requires `json-jackson` or `json-jackson3`)
+
+|`JsonPrintFormat.json(ObjectMapper)`
+|Pretty print as JSON with a custom `ObjectMapper`
+
+|`YamlPrintFormat.yaml()`
+|Print as YAML (requires `yaml-jackson` or `yaml-jackson3`)
+
+|`YamlPrintFormat.yaml(ObjectMapper)`
+|Print as YAML with a custom `ObjectMapper`
+
+|`ReceivedHttpRequestPrintFormat.httpRequest()`
+|Print as HTTP request format (requires `http`)
+|===
+
+
+== Scrubbers
+
+=== String Scrubbers
+
+[cols="2,3"]
+|===
+|Factory Method |Description
+
+|`Scrubbers.strings(String first, String... more)`
+|Scrub specific string values
+
+|`Scrubbers.stringsMatching(Pattern pattern)`
+|Scrub strings matching a regex pattern
+
+|`Scrubbers.stringsMatching(String pattern)`
+|Scrub strings matching a regex string
+
+|`Scrubbers.uuids()`
+|Scrub UUID strings
+|===
+
+=== Date/Time Scrubbers
+
+[cols="2,3"]
+|===
+|Factory Method |Description
+
+|`Scrubbers.dateTimeFormat(String pattern)`
+|Scrub dates matching a `DateTimeFormatter` pattern
+
+|`Scrubbers.dateTimeFormat(String pattern, Locale locale)`
+|Same with a specific locale
+
+|`Scrubbers.isoLocalDates()`
+|Scrub ISO local dates (`2024-01-15`)
+
+|`Scrubbers.isoOffsetDates()`
+|Scrub ISO offset dates
+
+|`Scrubbers.isoDates()`
+|Scrub ISO dates
+
+|`Scrubbers.isoLocalTimes()`
+|Scrub ISO local times (`10:15:30`)
+
+|`Scrubbers.isoOffsetTimes()`
+|Scrub ISO offset times
+
+|`Scrubbers.isoTimes()`
+|Scrub ISO times
+
+|`Scrubbers.isoLocalDateTimes()`
+|Scrub ISO local date-times
+
+|`Scrubbers.isoOffsetDateTimes()`
+|Scrub ISO offset date-times
+
+|`Scrubbers.isoZonedDateTimes()`
+|Scrub ISO zoned date-times
+
+|`Scrubbers.isoZonedDateTimes(Locale locale)`
+|Same with a specific locale
+
+|`Scrubbers.isoDateTimes()`
+|Scrub ISO date-times
+
+|`Scrubbers.isoDateTimes(Locale locale)`
+|Same with a specific locale
+
+|`Scrubbers.isoOrdinalDates()`
+|Scrub ISO ordinal dates
+
+|`Scrubbers.isoWeekDates()`
+|Scrub ISO week dates
+
+|`Scrubbers.isoInstants()`
+|Scrub ISO instants
+
+|`Scrubbers.basicIsoDates()`
+|Scrub basic ISO dates (`20240115`)
+
+|`Scrubbers.rfc1123DateTimes()`
+|Scrub RFC 1123 date-times
+|===
+
+=== Field Scrubbers
+
+[cols="2,3"]
+|===
+|Factory Method |Description
+
+|`Scrubbers.field(Class<T> type, String fieldName)`
+|Scrub a field value on objects of the given type
+|===
+
+=== JSON Scrubbers
+
+[cols="2,3"]
+|===
+|Factory Method |Description
+
+|`JsonPointerScrubber.jsonPointer(String jsonPointer)`
+|Scrub a JSON node at the given JSON Pointer path
+|===
+
+=== HTTP Scrubbers
+
+[cols="2,3"]
+|===
+|Factory Method |Description
+
+|`HttpScrubbers.headerValue(String headerName)`
+|Scrub an HTTP header value by name
+
+|`HttpScrubbers.hostHeaderValue()`
+|Scrub the `Host` header value
+
+|`HttpScrubbers.userAgentHeaderValue()`
+|Scrub the `User-agent` header value
+|===
+
+
+== Replacements
+
+[cols="2,3"]
+|===
+|Factory Method |Description
+
+|`Replacements.numbered(String label)`
+|Replace with `[label 1]`, `[label 2]`, etc.
+
+|`Replacements.numbered()`
+|Replace with numbered placeholder using default label
+
+|`Replacements.labeled(String label)`
+|Replace with `[scrubbed label]`
+
+|`Replacements.string(String replacement)`
+|Replace with a fixed string
+
+|`Replacements.relativeDate()`
+|Replace with relative date (e.g. `[today]`, `[yesterday]`)
+
+|`Replacements.relativeDateTime()`
+|Replace with relative date-time
+
+|`Replacements.masking()`
+|Replace characters with `*`
+|===
+
+
+== Approvers & Path Providers
+
+[cols="2,3"]
+|===
+|Factory Method |Description
+
+|`PathProviders.nextToTest()`
+|Place files next to the test class (default)
+
+|`PathProviders.nextToTestInSubdirectory()`
+|Place files in a subdirectory named after the test class
+
+|`PathProviders.approvedPath(Path path)`
+|Use a specific approved file path
+
+|`PathProviders.approvedPath(String path)`
+|Use a specific approved file path string
+|===
+
+
+== File Reviewers
+
+[cols="2,3"]
+|===
+|Factory Method |Description
+
+|`Reviewers.none()`
+|Do nothing on mismatch (default)
+
+|`Reviewers.automatic()`
+|Automatically accept all received values
+
+|`Reviewers.script(String script)`
+|Run a script with `\{receivedFile}` and `\{approvedFile}` placeholders
+|===
+
+
+== Configuration Properties
+
+[cols="2,2,1"]
+|===
+|Property |Environment Variable |Default
+
+|`defaultPrintFormat`
+|`APPROVEJ_DEFAULT_PRINT_FORMAT`
+|`singleLineString`
+
+|`defaultFileReviewer`
+|`APPROVEJ_DEFAULT_FILE_REVIEWER`
+|`none`
+
+|`defaultFileReviewerScript`
+|`APPROVEJ_DEFAULT_FILE_REVIEWER_SCRIPT`
+|_(none)_
+|===
+
+Configuration is resolved in priority order: environment variables > project properties (`src/test/resources/approvej.properties`) > user home properties (`~/.config/approvej/approvej.properties`) > defaults.

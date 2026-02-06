@@ -151,6 +151,24 @@ TIP: Use `--wait` or similar flags if your diff tool supports them to make the r
 This allows you to approve changes before the test finishes.
 
 
+[id="configuration_cicd"]
+== CI/CD Environments
+
+In CI/CD pipelines, no diff tool should open on test failures.
+The default `defaultFileReviewer` is `none`, which is the correct setting for CI.
+
+WARNING: Do not set `defaultFileReviewer` to `automatic` in CI, as it would silently accept all changes without human review.
+
+When a test fails, the received file is written next to the approved file.
+You can configure your CI to archive these as build artifacts for manual inspection.
+
+.Example: Explicitly set the file reviewer via environment variable
+[source,bash]
+----
+export APPROVEJ_DEFAULT_FILE_REVIEWER=none
+----
+
+
 [id="custom_extensions"]
 == Custom Extensions
 

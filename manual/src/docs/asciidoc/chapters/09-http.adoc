@@ -3,6 +3,8 @@
 ApproveJ provides capabilities to approval test HTTP requests sent by your software component.
 The core concept is the link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequest.html[`ReceivedHttpRequest`] record, which captures the method, URI, headers, and body of an HTTP request.
 
+HTTP approval testing follows the same <<printing,print>>, <<scrubbing,scrub>>, and <<approving,approve>> flow as any other value, with dedicated print formats and scrubbers for HTTP data.
+
 There are two ways to capture HTTP requests for approval:
 
 * **`HttpStubServer`** – A lightweight stub server included in the `http` module.

@@ -98,6 +98,8 @@ TIP: If you use the ApproveJ BOM, you can omit the Jackson version numbers as th
 
 NOTE: Jackson 3 has Java date/time support built-in, so no separate `jackson-datatype-jsr310` dependency is needed.
 
+The YAML module provides a `YamlPrintFormat` (see <<printing>>) for rendering objects as YAML in the approval flow.
+
 === Import Differences
 
 The API is identical between both modules.

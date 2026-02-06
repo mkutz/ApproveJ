@@ -8,6 +8,7 @@ Michael Kutz <mail@michael-kutz.de>
 :source-highlighter: highlight.js
 :highlightjs-languages: java, kotlin, xml, properties
 :hide-uri-scheme:
+:docinfo: shared
 :javadoc-url: javadoc
 
 include::chapters/00-introduction.adoc[leveloffset=1]
@@ -21,3 +22,4 @@ include::chapters/07-json-jackson.adoc[leveloffset=1]
 include::chapters/08-yaml-jackson.adoc[leveloffset=1]
 include::chapters/09-http.adoc[leveloffset=1]
 include::chapters/10-configuration.adoc[leveloffset=1]
+include::chapters/11-cheat-sheet.adoc[leveloffset=1]

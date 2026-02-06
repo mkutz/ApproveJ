@@ -1,0 +1,61 @@
+<style>
+  /* GitHub corner */
+  .github-corner:hover .octo-arm {
+    animation: octocat-wave 560ms ease-in-out;
+  }
+  @keyframes octocat-wave {
+    0%, 100% { transform: rotate(0); }
+    20%, 60% { transform: rotate(-25deg); }
+    40%, 80% { transform: rotate(10deg); }
+  }
+  @media (max-width: 500px) {
+    .github-corner:hover .octo-arm {
+      animation: none;
+    }
+    .github-corner .octo-arm {
+      animation: octocat-wave 560ms ease-in-out;
+    }
+  }
+  .github-corner,
+  .github-corner:hover {
+    color: #fff;
+  }
+  .github-corner svg {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 1000;
+  }
+
+  /* Logo */
+  #header h1::before {
+    content: "";
+    display: inline-block;
+    width: 1.2em;
+    height: 1.2em;
+    margin-right: 0.3em;
+    vertical-align: middle;
+    background: url("img/logo.svg") no-repeat center / contain;
+  }
+
+  /* Footer */
+  #approvej-footer {
+    margin-top: 3em;
+    padding: 1.5em 0;
+    border-top: 1px solid #ddddd8;
+    text-align: center;
+    font-size: 0.9em;
+    color: #6f6f6f;
+  }
+  #approvej-footer a {
+    color: #2156a5;
+    text-decoration: none;
+    margin: 0 0.6em;
+  }
+  #approvej-footer a:hover {
+    text-decoration: underline;
+  }
+  #approvej-footer .footer-links {
+    margin-bottom: 0.5em;
+  }
+</style>

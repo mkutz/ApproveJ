@@ -130,8 +130,9 @@ val updatePages by
 
     into(layout.buildDirectory.dir("pages"))
 
-    // Favicon
+    // Favicon and logo
     from("favicon.png") { into("img") }
+    from("logo.svg") { into("img") }
 
     // AsciiDoc manual
     from(project(":manual").tasks.named("asciidoctor"))
