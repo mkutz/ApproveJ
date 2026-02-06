@@ -3,11 +3,14 @@ package examples.java;
 import static org.approvej.image.ImageApprovalBuilder.approveImage;
 import static org.approvej.image.compare.ImageComparators.perceptualHash;
 import static org.approvej.image.compare.ImageComparators.pixel;
+import static org.approvej.image.scrub.ImageScrubbers.region;
+import static org.approvej.image.scrub.ImageScrubbers.regions;
 
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserType;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
+import java.awt.Rectangle;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
@@ -138,6 +141,74 @@ class ImageDocTest {
           .byFile();
     }
     // end::approve_screenshot_element[]
+  }
+
+  @Test
+  void approve_screenshot_scrubbed() {
+    // tag::approve_screenshot_scrubbed[]
+    try (Playwright playwright = Playwright.create()) {
+      Browser browser =
+          playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
+      Page page = browser.newPage();
+      page.setViewportSize(1280, 720);
+
+      page.navigate("https://approvej.org");
+      page.waitForLoadState();
+
+      // Scrub dynamic content like version numbers by masking a region
+      approveImage(page.screenshot())
+          .scrubbedOf(region(10, 50, 100, 20)) // <1>
+          .byFile();
+    }
+    // end::approve_screenshot_scrubbed[]
+  }
+
+  @Test
+  void approve_screenshot_scrubbed_element() {
+    // tag::approve_screenshot_scrubbed_element[]
+    try (Playwright playwright = Playwright.create()) {
+      Browser browser =
+          playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
+      Page page = browser.newPage();
+      page.setViewportSize(1280, 720);
+
+      page.navigate("https://approvej.org");
+      page.waitForLoadState();
+
+      // Use element bounding box to scrub dynamic content
+      var versionElement = page.locator("#revnumber");
+      var bounds = versionElement.boundingBox();
+
+      approveImage(page.screenshot())
+          .scrubbedOf(
+              region( // <1>
+                  (int) bounds.x, (int) bounds.y, (int) bounds.width, (int) bounds.height))
+          .byFile();
+    }
+    // end::approve_screenshot_scrubbed_element[]
+  }
+
+  @Test
+  void approve_screenshot_scrubbed_multiple() {
+    // tag::approve_screenshot_scrubbed_multiple[]
+    try (Playwright playwright = Playwright.create()) {
+      Browser browser =
+          playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true));
+      Page page = browser.newPage();
+      page.setViewportSize(1280, 720);
+
+      page.navigate("https://approvej.org");
+      page.waitForLoadState();
+
+      // Scrub multiple regions at once
+      approveImage(page.screenshot())
+          .scrubbedOf(
+              regions( // <1>
+                  new Rectangle(10, 50, 100, 20), // version number
+                  new Rectangle(200, 100, 80, 15))) // timestamp
+          .byFile();
+    }
+    // end::approve_screenshot_scrubbed_multiple[]
   }
 
   @Test
