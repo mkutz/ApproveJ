@@ -2,6 +2,10 @@
 
 Quick reference for the ApproveJ public API, organized by the approval flow.
 
+ifndef::backend-pdf[]
+TIP: A link:pdf/cheat-sheet-pdf.pdf[printable PDF version] of this cheat sheet is available.
+endif::[]
+
 
 == Entry Point
 

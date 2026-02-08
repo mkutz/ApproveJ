@@ -6,6 +6,7 @@ plugins {
   `jvm-test-suite`
   alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.asciidoctor)
+  alias(libs.plugins.asciidoctor.pdf)
 }
 
 java { toolchain { languageVersion.set(JavaLanguageVersion.of(21)) } }
@@ -48,4 +49,17 @@ tasks.withType<org.asciidoctor.gradle.jvm.AsciidoctorTask> {
   configurations("asciidoctorExt")
 }
 
-asciidoctorj { modules { diagram.use() } }
+tasks.register<org.asciidoctor.gradle.jvm.pdf.AsciidoctorPdfTask>("cheatSheetPdf") {
+  baseDirFollowsSourceFile()
+  sourceDir(file("src/docs/asciidoc"))
+  setOutputDir(layout.buildDirectory.dir("docs/asciidocPdf"))
+  sources { include("cheat-sheet-pdf.adoc") }
+}
+
+asciidoctorj {
+  setVersion("3.0.0")
+  modules {
+    diagram.use()
+    pdf.version("2.3.19")
+  }
+}

@@ -137,6 +137,9 @@ val updatePages by
     // AsciiDoc manual
     from(project(":manual").tasks.named("asciidoctor"))
 
+    // Cheat sheet PDF
+    from(project(":manual").tasks.named("cheatSheetPdf")) { into("pdf") }
+
     // Javadoc for each module
     project(":modules").subprojects.forEach { module ->
       from(module.tasks.named("javadoc")) { into("javadoc/${module.name}") }

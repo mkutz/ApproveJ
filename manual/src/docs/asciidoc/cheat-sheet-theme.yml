@@ -1,0 +1,21 @@
+extends: default
+page:
+  margin: [0.47in, 0.47in, 0.47in, 0.47in]
+  size: A4
+base:
+  font_size: 8
+  line_height_length: 10
+heading:
+  font_size: 14
+  h2_font_size: 10.5
+  h3_font_size: 9
+  margin_top: 4
+  margin_bottom: 2
+table:
+  font_size: 7.5
+  cell_padding: [1.5, 3, 1.5, 3]
+  head:
+    font_style: bold
+  border_width: 0.3
+code:
+  font_size: 7
