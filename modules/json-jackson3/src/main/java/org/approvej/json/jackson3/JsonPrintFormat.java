@@ -10,6 +10,7 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectReader;
 import tools.jackson.databind.ObjectWriter;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 /**
  * A {@link PrintFormat} that uses {@link ObjectWriter#writeValueAsString(Object)} to print a value
@@ -30,7 +31,10 @@ public final class JsonPrintFormat<T> implements PrintFormat<T>, PrintFormatProv
     }
   }
 
-  private static final ObjectMapper DEFAULT_JSON_MAPPER = JsonMapper.builder().build();
+  private static final ObjectMapper DEFAULT_JSON_MAPPER =
+      JsonMapper.builder()
+          .addModule(new SimpleModule().setSerializerModifier(new DeterministicPropertyOrder()))
+          .build();
 
   private final ObjectWriter objectWriter;
   private final ObjectReader objectReader;

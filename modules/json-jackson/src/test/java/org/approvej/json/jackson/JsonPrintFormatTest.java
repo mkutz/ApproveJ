@@ -82,6 +82,34 @@ class JsonPrintFormatTest {
   }
 
   @Test
+  void printer_pojo_getters() {
+    assertThat(json().printer().apply(new PersonPojo("Micha", "Kutz")))
+        .isEqualTo(
+            """
+            {
+              "firstName" : "Micha",
+              "lastName" : "Kutz",
+              "fullName" : "Micha Kutz",
+              "initials" : "MK"
+            }\
+            """);
+  }
+
+  @Test
+  void printer_inheritance() {
+    assertThat(json().printer().apply(new Pet("Luna", "cat", 4)))
+        .isEqualTo(
+            """
+            {
+              "species" : "cat",
+              "legs" : 4,
+              "name" : "Luna",
+              "description" : "Luna the cat"
+            }\
+            """);
+  }
+
+  @Test
   void printer_invalid() {
     Printer<Object> printer = json().printer();
     assertThatExceptionOfType(JsonPrinterException.class).isThrownBy(() -> printer.apply("{"));
@@ -90,5 +118,52 @@ class JsonPrintFormatTest {
   @Test
   void filenameExtension() {
     assertThat(json().filenameExtension()).isEqualTo("json");
+  }
+
+  @SuppressWarnings("unused")
+  static class PersonPojo {
+
+    public final String firstName;
+    public final String lastName;
+
+    PersonPojo(String firstName, String lastName) {
+      this.firstName = firstName;
+      this.lastName = lastName;
+    }
+
+    public String getFullName() {
+      return firstName + " " + lastName;
+    }
+
+    public String getInitials() {
+      return "" + firstName.charAt(0) + lastName.charAt(0);
+    }
+  }
+
+  @SuppressWarnings("unused")
+  static class Animal {
+
+    public final String species;
+    public final int legs;
+
+    Animal(String species, int legs) {
+      this.species = species;
+      this.legs = legs;
+    }
+  }
+
+  @SuppressWarnings("unused")
+  static class Pet extends Animal {
+
+    public final String name;
+
+    Pet(String name, String species, int legs) {
+      super(species, legs);
+      this.name = name;
+    }
+
+    public String getDescription() {
+      return name + " the " + species;
+    }
   }
 }

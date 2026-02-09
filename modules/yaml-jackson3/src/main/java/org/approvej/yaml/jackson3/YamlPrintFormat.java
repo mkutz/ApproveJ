@@ -8,6 +8,7 @@ import org.jspecify.annotations.NullMarked;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.module.SimpleModule;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 
 /**
@@ -32,7 +33,10 @@ public record YamlPrintFormat<T>(ObjectWriter objectWriter)
   }
 
   // Note: Jackson 3 has Java date/time support built-in, no need for JavaTimeModule
-  private static final YAMLMapper DEFAULT_YAML_MAPPER = YAMLMapper.builder().build();
+  private static final YAMLMapper DEFAULT_YAML_MAPPER =
+      YAMLMapper.builder()
+          .addModule(new SimpleModule().setSerializerModifier(new DeterministicPropertyOrder()))
+          .build();
 
   /**
    * Creates a {@link YamlPrintFormat} using the given {@link ObjectWriter}.
