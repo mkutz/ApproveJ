@@ -2,13 +2,12 @@ package org.approvej.json.jackson;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.approvej.configuration.Configuration;
 import org.approvej.print.PrintFormat;
@@ -38,10 +37,8 @@ public final class JsonPrintFormat<T> implements PrintFormat<T>, PrintFormatProv
   private static final ObjectMapper DEFAULT_JSON_MAPPER =
       JsonMapper.builder()
           .addModule(new JavaTimeModule())
-          .build()
-          .setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE)
-          .setVisibility(PropertyAccessor.IS_GETTER, JsonAutoDetect.Visibility.NONE)
-          .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+          .addModule(new SimpleModule().setSerializerModifier(new DeterministicPropertyOrder()))
+          .build();
 
   private final ObjectWriter objectWriter;
   private final ObjectReader objectReader;

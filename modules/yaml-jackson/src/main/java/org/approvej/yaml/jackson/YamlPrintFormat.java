@@ -5,6 +5,7 @@ import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.approvej.configuration.Configuration;
@@ -35,7 +36,10 @@ public record YamlPrintFormat<T>(ObjectWriter objectWriter)
   }
 
   private static final YAMLMapper DEFAULT_YAML_MAPPER =
-      YAMLMapper.builder().addModule(new JavaTimeModule()).build();
+      YAMLMapper.builder()
+          .addModule(new JavaTimeModule())
+          .addModule(new SimpleModule().setSerializerModifier(new DeterministicPropertyOrder()))
+          .build();
 
   /**
    * Creates a {@link YamlPrintFormat} using the given {@link ObjectWriter}.
