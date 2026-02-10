@@ -161,7 +161,7 @@ public record MultiLineStringPrintFormat(Printer<Object> printer)
       Set<String> allFieldNames =
           hierarchy.stream()
               .flatMap(clazz -> stream(clazz.getDeclaredFields()))
-              .filter(f -> !Modifier.isStatic(f.getModifiers()) && !f.isSynthetic())
+              .filter(field -> !Modifier.isStatic(field.getModifiers()) && !field.isSynthetic())
               .map(Field::getName)
               .collect(toSet());
 
@@ -187,7 +187,7 @@ public record MultiLineStringPrintFormat(Printer<Object> printer)
     private Stream<Property> fieldBackedProperties(
         Class<?> clazz, Object object, Set<String> seen) {
       return stream(clazz.getDeclaredFields())
-          .filter(f -> !Modifier.isStatic(f.getModifiers()) && !f.isSynthetic())
+          .filter(field -> !Modifier.isStatic(field.getModifiers()) && !field.isSynthetic())
           .flatMap(
               field ->
                   findGetterForField(field, clazz)
@@ -200,11 +200,11 @@ public record MultiLineStringPrintFormat(Printer<Object> printer)
         Class<?> clazz, Object object, Set<String> allFieldNames, Set<String> seen) {
       return stream(clazz.getDeclaredMethods())
           .filter(
-              m ->
-                  !Modifier.isStatic(m.getModifiers())
-                      && !m.isSynthetic()
-                      && m.getParameterCount() == 0
-                      && m.getReturnType() != void.class)
+              method ->
+                  !Modifier.isStatic(method.getModifiers())
+                      && !method.isSynthetic()
+                      && method.getParameterCount() == 0
+                      && method.getReturnType() != void.class)
           .flatMap(
               method ->
                   derivePropertyName(method)
@@ -220,13 +220,13 @@ public record MultiLineStringPrintFormat(Printer<Object> printer)
       Set<String> candidates = Set.of(fieldName, "get" + capitalized, "is" + capitalized);
       return stream(clazz.getDeclaredMethods())
           .filter(
-              m ->
-                  !Modifier.isStatic(m.getModifiers())
-                      && !m.isSynthetic()
-                      && m.getParameterCount() == 0
-                      && m.getReturnType() != void.class)
-          .filter(m -> candidates.contains(m.getName()))
-          .filter(m -> !m.getName().startsWith("is") || isBooleanReturnType(m))
+              method ->
+                  !Modifier.isStatic(method.getModifiers())
+                      && !method.isSynthetic()
+                      && method.getParameterCount() == 0
+                      && method.getReturnType() != void.class)
+          .filter(method -> candidates.contains(method.getName()))
+          .filter(method -> !method.getName().startsWith("is") || isBooleanReturnType(method))
           .findFirst();
     }
 
