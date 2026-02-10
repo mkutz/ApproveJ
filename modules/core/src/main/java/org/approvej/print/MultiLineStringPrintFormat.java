@@ -150,7 +150,11 @@ public record MultiLineStringPrintFormat(Printer<Object> printer)
     }
 
     private List<Property> discoverProperties(Object object) {
-      List<Class<?>> hierarchy = getTypes(object);
+      List<Class<?>> hierarchy =
+          Stream.<Class<?>>iterate(
+                  object.getClass(), type -> type != Object.class, Class::getSuperclass)
+              .toList()
+              .reversed();
 
       Set<String> allFieldNames = new LinkedHashSet<>();
       for (Class<?> clazz : hierarchy) {
@@ -161,8 +165,7 @@ public record MultiLineStringPrintFormat(Printer<Object> printer)
         }
       }
 
-      List<Property> fieldBacked = new ArrayList<>();
-      List<Property> getterOnly = new ArrayList<>();
+      List<Property> properties = new ArrayList<>();
       Set<String> seen = new LinkedHashSet<>();
 
       for (Class<?> clazz : hierarchy) {
@@ -172,7 +175,7 @@ public record MultiLineStringPrintFormat(Printer<Object> printer)
           }
           Method getter = findGetterForField(field, clazz);
           if (getter != null && seen.add(field.getName())) {
-            fieldBacked.add(new Property(field.getName(), object, getter));
+            properties.add(new Property(field.getName(), object, getter));
           }
         }
 
@@ -187,22 +190,17 @@ public record MultiLineStringPrintFormat(Printer<Object> printer)
           if (propertyName != null
               && !allFieldNames.contains(propertyName)
               && seen.add(propertyName)) {
-            getterOnly.add(new Property(propertyName, object, method));
+            properties.add(new Property(propertyName, object, method));
           }
         }
       }
 
       if (propertyNameComparator != null) {
-        List<Property> all = new ArrayList<>(fieldBacked);
-        all.addAll(getterOnly);
-        all.sort(Comparator.comparing(Property::name, propertyNameComparator));
-        return all;
+        properties.sort(Comparator.comparing(Property::name, propertyNameComparator));
+        return properties;
       }
 
-      getterOnly.sort(Comparator.comparing(Property::name));
-      List<Property> result = new ArrayList<>(fieldBacked);
-      result.addAll(getterOnly);
-      return result;
+      return PropertyOrdering.reorder(object.getClass(), properties, Property::name);
     }
 
     private @Nullable Method findGetterForField(Field field, Class<?> clazz) {
@@ -230,13 +228,6 @@ public record MultiLineStringPrintFormat(Printer<Object> printer)
         return Character.toLowerCase(name.charAt(2)) + name.substring(3);
       }
       return null;
-    }
-
-    private List<Class<?>> getTypes(Object object) {
-      return Stream.<Class<?>>iterate(
-              object.getClass(), type -> type != Object.class, Class::getSuperclass)
-          .toList()
-          .reversed();
     }
 
     private record Property(String name, Object target, Method accessor) {
