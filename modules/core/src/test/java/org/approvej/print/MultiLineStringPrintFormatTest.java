@@ -118,6 +118,25 @@ class MultiLineStringPrintFormatTest {
   }
 
   @Test
+  void printer_getter_non_boolean_is_method() {
+    //noinspection unused
+    record Widget(String name, boolean active) {
+      public String isType() {
+        return "special";
+      }
+    }
+
+    assertThat(multiLineString().printer().apply(new Widget("Gear", true)))
+        .isEqualTo(
+            """
+            Widget [
+              name=Gear,
+              active=true
+            ]\
+            """);
+  }
+
+  @Test
   void printer_pojo_getters() {
     assertThat(multiLineString().printer().apply(new PersonPojo("Micha", "Kutz")))
         .isEqualTo(
