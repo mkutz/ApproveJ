@@ -57,16 +57,24 @@ class YamlPrintFormatTest {
       }
     }
 
-    assertThat(yaml().printer().apply(new Person("Micha", LocalDate.of(1982, 2, 19))))
+    LocalDate birthday = LocalDate.of(1982, 2, 19);
+    int age = Period.between(birthday, LocalDate.now()).getYears();
+    LocalDate today = LocalDate.now();
+    boolean birthdayToday =
+        birthday.getDayOfMonth() == today.getDayOfMonth()
+            && birthday.getMonth() == today.getMonth();
+
+    assertThat(yaml().printer().apply(new Person("Micha", birthday)))
         .isEqualTo(
             """
             ---
             name: "Micha"
             birthday: "1982-02-19"
-            age: 43
-            birthdayToday: false
-            displayString: "Micha (43)"
-            """);
+            age: %d
+            birthdayToday: %s
+            displayString: "Micha (%d)"
+            """
+                .formatted(age, birthdayToday, age));
   }
 
   @Test
