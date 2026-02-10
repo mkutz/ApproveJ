@@ -219,8 +219,14 @@ public record MultiLineStringPrintFormat(Printer<Object> printer)
       String capitalized = fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
       Set<String> candidates = Set.of(fieldName, "get" + capitalized, "is" + capitalized);
       return stream(clazz.getDeclaredMethods())
-          .filter(m -> m.getParameterCount() == 0 && m.getReturnType() != void.class)
+          .filter(
+              m ->
+                  !Modifier.isStatic(m.getModifiers())
+                      && !m.isSynthetic()
+                      && m.getParameterCount() == 0
+                      && m.getReturnType() != void.class)
           .filter(m -> candidates.contains(m.getName()))
+          .filter(m -> !m.getName().startsWith("is") || isBooleanReturnType(m))
           .findFirst();
     }
 
@@ -229,10 +235,18 @@ public record MultiLineStringPrintFormat(Printer<Object> printer)
       if (name.startsWith("get") && name.length() > 3 && Character.isUpperCase(name.charAt(3))) {
         return Optional.of(Character.toLowerCase(name.charAt(3)) + name.substring(4));
       }
-      if (name.startsWith("is") && name.length() > 2 && Character.isUpperCase(name.charAt(2))) {
+      if (name.startsWith("is")
+          && name.length() > 2
+          && Character.isUpperCase(name.charAt(2))
+          && isBooleanReturnType(method)) {
         return Optional.of(Character.toLowerCase(name.charAt(2)) + name.substring(3));
       }
       return Optional.empty();
+    }
+
+    private static boolean isBooleanReturnType(Method method) {
+      Class<?> returnType = method.getReturnType();
+      return returnType == boolean.class || returnType == Boolean.class;
     }
 
     private record Property(String name, Object target, Method accessor) {
