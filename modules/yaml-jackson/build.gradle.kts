@@ -30,6 +30,8 @@ testing {
       getting(JvmTestSuite::class) {
         useJUnitJupiter()
         dependencies {
+          implementation(testFixtures(project(":modules:core")))
+
           implementation(libs.jackson2.databind)
           implementation(libs.jackson2.dataformat.yaml)
           implementation(libs.jackson2.jsr310)

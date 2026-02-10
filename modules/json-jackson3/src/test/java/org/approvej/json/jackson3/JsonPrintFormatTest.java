@@ -6,6 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.time.LocalDate;
 import java.time.Period;
+import org.approvej.print.PersonPojo;
+import org.approvej.print.Pet;
 import org.approvej.print.Printer;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.json.JsonMapper;
@@ -119,51 +121,4 @@ class JsonPrintFormatTest {
   }
 
   record Person(String name, LocalDate birthday) {}
-
-  @SuppressWarnings("unused")
-  static class PersonPojo {
-
-    public final String firstName;
-    public final String lastName;
-
-    PersonPojo(String firstName, String lastName) {
-      this.firstName = firstName;
-      this.lastName = lastName;
-    }
-
-    public String getFullName() {
-      return firstName + " " + lastName;
-    }
-
-    public String getInitials() {
-      return "" + firstName.charAt(0) + lastName.charAt(0);
-    }
-  }
-
-  @SuppressWarnings("unused")
-  static class Animal {
-
-    public final String species;
-    public final int legs;
-
-    Animal(String species, int legs) {
-      this.species = species;
-      this.legs = legs;
-    }
-  }
-
-  @SuppressWarnings("unused")
-  static class Pet extends Animal {
-
-    public final String name;
-
-    Pet(String name, String species, int legs) {
-      super(species, legs);
-      this.name = name;
-    }
-
-    public String getDescription() {
-      return name + " the " + species;
-    }
-  }
 }
