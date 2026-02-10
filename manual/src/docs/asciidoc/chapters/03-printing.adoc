@@ -13,6 +13,8 @@ In addition to the printing method, the `Printer`, the `PrinterFormat` also prov
 == Generic Multi Line String Print Format
 
 ApproveJ provides a generic link:{javadoc-url}/core/org/approvej/print/MultiLineStringPrintFormat.html[`MultiLineStringPrintFormat`] that will print the object with each of its properties on a new line to make comparing the result easier.
+In addition to field-backed properties, it discovers getter-only properties via `getXxx()` and `isXxx()` methods (the latter only for `boolean`/`Boolean` return types, per the JavaBeans convention).
+Field-backed properties appear first in declaration order, followed by getter-only properties alphabetically.
 You can use this format by calling the `printedAs` method on the builder.
 
 [source,java,indent=0,role="primary"]
