@@ -28,6 +28,8 @@ testing {
       getting(JvmTestSuite::class) {
         useJUnitJupiter()
         dependencies {
+          implementation(testFixtures(project(":modules:core")))
+
           implementation(libs.jackson3.databind)
 
           implementation(platform(libs.junit.bom))

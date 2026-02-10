@@ -3,6 +3,7 @@
 plugins {
   groovy
   `java-library`
+  `java-test-fixtures`
   jacoco
   `jacoco-report-aggregation`
   `jvm-test-suite`
