@@ -4,6 +4,7 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 
+import java.beans.Introspector;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -233,13 +234,13 @@ public record MultiLineStringPrintFormat(Printer<Object> printer)
     private Optional<String> derivePropertyName(Method method) {
       String name = method.getName();
       if (name.startsWith("get") && name.length() > 3 && Character.isUpperCase(name.charAt(3))) {
-        return Optional.of(Character.toLowerCase(name.charAt(3)) + name.substring(4));
+        return Optional.of(Introspector.decapitalize(name.substring(3)));
       }
       if (name.startsWith("is")
           && name.length() > 2
           && Character.isUpperCase(name.charAt(2))
           && isBooleanReturnType(method)) {
-        return Optional.of(Character.toLowerCase(name.charAt(2)) + name.substring(3));
+        return Optional.of(Introspector.decapitalize(name.substring(2)));
       }
       return Optional.empty();
     }
