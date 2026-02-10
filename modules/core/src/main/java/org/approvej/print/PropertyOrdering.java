@@ -56,10 +56,12 @@ public final class PropertyOrdering {
       return Arrays.stream(type.getRecordComponents()).map(RecordComponent::getName).toList();
     }
     List<String> names = new ArrayList<>();
-    for (Class<?> c = type; c != null && c != Object.class; c = c.getSuperclass()) {
+    for (Class<?> clazz = type;
+        clazz != null && clazz != Object.class;
+        clazz = clazz.getSuperclass()) {
       List<String> current =
-          Arrays.stream(c.getDeclaredFields())
-              .filter(f -> !Modifier.isStatic(f.getModifiers()) && !f.isSynthetic())
+          Arrays.stream(clazz.getDeclaredFields())
+              .filter(field -> !Modifier.isStatic(field.getModifiers()) && !field.isSynthetic())
               .map(Field::getName)
               .toList();
       names.addAll(0, current);
