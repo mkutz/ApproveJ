@@ -93,6 +93,73 @@ class MultiLineStringPrintFormatTest {
   private record SimpleExampleClass(UUID uuid, int number, boolean bool, Object object) {}
 
   @Test
+  void printer_getter() {
+    //noinspection unused
+    record Person(String name, int age) {
+      public String getDisplayString() {
+        return "%s (%d)".formatted(name, age);
+      }
+
+      public boolean isAdult() {
+        return age >= 18;
+      }
+    }
+
+    assertThat(multiLineString().printer().apply(new Person("Micha", 42)))
+        .isEqualTo(
+            """
+            Person [
+              name=Micha,
+              age=42,
+              adult=true,
+              displayString=Micha (42)
+            ]\
+            """);
+  }
+
+  @Test
+  void printer_pojo_getters() {
+    assertThat(multiLineString().printer().apply(new PersonPojo("Micha", "Kutz")))
+        .isEqualTo(
+            """
+            PersonPojo [
+              firstName=Micha,
+              lastName=Kutz,
+              fullName=Micha Kutz,
+              initials=MK
+            ]\
+            """);
+  }
+
+  @Test
+  void printer_inheritance() {
+    assertThat(multiLineString().printer().apply(new Pet("Luna", "cat", 4)))
+        .isEqualTo(
+            """
+            Pet [
+              species=cat,
+              legs=4,
+              name=Luna,
+              description=Luna the cat
+            ]\
+            """);
+  }
+
+  @Test
+  void printer_sorted_with_getters() {
+    assertThat(multiLineString().sorted().printer().apply(new PersonPojo("Micha", "Kutz")))
+        .isEqualTo(
+            """
+            PersonPojo [
+              firstName=Micha,
+              fullName=Micha Kutz,
+              initials=MK,
+              lastName=Kutz
+            ]\
+            """);
+  }
+
+  @Test
   void printer_complex_property() {
     ComplexExampleClass exampleObject =
         new ComplexExampleClass(
@@ -310,6 +377,73 @@ class MultiLineStringPrintFormatTest {
 
     public int number() {
       return number;
+    }
+  }
+
+  @SuppressWarnings("unused")
+  static class PersonPojo {
+
+    public final String firstName;
+    public final String lastName;
+
+    PersonPojo(String firstName, String lastName) {
+      this.firstName = firstName;
+      this.lastName = lastName;
+    }
+
+    public String getFirstName() {
+      return firstName;
+    }
+
+    public String getLastName() {
+      return lastName;
+    }
+
+    public String getFullName() {
+      return firstName + " " + lastName;
+    }
+
+    public String getInitials() {
+      return "" + firstName.charAt(0) + lastName.charAt(0);
+    }
+  }
+
+  @SuppressWarnings("unused")
+  static class Animal {
+
+    public final String species;
+    public final int legs;
+
+    Animal(String species, int legs) {
+      this.species = species;
+      this.legs = legs;
+    }
+
+    public String getSpecies() {
+      return species;
+    }
+
+    public int getLegs() {
+      return legs;
+    }
+  }
+
+  @SuppressWarnings("unused")
+  static class Pet extends Animal {
+
+    public final String name;
+
+    Pet(String name, String species, int legs) {
+      super(species, legs);
+      this.name = name;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public String getDescription() {
+      return name + " the " + species;
     }
   }
 }
