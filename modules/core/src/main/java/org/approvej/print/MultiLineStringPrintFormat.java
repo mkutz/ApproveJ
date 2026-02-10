@@ -1,6 +1,8 @@
 package org.approvej.print;
 
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -8,12 +10,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -156,78 +158,81 @@ public record MultiLineStringPrintFormat(Printer<Object> printer)
               .toList()
               .reversed();
 
-      Set<String> allFieldNames = new LinkedHashSet<>();
-      for (Class<?> clazz : hierarchy) {
-        for (Field field : clazz.getDeclaredFields()) {
-          if (!Modifier.isStatic(field.getModifiers()) && !field.isSynthetic()) {
-            allFieldNames.add(field.getName());
-          }
-        }
-      }
+      Set<String> allFieldNames =
+          hierarchy.stream()
+              .flatMap(clazz -> stream(clazz.getDeclaredFields()))
+              .filter(f -> !Modifier.isStatic(f.getModifiers()) && !f.isSynthetic())
+              .map(Field::getName)
+              .collect(toSet());
 
-      List<Property> properties = new ArrayList<>();
-      Set<String> seen = new LinkedHashSet<>();
-
-      for (Class<?> clazz : hierarchy) {
-        for (Field field : clazz.getDeclaredFields()) {
-          if (Modifier.isStatic(field.getModifiers()) || field.isSynthetic()) {
-            continue;
-          }
-          Method getter = findGetterForField(field, clazz);
-          if (getter != null && seen.add(field.getName())) {
-            properties.add(new Property(field.getName(), object, getter));
-          }
-        }
-
-        for (Method method : clazz.getDeclaredMethods()) {
-          if (Modifier.isStatic(method.getModifiers())
-              || method.isSynthetic()
-              || method.getParameterCount() != 0
-              || method.getReturnType() == void.class) {
-            continue;
-          }
-          String propertyName = derivePropertyName(method);
-          if (propertyName != null
-              && !allFieldNames.contains(propertyName)
-              && seen.add(propertyName)) {
-            properties.add(new Property(propertyName, object, method));
-          }
-        }
-      }
+      Set<String> seen = new HashSet<>();
+      List<Property> properties =
+          hierarchy.stream()
+              .flatMap(
+                  clazz ->
+                      Stream.concat(
+                          fieldBackedProperties(clazz, object, seen),
+                          getterOnlyProperties(clazz, object, allFieldNames, seen)))
+              .toList();
 
       if (propertyNameComparator != null) {
-        properties.sort(Comparator.comparing(Property::name, propertyNameComparator));
-        return properties;
+        return properties.stream()
+            .sorted(Comparator.comparing(Property::name, propertyNameComparator))
+            .toList();
       }
 
       return PropertyOrdering.reorder(object.getClass(), properties, Property::name);
     }
 
-    private @Nullable Method findGetterForField(Field field, Class<?> clazz) {
-      String fieldName = field.getName();
-      String capitalized = fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-      String[] candidates = {fieldName, "get" + capitalized, "is" + capitalized};
-      for (Method method : clazz.getDeclaredMethods()) {
-        if (method.getParameterCount() == 0 && method.getReturnType() != void.class) {
-          for (String candidate : candidates) {
-            if (method.getName().equals(candidate)) {
-              return method;
-            }
-          }
-        }
-      }
-      return null;
+    private Stream<Property> fieldBackedProperties(
+        Class<?> clazz, Object object, Set<String> seen) {
+      return stream(clazz.getDeclaredFields())
+          .filter(f -> !Modifier.isStatic(f.getModifiers()) && !f.isSynthetic())
+          .flatMap(
+              field ->
+                  findGetterForField(field, clazz)
+                      .filter(getter -> seen.add(field.getName()))
+                      .map(getter -> new Property(field.getName(), object, getter))
+                      .stream());
     }
 
-    private @Nullable String derivePropertyName(Method method) {
+    private Stream<Property> getterOnlyProperties(
+        Class<?> clazz, Object object, Set<String> allFieldNames, Set<String> seen) {
+      return stream(clazz.getDeclaredMethods())
+          .filter(
+              m ->
+                  !Modifier.isStatic(m.getModifiers())
+                      && !m.isSynthetic()
+                      && m.getParameterCount() == 0
+                      && m.getReturnType() != void.class)
+          .flatMap(
+              method ->
+                  derivePropertyName(method)
+                      .filter(name -> !allFieldNames.contains(name))
+                      .filter(name -> seen.add(name))
+                      .map(name -> new Property(name, object, method))
+                      .stream());
+    }
+
+    private Optional<Method> findGetterForField(Field field, Class<?> clazz) {
+      String fieldName = field.getName();
+      String capitalized = fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+      Set<String> candidates = Set.of(fieldName, "get" + capitalized, "is" + capitalized);
+      return stream(clazz.getDeclaredMethods())
+          .filter(m -> m.getParameterCount() == 0 && m.getReturnType() != void.class)
+          .filter(m -> candidates.contains(m.getName()))
+          .findFirst();
+    }
+
+    private Optional<String> derivePropertyName(Method method) {
       String name = method.getName();
       if (name.startsWith("get") && name.length() > 3 && Character.isUpperCase(name.charAt(3))) {
-        return Character.toLowerCase(name.charAt(3)) + name.substring(4);
+        return Optional.of(Character.toLowerCase(name.charAt(3)) + name.substring(4));
       }
       if (name.startsWith("is") && name.length() > 2 && Character.isUpperCase(name.charAt(2))) {
-        return Character.toLowerCase(name.charAt(2)) + name.substring(3);
+        return Optional.of(Character.toLowerCase(name.charAt(2)) + name.substring(3));
       }
-      return null;
+      return Optional.empty();
     }
 
     private record Property(String name, Object target, Method accessor) {
