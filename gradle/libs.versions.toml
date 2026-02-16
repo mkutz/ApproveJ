@@ -1,5 +1,5 @@
 [versions]
-junit = "6.0.2"
+junit = "6.0.3"
 assertj = "3.27.7"
 jackson2 = "2.21.0"
 jackson3 = "3.0.4"
