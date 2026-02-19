@@ -57,7 +57,9 @@ jobs:
         if: failure()
         with:
           name: modules-test-reports
-          path: modules/**/build/reports/tests/test/
+          path: |
+            modules/**/build/reports/tests/test/
+            plugins/**/build/reports/tests/test/
 
       - name: Enable auto merge for Dependabot PRs
         run: |
