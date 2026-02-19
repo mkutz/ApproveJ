@@ -31,14 +31,18 @@ import org.jspecify.annotations.Nullable;
  * @param defaultPrintFormat the {@link PrintFormat} that will be used if none is specified
  *     otherwise
  * @param defaultFileReviewer the {@link FileReviewer} that will be used if none is specified
+ * @param inventoryEnabled whether the approved file inventory is enabled
  */
 @NullMarked
 public record Configuration(
-    PrintFormat<Object> defaultPrintFormat, FileReviewer defaultFileReviewer) {
+    PrintFormat<Object> defaultPrintFormat,
+    FileReviewer defaultFileReviewer,
+    boolean inventoryEnabled) {
 
   private static final String DEFAULT_PRINT_FORMAT_PROPERTY = "defaultPrintFormat";
   private static final String DEFAULT_FILE_REVIEWER_PROPERTY = "defaultFileReviewer";
   private static final String DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY = "defaultFileReviewerScript";
+  private static final String INVENTORY_ENABLED_PROPERTY = "inventoryEnabled";
 
   /** The loaded {@link Configuration} object. */
   public static final Configuration configuration =
@@ -50,7 +54,9 @@ public record Configuration(
 
     FileReviewer fileReviewer = resolveFileReviewer(loader);
 
-    return new Configuration(printFormat, fileReviewer);
+    boolean inventoryEnabled = resolveInventoryEnabled(loader);
+
+    return new Configuration(printFormat, fileReviewer, inventoryEnabled);
   }
 
   @SuppressWarnings("unchecked")
@@ -68,5 +74,14 @@ public record Configuration(
     }
 
     return Registry.resolve(loader.get(DEFAULT_FILE_REVIEWER_PROPERTY, "none"), FileReviewer.class);
+  }
+
+  private static boolean resolveInventoryEnabled(ConfigurationLoader loader) {
+    String configured = loader.get(INVENTORY_ENABLED_PROPERTY);
+    if (configured != null) {
+      return Boolean.parseBoolean(configured);
+    }
+    String ci = System.getenv("CI");
+    return ci == null || ci.isBlank();
   }
 }

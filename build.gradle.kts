@@ -160,3 +160,23 @@ val updatePages by
       from(module.tasks.named("javadoc")) { into("javadoc/${module.name}") }
     }
   }
+
+project(":modules:core").afterEvaluate {
+  val testClasspath = the<SourceSetContainer>()["test"].runtimeClasspath
+
+  tasks.register<JavaExec>("approvejFindOrphans") {
+    group = "verification"
+    description = "List orphaned approved files"
+    classpath = testClasspath
+    mainClass.set("org.approvej.approve.ApprovedFileInventory")
+    args("--find")
+  }
+
+  tasks.register<JavaExec>("approvejCleanup") {
+    group = "verification"
+    description = "Detect and remove orphaned approved files"
+    classpath = testClasspath
+    mainClass.set("org.approvej.approve.ApprovedFileInventory")
+    args("--remove")
+  }
+}
