@@ -10,11 +10,12 @@ repositories { mavenCentral() }
 
 subprojects {
   afterEvaluate {
-    if (plugins.hasPlugin("maven-publish")) {
+    if (plugins.hasPlugin("maven-publish") && !plugins.hasPlugin("com.gradle.plugin-publish")) {
       publishing {
         publications {
           create<MavenPublication>(name) {
             from(components.findByName("java") ?: components.getByName("javaPlatform"))
+            project.properties["mavenPomArtifactId"]?.let { artifactId = "$it" }
             pom {
               project.properties["mavenPomName"]?.let { name = "$it" }
               project.properties["mavenPomDescription"]?.let { description = "$it" }
@@ -78,7 +79,10 @@ gradle.projectsEvaluated {
         mavenCentral {
           named("sonatype") {
             subprojects
-              .filter { it.plugins.hasPlugin("maven-publish") }
+              .filter {
+                it.plugins.hasPlugin("maven-publish") &&
+                  !it.plugins.hasPlugin("com.gradle.plugin-publish")
+              }
               .sortedBy { it.name }
               .forEach {
                 stagingRepository("${it.projectDir.relativeTo(rootDir)}/build/staging-deploy")
