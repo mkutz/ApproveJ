@@ -40,6 +40,10 @@ jobs:
 
       - run: ./gradlew jreleaserConfig -Pversion=${{ github.event.inputs.version }} --git-root-search
       - run: ./gradlew publish -Pversion=${{ github.event.inputs.version }}
+      - run: ./gradlew :modules:gradle-plugin:publishPlugins -Pversion=${{ github.event.inputs.version }}
+        env:
+          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
+          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
       - run: ./gradlew jreleaserFullRelease -Pversion=${{ github.event.inputs.version }} --git-root-search --stacktrace
       - uses: actions/upload-artifact@v6
         with:
