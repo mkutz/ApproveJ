@@ -187,7 +187,7 @@ public class ApprovedFileInventory {
   }
 
   /**
-   * CLI entry point for Gradle tasks.
+   * CLI entry point for build tool plugins.
    *
    * @param args {@code --find} to list orphans, {@code --remove} to delete them
    */
