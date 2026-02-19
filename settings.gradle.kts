@@ -8,6 +8,8 @@ include("modules:core")
 
 include("modules:gradle-plugin")
 
+include("modules:maven-plugin")
+
 include("modules:json-jackson")
 
 include("modules:json-jackson3")
