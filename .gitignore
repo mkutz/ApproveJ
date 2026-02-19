@@ -11,3 +11,4 @@ docs/**
 *.key
 pages
 banner-*.*
+.approvej
