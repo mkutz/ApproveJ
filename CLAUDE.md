@@ -106,6 +106,11 @@ Cases about the same thing are grouped together and roughly sorted by difference
 The more complex the setup, the later the case should appear.
 
 
+## Dependency Management
+
+Entries in `gradle/libs.versions.toml` must be sorted alphabetically within each section (`[versions]`, `[libraries]`, `[plugins]`).
+
+
 ## Commit Messages
 
 - Present tense, imperative mood ("Add feature" not "Added feature")
