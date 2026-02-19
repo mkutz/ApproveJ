@@ -1,0 +1,151 @@
+[id=cleanup]
+= Cleaning Up Orphaned Approved Files
+
+
+[id="cleanup_problem"]
+== The Problem
+
+When you rename or delete a test method, its approved file stays behind on disk.
+Over time these orphaned files accumulate and clutter the repository.
+
+ApproveJ provides an inventory-based mechanism to detect and remove orphaned approved files automatically.
+
+
+[id="cleanup_inventory"]
+== The Approved File Inventory
+
+Every time a test calls `byFile()`, ApproveJ records the approved file path and the originating test method.
+At the end of the test run, all entries are merged into a project-level inventory file:
+
+----
+.approvej/inventory.properties
+----
+
+The file uses Java Properties format.
+Each entry maps a relative file path to the test reference that created it:
+
+[source,properties]
+----
+src/test/resources/MyTest-myTest-approved.txt = com.example.MyTest#myTest
+----
+
+TIP: Commit `.approvej/inventory.properties` to version control so that the inventory is shared across the team.
+
+The inventory is updated incrementally.
+Only entries for test methods that ran in the current execution are refreshed.
+Entries for tests that did not run are preserved.
+
+
+[id="cleanup_configuration"]
+== Enabling the Inventory
+
+The inventory is controlled by the `inventoryEnabled` property.
+
+|===
+|Environment |Default
+
+|Local development (no `CI` environment variable)
+|`true`
+
+|CI (the `CI` environment variable is set)
+|`false`
+|===
+
+You can override this default in any <<configuration_sources,configuration source>>:
+
+.`src/test/resources/approvej.properties`
+[source,properties]
+----
+inventoryEnabled = true
+----
+
+Or via environment variable:
+
+[source,bash]
+----
+export APPROVEJ_INVENTORY_ENABLED=false
+----
+
+
+[id="cleanup_finding_orphans"]
+== Finding and Removing Orphans
+
+After running your tests with the inventory enabled, use the build plugin to detect orphans.
+An approved file is considered orphaned when its originating test method no longer exists in the compiled test classes.
+
+
+[id="cleanup_gradle"]
+=== Gradle Plugin
+
+Apply the plugin in your build file:
+
+.Gradle
+[source,groovy,subs=attributes+,role="primary"]
+----
+plugins {
+  id 'org.approvej' version '{revnumber}'
+}
+----
+.Gradle.kts
+[source,kotlin,subs=attributes+,role="secondary"]
+----
+plugins {
+  id("org.approvej") version "{revnumber}"
+}
+----
+
+The plugin registers two tasks in the `verification` group:
+
+[cols="1,2"]
+|===
+|Task |Description
+
+|`./gradlew approvejFindOrphans`
+|Lists orphaned approved files without deleting them
+
+|`./gradlew approvejCleanup`
+|Detects and removes orphaned approved files
+|===
+
+NOTE: Both tasks require the Java plugin to be applied in the same project.
+They use the test runtime classpath to resolve test classes.
+
+
+[id="cleanup_maven"]
+=== Maven Plugin
+
+Add the plugin to your `pom.xml`:
+
+[source,xml,subs=attributes+]
+----
+<plugin>
+  <groupId>org.approvej</groupId>
+  <artifactId>approvej-maven-plugin</artifactId>
+  <version>{revnumber}</version>
+</plugin>
+----
+
+The plugin provides two goals:
+
+[cols="1,2"]
+|===
+|Goal |Description
+
+|`mvn approvej:find-orphans`
+|Lists orphaned approved files without deleting them
+
+|`mvn approvej:cleanup`
+|Detects and removes orphaned approved files
+|===
+
+
+[id="cleanup_workflow"]
+== Typical Workflow
+
+1. Run your tests locally so the inventory is populated.
+2. Run the find-orphans task/goal to see which approved files are orphaned.
+3. Run the cleanup task/goal to delete the orphaned files.
+4. Commit the updated inventory and the removal of orphaned files.
+
+WARNING: Only approved files that have been recorded in the inventory can be detected as orphans.
+Make sure you have run all relevant tests with the inventory enabled at least once before cleaning up.
