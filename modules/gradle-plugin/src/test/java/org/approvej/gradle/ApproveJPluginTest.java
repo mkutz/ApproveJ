@@ -5,6 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.gradle.api.Project;
+import org.gradle.api.tasks.JavaExec;
+import org.gradle.testfixtures.ProjectBuilder;
 import org.gradle.testkit.runner.GradleRunner;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -14,7 +17,67 @@ class ApproveJPluginTest {
   @TempDir Path tempProjectDir;
 
   @Test
-  void apply() throws IOException {
+  void apply() {
+    Project project = ProjectBuilder.builder().build();
+    project.getPluginManager().apply("java");
+
+    project.getPluginManager().apply(ApproveJPlugin.class);
+
+    assertThat(project.getTasks().findByName("approvejFindOrphans")).isNotNull();
+    assertThat(project.getTasks().findByName("approvejCleanup")).isNotNull();
+  }
+
+  @Test
+  void apply_without_java_plugin() {
+    Project project = ProjectBuilder.builder().build();
+
+    project.getPluginManager().apply(ApproveJPlugin.class);
+
+    assertThat(project.getTasks().findByName("approvejFindOrphans")).isNull();
+    assertThat(project.getTasks().findByName("approvejCleanup")).isNull();
+  }
+
+  @Test
+  void apply_java_plugin_after_approvej() {
+    Project project = ProjectBuilder.builder().build();
+    project.getPluginManager().apply(ApproveJPlugin.class);
+
+    project.getPluginManager().apply("java");
+
+    assertThat(project.getTasks().findByName("approvejFindOrphans")).isNotNull();
+    assertThat(project.getTasks().findByName("approvejCleanup")).isNotNull();
+  }
+
+  @Test
+  void approvejFindOrphans_task_configuration() {
+    Project project = ProjectBuilder.builder().build();
+    project.getPluginManager().apply("java");
+    project.getPluginManager().apply(ApproveJPlugin.class);
+
+    var task = (JavaExec) project.getTasks().getByName("approvejFindOrphans");
+
+    assertThat(task.getGroup()).isEqualTo("verification");
+    assertThat(task.getDescription()).isEqualTo("List orphaned approved files");
+    assertThat(task.getMainClass().get()).isEqualTo("org.approvej.approve.ApprovedFileInventory");
+    assertThat(task.getArgs()).containsExactly("--find");
+  }
+
+  @Test
+  void approvejCleanup_task_configuration() {
+    Project project = ProjectBuilder.builder().build();
+    project.getPluginManager().apply("java");
+    project.getPluginManager().apply(ApproveJPlugin.class);
+
+    var task = (JavaExec) project.getTasks().getByName("approvejCleanup");
+
+    assertThat(task.getGroup()).isEqualTo("verification");
+    assertThat(task.getDescription()).isEqualTo("Detect and remove orphaned approved files");
+    assertThat(task.getMainClass().get()).isEqualTo("org.approvej.approve.ApprovedFileInventory");
+    assertThat(task.getArgs()).containsExactly("--remove");
+  }
+
+  @Test
+  void apply_functional() throws IOException {
     Files.writeString(
         tempProjectDir.resolve("build.gradle"),
         """
@@ -37,7 +100,7 @@ class ApproveJPluginTest {
   }
 
   @Test
-  void apply_without_java_plugin() throws IOException {
+  void apply_functional_without_java_plugin() throws IOException {
     Files.writeString(
         tempProjectDir.resolve("build.gradle"),
         """
