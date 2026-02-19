@@ -1,8 +1,8 @@
 [versions]
-junit = "6.0.3"
 assertj = "3.27.7"
 jackson2 = "2.21.0"
 jackson3 = "3.0.4"
+junit = "6.0.3"
 wiremock = "3.13.2"
 
 [libraries]
@@ -15,6 +15,7 @@ jackson2-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-
 jackson2-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson2" }
 jackson3-databind = { module = "tools.jackson.core:jackson-databind", version.ref = "jackson3" }
 jackson3-dataformat-yaml = { module = "tools.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson3" }
+java-diff-utils = { module = "io.github.java-diff-utils:java-diff-utils", version = "4.15" }
 jspecify = { module = "org.jspecify:jspecify", version = "1.0.0" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }

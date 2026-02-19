@@ -18,4 +18,6 @@ include("modules:http")
 
 include("modules:http-wiremock")
 
+include("modules:review-console")
+
 include("manual")

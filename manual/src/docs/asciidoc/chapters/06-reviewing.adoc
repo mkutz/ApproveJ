@@ -57,6 +57,25 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_revie
 ----
 
 
+== Console Review
+
+The `review-console` module provides a non-blocking reviewer that prints a colored unified diff to the test output.
+This lets you see what changed directly in your IDE's test panel or CI logs, without needing an external diff tool.
+The test will still fail, so you can review the diff and then approve the received file manually or with the `automatic` reviewer.
+
+To use it in your test code:
+
+[source,java,indent=0]
+----
+.reviewedBy(ConsoleFileReviewer.console())
+----
+
+To set it as the default reviewer globally, configure the alias `console` as described in <<configuration>>.
+
+NOTE: ANSI colors are used by default.
+Set the `NO_COLOR` environment variable to disable them.
+
+
 == Configure the Default Reviewer Globally
 
 See <<configuration>> on how to configure a global default reviewer.
