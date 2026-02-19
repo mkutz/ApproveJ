@@ -31,7 +31,7 @@ class ApprovedFileInventoryTest {
   }
 
   @Test
-  void record() {
+  void registerApprovedFile() {
     ApprovedFileInventory.addEntry(
         "src/test/MyTest-myTest-approved.txt", "com.example.MyTest#myTest");
 
@@ -64,8 +64,8 @@ class ApprovedFileInventoryTest {
     ApprovedFileInventory.writeInventory();
 
     TreeMap<String, String> inventory = ApprovedFileInventory.loadInventory();
-    assertThat(inventory).hasSize(2);
     assertThat(inventory)
+        .hasSize(2)
         .containsEntry("src/test/MyTest-myTest-alpha-approved.txt", "com.example.MyTest#myTest")
         .containsEntry("src/test/MyTest-myTest-beta-approved.txt", "com.example.MyTest#myTest");
   }
@@ -89,8 +89,8 @@ class ApprovedFileInventoryTest {
     ApprovedFileInventory.writeInventory();
 
     TreeMap<String, String> inventory = ApprovedFileInventory.loadInventory();
-    assertThat(inventory).hasSize(2);
     assertThat(inventory)
+        .hasSize(2)
         .containsEntry("src/test/MyTest-myTest-gamma-approved.txt", "com.example.MyTest#myTest")
         .containsEntry("src/test/MyTest-myTest-beta-approved.txt", "com.example.MyTest#myTest")
         .doesNotContainKey("src/test/MyTest-myTest-alpha-approved.txt");
@@ -112,8 +112,8 @@ class ApprovedFileInventoryTest {
     ApprovedFileInventory.writeInventory();
 
     TreeMap<String, String> inventory = ApprovedFileInventory.loadInventory();
-    assertThat(inventory).hasSize(2);
     assertThat(inventory)
+        .hasSize(2)
         .containsEntry("src/test/OtherTest-other-approved.txt", "com.example.OtherTest#other")
         .containsEntry("src/test/MyTest-myTest-approved.txt", "com.example.MyTest#myTest");
   }
@@ -134,8 +134,8 @@ class ApprovedFileInventoryTest {
     ApprovedFileInventory.writeInventory();
 
     TreeMap<String, String> inventory = ApprovedFileInventory.loadInventory();
-    assertThat(inventory).hasSize(2);
     assertThat(inventory)
+        .hasSize(2)
         .containsEntry(
             "src/test/ExistingTest-existing-approved.txt", "com.example.ExistingTest#existing")
         .containsEntry("src/test/NewTest-newTest-approved.txt", "com.example.NewTest#newTest");
@@ -198,7 +198,8 @@ class ApprovedFileInventoryTest {
     assertThat(removed).hasSize(1);
     assertThat(orphanFile).doesNotExist();
     TreeMap<String, String> inventory = ApprovedFileInventory.loadInventory();
-    assertThat(inventory).doesNotContainKey(orphanFile.toString());
-    assertThat(inventory).containsKey(validFile.toString());
+    assertThat(inventory)
+        .doesNotContainKey(orphanFile.toString())
+        .containsKey(validFile.toString());
   }
 }
