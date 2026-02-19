@@ -197,4 +197,40 @@ class ConfigurationTest {
 
     assertThat(loader.get("anyKey", "default")).isEqualTo("default");
   }
+
+  @Test
+  void loadConfiguration_inventoryEnabled_defaults_to_true() {
+    ConfigurationLoader loader = ConfigurationLoader.builder().build();
+
+    Configuration config = Configuration.loadConfiguration(loader);
+
+    assertThat(config.inventoryEnabled()).isTrue();
+  }
+
+  @Test
+  void loadConfiguration_inventoryEnabled_from_properties() {
+    Properties props = new Properties();
+    props.setProperty("inventoryEnabled", "false");
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+
+    Configuration config = Configuration.loadConfiguration(loader);
+
+    assertThat(config.inventoryEnabled()).isFalse();
+  }
+
+  @Test
+  void loadConfiguration_inventoryEnabled_env_overrides_properties() {
+    Map<String, String> env = Map.of("APPROVEJ_INVENTORY_ENABLED", "false");
+    Properties props = new Properties();
+    props.setProperty("inventoryEnabled", "true");
+    ConfigurationLoader loader =
+        ConfigurationLoader.builder()
+            .withEnvironmentVariables(env::get)
+            .withProperties(props)
+            .build();
+
+    Configuration config = Configuration.loadConfiguration(loader);
+
+    assertThat(config.inventoryEnabled()).isFalse();
+  }
 }
