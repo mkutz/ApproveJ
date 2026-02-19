@@ -150,7 +150,7 @@ public class ApprovedFileInventory {
       } else {
         Files.createDirectories(inventoryFile.getParent());
         String content =
-            "%s\n%s"
+            "%s%n%s"
                 .formatted(
                     HEADER,
                     inventory.entrySet().stream()
