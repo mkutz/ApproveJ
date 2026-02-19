@@ -277,6 +277,26 @@ endif::[]
 |===
 
 
+== Cleanup Tasks
+
+[cols="2,3"]
+|===
+|Command |Description
+
+|`./gradlew approvejFindOrphans`
+|List orphaned approved files (Gradle)
+
+|`./gradlew approvejCleanup`
+|Remove orphaned approved files (Gradle)
+
+|`mvn approvej:find-orphans`
+|List orphaned approved files (Maven)
+
+|`mvn approvej:cleanup`
+|Remove orphaned approved files (Maven)
+|===
+
+
 == Configuration Properties
 
 [cols="2,2,1"]
@@ -294,6 +314,10 @@ endif::[]
 |`defaultFileReviewerScript`
 |`APPROVEJ_DEFAULT_FILE_REVIEWER_SCRIPT`
 |_(none)_
+
+|`inventoryEnabled`
+|`APPROVEJ_INVENTORY_ENABLED`
+|`true` locally, `false` in CI
 |===
 
 Configuration is resolved in priority order: environment variables > project properties (`src/test/resources/approvej.properties`) > user home properties (`~/.config/approvej/approvej.properties`) > defaults.

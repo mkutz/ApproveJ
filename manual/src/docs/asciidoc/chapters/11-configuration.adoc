@@ -45,6 +45,11 @@ Can be an alias (e.g., `none`, `automatic`), a fully-qualified class name, or a 
 |The script to execute for reviewing differences.
 This implicitly sets the `defaultFileReviewer` to script
 |_(none)_
+
+|`inventoryEnabled`
+|Whether the approved file inventory is enabled.
+When enabled, ApproveJ records approved file paths in `.approvej/inventory.properties` during test runs.
+|`true` locally, `false` in CI
 |===
 
 
@@ -121,6 +126,9 @@ Environment variables use the `APPROVEJ_` prefix and convert camelCase property 
 
 |`defaultFileReviewer`
 |`APPROVEJ_DEFAULT_FILE_REVIEWER`
+
+|`inventoryEnabled`
+|`APPROVEJ_INVENTORY_ENABLED`
 |===
 
 .Example: Set default print format via environment variable
