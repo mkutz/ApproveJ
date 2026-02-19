@@ -110,13 +110,16 @@ E.g. `1.0.0` is written as `1.0`, `1.0.1` is written as `1.0.1`, and `1.1.0` is 
 
 ### Project Structure
 
-It is structured in four main modules:
+It is structured in four main directories:
 
-- The [modules](modules) directory contains all the published code modules:
+- The [modules](modules) directory contains all the published library modules:
   - [core](modules/core) contains the code for the core framework and should not have any dependencies to other modules and only very few (if any) to external libraries,
   - [json-jackson](modules/json-jackson) contains JSON-related code using Jackson,
   - [yaml-jackson](modules/yaml-jackson) contains YAML-related code using Jackson
   - [http](modules/http) contains code to create an HTTP server for approving requests
+- The [plugins](plugins) directory contains build tool plugins:
+  - [gradle](plugins/gradle) contains the Gradle plugin for managing approved files
+  - [maven](plugins/maven) contains the Maven plugin for managing approved files
 - the [bom](bom) directory contains the build file to generate a [Maven Bill of Material (BOM)](https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#bill-of-materials-bom-poms) for all the ApproveJ modules, and
 - the [manual](manual) directory contains the projects documentation written in [AsciiDoc](https://docs.asciidoctor.org/asciidoc/latest/).
 
