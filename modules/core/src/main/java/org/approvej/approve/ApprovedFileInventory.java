@@ -85,16 +85,9 @@ public class ApprovedFileInventory {
   }
 
   private static boolean isOrphan(InventoryEntry entry) {
-    String testReference = entry.testReference();
-    int hashIndex = testReference.indexOf('#');
-    if (hashIndex < 0) {
-      return true;
-    }
-    String className = testReference.substring(0, hashIndex);
-    String methodName = testReference.substring(hashIndex + 1);
     try {
-      return stream(Class.forName(className).getDeclaredMethods())
-          .noneMatch(method -> method.getName().equals(methodName));
+      return stream(Class.forName(entry.className()).getDeclaredMethods())
+          .noneMatch(method -> method.getName().equals(entry.methodName()));
     } catch (ClassNotFoundException e) {
       return true;
     }
