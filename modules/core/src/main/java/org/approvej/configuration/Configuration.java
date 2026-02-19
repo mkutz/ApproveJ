@@ -81,7 +81,7 @@ public record Configuration(
     if (configured != null) {
       return Boolean.parseBoolean(configured);
     }
-    String ci = System.getenv("CI");
+    String ci = loader.getenv("CI");
     return ci == null || ci.isBlank();
   }
 }

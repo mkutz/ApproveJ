@@ -18,9 +18,12 @@ final class ConfigurationLoader {
 
   private static final String ENV_PREFIX = "APPROVEJ_";
   private final List<ConfigurationSource> sources;
+  private final Function<String, @Nullable String> envLookup;
 
-  private ConfigurationLoader(List<ConfigurationSource> sources) {
+  private ConfigurationLoader(
+      List<ConfigurationSource> sources, Function<String, @Nullable String> envLookup) {
     this.sources = List.copyOf(sources);
+    this.envLookup = envLookup;
   }
 
   @Nullable String get(String key) {
@@ -31,6 +34,11 @@ final class ConfigurationLoader {
       }
     }
     return null;
+  }
+
+  /** Looks up a raw environment variable by its exact name (no prefix transformation). */
+  @Nullable String getenv(String name) {
+    return envLookup.apply(name);
   }
 
   String get(String key, String defaultValue) {
@@ -66,12 +74,14 @@ final class ConfigurationLoader {
 
   static final class Builder {
     private final List<ConfigurationSource> sources = new ArrayList<>();
+    private Function<String, @Nullable String> envLookup = key -> null;
 
     Builder withEnvironmentVariables() {
       return withEnvironmentVariables(System::getenv);
     }
 
     Builder withEnvironmentVariables(Function<String, @Nullable String> envLookup) {
+      this.envLookup = envLookup;
       sources.add(key -> envLookup.apply(toEnvironmentVariableName(key)));
       return this;
     }
@@ -112,7 +122,7 @@ final class ConfigurationLoader {
     }
 
     ConfigurationLoader build() {
-      return new ConfigurationLoader(sources);
+      return new ConfigurationLoader(sources, envLookup);
     }
   }
 }
