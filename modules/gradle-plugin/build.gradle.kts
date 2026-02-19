@@ -1,7 +1,7 @@
 plugins {
   `java-gradle-plugin`
   `jvm-test-suite`
-  `maven-publish`
+  alias(libs.plugins.plugin.publish)
 }
 
 java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
@@ -26,10 +26,15 @@ testing {
 }
 
 gradlePlugin {
+  website = "https://approvej.org"
+  vcsUrl = "https://github.com/mkutz/approvej"
   plugins {
     create("approvej") {
       id = "org.approvej"
       implementationClass = "org.approvej.gradle.ApproveJPlugin"
+      displayName = "ApproveJ"
+      description = "Find and remove orphaned approved files"
+      tags = listOf("testing", "approval-testing", "snapshot-testing")
     }
   }
 }
