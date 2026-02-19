@@ -1,5 +1,6 @@
 plugins {
   `java-library`
+  jacoco
   `jvm-test-suite`
   `maven-publish`
   alias(libs.plugins.maven.plugin.development)
@@ -18,6 +19,8 @@ dependencies {
   implementation(libs.maven.plugin.api)
   implementation(libs.maven.core)
 }
+
+tasks.jacocoTestReport { reports { xml.required = true } }
 
 testing {
   suites {

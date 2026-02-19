@@ -1,5 +1,6 @@
 plugins {
   `java-gradle-plugin`
+  jacoco
   `jvm-test-suite`
   alias(libs.plugins.plugin.publish)
 }
@@ -24,6 +25,8 @@ testing {
       }
   }
 }
+
+tasks.jacocoTestReport { reports { xml.required = true } }
 
 gradlePlugin {
   website = "https://approvej.org"
