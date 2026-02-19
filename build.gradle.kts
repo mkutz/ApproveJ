@@ -58,12 +58,6 @@ jreleaser {
           active = org.jreleaser.model.Active.ALWAYS
           maxRetries = 60
           retryDelay = 30
-          subprojects
-            .filter { it.plugins.hasPlugin("maven-publish") }
-            .sortedBy { it.name }
-            .forEach {
-              stagingRepository("${it.projectDir.relativeTo(rootDir)}/build/staging-deploy")
-            }
           url = "https://central.sonatype.com/api/v1/publisher"
         }
       }
@@ -73,6 +67,25 @@ jreleaser {
     github {
       overwrite = true
       update { enabled = true }
+    }
+  }
+}
+
+gradle.projectsEvaluated {
+  jreleaser {
+    deploy {
+      maven {
+        mavenCentral {
+          named("sonatype") {
+            subprojects
+              .filter { it.plugins.hasPlugin("maven-publish") }
+              .sortedBy { it.name }
+              .forEach {
+                stagingRepository("${it.projectDir.relativeTo(rootDir)}/build/staging-deploy")
+              }
+          }
+        }
+      }
     }
   }
 }
