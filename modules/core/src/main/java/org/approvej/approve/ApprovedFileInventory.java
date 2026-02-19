@@ -43,7 +43,7 @@ public class ApprovedFileInventory {
    *
    * @param pathProvider the path provider for the approved file
    */
-  public static void record(PathProvider pathProvider) {
+  public static void registerApprovedFile(PathProvider pathProvider) {
     TestMethod testMethod;
     try {
       testMethod = StackTraceTestFinderUtil.currentTestMethod();

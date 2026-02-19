@@ -203,7 +203,7 @@ public class ApprovalBuilder<T> {
     PathProvider updatedPathProvider =
         pathProvider.filenameAffix(name).filenameExtension(filenameExtension);
     if (configuration.inventoryEnabled()) {
-      ApprovedFileInventory.record(updatedPathProvider);
+      ApprovedFileInventory.registerApprovedFile(updatedPathProvider);
     }
     if (!(value instanceof String)) {
       printed().byFile(updatedPathProvider);
