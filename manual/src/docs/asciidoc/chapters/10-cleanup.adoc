@@ -1,14 +1,14 @@
 [id=cleanup]
-= Cleaning Up Orphaned Approved Files
+= Cleaning Up Leftover Approved Files
 
 
 [id="cleanup_problem"]
 == The Problem
 
 When you rename or delete a test method, its approved file stays behind on disk.
-Over time these orphaned files accumulate and clutter the repository.
+Over time these leftover files accumulate and clutter the repository.
 
-ApproveJ provides an inventory-based mechanism to detect and remove orphaned approved files automatically.
+ApproveJ provides an inventory-based mechanism to detect and remove leftover approved files automatically.
 
 
 [id="cleanup_inventory"]
@@ -67,11 +67,11 @@ export APPROVEJ_INVENTORY_ENABLED=false
 ----
 
 
-[id="cleanup_finding_orphans"]
-== Finding and Removing Orphans
+[id="cleanup_finding_leftovers"]
+== Finding and Removing Leftovers
 
-After running your tests with the inventory enabled, use the build plugin to detect orphans.
-An approved file is considered orphaned when its originating test method no longer exists in the compiled test classes.
+After running your tests with the inventory enabled, use the build plugin to detect leftovers.
+An approved file is considered a leftover when its originating test method no longer exists in the compiled test classes.
 
 
 [id="cleanup_gradle"]
@@ -100,11 +100,11 @@ The plugin registers two tasks in the `verification` group:
 |===
 |Task |Description
 
-|`./gradlew approvejFindOrphans`
-|Lists orphaned approved files without deleting them
+|`./gradlew approvejFindLeftovers`
+|Lists leftover approved files without deleting them
 
 |`./gradlew approvejCleanup`
-|Detects and removes orphaned approved files
+|Detects and removes leftover approved files
 |===
 
 NOTE: Both tasks require the Java plugin to be applied in the same project.
@@ -131,11 +131,11 @@ The plugin provides two goals:
 |===
 |Goal |Description
 
-|`mvn approvej:find-orphans`
-|Lists orphaned approved files without deleting them
+|`mvn approvej:find-leftovers`
+|Lists leftover approved files without deleting them
 
 |`mvn approvej:cleanup`
-|Detects and removes orphaned approved files
+|Detects and removes leftover approved files
 |===
 
 
@@ -143,9 +143,9 @@ The plugin provides two goals:
 == Typical Workflow
 
 1. Run your tests locally so the inventory is populated.
-2. Run the find-orphans task/goal to see which approved files are orphaned.
-3. Run the cleanup task/goal to delete the orphaned files.
-4. Commit the updated inventory and the removal of orphaned files.
+2. Run the find-leftovers task/goal to see which approved files are leftovers.
+3. Run the cleanup task/goal to delete the leftover files.
+4. Commit the updated inventory and the removal of leftover files.
 
-WARNING: Only approved files that have been recorded in the inventory can be detected as orphans.
+WARNING: Only approved files that have been recorded in the inventory can be detected as leftovers.
 Make sure you have run all relevant tests with the inventory enabled at least once before cleaning up.

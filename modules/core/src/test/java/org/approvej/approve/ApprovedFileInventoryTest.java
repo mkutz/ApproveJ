@@ -142,7 +142,7 @@ class ApprovedFileInventoryTest {
   }
 
   @Test
-  void findOrphans() throws IOException {
+  void findLeftovers() throws IOException {
     writeString(
         inventoryFile,
         """
@@ -151,17 +151,17 @@ class ApprovedFileInventoryTest {
         """,
         StandardOpenOption.CREATE);
 
-    List<InventoryEntry> orphans = ApprovedFileInventory.findOrphans();
+    List<InventoryEntry> leftovers = ApprovedFileInventory.findLeftovers();
 
-    assertThat(orphans).hasSize(1);
-    assertThat(orphans.getFirst().relativePath())
+    assertThat(leftovers).hasSize(1);
+    assertThat(leftovers.getFirst().relativePath())
         .isEqualTo("src/test/NonExistent-test-approved.txt");
-    assertThat(orphans.getFirst().testReference())
+    assertThat(leftovers.getFirst().testReference())
         .isEqualTo("com.nonexistent.NonExistentTest#test");
   }
 
   @Test
-  void findOrphans_missing_method() throws IOException {
+  void findLeftovers_missing_method() throws IOException {
     writeString(
         inventoryFile,
         """
@@ -170,36 +170,36 @@ class ApprovedFileInventoryTest {
         """,
         StandardOpenOption.CREATE);
 
-    List<InventoryEntry> orphans = ApprovedFileInventory.findOrphans();
+    List<InventoryEntry> leftovers = ApprovedFileInventory.findLeftovers();
 
-    assertThat(orphans).hasSize(1);
-    assertThat(orphans.getFirst().testReference())
+    assertThat(leftovers).hasSize(1);
+    assertThat(leftovers.getFirst().testReference())
         .isEqualTo("org.approvej.approve.ApprovedFileInventoryTest#nonExistentMethod");
   }
 
   @Test
-  void removeOrphans() throws IOException {
-    Path orphanFile = tempDir.resolve("orphan-approved.txt");
-    writeString(orphanFile, "old content", StandardOpenOption.CREATE);
+  void removeLeftovers() throws IOException {
+    Path leftoverFile = tempDir.resolve("leftover-approved.txt");
+    writeString(leftoverFile, "old content", StandardOpenOption.CREATE);
 
     Path validFile = tempDir.resolve("valid-approved.txt");
 
     writeString(
         inventoryFile,
         "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
-            + orphanFile
+            + leftoverFile
             + " = com.nonexistent.NonExistentTest#test\n"
             + validFile
-            + " = org.approvej.approve.ApprovedFileInventoryTest#removeOrphans\n",
+            + " = org.approvej.approve.ApprovedFileInventoryTest#removeLeftovers\n",
         StandardOpenOption.CREATE);
 
-    List<InventoryEntry> removed = ApprovedFileInventory.removeOrphans();
+    List<InventoryEntry> removed = ApprovedFileInventory.removeLeftovers();
 
     assertThat(removed).hasSize(1);
-    assertThat(orphanFile).doesNotExist();
+    assertThat(leftoverFile).doesNotExist();
     TreeMap<String, String> inventory = ApprovedFileInventory.loadInventory();
     assertThat(inventory)
-        .doesNotContainKey(orphanFile.toString())
+        .doesNotContainKey(leftoverFile.toString())
         .containsKey(validFile.toString());
   }
 }

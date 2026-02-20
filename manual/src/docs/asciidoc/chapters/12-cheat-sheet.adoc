@@ -283,17 +283,17 @@ endif::[]
 |===
 |Command |Description
 
-|`./gradlew approvejFindOrphans`
-|List orphaned approved files (Gradle)
+|`./gradlew approvejFindLeftovers`
+|List leftover approved files (Gradle)
 
 |`./gradlew approvejCleanup`
-|Remove orphaned approved files (Gradle)
+|Remove leftover approved files (Gradle)
 
-|`mvn approvej:find-orphans`
-|List orphaned approved files (Maven)
+|`mvn approvej:find-leftovers`
+|List leftover approved files (Maven)
 
 |`mvn approvej:cleanup`
-|Remove orphaned approved files (Maven)
+|Remove leftover approved files (Maven)
 |===
 
 

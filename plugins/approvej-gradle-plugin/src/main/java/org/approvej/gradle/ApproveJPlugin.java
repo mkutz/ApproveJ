@@ -6,7 +6,7 @@ import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.SourceSetContainer;
 
-/** Gradle plugin that registers tasks to find and remove orphaned approved files. */
+/** Gradle plugin that registers tasks to find and remove leftover approved files. */
 @SuppressWarnings("unused")
 public final class ApproveJPlugin implements Plugin<Project> {
 
@@ -27,11 +27,11 @@ public final class ApproveJPlugin implements Plugin<Project> {
               project
                   .getTasks()
                   .register(
-                      "approvejFindOrphans",
+                      "approvejFindLeftovers",
                       JavaExec.class,
                       task -> {
                         task.setGroup("verification");
-                        task.setDescription("List orphaned approved files");
+                        task.setDescription("List leftover approved files");
                         task.setClasspath(testClasspath);
                         task.getMainClass().set("org.approvej.approve.ApprovedFileInventory");
                         task.args("--find");
@@ -44,7 +44,7 @@ public final class ApproveJPlugin implements Plugin<Project> {
                       JavaExec.class,
                       task -> {
                         task.setGroup("verification");
-                        task.setDescription("Detect and remove orphaned approved files");
+                        task.setDescription("Detect and remove leftover approved files");
                         task.setClasspath(testClasspath);
                         task.getMainClass().set("org.approvej.approve.ApprovedFileInventory");
                         task.args("--remove");
