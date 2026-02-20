@@ -23,7 +23,7 @@ class ApproveJPluginTest {
 
     project.getPluginManager().apply(ApproveJPlugin.class);
 
-    assertThat(project.getTasks().findByName("approvejFindOrphans")).isNotNull();
+    assertThat(project.getTasks().findByName("approvejFindLeftovers")).isNotNull();
     assertThat(project.getTasks().findByName("approvejCleanup")).isNotNull();
   }
 
@@ -33,7 +33,7 @@ class ApproveJPluginTest {
 
     project.getPluginManager().apply(ApproveJPlugin.class);
 
-    assertThat(project.getTasks().findByName("approvejFindOrphans")).isNull();
+    assertThat(project.getTasks().findByName("approvejFindLeftovers")).isNull();
     assertThat(project.getTasks().findByName("approvejCleanup")).isNull();
   }
 
@@ -44,20 +44,20 @@ class ApproveJPluginTest {
 
     project.getPluginManager().apply("java");
 
-    assertThat(project.getTasks().findByName("approvejFindOrphans")).isNotNull();
+    assertThat(project.getTasks().findByName("approvejFindLeftovers")).isNotNull();
     assertThat(project.getTasks().findByName("approvejCleanup")).isNotNull();
   }
 
   @Test
-  void approvejFindOrphans_task_configuration() {
+  void approvejFindLeftovers_task_configuration() {
     Project project = ProjectBuilder.builder().build();
     project.getPluginManager().apply("java");
     project.getPluginManager().apply(ApproveJPlugin.class);
 
-    var task = (JavaExec) project.getTasks().getByName("approvejFindOrphans");
+    var task = (JavaExec) project.getTasks().getByName("approvejFindLeftovers");
 
     assertThat(task.getGroup()).isEqualTo("verification");
-    assertThat(task.getDescription()).isEqualTo("List orphaned approved files");
+    assertThat(task.getDescription()).isEqualTo("List leftover approved files");
     assertThat(task.getMainClass().get()).isEqualTo("org.approvej.approve.ApprovedFileInventory");
     assertThat(task.getArgs()).containsExactly("--find");
   }
@@ -71,7 +71,7 @@ class ApproveJPluginTest {
     var task = (JavaExec) project.getTasks().getByName("approvejCleanup");
 
     assertThat(task.getGroup()).isEqualTo("verification");
-    assertThat(task.getDescription()).isEqualTo("Detect and remove orphaned approved files");
+    assertThat(task.getDescription()).isEqualTo("Detect and remove leftover approved files");
     assertThat(task.getMainClass().get()).isEqualTo("org.approvej.approve.ApprovedFileInventory");
     assertThat(task.getArgs()).containsExactly("--remove");
   }
@@ -95,8 +95,8 @@ class ApproveJPluginTest {
             .build();
 
     assertThat(result.getOutput())
-        .contains("approvejFindOrphans - List orphaned approved files")
-        .contains("approvejCleanup - Detect and remove orphaned approved files");
+        .contains("approvejFindLeftovers - List leftover approved files")
+        .contains("approvejCleanup - Detect and remove leftover approved files");
   }
 
   @Test
@@ -117,7 +117,7 @@ class ApproveJPluginTest {
             .build();
 
     assertThat(result.getOutput())
-        .doesNotContain("approvejFindOrphans")
+        .doesNotContain("approvejFindLeftovers")
         .doesNotContain("approvejCleanup");
   }
 }

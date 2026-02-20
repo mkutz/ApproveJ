@@ -7,7 +7,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
-/** Detects and removes orphaned approved files whose originating test method no longer exists. */
+/** Detects and removes leftover approved files whose originating test method no longer exists. */
 @Mojo(name = "cleanup", requiresDependencyResolution = ResolutionScope.TEST, threadSafe = true)
 public class CleanupMojo extends AbstractMojo {
 

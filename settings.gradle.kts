@@ -6,9 +6,9 @@ include("bom")
 
 include("modules:core")
 
-include("plugins:gradle")
+include("plugins:approvej-gradle-plugin")
 
-include("plugins:maven")
+include("plugins:approvej-maven-plugin")
 
 include("modules:json-jackson")
 

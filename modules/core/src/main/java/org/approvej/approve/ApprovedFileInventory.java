@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * Tracks approved files in an inventory so that orphaned files (from renamed or deleted tests) can
+ * Tracks approved files in an inventory so that leftover files (from renamed or deleted tests) can
  * be detected and cleaned up.
  *
  * <p>During a test run, each {@code byFile()} call records the approved file path and its
@@ -75,18 +75,18 @@ public class ApprovedFileInventory {
   }
 
   /**
-   * Finds orphaned inventory entries whose test methods no longer exist.
+   * Finds leftover inventory entries whose test methods no longer exist.
    *
-   * @return a list of orphaned inventory entries
+   * @return a list of leftover inventory entries
    */
-  static List<InventoryEntry> findOrphans() {
+  static List<InventoryEntry> findLeftovers() {
     return loadInventory().entrySet().stream()
         .map(entry -> new InventoryEntry(entry.getKey(), entry.getValue()))
-        .filter(ApprovedFileInventory::isOrphan)
+        .filter(ApprovedFileInventory::isLeftover)
         .toList();
   }
 
-  private static boolean isOrphan(InventoryEntry entry) {
+  private static boolean isLeftover(InventoryEntry entry) {
     try {
       return stream(Class.forName(entry.className()).getDeclaredMethods())
           .noneMatch(method -> method.getName().equals(entry.methodName()));
@@ -96,30 +96,30 @@ public class ApprovedFileInventory {
   }
 
   /**
-   * Removes orphaned approved files and updates the inventory.
+   * Removes leftover approved files and updates the inventory.
    *
-   * @return the list of removed orphan entries
+   * @return the list of removed leftover entries
    */
-  static List<InventoryEntry> removeOrphans() {
-    List<InventoryEntry> orphans = findOrphans();
-    if (orphans.isEmpty()) {
-      return orphans;
+  static List<InventoryEntry> removeLeftovers() {
+    List<InventoryEntry> leftovers = findLeftovers();
+    if (leftovers.isEmpty()) {
+      return leftovers;
     }
 
     TreeMap<String, String> inventory = loadInventory();
-    orphans.forEach(
-        orphan -> {
+    leftovers.forEach(
+        leftover -> {
           try {
-            Files.deleteIfExists(Path.of(orphan.relativePath()));
-            inventory.remove(orphan.relativePath());
+            Files.deleteIfExists(Path.of(leftover.relativePath()));
+            inventory.remove(leftover.relativePath());
           } catch (IOException e) {
-            System.err.printf("Failed to delete orphaned file: %s%n", orphan.relativePath());
+            System.err.printf("Failed to delete leftover file: %s%n", leftover.relativePath());
           }
         });
 
     saveInventory(inventory);
 
-    return orphans;
+    return leftovers;
   }
 
   static TreeMap<String, String> loadInventory() {
@@ -184,7 +184,7 @@ public class ApprovedFileInventory {
   /**
    * CLI entry point for build tool plugins.
    *
-   * @param args {@code --find} to list orphans, {@code --remove} to delete them
+   * @param args {@code --find} to list leftovers, {@code --remove} to delete them
    */
   public static void main(String[] args) {
     String usage = "Usage: ApprovedFileInventory --find | --remove";
@@ -194,27 +194,28 @@ public class ApprovedFileInventory {
     }
 
     String command = args[0];
-
     switch (command) {
       case "--find" -> {
-        List<InventoryEntry> orphans = findOrphans();
-        if (orphans.isEmpty()) {
-          System.out.println("No orphaned approved files found.");
+        List<InventoryEntry> leftovers = findLeftovers();
+        if (leftovers.isEmpty()) {
+          System.out.println("No leftover approved files found.");
         } else {
-          System.out.println("Orphaned approved files:");
-          orphans.forEach(
-              orphan ->
+          System.out.println("Leftover approved files:");
+          leftovers.forEach(
+              leftover ->
                   System.out.printf(
-                      "  %s (from %s)%n", orphan.relativePath(), orphan.testReference()));
+                      "  %s%n    from %s%n",
+                      Path.of(leftover.relativePath()).toUri(), leftover.testReference()));
         }
       }
       case "--remove" -> {
-        List<InventoryEntry> removed = removeOrphans();
+        List<InventoryEntry> removed = removeLeftovers();
         if (removed.isEmpty()) {
-          System.out.println("No orphaned approved files found.");
+          System.out.println("No leftover approved files found.");
         } else {
-          System.out.println("Removed orphaned approved files:");
-          removed.forEach(orphan -> System.out.printf("  %s%n", orphan.relativePath()));
+          System.out.println("Removed leftover approved files:");
+          removed.forEach(
+              leftover -> System.out.printf("  %s%n", Path.of(leftover.relativePath()).toUri()));
         }
       }
       default -> {

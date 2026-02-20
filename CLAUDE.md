@@ -41,8 +41,8 @@ It provides a fluent API to compare actual values against previously approved "g
 - **modules/yaml-jackson3** - YAML support using Jackson 3.x
 - **modules/http** - HTTP stub server for approving HTTP requests
 - **modules/http-wiremock** - WireMock adapter for HTTP testing
-- **plugins/gradle** - Gradle plugin for managing approved files
-- **plugins/maven** - Maven plugin for managing approved files
+- **plugins/approvej-gradle-plugin** - Gradle plugin for managing approved files
+- **plugins/approvej-maven-plugin** - Maven plugin for managing approved files
 - **bom** - Maven Bill of Materials
 - **manual** - AsciiDoc documentation (code samples included from tests in `manual/src/test`)
 
