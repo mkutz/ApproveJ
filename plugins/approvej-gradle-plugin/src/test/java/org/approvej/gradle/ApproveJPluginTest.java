@@ -49,7 +49,7 @@ class ApproveJPluginTest {
   }
 
   @Test
-  void approvejFindLeftovers_task_configuration() {
+  void apply_findLeftovers_task_configuration() {
     Project project = ProjectBuilder.builder().build();
     project.getPluginManager().apply("java");
     project.getPluginManager().apply(ApproveJPlugin.class);
@@ -63,7 +63,7 @@ class ApproveJPluginTest {
   }
 
   @Test
-  void approvejCleanup_task_configuration() {
+  void apply_cleanup_task_configuration() {
     Project project = ProjectBuilder.builder().build();
     project.getPluginManager().apply("java");
     project.getPluginManager().apply(ApproveJPlugin.class);

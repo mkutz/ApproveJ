@@ -31,7 +31,7 @@ class ApprovedFileInventoryTest {
   }
 
   @Test
-  void registerApprovedFile() {
+  void writeInventory() {
     ApprovedFileInventory.addEntry(
         "src/test/MyTest-myTest-approved.txt", "com.example.MyTest#myTest");
 
@@ -43,7 +43,7 @@ class ApprovedFileInventoryTest {
   }
 
   @Test
-  void record_multiple_entries() {
+  void writeInventory_multiple_entries() {
     ApprovedFileInventory.addEntry("src/test/BTest-b-approved.txt", "com.example.BTest#b");
     ApprovedFileInventory.addEntry("src/test/ATest-a-approved.txt", "com.example.ATest#a");
 
@@ -55,7 +55,7 @@ class ApprovedFileInventoryTest {
   }
 
   @Test
-  void record_named_approvals() {
+  void writeInventory_named_approvals() {
     ApprovedFileInventory.addEntry(
         "src/test/MyTest-myTest-alpha-approved.txt", "com.example.MyTest#myTest");
     ApprovedFileInventory.addEntry(
@@ -71,7 +71,7 @@ class ApprovedFileInventoryTest {
   }
 
   @Test
-  void record_replaces_entries_for_executed_methods() throws IOException {
+  void writeInventory_replaces_entries_for_executed_methods() throws IOException {
     writeString(
         inventoryFile,
         """
@@ -97,7 +97,7 @@ class ApprovedFileInventoryTest {
   }
 
   @Test
-  void record_preserves_entries_for_unexecuted_methods() throws IOException {
+  void writeInventory_preserves_entries_for_unexecuted_methods() throws IOException {
     writeString(
         inventoryFile,
         """
@@ -119,7 +119,7 @@ class ApprovedFileInventoryTest {
   }
 
   @Test
-  void record_merges_with_existing() throws IOException {
+  void writeInventory_merges_with_existing() throws IOException {
     writeString(
         inventoryFile,
         """
