@@ -12,10 +12,9 @@ class PathProvidersTest {
     String giveApprovedPath = "./src/test/resources/some file";
     PathProvider pathProvider = PathProviders.approvedPath(giveApprovedPath);
 
-    assertThat(pathProvider.approvedPath())
-        .isEqualTo(Path.of(giveApprovedPath).toAbsolutePath().normalize());
+    assertThat(pathProvider.approvedPath()).isEqualTo(Path.of(giveApprovedPath).normalize());
     assertThat(pathProvider.receivedPath())
-        .isEqualTo(Path.of("./src/test/resources/some file-received").toAbsolutePath().normalize());
+        .isEqualTo(Path.of("./src/test/resources/some file-received").normalize());
   }
 
   @Test
@@ -29,7 +28,6 @@ class PathProvidersTest {
                         + "PathProvidersTest"
                         + "-nextToTest"
                         + "-approved.txt")
-                .toAbsolutePath()
                 .normalize());
     assertThat(pathProvider.receivedPath())
         .isEqualTo(
@@ -38,7 +36,6 @@ class PathProvidersTest {
                         + "PathProvidersTest"
                         + "-nextToTest"
                         + "-received.txt")
-                .toAbsolutePath()
                 .normalize());
   }
 
@@ -52,7 +49,6 @@ class PathProvidersTest {
                         + "PathProvidersTest"
                         + "-nextToTest_filenameExtension"
                         + "-approved.json")
-                .toAbsolutePath()
                 .normalize());
     assertThat(pathProvider.receivedPath())
         .isEqualTo(
@@ -61,7 +57,6 @@ class PathProvidersTest {
                         + "PathProvidersTest"
                         + "-nextToTest_filenameExtension"
                         + "-received.json")
-                .toAbsolutePath()
                 .normalize());
   }
 
@@ -75,7 +70,6 @@ class PathProvidersTest {
                         + "PathProvidersTest/"
                         + "nextToTestInSubdirectory"
                         + "-approved.txt")
-                .toAbsolutePath()
                 .normalize());
     assertThat(pathProvider.receivedPath())
         .isEqualTo(
@@ -84,7 +78,6 @@ class PathProvidersTest {
                         + "PathProvidersTest/"
                         + "nextToTestInSubdirectory"
                         + "-received.txt")
-                .toAbsolutePath()
                 .normalize());
   }
 
@@ -96,13 +89,11 @@ class PathProvidersTest {
         .isEqualTo(
             directory
                 .resolve("PathProvidersTest" + "-nextToTest_directory" + "-approved.txt")
-                .toAbsolutePath()
                 .normalize());
     assertThat(pathProvider.receivedPath())
         .isEqualTo(
             directory
                 .resolve("PathProvidersTest" + "-nextToTest_directory" + "-received.txt")
-                .toAbsolutePath()
                 .normalize());
   }
 
@@ -117,7 +108,6 @@ class PathProvidersTest {
                         + "-nextToTest_filenameAffix"
                         + "-additional info"
                         + "-approved.txt")
-                .toAbsolutePath()
                 .normalize());
     assertThat(pathProvider.receivedPath())
         .isEqualTo(
@@ -127,7 +117,6 @@ class PathProvidersTest {
                         + "-nextToTest_filenameAffix"
                         + "-additional info"
                         + "-received.txt")
-                .toAbsolutePath()
                 .normalize());
   }
 }

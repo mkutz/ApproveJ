@@ -33,41 +33,46 @@ class ApprovedFileInventoryTest {
   @Test
   void writeInventory() {
     ApprovedFileInventory.addEntry(
-        "src/test/MyTest-myTest-approved.txt", "com.example.MyTest#myTest");
+        Path.of("src/test/MyTest-myTest-approved.txt"), "com.example.MyTest#myTest");
 
     ApprovedFileInventory.writeInventory();
 
-    TreeMap<String, String> inventory = ApprovedFileInventory.loadInventory();
-    assertThat(inventory)
-        .containsEntry("src/test/MyTest-myTest-approved.txt", "com.example.MyTest#myTest");
+    TreeMap<Path, InventoryEntry> inventory = ApprovedFileInventory.loadInventory();
+    assertThat(inventory.values())
+        .containsExactly(
+            new InventoryEntry(
+                Path.of("src/test/MyTest-myTest-approved.txt"), "com.example.MyTest#myTest"));
   }
 
   @Test
   void writeInventory_multiple_entries() {
-    ApprovedFileInventory.addEntry("src/test/BTest-b-approved.txt", "com.example.BTest#b");
-    ApprovedFileInventory.addEntry("src/test/ATest-a-approved.txt", "com.example.ATest#a");
+    ApprovedFileInventory.addEntry(Path.of("src/test/BTest-b-approved.txt"), "com.example.BTest#b");
+    ApprovedFileInventory.addEntry(Path.of("src/test/ATest-a-approved.txt"), "com.example.ATest#a");
 
     ApprovedFileInventory.writeInventory();
 
-    TreeMap<String, String> inventory = ApprovedFileInventory.loadInventory();
+    TreeMap<Path, InventoryEntry> inventory = ApprovedFileInventory.loadInventory();
     assertThat(inventory).hasSize(2);
-    assertThat(inventory.firstKey()).isEqualTo("src/test/ATest-a-approved.txt");
+    assertThat(inventory.firstKey()).isEqualTo(Path.of("src/test/ATest-a-approved.txt"));
   }
 
   @Test
   void writeInventory_named_approvals() {
     ApprovedFileInventory.addEntry(
-        "src/test/MyTest-myTest-alpha-approved.txt", "com.example.MyTest#myTest");
+        Path.of("src/test/MyTest-myTest-alpha-approved.txt"), "com.example.MyTest#myTest");
     ApprovedFileInventory.addEntry(
-        "src/test/MyTest-myTest-beta-approved.txt", "com.example.MyTest#myTest");
+        Path.of("src/test/MyTest-myTest-beta-approved.txt"), "com.example.MyTest#myTest");
 
     ApprovedFileInventory.writeInventory();
 
-    TreeMap<String, String> inventory = ApprovedFileInventory.loadInventory();
-    assertThat(inventory)
+    TreeMap<Path, InventoryEntry> inventory = ApprovedFileInventory.loadInventory();
+    assertThat(inventory.values())
         .hasSize(2)
-        .containsEntry("src/test/MyTest-myTest-alpha-approved.txt", "com.example.MyTest#myTest")
-        .containsEntry("src/test/MyTest-myTest-beta-approved.txt", "com.example.MyTest#myTest");
+        .contains(
+            new InventoryEntry(
+                Path.of("src/test/MyTest-myTest-alpha-approved.txt"), "com.example.MyTest#myTest"),
+            new InventoryEntry(
+                Path.of("src/test/MyTest-myTest-beta-approved.txt"), "com.example.MyTest#myTest"));
   }
 
   @Test
@@ -82,18 +87,21 @@ class ApprovedFileInventoryTest {
         StandardOpenOption.CREATE);
 
     ApprovedFileInventory.addEntry(
-        "src/test/MyTest-myTest-gamma-approved.txt", "com.example.MyTest#myTest");
+        Path.of("src/test/MyTest-myTest-gamma-approved.txt"), "com.example.MyTest#myTest");
     ApprovedFileInventory.addEntry(
-        "src/test/MyTest-myTest-beta-approved.txt", "com.example.MyTest#myTest");
+        Path.of("src/test/MyTest-myTest-beta-approved.txt"), "com.example.MyTest#myTest");
 
     ApprovedFileInventory.writeInventory();
 
-    TreeMap<String, String> inventory = ApprovedFileInventory.loadInventory();
-    assertThat(inventory)
+    TreeMap<Path, InventoryEntry> inventory = ApprovedFileInventory.loadInventory();
+    assertThat(inventory.values())
         .hasSize(2)
-        .containsEntry("src/test/MyTest-myTest-gamma-approved.txt", "com.example.MyTest#myTest")
-        .containsEntry("src/test/MyTest-myTest-beta-approved.txt", "com.example.MyTest#myTest")
-        .doesNotContainKey("src/test/MyTest-myTest-alpha-approved.txt");
+        .contains(
+            new InventoryEntry(
+                Path.of("src/test/MyTest-myTest-gamma-approved.txt"), "com.example.MyTest#myTest"),
+            new InventoryEntry(
+                Path.of("src/test/MyTest-myTest-beta-approved.txt"), "com.example.MyTest#myTest"));
+    assertThat(inventory).doesNotContainKey(Path.of("src/test/MyTest-myTest-alpha-approved.txt"));
   }
 
   @Test
@@ -107,15 +115,18 @@ class ApprovedFileInventoryTest {
         StandardOpenOption.CREATE);
 
     ApprovedFileInventory.addEntry(
-        "src/test/MyTest-myTest-approved.txt", "com.example.MyTest#myTest");
+        Path.of("src/test/MyTest-myTest-approved.txt"), "com.example.MyTest#myTest");
 
     ApprovedFileInventory.writeInventory();
 
-    TreeMap<String, String> inventory = ApprovedFileInventory.loadInventory();
-    assertThat(inventory)
+    TreeMap<Path, InventoryEntry> inventory = ApprovedFileInventory.loadInventory();
+    assertThat(inventory.values())
         .hasSize(2)
-        .containsEntry("src/test/OtherTest-other-approved.txt", "com.example.OtherTest#other")
-        .containsEntry("src/test/MyTest-myTest-approved.txt", "com.example.MyTest#myTest");
+        .contains(
+            new InventoryEntry(
+                Path.of("src/test/OtherTest-other-approved.txt"), "com.example.OtherTest#other"),
+            new InventoryEntry(
+                Path.of("src/test/MyTest-myTest-approved.txt"), "com.example.MyTest#myTest"));
   }
 
   @Test
@@ -132,7 +143,7 @@ class ApprovedFileInventoryTest {
 
     assertThat(leftovers).hasSize(1);
     assertThat(leftovers.getFirst().relativePath())
-        .isEqualTo("src/test/NonExistent-test-approved.txt");
+        .isEqualTo(Path.of("src/test/NonExistent-test-approved.txt"));
     assertThat(leftovers.getFirst().testReference())
         .isEqualTo("com.nonexistent.NonExistentTest#test");
   }
@@ -174,9 +185,7 @@ class ApprovedFileInventoryTest {
 
     assertThat(removed).hasSize(1);
     assertThat(leftoverFile).doesNotExist();
-    TreeMap<String, String> inventory = ApprovedFileInventory.loadInventory();
-    assertThat(inventory)
-        .doesNotContainKey(leftoverFile.toString())
-        .containsKey(validFile.toString());
+    TreeMap<Path, InventoryEntry> inventory = ApprovedFileInventory.loadInventory();
+    assertThat(inventory).doesNotContainKey(leftoverFile).containsKey(validFile);
   }
 }

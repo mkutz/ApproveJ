@@ -32,7 +32,7 @@ class StackTraceTestFinderUtilSpockSpec extends Specification {
         StackTraceTestFinderUtil.currentTestMethod().method())
 
     then:
-    testSourcePath == thisTestSourcePath.toAbsolutePath().normalize()
+    testSourcePath == thisTestSourcePath.normalize()
   }
 
   def 'findTestSourcePath_file_in_build'() {
@@ -50,7 +50,7 @@ class StackTraceTestFinderUtilSpockSpec extends Specification {
         StackTraceTestFinderUtil.currentTestMethod().method())
 
     then:
-    testSourcePath == thisTestSourcePath.toAbsolutePath().normalize()
+    testSourcePath == thisTestSourcePath.normalize()
 
     cleanup:
     delete(wrongTestSourcePath)
@@ -69,7 +69,7 @@ class StackTraceTestFinderUtilSpockSpec extends Specification {
     Path testSourcePath = StackTraceTestFinderUtil.findTestSourcePath(StackTraceTestFinderUtil.currentTestMethod().method())
 
     then:
-    testSourcePath == thisTestSourcePath.toAbsolutePath().normalize()
+    testSourcePath == thisTestSourcePath.normalize()
 
     cleanup:
     delete(wrongTestSourcePath)

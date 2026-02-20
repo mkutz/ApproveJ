@@ -82,7 +82,7 @@ public record PathProvider(
    * {@link #baseFilename}, followed by {@link #approvedLabel} (if any), followed by the {@link
    * #filenameExtension} (if any).
    *
-   * @return the absolute and normalized {@link Path} to the approved file
+   * @return the normalized {@link Path} to the approved file
    */
   public Path approvedPath() {
     return directory
@@ -93,7 +93,6 @@ public record PathProvider(
                     filenameAffix.isBlank() ? "" : "-%s".formatted(filenameAffix),
                     approvedLabel.isBlank() ? "" : "-%s".formatted(approvedLabel),
                     filenameExtension.isBlank() ? "" : ".%s".formatted(filenameExtension)))
-        .toAbsolutePath()
         .normalize();
   }
 
@@ -102,7 +101,7 @@ public record PathProvider(
    * {@link #baseFilename}, followed by {@value RECEIVED} (if any), followed by the {@link
    * #filenameExtension} (if any).
    *
-   * @return the absolute and normalized {@link Path} to the received file
+   * @return the normalized {@link Path} to the received file
    */
   public Path receivedPath() {
     return directory
@@ -113,7 +112,6 @@ public record PathProvider(
                     filenameAffix.isBlank() ? "" : "-%s".formatted(filenameAffix),
                     "-%s".formatted(RECEIVED),
                     filenameExtension.isBlank() ? "" : ".%s".formatted(filenameExtension)))
-        .toAbsolutePath()
         .normalize();
   }
 }

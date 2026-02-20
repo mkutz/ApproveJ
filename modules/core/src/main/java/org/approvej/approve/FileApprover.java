@@ -77,7 +77,7 @@ record FileApprover(PathProvider pathProvider) implements Approver {
           paths
               .filter(
                   path ->
-                      !path.toAbsolutePath().equals(approvedPath)
+                      !path.normalize().equals(approvedPath)
                           && baseFilenamePattern.matcher(path.getFileName().toString()).matches())
               .sorted(
                   comparing(
