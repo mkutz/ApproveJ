@@ -7,11 +7,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -32,9 +33,9 @@ public class ApprovedFileInventory {
   private static final ConcurrentHashMap<String, String> entries = new ConcurrentHashMap<>();
   private static final ConcurrentHashMap<String, Boolean> executedMethods =
       new ConcurrentHashMap<>();
-  private static final AtomicBoolean shutdownHookRegistered = new AtomicBoolean(false);
+  private static final AtomicReference<Thread> shutdownHook = new AtomicReference<>();
 
-  private static Path inventoryFile = DEFAULT_INVENTORY_FILE;
+  private static volatile Path inventoryFile = DEFAULT_INVENTORY_FILE;
 
   private ApprovedFileInventory() {}
 
@@ -53,22 +54,27 @@ public class ApprovedFileInventory {
 
     String testReference =
         "%s#%s".formatted(testMethod.testClass().getName(), testMethod.testCaseName());
-    String relativePath =
-        Path.of("").toAbsolutePath().relativize(pathProvider.approvedPath()).toString();
+    Path cwd = Path.of("").toAbsolutePath();
+    Path approvedPath = pathProvider.approvedPath().toAbsolutePath();
+    String relativePath;
+    try {
+      relativePath = cwd.relativize(approvedPath).toString();
+    } catch (IllegalArgumentException e) {
+      relativePath = approvedPath.toString();
+    }
 
     addEntry(relativePath, testReference);
 
-    if (shutdownHookRegistered.compareAndSet(false, true)) {
-      Runtime.getRuntime()
-          .addShutdownHook(
-              new Thread(ApprovedFileInventory::writeInventory, "ApproveJ-Inventory-Writer"));
+    Thread hook = new Thread(ApprovedFileInventory::writeInventory, "ApproveJ-Inventory-Writer");
+    if (shutdownHook.compareAndSet(null, hook)) {
+      Runtime.getRuntime().addShutdownHook(hook);
     }
   }
 
   static void writeInventory() {
     TreeMap<String, String> merged = loadInventory();
 
-    merged.values().removeAll(executedMethods.keySet());
+    merged.entrySet().removeIf(entry -> executedMethods.containsKey(entry.getValue()));
     merged.putAll(entries);
 
     saveInventory(merged);
@@ -107,19 +113,20 @@ public class ApprovedFileInventory {
     }
 
     TreeMap<String, String> inventory = loadInventory();
-    leftovers.forEach(
-        leftover -> {
-          try {
-            Files.deleteIfExists(Path.of(leftover.relativePath()));
-            inventory.remove(leftover.relativePath());
-          } catch (IOException e) {
-            System.err.printf("Failed to delete leftover file: %s%n", leftover.relativePath());
-          }
-        });
+    List<InventoryEntry> removed = new ArrayList<>();
+    for (InventoryEntry leftover : leftovers) {
+      try {
+        Files.deleteIfExists(Path.of(leftover.relativePath()));
+        inventory.remove(leftover.relativePath());
+        removed.add(leftover);
+      } catch (IOException e) {
+        System.err.printf("Failed to delete leftover file: %s%n", leftover.relativePath());
+      }
+    }
 
     saveInventory(inventory);
 
-    return leftovers;
+    return removed;
   }
 
   static TreeMap<String, String> loadInventory() {
@@ -172,7 +179,14 @@ public class ApprovedFileInventory {
   static void reset(Path testInventoryFile) {
     entries.clear();
     executedMethods.clear();
-    shutdownHookRegistered.set(false);
+    Thread hook = shutdownHook.getAndSet(null);
+    if (hook != null) {
+      try {
+        Runtime.getRuntime().removeShutdownHook(hook);
+      } catch (IllegalStateException e) {
+        // JVM is already shutting down
+      }
+    }
     inventoryFile = testInventoryFile;
   }
 
