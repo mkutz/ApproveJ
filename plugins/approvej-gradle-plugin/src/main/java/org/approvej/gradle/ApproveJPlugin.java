@@ -49,6 +49,32 @@ public final class ApproveJPlugin implements Plugin<Project> {
                         task.getMainClass().set("org.approvej.approve.ApprovedFileInventory");
                         task.args("--remove");
                       });
+
+              project
+                  .getTasks()
+                  .register(
+                      "approvejApproveAll",
+                      JavaExec.class,
+                      task -> {
+                        task.setGroup("verification");
+                        task.setDescription("Approve all unapproved files");
+                        task.setClasspath(testClasspath);
+                        task.getMainClass().set("org.approvej.approve.ApprovedFileInventory");
+                        task.args("--approve-all");
+                      });
+
+              project
+                  .getTasks()
+                  .register(
+                      "approvejReviewUnapproved",
+                      JavaExec.class,
+                      task -> {
+                        task.setGroup("verification");
+                        task.setDescription("Review all unapproved files");
+                        task.setClasspath(testClasspath);
+                        task.getMainClass().set("org.approvej.approve.ApprovedFileInventory");
+                        task.args("--review-unapproved");
+                      });
             });
   }
 }

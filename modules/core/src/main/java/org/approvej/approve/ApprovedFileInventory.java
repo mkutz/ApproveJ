@@ -1,5 +1,6 @@
 package org.approvej.approve;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 
@@ -13,6 +14,8 @@ import java.util.Properties;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
+import org.approvej.configuration.Configuration;
+import org.approvej.review.FileReviewer;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -201,12 +204,96 @@ public class ApprovedFileInventory {
   }
 
   /**
+   * Finds all received files corresponding to inventory entries.
+   *
+   * <p>For each approved file in the inventory, checks if a corresponding received file exists next
+   * to it.
+   *
+   * @return a sorted list of paths to received files that exist
+   */
+  static List<Path> findReceivedFiles() {
+    return loadInventory().keySet().stream()
+        .map(ApprovedFileInventory::receivedPathFor)
+        .filter(Files::exists)
+        .sorted()
+        .toList();
+  }
+
+  private static Path receivedPathFor(Path approvedPath) {
+    String filename = approvedPath.getFileName().toString();
+    int approvedWithExtIdx = filename.lastIndexOf("-approved.");
+    if (approvedWithExtIdx >= 0) {
+      return approvedPath
+          .getParent()
+          .resolve(
+              filename.substring(0, approvedWithExtIdx)
+                  + "-received."
+                  + filename.substring(approvedWithExtIdx + "-approved.".length()));
+    }
+    if (filename.endsWith("-approved")) {
+      return approvedPath
+          .getParent()
+          .resolve(filename.substring(0, filename.length() - "-approved".length()) + "-received");
+    }
+    return approvedPath;
+  }
+
+  /**
+   * Approves all unapproved files by moving each received file to its corresponding approved file.
+   *
+   * @return the list of received file paths that were approved
+   */
+  static List<Path> approveAll() {
+    List<Path> approved = new ArrayList<>();
+    for (Path approvedPath : loadInventory().keySet()) {
+      Path received = receivedPathFor(approvedPath);
+      if (!Files.exists(received)) {
+        continue;
+      }
+      try {
+        Files.move(received, approvedPath, REPLACE_EXISTING);
+        approved.add(received);
+      } catch (IOException e) {
+        System.err.printf("Failed to approve %s: %s%n", received, e.getMessage());
+      }
+    }
+    return approved;
+  }
+
+  /**
+   * Reviews all unapproved files using the configured {@link FileReviewer}.
+   *
+   * @param reviewer the {@link FileReviewer} to use for reviewing each unapproved file
+   */
+  static void reviewUnapproved(FileReviewer reviewer) {
+    var unapprovedEntries =
+        loadInventory().keySet().stream()
+            .filter(approvedPath -> Files.exists(receivedPathFor(approvedPath)))
+            .sorted()
+            .toList();
+    if (unapprovedEntries.isEmpty()) {
+      System.out.println("No unapproved files found.");
+      return;
+    }
+    System.out.println("Unapproved files:");
+    unapprovedEntries.forEach(
+        approvedPath -> {
+          Path receivedPath = receivedPathFor(approvedPath);
+          System.out.printf("  %s%n", receivedPath.toUri());
+          reviewer.apply(PathProviders.approvedPath(approvedPath));
+        });
+  }
+
+  /**
    * CLI entry point for build tool plugins.
    *
-   * @param args {@code --find} to list leftovers, {@code --remove} to delete them
+   * @param args {@code --find} to list leftovers, {@code --remove} to delete them, {@code
+   *     --approve-all} to approve all unapproved files, {@code --review-unapproved} to review all
+   *     unapproved files
    */
   public static void main(String[] args) {
-    String usage = "Usage: ApprovedFileInventory --find | --remove";
+    String usage =
+        "Usage: ApprovedFileInventory --find | --remove | --approve-all | --review-unapproved";
     if (args.length == 0) {
       System.err.println(usage);
       System.exit(1);
@@ -235,6 +322,18 @@ public class ApprovedFileInventory {
           System.out.println("Removed leftover approved files:");
           removed.forEach(leftover -> System.out.printf("  %s%n", leftover.relativePath().toUri()));
         }
+      }
+      case "--approve-all" -> {
+        List<Path> approved = approveAll();
+        if (approved.isEmpty()) {
+          System.out.println("No unapproved files found.");
+        } else {
+          System.out.println("Approved files:");
+          approved.forEach(path -> System.out.printf("  %s%n", path.toUri()));
+        }
+      }
+      case "--review-unapproved" -> {
+        reviewUnapproved(Configuration.configuration.defaultFileReviewer());
       }
       default -> {
         System.err.printf("Unknown command: %s%n", command);

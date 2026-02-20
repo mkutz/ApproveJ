@@ -4,10 +4,13 @@ import static java.nio.file.Files.writeString;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
+import org.approvej.review.FileReviewResult;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -187,5 +190,130 @@ class ApprovedFileInventoryTest {
     assertThat(leftoverFile).doesNotExist();
     TreeMap<Path, InventoryEntry> inventory = ApprovedFileInventory.loadInventory();
     assertThat(inventory).doesNotContainKey(leftoverFile).containsKey(validFile);
+  }
+
+  @Test
+  void findReceivedFiles() throws IOException {
+    Path approvedFile1 = tempDir.resolve("MyTest-myMethod-approved.txt");
+    Files.createFile(approvedFile1);
+    Path receivedFile1 = tempDir.resolve("MyTest-myMethod-received.txt");
+    Files.createFile(receivedFile1);
+    Path approvedFile2 = tempDir.resolve("OtherTest-other-approved.json");
+    Files.createFile(approvedFile2);
+    Path receivedFile2 = tempDir.resolve("OtherTest-other-received.json");
+    Files.createFile(receivedFile2);
+    writeString(
+        inventoryFile,
+        "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
+            + approvedFile1
+            + " = com.example.MyTest#myMethod\n"
+            + approvedFile2
+            + " = com.example.OtherTest#other\n",
+        StandardOpenOption.CREATE);
+
+    List<Path> receivedFiles = ApprovedFileInventory.findReceivedFiles();
+
+    assertThat(receivedFiles)
+        .hasSize(2)
+        .anySatisfy(
+            p -> assertThat(p.getFileName().toString()).isEqualTo("MyTest-myMethod-received.txt"))
+        .anySatisfy(
+            p -> assertThat(p.getFileName().toString()).isEqualTo("OtherTest-other-received.json"));
+  }
+
+  @Test
+  void findReceivedFiles_only_existing() throws IOException {
+    Path approvedFile = tempDir.resolve("MyTest-myMethod-approved.txt");
+    Files.createFile(approvedFile);
+    Path receivedFile = tempDir.resolve("MyTest-myMethod-received.txt");
+    Files.createFile(receivedFile);
+    Path approvedFileNoReceived = tempDir.resolve("OtherTest-other-approved.json");
+    Files.createFile(approvedFileNoReceived);
+    writeString(
+        inventoryFile,
+        "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
+            + approvedFile
+            + " = com.example.MyTest#myMethod\n"
+            + approvedFileNoReceived
+            + " = com.example.OtherTest#other\n",
+        StandardOpenOption.CREATE);
+
+    List<Path> receivedFiles = ApprovedFileInventory.findReceivedFiles();
+
+    assertThat(receivedFiles)
+        .hasSize(1)
+        .anySatisfy(
+            p -> assertThat(p.getFileName().toString()).isEqualTo("MyTest-myMethod-received.txt"));
+  }
+
+  @Test
+  void findReceivedFiles_empty() {
+    List<Path> receivedFiles = ApprovedFileInventory.findReceivedFiles();
+
+    assertThat(receivedFiles).isEmpty();
+  }
+
+  @Test
+  void approveAll() throws IOException {
+    Path receivedFile = tempDir.resolve("MyTest-myMethod-received.txt");
+    writeString(receivedFile, "received content", StandardOpenOption.CREATE);
+    Path approvedFile = tempDir.resolve("MyTest-myMethod-approved.txt");
+    writeString(approvedFile, "old approved content", StandardOpenOption.CREATE);
+    writeString(
+        inventoryFile,
+        "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
+            + approvedFile
+            + " = com.example.MyTest#myMethod\n",
+        StandardOpenOption.CREATE);
+
+    List<Path> approved = ApprovedFileInventory.approveAll();
+
+    assertThat(approved).hasSize(1);
+    assertThat(receivedFile).doesNotExist();
+    assertThat(approvedFile).exists().hasContent("received content");
+  }
+
+  @Test
+  void approveAll_no_received_files() {
+    List<Path> approved = ApprovedFileInventory.approveAll();
+
+    assertThat(approved).isEmpty();
+  }
+
+  @Test
+  void reviewUnapproved() throws IOException {
+    Path receivedFile = tempDir.resolve("MyTest-myMethod-received.txt");
+    writeString(receivedFile, "received content", StandardOpenOption.CREATE);
+    Path approvedFile = tempDir.resolve("MyTest-myMethod-approved.txt");
+    writeString(approvedFile, "approved content", StandardOpenOption.CREATE);
+    writeString(
+        inventoryFile,
+        "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
+            + approvedFile
+            + " = com.example.MyTest#myMethod\n",
+        StandardOpenOption.CREATE);
+
+    var reviewedProviders = new ArrayList<PathProvider>();
+    ApprovedFileInventory.reviewUnapproved(
+        pathProvider -> {
+          reviewedProviders.add(pathProvider);
+          return new FileReviewResult(false);
+        });
+
+    assertThat(reviewedProviders).hasSize(1);
+    assertThat(reviewedProviders.getFirst().receivedPath()).isEqualTo(receivedFile.normalize());
+    assertThat(reviewedProviders.getFirst().approvedPath()).isEqualTo(approvedFile.normalize());
+  }
+
+  @Test
+  void reviewUnapproved_no_received_files() {
+    var reviewedProviders = new ArrayList<PathProvider>();
+    ApprovedFileInventory.reviewUnapproved(
+        pathProvider -> {
+          reviewedProviders.add(pathProvider);
+          return new FileReviewResult(false);
+        });
+
+    assertThat(reviewedProviders).isEmpty();
   }
 }
