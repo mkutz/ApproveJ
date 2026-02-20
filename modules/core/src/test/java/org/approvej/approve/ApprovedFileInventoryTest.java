@@ -194,10 +194,22 @@ class ApprovedFileInventoryTest {
 
   @Test
   void findReceivedFiles() throws IOException {
-    ApprovedFileInventory.reset(inventoryFile, tempDir);
-    Files.createFile(tempDir.resolve("MyTest-myMethod-received.txt"));
-    Files.createFile(tempDir.resolve("MyTest-myMethod-approved.txt"));
-    Files.createFile(tempDir.resolve("OtherTest-other-received.json"));
+    Path approvedFile1 = tempDir.resolve("MyTest-myMethod-approved.txt");
+    Files.createFile(approvedFile1);
+    Path receivedFile1 = tempDir.resolve("MyTest-myMethod-received.txt");
+    Files.createFile(receivedFile1);
+    Path approvedFile2 = tempDir.resolve("OtherTest-other-approved.json");
+    Files.createFile(approvedFile2);
+    Path receivedFile2 = tempDir.resolve("OtherTest-other-received.json");
+    Files.createFile(receivedFile2);
+    writeString(
+        inventoryFile,
+        "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
+            + approvedFile1
+            + " = com.example.MyTest#myMethod\n"
+            + approvedFile2
+            + " = com.example.OtherTest#other\n",
+        StandardOpenOption.CREATE);
 
     List<Path> receivedFiles = ApprovedFileInventory.findReceivedFiles();
 
@@ -210,9 +222,32 @@ class ApprovedFileInventoryTest {
   }
 
   @Test
-  void findReceivedFiles_empty() {
-    ApprovedFileInventory.reset(inventoryFile, tempDir);
+  void findReceivedFiles_only_existing() throws IOException {
+    Path approvedFile = tempDir.resolve("MyTest-myMethod-approved.txt");
+    Files.createFile(approvedFile);
+    Path receivedFile = tempDir.resolve("MyTest-myMethod-received.txt");
+    Files.createFile(receivedFile);
+    Path approvedFileNoReceived = tempDir.resolve("OtherTest-other-approved.json");
+    Files.createFile(approvedFileNoReceived);
+    writeString(
+        inventoryFile,
+        "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
+            + approvedFile
+            + " = com.example.MyTest#myMethod\n"
+            + approvedFileNoReceived
+            + " = com.example.OtherTest#other\n",
+        StandardOpenOption.CREATE);
 
+    List<Path> receivedFiles = ApprovedFileInventory.findReceivedFiles();
+
+    assertThat(receivedFiles)
+        .hasSize(1)
+        .anySatisfy(
+            p -> assertThat(p.getFileName().toString()).isEqualTo("MyTest-myMethod-received.txt"));
+  }
+
+  @Test
+  void findReceivedFiles_empty() {
     List<Path> receivedFiles = ApprovedFileInventory.findReceivedFiles();
 
     assertThat(receivedFiles).isEmpty();
@@ -220,11 +255,16 @@ class ApprovedFileInventoryTest {
 
   @Test
   void approveAll() throws IOException {
-    ApprovedFileInventory.reset(inventoryFile, tempDir);
     Path receivedFile = tempDir.resolve("MyTest-myMethod-received.txt");
     writeString(receivedFile, "received content", StandardOpenOption.CREATE);
     Path approvedFile = tempDir.resolve("MyTest-myMethod-approved.txt");
     writeString(approvedFile, "old approved content", StandardOpenOption.CREATE);
+    writeString(
+        inventoryFile,
+        "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
+            + approvedFile
+            + " = com.example.MyTest#myMethod\n",
+        StandardOpenOption.CREATE);
 
     List<Path> approved = ApprovedFileInventory.approveAll();
 
@@ -235,8 +275,6 @@ class ApprovedFileInventoryTest {
 
   @Test
   void approveAll_no_received_files() {
-    ApprovedFileInventory.reset(inventoryFile, tempDir);
-
     List<Path> approved = ApprovedFileInventory.approveAll();
 
     assertThat(approved).isEmpty();
@@ -244,11 +282,16 @@ class ApprovedFileInventoryTest {
 
   @Test
   void reviewUnapproved() throws IOException {
-    ApprovedFileInventory.reset(inventoryFile, tempDir);
     Path receivedFile = tempDir.resolve("MyTest-myMethod-received.txt");
     writeString(receivedFile, "received content", StandardOpenOption.CREATE);
     Path approvedFile = tempDir.resolve("MyTest-myMethod-approved.txt");
     writeString(approvedFile, "approved content", StandardOpenOption.CREATE);
+    writeString(
+        inventoryFile,
+        "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
+            + approvedFile
+            + " = com.example.MyTest#myMethod\n",
+        StandardOpenOption.CREATE);
 
     var reviewedProviders = new ArrayList<PathProvider>();
     ApprovedFileInventory.reviewUnapproved(
@@ -264,8 +307,6 @@ class ApprovedFileInventoryTest {
 
   @Test
   void reviewUnapproved_no_received_files() {
-    ApprovedFileInventory.reset(inventoryFile, tempDir);
-
     var reviewedProviders = new ArrayList<PathProvider>();
     ApprovedFileInventory.reviewUnapproved(
         pathProvider -> {
