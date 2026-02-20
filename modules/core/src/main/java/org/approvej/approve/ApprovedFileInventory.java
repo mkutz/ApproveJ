@@ -36,7 +36,8 @@ public class ApprovedFileInventory {
       new ConcurrentHashMap<>();
   private static final AtomicReference<@Nullable Thread> shutdownHook = new AtomicReference<>();
 
-  private static volatile Path inventoryFile = DEFAULT_INVENTORY_FILE;
+  private static final AtomicReference<Path> inventoryFile =
+      new AtomicReference<>(DEFAULT_INVENTORY_FILE);
 
   private ApprovedFileInventory() {}
 
@@ -123,11 +124,12 @@ public class ApprovedFileInventory {
 
   static TreeMap<Path, InventoryEntry> loadInventory() {
     TreeMap<Path, InventoryEntry> result = new TreeMap<>();
-    if (!Files.exists(inventoryFile)) {
+    Path inventoryPath = inventoryFile.get();
+    if (!Files.exists(inventoryPath)) {
       return result;
     }
     Properties properties = new Properties();
-    try (BufferedReader reader = Files.newBufferedReader(inventoryFile)) {
+    try (BufferedReader reader = Files.newBufferedReader(inventoryPath)) {
       properties.load(reader);
     } catch (IOException e) {
       System.err.printf("Failed to read inventory file: %s%n", e.getMessage());
@@ -144,11 +146,12 @@ public class ApprovedFileInventory {
   }
 
   private static void saveInventory(TreeMap<Path, InventoryEntry> inventory) {
+    Path inventoryPath = inventoryFile.get();
     try {
       if (inventory.isEmpty()) {
-        Files.deleteIfExists(inventoryFile);
+        Files.deleteIfExists(inventoryPath);
       } else {
-        Files.createDirectories(inventoryFile.getParent());
+        Files.createDirectories(inventoryPath.getParent());
         String content =
             "%s%n%s"
                 .formatted(
@@ -160,7 +163,7 @@ public class ApprovedFileInventory {
                                     .formatted(
                                         escapeKey(e.relativePath().toString()), e.testReference()))
                         .collect(joining("\n", "", "\n")));
-        Files.writeString(inventoryFile, content);
+        Files.writeString(inventoryPath, content);
       }
     } catch (IOException e) {
       System.err.printf("Failed to write inventory file: %s%n", e.getMessage());
@@ -189,7 +192,7 @@ public class ApprovedFileInventory {
         // JVM is already shutting down
       }
     }
-    inventoryFile = testInventoryFile;
+    inventoryFile.set(testInventoryFile);
   }
 
   /** Resets static state to defaults. For testing only. */
