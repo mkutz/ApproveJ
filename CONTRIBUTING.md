@@ -103,7 +103,7 @@ All pipelines can be found in [.github/workflows](.github/workflows).
 
 ### Versioning
 
-Shakespeare is using [SemVer 2.0](https://semver.org/spec/v2.0.0.html) but omits the patch digit in case it is `0`.
+ApproveJ is using [SemVer 2.0](https://semver.org/spec/v2.0.0.html) but omits the patch digit in case it is `0`.
 
 E.g. `1.0.0` is written as `1.0`, `1.0.1` is written as `1.0.1`, and `1.1.0` is written as `1.1`.
 
@@ -114,12 +114,15 @@ It is structured in four main directories:
 
 - The [modules](modules) directory contains all the published library modules:
   - [core](modules/core) contains the code for the core framework and should not have any dependencies to other modules and only very few (if any) to external libraries,
-  - [json-jackson](modules/json-jackson) contains JSON-related code using Jackson,
-  - [yaml-jackson](modules/yaml-jackson) contains YAML-related code using Jackson
-  - [http](modules/http) contains code to create an HTTP server for approving requests
+  - [json-jackson](modules/json-jackson) contains JSON-related code using Jackson 2.x,
+  - [json-jackson3](modules/json-jackson3) contains JSON-related code using Jackson 3.x,
+  - [yaml-jackson](modules/yaml-jackson) contains YAML-related code using Jackson 2.x,
+  - [yaml-jackson3](modules/yaml-jackson3) contains YAML-related code using Jackson 3.x,
+  - [http](modules/http) contains code to create an HTTP server for approving requests,
+  - [http-wiremock](modules/http-wiremock) contains the WireMock adapter for HTTP testing
 - The [plugins](plugins) directory contains build tool plugins:
-  - [gradle](plugins/gradle) contains the Gradle plugin for managing approved files
-  - [maven](plugins/maven) contains the Maven plugin for managing approved files
+  - [approvej-gradle-plugin](plugins/approvej-gradle-plugin) contains the Gradle plugin for managing approved files
+  - [approvej-maven-plugin](plugins/approvej-maven-plugin) contains the Maven plugin for managing approved files
 - the [bom](bom) directory contains the build file to generate a [Maven Bill of Material (BOM)](https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#bill-of-materials-bom-poms) for all the ApproveJ modules, and
 - the [manual](manual) directory contains the projects documentation written in [AsciiDoc](https://docs.asciidoctor.org/asciidoc/latest/).
 
