@@ -14,6 +14,18 @@ import org.junit.jupiter.api.io.TempDir;
 class MojoHelperTest {
 
   @Test
+  void executeInventory_nonzero_exit_code(@TempDir Path tempDir) {
+    var project = new MavenProject();
+    project.getBuild().setOutputDirectory(tempDir.resolve("classes").toString());
+    project.getBuild().setTestOutputDirectory(tempDir.resolve("test-classes").toString());
+    project.setFile(tempDir.resolve("pom.xml").toFile());
+
+    assertThatExceptionOfType(MojoExecutionException.class)
+        .isThrownBy(() -> MojoHelper.executeInventory(project, "--find", new SystemStreamLog()))
+        .withMessageContaining("exited with code");
+  }
+
+  @Test
   void buildCommand_find() {
     var classpathElements = List.of("/lib/a.jar", "/lib/b.jar");
 
@@ -45,17 +57,5 @@ class MojoHelperTest {
             expectedClasspath,
             "org.approvej.approve.ApprovedFileInventory",
             "--remove");
-  }
-
-  @Test
-  void executeInventory_nonzero_exit_code(@TempDir Path tempDir) {
-    var project = new MavenProject();
-    project.getBuild().setOutputDirectory(tempDir.resolve("classes").toString());
-    project.getBuild().setTestOutputDirectory(tempDir.resolve("test-classes").toString());
-    project.setFile(tempDir.resolve("pom.xml").toFile());
-
-    assertThatExceptionOfType(MojoExecutionException.class)
-        .isThrownBy(() -> MojoHelper.executeInventory(project, "--find", new SystemStreamLog()))
-        .withMessageContaining("exited with code");
   }
 }

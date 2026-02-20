@@ -82,6 +82,53 @@ class ConfigurationTest {
   }
 
   @Test
+  void loadConfiguration_inventoryEnabled_defaults_to_true() {
+    ConfigurationLoader loader = ConfigurationLoader.builder().build();
+
+    Configuration config = Configuration.loadConfiguration(loader);
+
+    assertThat(config.inventoryEnabled()).isTrue();
+  }
+
+  @Test
+  void loadConfiguration_inventoryEnabled_defaults_to_false_in_ci() {
+    Map<String, String> env = Map.of("CI", "true");
+    ConfigurationLoader loader =
+        ConfigurationLoader.builder().withEnvironmentVariables(env::get).build();
+
+    Configuration config = Configuration.loadConfiguration(loader);
+
+    assertThat(config.inventoryEnabled()).isFalse();
+  }
+
+  @Test
+  void loadConfiguration_inventoryEnabled_from_properties() {
+    Properties props = new Properties();
+    props.setProperty("inventoryEnabled", "false");
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+
+    Configuration config = Configuration.loadConfiguration(loader);
+
+    assertThat(config.inventoryEnabled()).isFalse();
+  }
+
+  @Test
+  void loadConfiguration_inventoryEnabled_env_overrides_properties() {
+    Map<String, String> env = Map.of("APPROVEJ_INVENTORY_ENABLED", "false");
+    Properties props = new Properties();
+    props.setProperty("inventoryEnabled", "true");
+    ConfigurationLoader loader =
+        ConfigurationLoader.builder()
+            .withEnvironmentVariables(env::get)
+            .withProperties(props)
+            .build();
+
+    Configuration config = Configuration.loadConfiguration(loader);
+
+    assertThat(config.inventoryEnabled()).isFalse();
+  }
+
+  @Test
   void configurationLoader_priorityChain() {
     // Simulate: env > project props > user home props
     Map<String, String> env = Map.of(); // Empty - no env variable set
@@ -127,16 +174,6 @@ class ConfigurationTest {
 
     // Environment variable has highest priority
     assertThat(config.defaultPrintFormat()).isInstanceOf(SingleLineStringPrintFormat.class);
-  }
-
-  @Test
-  void toEnvironmentVariableName() {
-    assertThat(ConfigurationLoader.toEnvironmentVariableName("defaultPrintFormat"))
-        .isEqualTo("APPROVEJ_DEFAULT_PRINT_FORMAT");
-    assertThat(ConfigurationLoader.toEnvironmentVariableName("timeout"))
-        .isEqualTo("APPROVEJ_TIMEOUT");
-    assertThat(ConfigurationLoader.toEnvironmentVariableName("maxRetryCount"))
-        .isEqualTo("APPROVEJ_MAX_RETRY_COUNT");
   }
 
   @Test
@@ -199,49 +236,12 @@ class ConfigurationTest {
   }
 
   @Test
-  void loadConfiguration_inventoryEnabled_defaults_to_true() {
-    ConfigurationLoader loader = ConfigurationLoader.builder().build();
-
-    Configuration config = Configuration.loadConfiguration(loader);
-
-    assertThat(config.inventoryEnabled()).isTrue();
-  }
-
-  @Test
-  void loadConfiguration_inventoryEnabled_defaults_to_false_in_ci() {
-    Map<String, String> env = Map.of("CI", "true");
-    ConfigurationLoader loader =
-        ConfigurationLoader.builder().withEnvironmentVariables(env::get).build();
-
-    Configuration config = Configuration.loadConfiguration(loader);
-
-    assertThat(config.inventoryEnabled()).isFalse();
-  }
-
-  @Test
-  void loadConfiguration_inventoryEnabled_from_properties() {
-    Properties props = new Properties();
-    props.setProperty("inventoryEnabled", "false");
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
-
-    Configuration config = Configuration.loadConfiguration(loader);
-
-    assertThat(config.inventoryEnabled()).isFalse();
-  }
-
-  @Test
-  void loadConfiguration_inventoryEnabled_env_overrides_properties() {
-    Map<String, String> env = Map.of("APPROVEJ_INVENTORY_ENABLED", "false");
-    Properties props = new Properties();
-    props.setProperty("inventoryEnabled", "true");
-    ConfigurationLoader loader =
-        ConfigurationLoader.builder()
-            .withEnvironmentVariables(env::get)
-            .withProperties(props)
-            .build();
-
-    Configuration config = Configuration.loadConfiguration(loader);
-
-    assertThat(config.inventoryEnabled()).isFalse();
+  void toEnvironmentVariableName() {
+    assertThat(ConfigurationLoader.toEnvironmentVariableName("defaultPrintFormat"))
+        .isEqualTo("APPROVEJ_DEFAULT_PRINT_FORMAT");
+    assertThat(ConfigurationLoader.toEnvironmentVariableName("timeout"))
+        .isEqualTo("APPROVEJ_TIMEOUT");
+    assertThat(ConfigurationLoader.toEnvironmentVariableName("maxRetryCount"))
+        .isEqualTo("APPROVEJ_MAX_RETRY_COUNT");
   }
 }
