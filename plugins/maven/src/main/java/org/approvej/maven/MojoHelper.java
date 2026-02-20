@@ -35,16 +35,32 @@ final class MojoHelper {
 
       Process process = processBuilder.start();
 
-      try (BufferedReader stdout =
-          new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-        stdout.lines().forEach(log::info);
-      }
-      try (BufferedReader stderr =
-          new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-        stderr.lines().forEach(log::error);
-      }
+      Thread stdoutThread =
+          new Thread(
+              () -> {
+                try (BufferedReader stdout =
+                    new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                  stdout.lines().forEach(log::info);
+                } catch (IOException e) {
+                  log.error("Error reading stdout from ApprovedFileInventory", e);
+                }
+              });
+      Thread stderrThread =
+          new Thread(
+              () -> {
+                try (BufferedReader stderr =
+                    new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+                  stderr.lines().forEach(log::error);
+                } catch (IOException e) {
+                  log.error("Error reading stderr from ApprovedFileInventory", e);
+                }
+              });
+      stdoutThread.start();
+      stderrThread.start();
 
       int exitCode = process.waitFor();
+      stdoutThread.join();
+      stderrThread.join();
       if (exitCode != 0) {
         throw new MojoExecutionException("ApprovedFileInventory exited with code " + exitCode);
       }
