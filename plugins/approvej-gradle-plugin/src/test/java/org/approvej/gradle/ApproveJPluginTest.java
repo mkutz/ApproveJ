@@ -25,6 +25,8 @@ class ApproveJPluginTest {
 
     assertThat(project.getTasks().findByName("approvejFindLeftovers")).isNotNull();
     assertThat(project.getTasks().findByName("approvejCleanup")).isNotNull();
+    assertThat(project.getTasks().findByName("approvejApproveAll")).isNotNull();
+    assertThat(project.getTasks().findByName("approvejReviewUnapproved")).isNotNull();
   }
 
   @Test
@@ -35,6 +37,8 @@ class ApproveJPluginTest {
 
     assertThat(project.getTasks().findByName("approvejFindLeftovers")).isNull();
     assertThat(project.getTasks().findByName("approvejCleanup")).isNull();
+    assertThat(project.getTasks().findByName("approvejApproveAll")).isNull();
+    assertThat(project.getTasks().findByName("approvejReviewUnapproved")).isNull();
   }
 
   @Test
@@ -46,6 +50,8 @@ class ApproveJPluginTest {
 
     assertThat(project.getTasks().findByName("approvejFindLeftovers")).isNotNull();
     assertThat(project.getTasks().findByName("approvejCleanup")).isNotNull();
+    assertThat(project.getTasks().findByName("approvejApproveAll")).isNotNull();
+    assertThat(project.getTasks().findByName("approvejReviewUnapproved")).isNotNull();
   }
 
   @Test
@@ -77,6 +83,34 @@ class ApproveJPluginTest {
   }
 
   @Test
+  void apply_approveAll_task_configuration() {
+    Project project = ProjectBuilder.builder().build();
+    project.getPluginManager().apply("java");
+    project.getPluginManager().apply(ApproveJPlugin.class);
+
+    var task = (JavaExec) project.getTasks().getByName("approvejApproveAll");
+
+    assertThat(task.getGroup()).isEqualTo("verification");
+    assertThat(task.getDescription()).isEqualTo("Approve all unapproved files");
+    assertThat(task.getMainClass().get()).isEqualTo("org.approvej.approve.ApprovedFileInventory");
+    assertThat(task.getArgs()).containsExactly("--approve-all");
+  }
+
+  @Test
+  void apply_reviewUnapproved_task_configuration() {
+    Project project = ProjectBuilder.builder().build();
+    project.getPluginManager().apply("java");
+    project.getPluginManager().apply(ApproveJPlugin.class);
+
+    var task = (JavaExec) project.getTasks().getByName("approvejReviewUnapproved");
+
+    assertThat(task.getGroup()).isEqualTo("verification");
+    assertThat(task.getDescription()).isEqualTo("Review all unapproved files");
+    assertThat(task.getMainClass().get()).isEqualTo("org.approvej.approve.ApprovedFileInventory");
+    assertThat(task.getArgs()).containsExactly("--review-unapproved");
+  }
+
+  @Test
   void apply_functional() throws IOException {
     Files.writeString(
         tempProjectDir.resolve("build.gradle"),
@@ -96,7 +130,9 @@ class ApproveJPluginTest {
 
     assertThat(result.getOutput())
         .contains("approvejFindLeftovers - List leftover approved files")
-        .contains("approvejCleanup - Detect and remove leftover approved files");
+        .contains("approvejCleanup - Detect and remove leftover approved files")
+        .contains("approvejApproveAll - Approve all unapproved files")
+        .contains("approvejReviewUnapproved - Review all unapproved files");
   }
 
   @Test
@@ -118,6 +154,8 @@ class ApproveJPluginTest {
 
     assertThat(result.getOutput())
         .doesNotContain("approvejFindLeftovers")
-        .doesNotContain("approvejCleanup");
+        .doesNotContain("approvejCleanup")
+        .doesNotContain("approvejApproveAll")
+        .doesNotContain("approvejReviewUnapproved");
   }
 }

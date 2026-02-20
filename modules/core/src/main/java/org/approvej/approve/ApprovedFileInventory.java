@@ -1,5 +1,6 @@
 package org.approvej.approve;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 
@@ -13,6 +14,8 @@ import java.util.Properties;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
+import org.approvej.configuration.Configuration;
+import org.approvej.review.FileReviewer;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -28,6 +31,7 @@ import org.jspecify.annotations.Nullable;
 public class ApprovedFileInventory {
 
   private static final Path DEFAULT_INVENTORY_FILE = Path.of(".approvej/inventory.properties");
+  private static final Path DEFAULT_WORKING_DIRECTORY = Path.of(".");
   private static final String HEADER =
       "# ApproveJ Approved File Inventory (auto-generated, do not edit)";
 
@@ -38,6 +42,9 @@ public class ApprovedFileInventory {
 
   private static final AtomicReference<Path> inventoryFile =
       new AtomicReference<>(DEFAULT_INVENTORY_FILE);
+
+  private static final AtomicReference<Path> workingDirectory =
+      new AtomicReference<>(DEFAULT_WORKING_DIRECTORY);
 
   private ApprovedFileInventory() {}
 
@@ -193,6 +200,15 @@ public class ApprovedFileInventory {
       }
     }
     inventoryFile.set(testInventoryFile);
+    workingDirectory.set(DEFAULT_WORKING_DIRECTORY);
+  }
+
+  /**
+   * Resets static state and sets the inventory file path and working directory. For testing only.
+   */
+  static void reset(Path testInventoryFile, Path testWorkingDirectory) {
+    reset(testInventoryFile);
+    workingDirectory.set(testWorkingDirectory);
   }
 
   /** Resets static state to defaults. For testing only. */
@@ -201,12 +217,89 @@ public class ApprovedFileInventory {
   }
 
   /**
+   * Finds all received files in the working directory recursively.
+   *
+   * @return a sorted list of paths to received files
+   */
+  static List<Path> findReceivedFiles() {
+    try (var stream = Files.walk(workingDirectory.get())) {
+      return stream
+          .filter(
+              path -> {
+                String filename = path.getFileName().toString();
+                return filename.contains("-received.") || filename.endsWith("-received");
+              })
+          .map(Path::normalize)
+          .sorted()
+          .toList();
+    } catch (IOException e) {
+      System.err.printf("Failed to search for received files: %s%n", e.getMessage());
+      return List.of();
+    }
+  }
+
+  private static Path approvedPathFor(Path receivedPath) {
+    String filename = receivedPath.getFileName().toString();
+    String approvedFilename;
+    if (filename.contains("-received.")) {
+      approvedFilename = filename.replace("-received.", "-approved.");
+    } else {
+      approvedFilename =
+          filename.substring(0, filename.length() - "-received".length()) + "-approved";
+    }
+    return receivedPath.getParent().resolve(approvedFilename);
+  }
+
+  /**
+   * Approves all unapproved files by moving each received file to its corresponding approved file.
+   *
+   * @return the list of approved file paths (the received files that were moved)
+   */
+  static List<Path> approveAll() {
+    List<Path> receivedFiles = findReceivedFiles();
+    List<Path> approved = new ArrayList<>();
+    for (Path received : receivedFiles) {
+      Path approvedPath = approvedPathFor(received);
+      try {
+        Files.move(received, approvedPath, REPLACE_EXISTING);
+        approved.add(received);
+      } catch (IOException e) {
+        System.err.printf("Failed to approve %s: %s%n", received, e.getMessage());
+      }
+    }
+    return approved;
+  }
+
+  /**
+   * Reviews all unapproved files using the configured {@link FileReviewer}.
+   *
+   * @param reviewer the {@link FileReviewer} to use for reviewing each unapproved file
+   */
+  static void reviewUnapproved(FileReviewer reviewer) {
+    List<Path> receivedFiles = findReceivedFiles();
+    if (receivedFiles.isEmpty()) {
+      System.out.println("No unapproved files found.");
+      return;
+    }
+    System.out.println("Unapproved files:");
+    receivedFiles.forEach(
+        received -> {
+          Path approvedPath = approvedPathFor(received);
+          System.out.printf("  %s%n", received.toUri());
+          reviewer.apply(PathProviders.approvedPath(approvedPath));
+        });
+  }
+
+  /**
    * CLI entry point for build tool plugins.
    *
-   * @param args {@code --find} to list leftovers, {@code --remove} to delete them
+   * @param args {@code --find} to list leftovers, {@code --remove} to delete them, {@code
+   *     --approve-all} to approve all unapproved files, {@code --review-unapproved} to review all
+   *     unapproved files
    */
   public static void main(String[] args) {
-    String usage = "Usage: ApprovedFileInventory --find | --remove";
+    String usage =
+        "Usage: ApprovedFileInventory --find | --remove | --approve-all | --review-unapproved";
     if (args.length == 0) {
       System.err.println(usage);
       System.exit(1);
@@ -235,6 +328,18 @@ public class ApprovedFileInventory {
           System.out.println("Removed leftover approved files:");
           removed.forEach(leftover -> System.out.printf("  %s%n", leftover.relativePath().toUri()));
         }
+      }
+      case "--approve-all" -> {
+        List<Path> approved = approveAll();
+        if (approved.isEmpty()) {
+          System.out.println("No unapproved files found.");
+        } else {
+          System.out.println("Approved files:");
+          approved.forEach(path -> System.out.printf("  %s%n", path.toUri()));
+        }
+      }
+      case "--review-unapproved" -> {
+        reviewUnapproved(Configuration.configuration.defaultFileReviewer());
       }
       default -> {
         System.err.printf("Unknown command: %s%n", command);
