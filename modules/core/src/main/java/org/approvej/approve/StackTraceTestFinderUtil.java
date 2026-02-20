@@ -63,7 +63,8 @@ public class StackTraceTestFinderUtil {
     String sourceSetName =
         Path.of(declaringClass.getProtectionDomain().getCodeSource().getLocation().getPath())
             .getFileName()
-            .toString();
+            .toString()
+            .replace("-classes", "");
     String packagePath = declaringClass.getPackageName().replace(".", "/");
     String pathRegex =
         "(?!build|target).*%s.*/%s/%s\\.(java|kt|groovy|scala)$"
