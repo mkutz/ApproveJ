@@ -16,13 +16,10 @@ class PathProviderTest {
     assertThat(new PathProvider(Path.of("./src/test/resources/"), "base", "affix", "", "xml"))
         .hasFieldOrPropertyWithValue(
             "approvedPath",
-            Path.of("./src/test/resources/" + "base" + "-affix" + ".xml")
-                .toAbsolutePath()
-                .normalize())
+            Path.of("./src/test/resources/" + "base" + "-affix" + ".xml").normalize())
         .hasFieldOrPropertyWithValue(
             "receivedPath",
             Path.of("./src/test/resources/" + "base" + "-affix" + "-received" + ".xml")
-                .toAbsolutePath()
                 .normalize());
   }
 
@@ -30,15 +27,10 @@ class PathProviderTest {
   void directory() {
     assertThat(pathProvider.directory(Path.of("/tmp/")))
         .hasFieldOrPropertyWithValue(
-            "approvedPath",
-            Path.of("/tmp/" + "base" + "-affix" + "-approved" + ".xml")
-                .toAbsolutePath()
-                .normalize())
+            "approvedPath", Path.of("/tmp/" + "base" + "-affix" + "-approved" + ".xml").normalize())
         .hasFieldOrPropertyWithValue(
             "receivedPath",
-            Path.of("/tmp/" + "base" + "-affix" + "-received" + ".xml")
-                .toAbsolutePath()
-                .normalize());
+            Path.of("/tmp/" + "base" + "-affix" + "-received" + ".xml").normalize());
   }
 
   @Test
@@ -47,12 +39,10 @@ class PathProviderTest {
         .hasFieldOrPropertyWithValue(
             "approvedPath",
             Path.of("./src/test/resources/" + "base" + "-special" + "-approved" + ".xml")
-                .toAbsolutePath()
                 .normalize())
         .hasFieldOrPropertyWithValue(
             "receivedPath",
             Path.of("./src/test/resources/" + "base" + "-special" + "-received" + ".xml")
-                .toAbsolutePath()
                 .normalize());
   }
 
@@ -61,14 +51,10 @@ class PathProviderTest {
     assertThat(pathProvider.filenameAffix(" "))
         .hasFieldOrPropertyWithValue(
             "approvedPath",
-            Path.of("./src/test/resources/" + "base" + "-approved" + ".xml")
-                .toAbsolutePath()
-                .normalize())
+            Path.of("./src/test/resources/" + "base" + "-approved" + ".xml").normalize())
         .hasFieldOrPropertyWithValue(
             "receivedPath",
-            Path.of("./src/test/resources/" + "base" + "-received" + ".xml")
-                .toAbsolutePath()
-                .normalize());
+            Path.of("./src/test/resources/" + "base" + "-received" + ".xml").normalize());
   }
 
   @Test
@@ -76,13 +62,10 @@ class PathProviderTest {
     assertThat(pathProvider.filenameExtension("yml"))
         .hasFieldOrPropertyWithValue(
             "approvedPath",
-            Path.of("./src/test/resources/" + "base" + "-affix" + "-approved" + ".yml")
-                .toAbsolutePath()
-                .normalize())
+            Path.of("./src/test/resources/" + "base" + "-affix" + "-approved" + ".yml").normalize())
         .hasFieldOrPropertyWithValue(
             "receivedPath",
             Path.of("./src/test/resources/" + "base" + "-affix" + "-received" + ".yml")
-                .toAbsolutePath()
                 .normalize());
   }
 
@@ -91,14 +74,10 @@ class PathProviderTest {
     assertThat(pathProvider.filenameExtension(" "))
         .hasFieldOrPropertyWithValue(
             "approvedPath",
-            Path.of("./src/test/resources/" + "base" + "-affix" + "-approved")
-                .toAbsolutePath()
-                .normalize())
+            Path.of("./src/test/resources/" + "base" + "-affix" + "-approved").normalize())
         .hasFieldOrPropertyWithValue(
             "receivedPath",
-            Path.of("./src/test/resources/" + "base" + "-affix" + "-received")
-                .toAbsolutePath()
-                .normalize());
+            Path.of("./src/test/resources/" + "base" + "-affix" + "-received").normalize());
   }
 
   @Test
@@ -114,7 +93,6 @@ class PathProviderTest {
                         + "-approved"
                         + "."
                         + DEFAULT_FILENAME_EXTENSION)
-                .toAbsolutePath()
                 .normalize())
         .hasFieldOrPropertyWithValue(
             "receivedPath",
@@ -125,7 +103,6 @@ class PathProviderTest {
                         + "-received"
                         + "."
                         + DEFAULT_FILENAME_EXTENSION)
-                .toAbsolutePath()
                 .normalize());
   }
 
@@ -136,13 +113,10 @@ class PathProviderTest {
             pathProviderFilenameExtensionAlreadySet.filenameExtension(DEFAULT_FILENAME_EXTENSION))
         .hasFieldOrPropertyWithValue(
             "approvedPath",
-            Path.of("./src/test/resources/" + "base" + "-affix" + "-approved" + ".xml")
-                .toAbsolutePath()
-                .normalize())
+            Path.of("./src/test/resources/" + "base" + "-affix" + "-approved" + ".xml").normalize())
         .hasFieldOrPropertyWithValue(
             "receivedPath",
             Path.of("./src/test/resources/" + "base" + "-affix" + "-received" + ".xml")
-                .toAbsolutePath()
                 .normalize());
   }
 
@@ -151,7 +125,6 @@ class PathProviderTest {
     assertThat(pathProvider.approvedPath())
         .isEqualTo(
             Path.of("./src/test/resources/" + "base" + "-affix" + "-approved" + ".xml")
-                .toAbsolutePath()
                 .normalize());
   }
 
@@ -160,7 +133,6 @@ class PathProviderTest {
     assertThat(pathProvider.receivedPath())
         .isEqualTo(
             Path.of("./src/test/resources/" + "base" + "-affix" + "-received" + ".xml")
-                .toAbsolutePath()
                 .normalize());
   }
 }

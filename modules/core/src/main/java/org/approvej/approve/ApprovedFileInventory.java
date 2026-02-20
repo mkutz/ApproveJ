@@ -14,6 +14,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Tracks approved files in an inventory so that leftover files (from renamed or deleted tests) can
@@ -30,10 +31,10 @@ public class ApprovedFileInventory {
   private static final String HEADER =
       "# ApproveJ Approved File Inventory (auto-generated, do not edit)";
 
-  private static final ConcurrentHashMap<String, String> entries = new ConcurrentHashMap<>();
+  private static final ConcurrentHashMap<Path, InventoryEntry> entries = new ConcurrentHashMap<>();
   private static final ConcurrentHashMap<String, Boolean> executedMethods =
       new ConcurrentHashMap<>();
-  private static final AtomicReference<Thread> shutdownHook = new AtomicReference<>();
+  private static final AtomicReference<@Nullable Thread> shutdownHook = new AtomicReference<>();
 
   private static volatile Path inventoryFile = DEFAULT_INVENTORY_FILE;
 
@@ -54,16 +55,8 @@ public class ApprovedFileInventory {
 
     String testReference =
         "%s#%s".formatted(testMethod.testClass().getName(), testMethod.testCaseName());
-    Path cwd = Path.of("").toAbsolutePath();
-    Path approvedPath = pathProvider.approvedPath().toAbsolutePath();
-    String relativePath;
-    try {
-      relativePath = cwd.relativize(approvedPath).toString();
-    } catch (IllegalArgumentException e) {
-      relativePath = approvedPath.toString();
-    }
 
-    addEntry(relativePath, testReference);
+    addEntry(pathProvider.approvedPath(), testReference);
 
     Thread hook = new Thread(ApprovedFileInventory::writeInventory, "ApproveJ-Inventory-Writer");
     if (shutdownHook.compareAndSet(null, hook)) {
@@ -72,9 +65,11 @@ public class ApprovedFileInventory {
   }
 
   static void writeInventory() {
-    TreeMap<String, String> merged = loadInventory();
+    TreeMap<Path, InventoryEntry> merged = loadInventory();
 
-    merged.entrySet().removeIf(entry -> executedMethods.containsKey(entry.getValue()));
+    merged
+        .entrySet()
+        .removeIf(entry -> executedMethods.containsKey(entry.getValue().testReference()));
     merged.putAll(entries);
 
     saveInventory(merged);
@@ -86,10 +81,7 @@ public class ApprovedFileInventory {
    * @return a list of leftover inventory entries
    */
   static List<InventoryEntry> findLeftovers() {
-    return loadInventory().entrySet().stream()
-        .map(entry -> new InventoryEntry(entry.getKey(), entry.getValue()))
-        .filter(ApprovedFileInventory::isLeftover)
-        .toList();
+    return loadInventory().values().stream().filter(ApprovedFileInventory::isLeftover).toList();
   }
 
   private static boolean isLeftover(InventoryEntry entry) {
@@ -112,11 +104,11 @@ public class ApprovedFileInventory {
       return leftovers;
     }
 
-    TreeMap<String, String> inventory = loadInventory();
+    TreeMap<Path, InventoryEntry> inventory = loadInventory();
     List<InventoryEntry> removed = new ArrayList<>();
     for (InventoryEntry leftover : leftovers) {
       try {
-        Files.deleteIfExists(Path.of(leftover.relativePath()));
+        Files.deleteIfExists(leftover.relativePath());
         inventory.remove(leftover.relativePath());
         removed.add(leftover);
       } catch (IOException e) {
@@ -129,8 +121,8 @@ public class ApprovedFileInventory {
     return removed;
   }
 
-  static TreeMap<String, String> loadInventory() {
-    TreeMap<String, String> result = new TreeMap<>();
+  static TreeMap<Path, InventoryEntry> loadInventory() {
+    TreeMap<Path, InventoryEntry> result = new TreeMap<>();
     if (!Files.exists(inventoryFile)) {
       return result;
     }
@@ -141,11 +133,17 @@ public class ApprovedFileInventory {
       System.err.printf("Failed to read inventory file: %s%n", e.getMessage());
       return result;
     }
-    properties.stringPropertyNames().forEach(key -> result.put(key, properties.getProperty(key)));
+    properties
+        .stringPropertyNames()
+        .forEach(
+            key -> {
+              Path path = Path.of(key);
+              result.put(path, new InventoryEntry(path, properties.getProperty(key)));
+            });
     return result;
   }
 
-  private static void saveInventory(TreeMap<String, String> inventory) {
+  private static void saveInventory(TreeMap<Path, InventoryEntry> inventory) {
     try {
       if (inventory.isEmpty()) {
         Files.deleteIfExists(inventoryFile);
@@ -155,8 +153,12 @@ public class ApprovedFileInventory {
             "%s%n%s"
                 .formatted(
                     HEADER,
-                    inventory.entrySet().stream()
-                        .map(e -> "%s = %s".formatted(escapeKey(e.getKey()), e.getValue()))
+                    inventory.values().stream()
+                        .map(
+                            e ->
+                                "%s = %s"
+                                    .formatted(
+                                        escapeKey(e.relativePath().toString()), e.testReference()))
                         .collect(joining("\n", "", "\n")));
         Files.writeString(inventoryFile, content);
       }
@@ -170,8 +172,8 @@ public class ApprovedFileInventory {
   }
 
   /** Adds an entry directly. For testing only. */
-  static void addEntry(String relativePath, String testReference) {
-    entries.put(relativePath, testReference);
+  static void addEntry(Path relativePath, String testReference) {
+    entries.put(relativePath, new InventoryEntry(relativePath, testReference));
     executedMethods.put(testReference, Boolean.TRUE);
   }
 
@@ -219,7 +221,7 @@ public class ApprovedFileInventory {
               leftover ->
                   System.out.printf(
                       "  %s%n    from %s%n",
-                      Path.of(leftover.relativePath()).toUri(), leftover.testReference()));
+                      leftover.relativePath().toUri(), leftover.testReference()));
         }
       }
       case "--remove" -> {
@@ -228,8 +230,7 @@ public class ApprovedFileInventory {
           System.out.println("No leftover approved files found.");
         } else {
           System.out.println("Removed leftover approved files:");
-          removed.forEach(
-              leftover -> System.out.printf("  %s%n", Path.of(leftover.relativePath()).toUri()));
+          removed.forEach(leftover -> System.out.printf("  %s%n", leftover.relativePath().toUri()));
         }
       }
       default -> {

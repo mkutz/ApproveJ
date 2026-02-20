@@ -1,12 +1,13 @@
 package org.approvej.approve;
 
+import java.nio.file.Path;
 import org.jspecify.annotations.NullMarked;
 
 /** An entry in the approved file inventory, mapping a file path to its originating test method. */
 @NullMarked
-record InventoryEntry(String relativePath, String className, String methodName) {
+record InventoryEntry(Path relativePath, String className, String methodName) {
 
-  InventoryEntry(String relativePath, String testReference) {
+  InventoryEntry(Path relativePath, String testReference) {
     this(relativePath, parseClassName(testReference), parseMethodName(testReference));
   }
 

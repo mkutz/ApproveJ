@@ -77,7 +77,6 @@ public class StackTraceTestFinderUtil {
                 attributes.isRegularFile() && path.normalize().toString().matches(pathRegex))) {
       return pathStream
           .findFirst()
-          .map(Path::toAbsolutePath)
           .map(Path::normalize)
           .orElseThrow(() -> new FileApproverError("Could not locate test source file"));
     } catch (IOException e) {

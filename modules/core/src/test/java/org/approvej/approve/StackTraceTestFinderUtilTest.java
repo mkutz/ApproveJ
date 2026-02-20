@@ -58,7 +58,7 @@ class StackTraceTestFinderUtilTest {
         StackTraceTestFinderUtil.findTestSourcePath(
             StackTraceTestFinderUtil.currentTestMethod().method());
 
-    assertThat(testSourcePath).isEqualTo(thisTestSourcePath.toAbsolutePath().normalize());
+    assertThat(testSourcePath).isEqualTo(thisTestSourcePath.normalize());
   }
 
   @Test
@@ -74,7 +74,7 @@ class StackTraceTestFinderUtilTest {
         StackTraceTestFinderUtil.findTestSourcePath(
             StackTraceTestFinderUtil.currentTestMethod().method());
 
-    assertThat(testSourcePath).isEqualTo(thisTestSourcePath.toAbsolutePath().normalize());
+    assertThat(testSourcePath).isEqualTo(thisTestSourcePath.normalize());
   }
 
   @Test
@@ -90,6 +90,6 @@ class StackTraceTestFinderUtilTest {
         StackTraceTestFinderUtil.findTestSourcePath(
             StackTraceTestFinderUtil.currentTestMethod().method());
 
-    assertThat(testSourcePath).isEqualTo(thisTestSourcePath.toAbsolutePath().normalize());
+    assertThat(testSourcePath).isEqualTo(thisTestSourcePath.normalize());
   }
 }
