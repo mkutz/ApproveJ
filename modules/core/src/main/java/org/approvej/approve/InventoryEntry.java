@@ -12,14 +12,14 @@ record InventoryEntry(Path relativePath, String className, String methodName) {
   }
 
   String testReference() {
-    return className + "#" + methodName;
+    return "%s#%s".formatted(className, methodName);
   }
 
   private static String parseClassName(String testReference) {
     int hashIndex = testReference.indexOf('#');
     if (hashIndex < 0) {
       throw new IllegalArgumentException(
-          "Invalid test reference (expected 'className#methodName'): " + testReference);
+          "Invalid test reference (expected 'className#methodName'): %s".formatted(testReference));
     }
     return testReference.substring(0, hashIndex);
   }

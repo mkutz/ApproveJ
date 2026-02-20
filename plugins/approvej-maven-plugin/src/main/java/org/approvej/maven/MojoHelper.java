@@ -1,10 +1,10 @@
 package org.approvej.maven;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -62,7 +62,8 @@ final class MojoHelper {
       stdoutThread.join();
       stderrThread.join();
       if (exitCode != 0) {
-        throw new MojoExecutionException("ApprovedFileInventory exited with code " + exitCode);
+        throw new MojoExecutionException(
+            "ApprovedFileInventory exited with code %d".formatted(exitCode));
       }
     } catch (IOException e) {
       throw new MojoExecutionException("Failed to execute ApprovedFileInventory", e);
@@ -74,14 +75,8 @@ final class MojoHelper {
 
   static List<String> buildCommand(List<String> classpathElements, String command) {
     String javaExecutable = Path.of(System.getProperty("java.home"), "bin", "java").toString();
-    String classpath = String.join(System.getProperty("path.separator"), classpathElements);
+    String classpath = String.join(File.pathSeparator, classpathElements);
 
-    List<String> cmd = new ArrayList<>();
-    cmd.add(javaExecutable);
-    cmd.add("-cp");
-    cmd.add(classpath);
-    cmd.add(MAIN_CLASS);
-    cmd.add(command);
-    return cmd;
+    return List.of(javaExecutable, "-cp", classpath, MAIN_CLASS, command);
   }
 }
