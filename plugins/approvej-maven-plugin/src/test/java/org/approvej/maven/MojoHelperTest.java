@@ -28,7 +28,7 @@ class MojoHelperTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"--find", "--remove"})
+  @ValueSource(strings = {"--find", "--remove", "--approve-all", "--review-unapproved"})
   void buildCommand(String command) {
     var classpathElements = List.of("/lib/a.jar", "/lib/b.jar");
 
