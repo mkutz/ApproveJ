@@ -208,6 +208,17 @@ class ConfigurationTest {
   }
 
   @Test
+  void loadConfiguration_inventoryEnabled_defaults_to_false_in_ci() {
+    Map<String, String> env = Map.of("CI", "true");
+    ConfigurationLoader loader =
+        ConfigurationLoader.builder().withEnvironmentVariables(env::get).build();
+
+    Configuration config = Configuration.loadConfiguration(loader);
+
+    assertThat(config.inventoryEnabled()).isFalse();
+  }
+
+  @Test
   void loadConfiguration_inventoryEnabled_from_properties() {
     Properties props = new Properties();
     props.setProperty("inventoryEnabled", "false");

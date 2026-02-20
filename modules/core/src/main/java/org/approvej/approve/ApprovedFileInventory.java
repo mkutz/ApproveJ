@@ -59,7 +59,9 @@ public class ApprovedFileInventory {
     addEntry(relativePath, testReference);
 
     if (shutdownHookRegistered.compareAndSet(false, true)) {
-      Runtime.getRuntime().addShutdownHook(new Thread(ApprovedFileInventory::writeInventory));
+      Runtime.getRuntime()
+          .addShutdownHook(
+              new Thread(ApprovedFileInventory::writeInventory, "ApproveJ-Inventory-Writer"));
     }
   }
 
@@ -109,10 +111,10 @@ public class ApprovedFileInventory {
         orphan -> {
           try {
             Files.deleteIfExists(Path.of(orphan.relativePath()));
+            inventory.remove(orphan.relativePath());
           } catch (IOException e) {
             System.err.printf("Failed to delete orphaned file: %s%n", orphan.relativePath());
           }
-          inventory.remove(orphan.relativePath());
         });
 
     saveInventory(inventory);
