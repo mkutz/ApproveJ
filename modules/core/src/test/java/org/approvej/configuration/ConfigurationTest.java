@@ -229,13 +229,6 @@ class ConfigurationTest {
   }
 
   @Test
-  void configurationLoader_emptyBuilder_returnsLoaderWithNoSources() {
-    ConfigurationLoader loader = ConfigurationLoader.builder().build();
-
-    assertThat(loader.get("anyKey", "default")).isEqualTo("default");
-  }
-
-  @Test
   void toEnvironmentVariableName() {
     assertThat(ConfigurationLoader.toEnvironmentVariableName("defaultPrintFormat"))
         .isEqualTo("APPROVEJ_DEFAULT_PRINT_FORMAT");

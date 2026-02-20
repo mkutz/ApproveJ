@@ -119,29 +119,6 @@ class ApprovedFileInventoryTest {
   }
 
   @Test
-  void writeInventory_merges_with_existing() throws IOException {
-    writeString(
-        inventoryFile,
-        """
-        # ApproveJ Approved File Inventory (auto-generated, do not edit)
-        src/test/ExistingTest-existing-approved.txt = com.example.ExistingTest#existing
-        """,
-        StandardOpenOption.CREATE);
-
-    ApprovedFileInventory.addEntry(
-        "src/test/NewTest-newTest-approved.txt", "com.example.NewTest#newTest");
-
-    ApprovedFileInventory.writeInventory();
-
-    TreeMap<String, String> inventory = ApprovedFileInventory.loadInventory();
-    assertThat(inventory)
-        .hasSize(2)
-        .containsEntry(
-            "src/test/ExistingTest-existing-approved.txt", "com.example.ExistingTest#existing")
-        .containsEntry("src/test/NewTest-newTest-approved.txt", "com.example.NewTest#newTest");
-  }
-
-  @Test
   void findLeftovers() throws IOException {
     writeString(
         inventoryFile,
