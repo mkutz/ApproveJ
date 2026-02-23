@@ -1,7 +1,7 @@
 [versions]
 junit = "6.0.3"
 assertj = "3.27.7"
-jackson2 = "2.21.0"
+jackson2 = "2.21.1"
 jackson3 = "3.0.4"
 maven = "3.9.12"
 wiremock = "3.13.2"
