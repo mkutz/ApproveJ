@@ -68,7 +68,7 @@ public class StackTraceTestFinderUtil {
             .replace("-classes", "");
     String packagePath = declaringClass.getPackageName().replace(".", "/");
     String pathRegex =
-        "(?!build|target|bin|out).*%s.*/%s/%s\\.(java|kt|groovy|scala)$"
+        "(?!(?:build|target|bin|out)/).*%s.*/%s/%s\\.(java|kt|groovy|scala)$"
             .formatted(sourceSetName, packagePath, declaringClass.getSimpleName());
     try (Stream<Path> pathStream =
         Files.find(
@@ -86,7 +86,9 @@ public class StackTraceTestFinderUtil {
           if (srcMatches.size() == 1) {
             yield srcMatches.getFirst();
           }
-          throw new FileApproverError("Found multiple test source files: %s".formatted(matches));
+          throw new FileApproverError(
+              "Found multiple test source files (%d contain 'src'): %s"
+                  .formatted(srcMatches.size(), matches));
         }
       };
     } catch (IOException e) {
