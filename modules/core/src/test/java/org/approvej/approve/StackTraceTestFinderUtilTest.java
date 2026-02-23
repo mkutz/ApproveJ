@@ -68,6 +68,7 @@ class StackTraceTestFinderUtilTest {
         "build/spotless-clean/spotlessJava/java/test/org/approvej/approve/StackTraceTestFinderUtilTest.java",
         "target/spotless-clean/spotlessJava/java/test/org/approvej/approve/StackTraceTestFinderUtilTest.java",
         "bin/test/org/approvej/approve/StackTraceTestFinderUtilTest.java",
+        "out/test/org/approvej/approve/StackTraceTestFinderUtilTest.java",
         "other/test/java/org/approvej/approve/StackTraceTestFinderUtilTest.java",
       })
   void findTestSourcePath_duplicate_file(String wrongPath) throws IOException {
@@ -105,6 +106,6 @@ class StackTraceTestFinderUtilTest {
 
     assertThatThrownBy(() -> StackTraceTestFinderUtil.findTestSourcePath(method))
         .isInstanceOf(FileApproverError.class)
-        .hasMessageStartingWith("Found multiple test source files:");
+        .hasMessageStartingWith("Found multiple test source files (");
   }
 }
