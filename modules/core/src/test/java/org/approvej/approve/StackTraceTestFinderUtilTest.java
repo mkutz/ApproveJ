@@ -110,6 +110,16 @@ class StackTraceTestFinderUtilTest {
   }
 
   @Test
+  void findTestSourcePath_no_source_file() throws NoSuchMethodException {
+    Method method =
+        org.assertj.core.api.Assertions.class.getDeclaredMethod("assertThat", boolean.class);
+
+    assertThatThrownBy(() -> StackTraceTestFinderUtil.findTestSourcePath(method))
+        .isInstanceOf(FileApproverError.class)
+        .hasMessage("Could not locate test source file");
+  }
+
+  @Test
   void findTestSourcePath_prefers_src_path() throws IOException {
     Path wrongTestSourcePath =
         Path.of("other/test/java/org/approvej/approve/StackTraceTestFinderUtilTest.java");
