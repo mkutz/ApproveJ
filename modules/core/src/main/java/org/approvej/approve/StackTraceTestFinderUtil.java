@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.jspecify.annotations.NullMarked;
@@ -67,7 +68,7 @@ public class StackTraceTestFinderUtil {
             .replace("-classes", "");
     String packagePath = declaringClass.getPackageName().replace(".", "/");
     String pathRegex =
-        "(?!build|target).*%s.*/%s/%s\\.(java|kt|groovy|scala)$"
+        "(?!build|target|bin|out).*%s.*/%s/%s\\.(java|kt|groovy|scala)$"
             .formatted(sourceSetName, packagePath, declaringClass.getSimpleName());
     try (Stream<Path> pathStream =
         Files.find(
@@ -75,10 +76,19 @@ public class StackTraceTestFinderUtil {
             packageDepth + 10,
             (path, attributes) ->
                 attributes.isRegularFile() && path.normalize().toString().matches(pathRegex))) {
-      return pathStream
-          .findFirst()
-          .map(Path::normalize)
-          .orElseThrow(() -> new FileApproverError("Could not locate test source file"));
+      List<Path> matches = pathStream.map(Path::normalize).toList();
+      return switch (matches.size()) {
+        case 0 -> throw new FileApproverError("Could not locate test source file");
+        case 1 -> matches.getFirst();
+        default -> {
+          List<Path> srcMatches =
+              matches.stream().filter(path -> path.toString().contains("src")).toList();
+          if (srcMatches.size() == 1) {
+            yield srcMatches.getFirst();
+          }
+          throw new FileApproverError("Found multiple test source files: %s".formatted(matches));
+        }
+      };
     } catch (IOException e) {
       throw new FileApproverError("Could not traverse code directory", e);
     }

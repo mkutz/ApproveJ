@@ -3,6 +3,7 @@ package org.approvej.approve;
 import static java.nio.file.Files.copy;
 import static java.nio.file.Files.createDirectories;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -91,5 +92,50 @@ class StackTraceTestFinderUtilTest {
             StackTraceTestFinderUtil.currentTestMethod().method());
 
     assertThat(testSourcePath).isEqualTo(thisTestSourcePath.normalize());
+  }
+
+  @Test
+  void findTestSourcePath_file_in_bin() throws IOException {
+    Path wrongTestSourcePath =
+        Path.of("bin/test/org/approvej/approve/StackTraceTestFinderUtilTest.java");
+    wrongTestSourcePathsToCleanup.add(wrongTestSourcePath);
+    createDirectories(wrongTestSourcePath.getParent());
+    copy(thisTestSourcePath, wrongTestSourcePath);
+
+    Path testSourcePath =
+        StackTraceTestFinderUtil.findTestSourcePath(
+            StackTraceTestFinderUtil.currentTestMethod().method());
+
+    assertThat(testSourcePath).isEqualTo(thisTestSourcePath.normalize());
+  }
+
+  @Test
+  void findTestSourcePath_prefers_src_path() throws IOException {
+    Path wrongTestSourcePath =
+        Path.of("other/test/java/org/approvej/approve/StackTraceTestFinderUtilTest.java");
+    wrongTestSourcePathsToCleanup.add(wrongTestSourcePath);
+    createDirectories(wrongTestSourcePath.getParent());
+    copy(thisTestSourcePath, wrongTestSourcePath);
+
+    Path testSourcePath =
+        StackTraceTestFinderUtil.findTestSourcePath(
+            StackTraceTestFinderUtil.currentTestMethod().method());
+
+    assertThat(testSourcePath).isEqualTo(thisTestSourcePath.normalize());
+  }
+
+  @Test
+  void findTestSourcePath_ambiguous() throws IOException {
+    Path wrongTestSourcePath =
+        Path.of("other/src/test/java/org/approvej/approve/StackTraceTestFinderUtilTest.java");
+    wrongTestSourcePathsToCleanup.add(wrongTestSourcePath);
+    createDirectories(wrongTestSourcePath.getParent());
+    copy(thisTestSourcePath, wrongTestSourcePath);
+
+    Method method = StackTraceTestFinderUtil.currentTestMethod().method();
+
+    assertThatThrownBy(() -> StackTraceTestFinderUtil.findTestSourcePath(method))
+        .isInstanceOf(FileApproverError.class)
+        .hasMessageStartingWith("Found multiple test source files:");
   }
 }
