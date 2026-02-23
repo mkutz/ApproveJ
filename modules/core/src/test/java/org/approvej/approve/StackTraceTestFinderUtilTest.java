@@ -62,42 +62,16 @@ class StackTraceTestFinderUtilTest {
     assertThat(testSourcePath).isEqualTo(thisTestSourcePath.normalize());
   }
 
-  @Test
-  void findTestSourcePath_file_in_build() throws IOException {
-    Path wrongTestSourcePath =
-        Path.of(
-            "build/spotless-clean/spotlessJava/java/test/org/approvej/approve/StackTraceTestFinderUtilTest.java");
-    wrongTestSourcePathsToCleanup.add(wrongTestSourcePath);
-    createDirectories(wrongTestSourcePath.getParent());
-    copy(thisTestSourcePath, wrongTestSourcePath);
-
-    Path testSourcePath =
-        StackTraceTestFinderUtil.findTestSourcePath(
-            StackTraceTestFinderUtil.currentTestMethod().method());
-
-    assertThat(testSourcePath).isEqualTo(thisTestSourcePath.normalize());
-  }
-
-  @Test
-  void findTestSourcePath_file_in_target() throws IOException {
-    Path wrongTestSourcePath =
-        Path.of(
-            "target/spotless-clean/spotlessJava/java/test/org/approvej/approve/StackTraceTestFinderUtilTest.java");
-    wrongTestSourcePathsToCleanup.add(wrongTestSourcePath);
-    createDirectories(wrongTestSourcePath.getParent());
-    copy(thisTestSourcePath, wrongTestSourcePath);
-
-    Path testSourcePath =
-        StackTraceTestFinderUtil.findTestSourcePath(
-            StackTraceTestFinderUtil.currentTestMethod().method());
-
-    assertThat(testSourcePath).isEqualTo(thisTestSourcePath.normalize());
-  }
-
-  @Test
-  void findTestSourcePath_file_in_bin() throws IOException {
-    Path wrongTestSourcePath =
-        Path.of("bin/test/org/approvej/approve/StackTraceTestFinderUtilTest.java");
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "build/spotless-clean/spotlessJava/java/test/org/approvej/approve/StackTraceTestFinderUtilTest.java",
+        "target/spotless-clean/spotlessJava/java/test/org/approvej/approve/StackTraceTestFinderUtilTest.java",
+        "bin/test/org/approvej/approve/StackTraceTestFinderUtilTest.java",
+        "other/test/java/org/approvej/approve/StackTraceTestFinderUtilTest.java",
+      })
+  void findTestSourcePath_duplicate_file(String wrongPath) throws IOException {
+    Path wrongTestSourcePath = Path.of(wrongPath);
     wrongTestSourcePathsToCleanup.add(wrongTestSourcePath);
     createDirectories(wrongTestSourcePath.getParent());
     copy(thisTestSourcePath, wrongTestSourcePath);
@@ -117,21 +91,6 @@ class StackTraceTestFinderUtilTest {
     assertThatThrownBy(() -> StackTraceTestFinderUtil.findTestSourcePath(method))
         .isInstanceOf(FileApproverError.class)
         .hasMessage("Could not locate test source file");
-  }
-
-  @Test
-  void findTestSourcePath_prefers_src_path() throws IOException {
-    Path wrongTestSourcePath =
-        Path.of("other/test/java/org/approvej/approve/StackTraceTestFinderUtilTest.java");
-    wrongTestSourcePathsToCleanup.add(wrongTestSourcePath);
-    createDirectories(wrongTestSourcePath.getParent());
-    copy(thisTestSourcePath, wrongTestSourcePath);
-
-    Path testSourcePath =
-        StackTraceTestFinderUtil.findTestSourcePath(
-            StackTraceTestFinderUtil.currentTestMethod().method());
-
-    assertThat(testSourcePath).isEqualTo(thisTestSourcePath.normalize());
   }
 
   @Test
