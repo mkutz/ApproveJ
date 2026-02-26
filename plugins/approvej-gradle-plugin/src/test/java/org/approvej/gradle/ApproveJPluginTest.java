@@ -11,6 +11,8 @@ import org.gradle.testfixtures.ProjectBuilder;
 import org.gradle.testkit.runner.GradleRunner;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class ApproveJPluginTest {
 
@@ -54,60 +56,24 @@ class ApproveJPluginTest {
     assertThat(project.getTasks().findByName("approvejReviewUnapproved")).isNotNull();
   }
 
-  @Test
-  void apply_findLeftovers_task_configuration() {
+  @ParameterizedTest
+  @CsvSource({
+    "approvejFindLeftovers, List leftover approved files, --find",
+    "approvejCleanup, Detect and remove leftover approved files, --remove",
+    "approvejApproveAll, Approve all unapproved files, --approve-all",
+    "approvejReviewUnapproved, Review all unapproved files, --review-unapproved"
+  })
+  void apply_task_configuration(String taskName, String description, String arg) {
     Project project = ProjectBuilder.builder().build();
     project.getPluginManager().apply("java");
     project.getPluginManager().apply(ApproveJPlugin.class);
 
-    var task = (JavaExec) project.getTasks().getByName("approvejFindLeftovers");
+    var task = (JavaExec) project.getTasks().getByName(taskName);
 
     assertThat(task.getGroup()).isEqualTo("verification");
-    assertThat(task.getDescription()).isEqualTo("List leftover approved files");
+    assertThat(task.getDescription()).isEqualTo(description);
     assertThat(task.getMainClass().get()).isEqualTo("org.approvej.approve.ApprovedFileInventory");
-    assertThat(task.getArgs()).containsExactly("--find");
-  }
-
-  @Test
-  void apply_cleanup_task_configuration() {
-    Project project = ProjectBuilder.builder().build();
-    project.getPluginManager().apply("java");
-    project.getPluginManager().apply(ApproveJPlugin.class);
-
-    var task = (JavaExec) project.getTasks().getByName("approvejCleanup");
-
-    assertThat(task.getGroup()).isEqualTo("verification");
-    assertThat(task.getDescription()).isEqualTo("Detect and remove leftover approved files");
-    assertThat(task.getMainClass().get()).isEqualTo("org.approvej.approve.ApprovedFileInventory");
-    assertThat(task.getArgs()).containsExactly("--remove");
-  }
-
-  @Test
-  void apply_approveAll_task_configuration() {
-    Project project = ProjectBuilder.builder().build();
-    project.getPluginManager().apply("java");
-    project.getPluginManager().apply(ApproveJPlugin.class);
-
-    var task = (JavaExec) project.getTasks().getByName("approvejApproveAll");
-
-    assertThat(task.getGroup()).isEqualTo("verification");
-    assertThat(task.getDescription()).isEqualTo("Approve all unapproved files");
-    assertThat(task.getMainClass().get()).isEqualTo("org.approvej.approve.ApprovedFileInventory");
-    assertThat(task.getArgs()).containsExactly("--approve-all");
-  }
-
-  @Test
-  void apply_reviewUnapproved_task_configuration() {
-    Project project = ProjectBuilder.builder().build();
-    project.getPluginManager().apply("java");
-    project.getPluginManager().apply(ApproveJPlugin.class);
-
-    var task = (JavaExec) project.getTasks().getByName("approvejReviewUnapproved");
-
-    assertThat(task.getGroup()).isEqualTo("verification");
-    assertThat(task.getDescription()).isEqualTo("Review all unapproved files");
-    assertThat(task.getMainClass().get()).isEqualTo("org.approvej.approve.ApprovedFileInventory");
-    assertThat(task.getArgs()).containsExactly("--review-unapproved");
+    assertThat(task.getArgs()).containsExactly(arg);
   }
 
   @Test

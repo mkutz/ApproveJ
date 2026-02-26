@@ -247,6 +247,27 @@ class ApprovedFileInventoryTest {
   }
 
   @Test
+  void findReceivedFiles_extensionless() throws IOException {
+    Path approvedFile = tempDir.resolve("MyTest-myMethod-approved");
+    Files.createFile(approvedFile);
+    Path receivedFile = tempDir.resolve("MyTest-myMethod-received");
+    Files.createFile(receivedFile);
+    writeString(
+        inventoryFile,
+        "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
+            + approvedFile
+            + " = com.example.MyTest#myMethod\n",
+        StandardOpenOption.CREATE);
+
+    List<Path> receivedFiles = ApprovedFileInventory.findReceivedFiles();
+
+    assertThat(receivedFiles)
+        .hasSize(1)
+        .anySatisfy(
+            p -> assertThat(p.getFileName().toString()).isEqualTo("MyTest-myMethod-received"));
+  }
+
+  @Test
   void findReceivedFiles_empty() {
     List<Path> receivedFiles = ApprovedFileInventory.findReceivedFiles();
 
@@ -315,5 +336,43 @@ class ApprovedFileInventoryTest {
         });
 
     assertThat(reviewedProviders).isEmpty();
+  }
+
+  @Test
+  void main_approve_all() throws IOException {
+    Path receivedFile = tempDir.resolve("MyTest-myMethod-received.txt");
+    writeString(receivedFile, "received content", StandardOpenOption.CREATE);
+    Path approvedFile = tempDir.resolve("MyTest-myMethod-approved.txt");
+    writeString(approvedFile, "old approved content", StandardOpenOption.CREATE);
+    writeString(
+        inventoryFile,
+        "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
+            + approvedFile
+            + " = com.example.MyTest#myMethod\n",
+        StandardOpenOption.CREATE);
+
+    ApprovedFileInventory.main(new String[] {"--approve-all"});
+
+    assertThat(receivedFile).doesNotExist();
+    assertThat(approvedFile).exists().hasContent("received content");
+  }
+
+  @Test
+  void main_review_unapproved() throws IOException {
+    Path receivedFile = tempDir.resolve("MyTest-myMethod-received.txt");
+    writeString(receivedFile, "received content", StandardOpenOption.CREATE);
+    Path approvedFile = tempDir.resolve("MyTest-myMethod-approved.txt");
+    writeString(approvedFile, "approved content", StandardOpenOption.CREATE);
+    writeString(
+        inventoryFile,
+        "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
+            + approvedFile
+            + " = com.example.MyTest#myMethod\n",
+        StandardOpenOption.CREATE);
+
+    ApprovedFileInventory.main(new String[] {"--review-unapproved"});
+
+    assertThat(receivedFile).exists();
+    assertThat(approvedFile).exists();
   }
 }
