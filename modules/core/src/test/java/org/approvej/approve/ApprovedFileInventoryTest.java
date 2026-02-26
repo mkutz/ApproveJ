@@ -215,10 +215,8 @@ class ApprovedFileInventoryTest {
 
     assertThat(receivedFiles)
         .hasSize(2)
-        .anySatisfy(
-            p -> assertThat(p.getFileName().toString()).isEqualTo("MyTest-myMethod-received.txt"))
-        .anySatisfy(
-            p -> assertThat(p.getFileName().toString()).isEqualTo("OtherTest-other-received.json"));
+        .anySatisfy(p -> assertThat(p.getFileName()).hasToString("MyTest-myMethod-received.txt"))
+        .anySatisfy(p -> assertThat(p.getFileName()).hasToString("OtherTest-other-received.json"));
   }
 
   @Test
@@ -242,8 +240,7 @@ class ApprovedFileInventoryTest {
 
     assertThat(receivedFiles)
         .hasSize(1)
-        .anySatisfy(
-            p -> assertThat(p.getFileName().toString()).isEqualTo("MyTest-myMethod-received.txt"));
+        .anySatisfy(p -> assertThat(p.getFileName()).hasToString("MyTest-myMethod-received.txt"));
   }
 
   @Test
@@ -263,8 +260,7 @@ class ApprovedFileInventoryTest {
 
     assertThat(receivedFiles)
         .hasSize(1)
-        .anySatisfy(
-            p -> assertThat(p.getFileName().toString()).isEqualTo("MyTest-myMethod-received"));
+        .anySatisfy(p -> assertThat(p.getFileName()).hasToString("MyTest-myMethod-received"));
   }
 
   @Test
@@ -291,8 +287,7 @@ class ApprovedFileInventoryTest {
 
     assertThat(receivedFiles)
         .hasSize(1)
-        .anySatisfy(
-            p -> assertThat(p.getFileName().toString()).isEqualTo("some_file-received.txt"));
+        .anySatisfy(p -> assertThat(p.getFileName()).hasToString("some_file-received.txt"));
   }
 
   @Test
