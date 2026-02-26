@@ -278,13 +278,14 @@ public class ApprovedFileInventory {
   /**
    * CLI entry point for build tool plugins.
    *
-   * @param args {@code --find} to list leftovers, {@code --remove} to delete them, {@code
-   *     --approve-all} to approve all unapproved files, {@code --review-unapproved} to review all
-   *     unapproved files
+   * @param args {@code --find-leftovers} to list leftovers, {@code --cleanup} to delete them,
+   *     {@code --approve-all} to approve all unapproved files, {@code --review-unapproved} to
+   *     review all unapproved files
    */
   public static void main(String[] args) {
     String usage =
-        "Usage: ApprovedFileInventory --find | --remove | --approve-all | --review-unapproved";
+        "Usage: ApprovedFileInventory --find-leftovers | --cleanup | --approve-all |"
+            + " --review-unapproved";
     if (args.length == 0) {
       System.err.println(usage);
       System.exit(1);
@@ -292,7 +293,7 @@ public class ApprovedFileInventory {
 
     String command = args[0];
     switch (command) {
-      case "--find" -> {
+      case "--find-leftovers" -> {
         List<InventoryEntry> leftovers = findLeftovers();
         if (leftovers.isEmpty()) {
           System.out.println("No leftover approved files found.");
@@ -305,7 +306,7 @@ public class ApprovedFileInventory {
                       leftover.relativePath().toUri(), leftover.testReference()));
         }
       }
-      case "--remove" -> {
+      case "--cleanup" -> {
         List<InventoryEntry> removed = removeLeftovers();
         if (removed.isEmpty()) {
           System.out.println("No leftover approved files found.");

@@ -16,6 +16,6 @@ public class CleanupMojo extends AbstractMojo {
 
   @Override
   public void execute() throws MojoExecutionException {
-    MojoHelper.executeInventory(project, "--remove", getLog());
+    MojoHelper.executeInventory(project, "--cleanup", getLog());
   }
 }

@@ -58,8 +58,8 @@ class ApproveJPluginTest {
 
   @ParameterizedTest
   @CsvSource({
-    "approvejFindLeftovers, List leftover approved files, --find",
-    "approvejCleanup, Detect and remove leftover approved files, --remove",
+    "approvejFindLeftovers, List leftover approved files, --find-leftovers",
+    "approvejCleanup, Detect and remove leftover approved files, --cleanup",
     "approvejApproveAll, Approve all unapproved files, --approve-all",
     "approvejReviewUnapproved, Review all unapproved files, --review-unapproved"
   })
