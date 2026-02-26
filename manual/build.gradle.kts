@@ -53,7 +53,7 @@ tasks.register<org.asciidoctor.gradle.jvm.pdf.AsciidoctorPdfTask>("cheatSheetPdf
   baseDirFollowsSourceFile()
   sourceDir(file("src/docs/asciidoc"))
   setOutputDir(layout.buildDirectory.dir("docs/asciidocPdf"))
-  sources { include("cheat-sheet-pdf.adoc") }
+  sources { include("approvej-cheat-sheet.adoc") }
 }
 
 asciidoctorj {

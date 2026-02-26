@@ -1,5 +1,5 @@
 [id=cleanup]
-= Cleaning Up Leftover Approved Files
+= Managing Approved/Received Files
 
 
 [id="cleanup_problem"]
@@ -9,6 +9,7 @@ When you rename or delete a test method, its approved file stays behind on disk.
 Over time these leftover files accumulate and clutter the repository.
 
 ApproveJ provides an inventory-based mechanism to detect and remove leftover approved files automatically.
+The same mechanism also helps you review and approve received files across the project.
 
 
 [id="cleanup_inventory"]
@@ -94,7 +95,7 @@ plugins {
 }
 ----
 
-The plugin registers two tasks in the `verification` group:
+The plugin registers the following tasks in the `verification` group:
 
 [cols="1,2"]
 |===
@@ -105,9 +106,15 @@ The plugin registers two tasks in the `verification` group:
 
 |`./gradlew approvejCleanup`
 |Detects and removes leftover approved files
+
+|`./gradlew approvejApproveAll`
+|Approves all unapproved files by moving received files to their approved counterparts
+
+|`./gradlew approvejReviewUnapproved`
+|Opens all unapproved files in the configured default <<reviewing,file reviewer>>
 |===
 
-NOTE: Both tasks require the Java plugin to be applied in the same project.
+NOTE: All tasks require the Java plugin to be applied in the same project.
 They use the test runtime classpath to resolve test classes.
 
 
@@ -125,7 +132,7 @@ Add the plugin to your `pom.xml`:
 </plugin>
 ----
 
-The plugin provides two goals:
+The plugin provides the following goals:
 
 [cols="1,2"]
 |===
@@ -136,6 +143,12 @@ The plugin provides two goals:
 
 |`mvn approvej:cleanup`
 |Detects and removes leftover approved files
+
+|`mvn approvej:approve-all`
+|Approves all unapproved files by moving received files to their approved counterparts
+
+|`mvn approvej:review-unapproved`
+|Opens all unapproved files in the configured default <<reviewing,file reviewer>>
 |===
 
 
@@ -149,3 +162,40 @@ The plugin provides two goals:
 
 WARNING: Only approved files that have been recorded in the inventory can be detected as leftovers.
 Make sure you have run all relevant tests with the inventory enabled at least once before cleaning up.
+
+
+[id="cleanup_review_unapproved"]
+== Reviewing Unapproved Files
+
+After running your tests, some may have failed because the received value differs from the approved value.
+Instead of reviewing each failure individually, you can use the `reviewUnapproved` task/goal to open all unapproved files in the configured default <<reviewing,file reviewer>> at once.
+
+[source,bash]
+----
+# Gradle
+./gradlew approvejReviewUnapproved
+
+# Maven
+mvn approvej:review-unapproved
+----
+
+This scans the inventory for approved files that have a corresponding received file and opens each pair in the file reviewer.
+
+
+[id="cleanup_approve_all"]
+== Approving All Received Files
+
+If you are confident that all received files are correct, you can approve them all at once.
+The `approveAll` task/goal moves every received file to its corresponding approved file, replacing the previous content.
+
+[source,bash]
+----
+# Gradle
+./gradlew approvejApproveAll
+
+# Maven
+mvn approvej:approve-all
+----
+
+WARNING: This overwrites all approved files with their received counterparts without review.
+Make sure you check the changes before committing them to version control.

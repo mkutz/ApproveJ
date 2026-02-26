@@ -3,7 +3,7 @@
 Quick reference for the ApproveJ public API, organized by the approval flow.
 
 ifndef::backend-pdf[]
-TIP: A link:pdf/cheat-sheet-pdf.pdf[printable PDF version] of this cheat sheet is available.
+TIP: A link:pdf/approvej-cheat-sheet.pdf[printable PDF version] of this cheat sheet is available.
 endif::[]
 
 
@@ -277,7 +277,7 @@ endif::[]
 |===
 
 
-== Cleanup Tasks
+== Build Plugin Tasks
 
 [cols="2,3"]
 |===
@@ -289,11 +289,23 @@ endif::[]
 |`./gradlew approvejCleanup`
 |Remove leftover approved files (Gradle)
 
+|`./gradlew approvejApproveAll`
+|Approve all unapproved files (Gradle)
+
+|`./gradlew approvejReviewUnapproved`
+|Review all unapproved files (Gradle)
+
 |`mvn approvej:find-leftovers`
 |List leftover approved files (Maven)
 
 |`mvn approvej:cleanup`
 |Remove leftover approved files (Maven)
+
+|`mvn approvej:approve-all`
+|Approve all unapproved files (Maven)
+
+|`mvn approvej:review-unapproved`
+|Review all unapproved files (Maven)
 |===
 
 
