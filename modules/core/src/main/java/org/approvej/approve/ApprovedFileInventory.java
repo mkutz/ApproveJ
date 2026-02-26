@@ -97,19 +97,23 @@ public class ApprovedFileInventory {
     }
   }
 
+  /** Result of a {@link #removeLeftovers()} operation. */
+  record CleanupResult(List<InventoryEntry> removed, int failures) {}
+
   /**
    * Removes leftover approved files and updates the inventory.
    *
-   * @return the list of removed leftover entries
+   * @return the result containing the list of removed leftover entries and the number of failures
    */
-  static List<InventoryEntry> removeLeftovers() {
+  static CleanupResult removeLeftovers() {
     List<InventoryEntry> leftovers = findLeftovers();
     if (leftovers.isEmpty()) {
-      return leftovers;
+      return new CleanupResult(leftovers, 0);
     }
 
     TreeMap<Path, InventoryEntry> inventory = loadInventory();
     List<InventoryEntry> removed = new ArrayList<>();
+    int failures = 0;
     for (InventoryEntry leftover : leftovers) {
       try {
         Files.deleteIfExists(leftover.relativePath());
@@ -117,12 +121,13 @@ public class ApprovedFileInventory {
         removed.add(leftover);
       } catch (IOException e) {
         System.err.printf("Failed to delete leftover file: %s%n", leftover.relativePath());
+        failures++;
       }
     }
 
     saveInventory(inventory);
 
-    return removed;
+    return new CleanupResult(removed, failures);
   }
 
   static TreeMap<Path, InventoryEntry> loadInventory() {
@@ -203,26 +208,6 @@ public class ApprovedFileInventory {
     reset(DEFAULT_INVENTORY_FILE);
   }
 
-  /**
-   * Finds all received files corresponding to inventory entries.
-   *
-   * <p>For each approved file in the inventory, checks if a corresponding received file exists next
-   * to it.
-   *
-   * @return a sorted list of paths to received files that exist
-   */
-  static List<Path> findReceivedFiles() {
-    return loadInventory().keySet().stream()
-        .map(ApprovedFileInventory::receivedPathFor)
-        .filter(Files::exists)
-        .sorted()
-        .toList();
-  }
-
-  private static Path receivedPathFor(Path approvedPath) {
-    return PathProviders.approvedPath(approvedPath).receivedPath();
-  }
-
   /** Result of an {@link #approveAll()} operation. */
   record ApproveResult(List<Path> approved, int failures) {}
 
@@ -236,7 +221,7 @@ public class ApprovedFileInventory {
     List<Path> approved = new ArrayList<>();
     int failures = 0;
     for (Path approvedPath : loadInventory().keySet()) {
-      Path received = receivedPathFor(approvedPath);
+      Path received = PathProviders.approvedPath(approvedPath).receivedPath();
       if (!Files.exists(received)) {
         continue;
       }
@@ -259,8 +244,9 @@ public class ApprovedFileInventory {
   static void reviewUnapproved(FileReviewer reviewer) {
     var unapprovedEntries =
         loadInventory().keySet().stream()
-            .filter(approvedPath -> Files.exists(receivedPathFor(approvedPath)))
-            .sorted()
+            .map(PathProviders::approvedPath)
+            .filter(pathProvider -> Files.exists(pathProvider.receivedPath()))
+            .sorted(java.util.Comparator.comparing(PathProvider::approvedPath))
             .toList();
     if (unapprovedEntries.isEmpty()) {
       System.out.println("No unapproved files found.");
@@ -268,10 +254,9 @@ public class ApprovedFileInventory {
     }
     System.out.println("Unapproved files:");
     unapprovedEntries.forEach(
-        approvedPath -> {
-          Path receivedPath = receivedPathFor(approvedPath);
-          System.out.printf("  %s%n", receivedPath.toUri());
-          reviewer.apply(PathProviders.approvedPath(approvedPath));
+        pathProvider -> {
+          System.out.printf("  %s%n", pathProvider.receivedPath().toUri());
+          reviewer.apply(pathProvider);
         });
   }
 
@@ -307,12 +292,20 @@ public class ApprovedFileInventory {
         }
       }
       case "--cleanup" -> {
-        List<InventoryEntry> removed = removeLeftovers();
-        if (removed.isEmpty()) {
+        CleanupResult cleanupResult = removeLeftovers();
+        if (cleanupResult.removed().isEmpty() && cleanupResult.failures() == 0) {
           System.out.println("No leftover approved files found.");
         } else {
-          System.out.println("Removed leftover approved files:");
-          removed.forEach(leftover -> System.out.printf("  %s%n", leftover.relativePath().toUri()));
+          if (!cleanupResult.removed().isEmpty()) {
+            System.out.println("Removed leftover approved files:");
+            cleanupResult
+                .removed()
+                .forEach(leftover -> System.out.printf("  %s%n", leftover.relativePath().toUri()));
+          }
+          if (cleanupResult.failures() > 0) {
+            System.err.printf("Failed to delete %d leftover file(s).%n", cleanupResult.failures());
+            System.exit(1);
+          }
         }
       }
       case "--approve-all" -> {

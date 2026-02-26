@@ -4,7 +4,6 @@ import static java.nio.file.Files.writeString;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -184,110 +183,13 @@ class ApprovedFileInventoryTest {
             + " = org.approvej.approve.ApprovedFileInventoryTest#removeLeftovers\n",
         StandardOpenOption.CREATE);
 
-    List<InventoryEntry> removed = ApprovedFileInventory.removeLeftovers();
+    ApprovedFileInventory.CleanupResult result = ApprovedFileInventory.removeLeftovers();
 
-    assertThat(removed).hasSize(1);
+    assertThat(result.removed()).hasSize(1);
+    assertThat(result.failures()).isZero();
     assertThat(leftoverFile).doesNotExist();
     TreeMap<Path, InventoryEntry> inventory = ApprovedFileInventory.loadInventory();
     assertThat(inventory).doesNotContainKey(leftoverFile).containsKey(validFile);
-  }
-
-  @Test
-  void findReceivedFiles() throws IOException {
-    Path approvedFile1 = tempDir.resolve("MyTest-myMethod-approved.txt");
-    Files.createFile(approvedFile1);
-    Path receivedFile1 = tempDir.resolve("MyTest-myMethod-received.txt");
-    Files.createFile(receivedFile1);
-    Path approvedFile2 = tempDir.resolve("OtherTest-other-approved.json");
-    Files.createFile(approvedFile2);
-    Path receivedFile2 = tempDir.resolve("OtherTest-other-received.json");
-    Files.createFile(receivedFile2);
-    writeString(
-        inventoryFile,
-        "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
-            + approvedFile1
-            + " = com.example.MyTest#myMethod\n"
-            + approvedFile2
-            + " = com.example.OtherTest#other\n",
-        StandardOpenOption.CREATE);
-
-    List<Path> receivedFiles = ApprovedFileInventory.findReceivedFiles();
-
-    assertThat(receivedFiles)
-        .hasSize(2)
-        .anySatisfy(p -> assertThat(p.getFileName()).hasToString("MyTest-myMethod-received.txt"))
-        .anySatisfy(p -> assertThat(p.getFileName()).hasToString("OtherTest-other-received.json"));
-  }
-
-  @Test
-  void findReceivedFiles_only_existing() throws IOException {
-    Path approvedFile = tempDir.resolve("MyTest-myMethod-approved.txt");
-    Files.createFile(approvedFile);
-    Path receivedFile = tempDir.resolve("MyTest-myMethod-received.txt");
-    Files.createFile(receivedFile);
-    Path approvedFileNoReceived = tempDir.resolve("OtherTest-other-approved.json");
-    Files.createFile(approvedFileNoReceived);
-    writeString(
-        inventoryFile,
-        "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
-            + approvedFile
-            + " = com.example.MyTest#myMethod\n"
-            + approvedFileNoReceived
-            + " = com.example.OtherTest#other\n",
-        StandardOpenOption.CREATE);
-
-    List<Path> receivedFiles = ApprovedFileInventory.findReceivedFiles();
-
-    assertThat(receivedFiles)
-        .hasSize(1)
-        .anySatisfy(p -> assertThat(p.getFileName()).hasToString("MyTest-myMethod-received.txt"));
-  }
-
-  @Test
-  void findReceivedFiles_extensionless() throws IOException {
-    Path approvedFile = tempDir.resolve("MyTest-myMethod-approved");
-    Files.createFile(approvedFile);
-    Path receivedFile = tempDir.resolve("MyTest-myMethod-received");
-    Files.createFile(receivedFile);
-    writeString(
-        inventoryFile,
-        "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
-            + approvedFile
-            + " = com.example.MyTest#myMethod\n",
-        StandardOpenOption.CREATE);
-
-    List<Path> receivedFiles = ApprovedFileInventory.findReceivedFiles();
-
-    assertThat(receivedFiles)
-        .hasSize(1)
-        .anySatisfy(p -> assertThat(p.getFileName()).hasToString("MyTest-myMethod-received"));
-  }
-
-  @Test
-  void findReceivedFiles_empty() {
-    List<Path> receivedFiles = ApprovedFileInventory.findReceivedFiles();
-
-    assertThat(receivedFiles).isEmpty();
-  }
-
-  @Test
-  void findReceivedFiles_no_approved_infix() throws IOException {
-    Path approvedFile = tempDir.resolve("some_file.txt");
-    Files.createFile(approvedFile);
-    Path receivedFile = tempDir.resolve("some_file-received.txt");
-    Files.createFile(receivedFile);
-    writeString(
-        inventoryFile,
-        "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
-            + approvedFile
-            + " = com.example.MyTest#myMethod\n",
-        StandardOpenOption.CREATE);
-
-    List<Path> receivedFiles = ApprovedFileInventory.findReceivedFiles();
-
-    assertThat(receivedFiles)
-        .hasSize(1)
-        .anySatisfy(p -> assertThat(p.getFileName()).hasToString("some_file-received.txt"));
   }
 
   @Test
