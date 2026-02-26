@@ -179,6 +179,30 @@ Date-times: `isoLocalDateTimes`, `isoOffsetDateTimes`, `isoZonedDateTimes`(+loca
 |===
 
 
+== Build Plugin Tasks
+
+[cols="2,3"]
+|===
+|Command |Description
+
+a|`gradle approvejFindLeftovers` +
+`mvn approvej:find-leftovers`
+|List leftover approved files
+
+a|`gradle approvejCleanup` +
+`mvn approvej:cleanup`
+|Remove leftover approved files
+
+a|`gradle approvejApproveAll` +
+`mvn approvej:approve-all`
+|Approve all unapproved files
+
+a|`gradle approvejReviewUnapproved` +
+`mvn approvej:review-unapproved`
+|Review all unapproved files
+|===
+
+
 == Configuration Properties
 
 [cols="2,2,1"]
