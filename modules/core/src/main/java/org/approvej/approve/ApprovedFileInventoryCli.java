@@ -21,7 +21,13 @@ import org.jspecify.annotations.NullMarked;
  * and delegates to instance methods.
  */
 @NullMarked
-public record ApprovedFileInventoryCli(TreeMap<Path, InventoryEntry> inventory) {
+final class ApprovedFileInventoryCli {
+
+  private final TreeMap<Path, InventoryEntry> inventory;
+
+  ApprovedFileInventoryCli(TreeMap<Path, InventoryEntry> inventory) {
+    this.inventory = inventory;
+  }
 
   /**
    * Finds leftover inventory entries whose test methods no longer exist.
@@ -63,7 +69,9 @@ public record ApprovedFileInventoryCli(TreeMap<Path, InventoryEntry> inventory) 
         inventory.remove(leftover.relativePath());
         removed.add(leftover);
       } catch (IOException e) {
-        System.err.printf("Failed to delete leftover file: %s%n", leftover.relativePath());
+        System.err.printf(
+            "Failed to delete leftover file: %s (%s: %s)%n",
+            leftover.relativePath(), e.getClass().getSimpleName(), e.getMessage());
         failures++;
       }
     }

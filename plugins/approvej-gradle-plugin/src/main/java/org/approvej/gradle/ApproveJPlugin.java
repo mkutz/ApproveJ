@@ -7,7 +7,7 @@ import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.SourceSetContainer;
 
-/** Gradle plugin that registers tasks to find and remove leftover approved files. */
+/** Gradle plugin that registers tasks to manage approved files. */
 @SuppressWarnings("unused")
 public final class ApproveJPlugin implements Plugin<Project> {
 
