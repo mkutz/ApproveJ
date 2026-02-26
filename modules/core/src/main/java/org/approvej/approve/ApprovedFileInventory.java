@@ -220,31 +220,21 @@ public class ApprovedFileInventory {
   }
 
   private static Path receivedPathFor(Path approvedPath) {
-    String filename = approvedPath.getFileName().toString();
-    int approvedWithExtIdx = filename.lastIndexOf("-approved.");
-    if (approvedWithExtIdx >= 0) {
-      return approvedPath
-          .getParent()
-          .resolve(
-              filename.substring(0, approvedWithExtIdx)
-                  + "-received."
-                  + filename.substring(approvedWithExtIdx + "-approved.".length()));
-    }
-    if (filename.endsWith("-approved")) {
-      return approvedPath
-          .getParent()
-          .resolve(filename.substring(0, filename.length() - "-approved".length()) + "-received");
-    }
-    return approvedPath;
+    return PathProviders.approvedPath(approvedPath).receivedPath();
   }
+
+  /** Result of an {@link #approveAll()} operation. */
+  record ApproveResult(List<Path> approved, int failures) {}
 
   /**
    * Approves all unapproved files by moving each received file to its corresponding approved file.
    *
-   * @return the list of received file paths that were approved
+   * @return the result containing the list of approved file paths that were updated and the number
+   *     of failures
    */
-  static List<Path> approveAll() {
+  static ApproveResult approveAll() {
     List<Path> approved = new ArrayList<>();
+    int failures = 0;
     for (Path approvedPath : loadInventory().keySet()) {
       Path received = receivedPathFor(approvedPath);
       if (!Files.exists(received)) {
@@ -252,12 +242,13 @@ public class ApprovedFileInventory {
       }
       try {
         Files.move(received, approvedPath, REPLACE_EXISTING);
-        approved.add(received);
+        approved.add(approvedPath);
       } catch (IOException e) {
         System.err.printf("Failed to approve %s: %s%n", received, e.getMessage());
+        failures++;
       }
     }
-    return approved;
+    return new ApproveResult(approved, failures);
   }
 
   /**
@@ -324,17 +315,22 @@ public class ApprovedFileInventory {
         }
       }
       case "--approve-all" -> {
-        List<Path> approved = approveAll();
-        if (approved.isEmpty()) {
+        ApproveResult result = approveAll();
+        if (result.approved().isEmpty() && result.failures() == 0) {
           System.out.println("No unapproved files found.");
         } else {
-          System.out.println("Approved files:");
-          approved.forEach(path -> System.out.printf("  %s%n", path.toUri()));
+          if (!result.approved().isEmpty()) {
+            System.out.println("Approved files:");
+            result.approved().forEach(path -> System.out.printf("  %s%n", path.toUri()));
+          }
+          if (result.failures() > 0) {
+            System.err.printf("Failed to approve %d file(s).%n", result.failures());
+            System.exit(1);
+          }
         }
       }
-      case "--review-unapproved" -> {
-        reviewUnapproved(Configuration.configuration.defaultFileReviewer());
-      }
+      case "--review-unapproved" ->
+          reviewUnapproved(Configuration.configuration.defaultFileReviewer());
       default -> {
         System.err.printf("Unknown command: %s%n", command);
         System.err.println(usage);

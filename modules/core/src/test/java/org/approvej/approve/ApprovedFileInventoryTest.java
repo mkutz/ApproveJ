@@ -275,6 +275,27 @@ class ApprovedFileInventoryTest {
   }
 
   @Test
+  void findReceivedFiles_no_approved_infix() throws IOException {
+    Path approvedFile = tempDir.resolve("some_file.txt");
+    Files.createFile(approvedFile);
+    Path receivedFile = tempDir.resolve("some_file-received.txt");
+    Files.createFile(receivedFile);
+    writeString(
+        inventoryFile,
+        "# ApproveJ Approved File Inventory (auto-generated, do not edit)\n"
+            + approvedFile
+            + " = com.example.MyTest#myMethod\n",
+        StandardOpenOption.CREATE);
+
+    List<Path> receivedFiles = ApprovedFileInventory.findReceivedFiles();
+
+    assertThat(receivedFiles)
+        .hasSize(1)
+        .anySatisfy(
+            p -> assertThat(p.getFileName().toString()).isEqualTo("some_file-received.txt"));
+  }
+
+  @Test
   void approveAll() throws IOException {
     Path receivedFile = tempDir.resolve("MyTest-myMethod-received.txt");
     writeString(receivedFile, "received content", StandardOpenOption.CREATE);
@@ -287,18 +308,20 @@ class ApprovedFileInventoryTest {
             + " = com.example.MyTest#myMethod\n",
         StandardOpenOption.CREATE);
 
-    List<Path> approved = ApprovedFileInventory.approveAll();
+    ApprovedFileInventory.ApproveResult result = ApprovedFileInventory.approveAll();
 
-    assertThat(approved).hasSize(1);
+    assertThat(result.approved()).containsExactly(approvedFile);
+    assertThat(result.failures()).isZero();
     assertThat(receivedFile).doesNotExist();
     assertThat(approvedFile).exists().hasContent("received content");
   }
 
   @Test
   void approveAll_no_received_files() {
-    List<Path> approved = ApprovedFileInventory.approveAll();
+    ApprovedFileInventory.ApproveResult result = ApprovedFileInventory.approveAll();
 
-    assertThat(approved).isEmpty();
+    assertThat(result.approved()).isEmpty();
+    assertThat(result.failures()).isZero();
   }
 
   @Test
