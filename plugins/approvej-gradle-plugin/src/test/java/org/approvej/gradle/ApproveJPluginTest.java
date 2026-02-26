@@ -72,7 +72,8 @@ class ApproveJPluginTest {
 
     assertThat(task.getGroup()).isEqualTo("verification");
     assertThat(task.getDescription()).isEqualTo(description);
-    assertThat(task.getMainClass().get()).isEqualTo("org.approvej.approve.ApprovedFileInventory");
+    assertThat(task.getMainClass().get())
+        .isEqualTo("org.approvej.approve.ApprovedFileInventoryCli");
     assertThat(task.getArgs()).containsExactly(arg);
   }
 
