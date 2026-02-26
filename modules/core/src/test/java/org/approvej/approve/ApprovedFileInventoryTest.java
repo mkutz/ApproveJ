@@ -290,7 +290,7 @@ class ApprovedFileInventoryTest {
             + " = com.example.MyTest#myMethod\n",
         StandardOpenOption.CREATE);
 
-    ApprovedFileInventory.main(new String[] {"--review-unapproved"});
+    ApprovedFileInventory.reviewUnapproved(pathProvider -> new FileReviewResult(false));
 
     assertThat(receivedFile).exists();
     assertThat(approvedFile).exists();

@@ -23,12 +23,13 @@ class MojoHelperTest {
     project.setFile(tempDir.resolve("pom.xml").toFile());
 
     assertThatExceptionOfType(MojoExecutionException.class)
-        .isThrownBy(() -> MojoHelper.executeInventory(project, "--find", new SystemStreamLog()))
+        .isThrownBy(
+            () -> MojoHelper.executeInventory(project, "--find-leftovers", new SystemStreamLog()))
         .withMessageContaining("exited with code");
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"--find", "--remove", "--approve-all", "--review-unapproved"})
+  @ValueSource(strings = {"--find-leftovers", "--cleanup", "--approve-all", "--review-unapproved"})
   void buildCommand(String command) {
     var classpathElements = List.of("/lib/a.jar", "/lib/b.jar");
 
