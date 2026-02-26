@@ -15,9 +15,10 @@ public final class ApproveJPlugin implements Plugin<Project> {
 
   private static final List<TaskDefinition> TASK_DEFINITIONS =
       List.of(
-          new TaskDefinition("approvejFindLeftovers", "List leftover approved files", "--find"),
           new TaskDefinition(
-              "approvejCleanup", "Detect and remove leftover approved files", "--remove"),
+              "approvejFindLeftovers", "List leftover approved files", "--find-leftovers"),
+          new TaskDefinition(
+              "approvejCleanup", "Detect and remove leftover approved files", "--cleanup"),
           new TaskDefinition("approvejApproveAll", "Approve all unapproved files", "--approve-all"),
           new TaskDefinition(
               "approvejReviewUnapproved", "Review all unapproved files", "--review-unapproved"));

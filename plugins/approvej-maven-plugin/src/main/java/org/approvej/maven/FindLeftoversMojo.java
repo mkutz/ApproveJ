@@ -19,6 +19,6 @@ public class FindLeftoversMojo extends AbstractMojo {
 
   @Override
   public void execute() throws MojoExecutionException {
-    MojoHelper.executeInventory(project, "--find", getLog());
+    MojoHelper.executeInventory(project, "--find-leftovers", getLog());
   }
 }
