@@ -10,10 +10,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 
-/** Shared helper for forking a JVM to run {@code ApprovedFileInventory}. */
+/** Shared helper for forking a JVM to run {@code ApprovedFileInventoryCli}. */
 final class MojoHelper {
 
-  private static final String MAIN_CLASS = "org.approvej.approve.ApprovedFileInventory";
+  private static final String MAIN_CLASS = "org.approvej.approve.ApprovedFileInventoryCli";
 
   private MojoHelper() {}
 
@@ -42,7 +42,7 @@ final class MojoHelper {
                     new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                   stdout.lines().forEach(log::info);
                 } catch (IOException e) {
-                  log.error("Error reading stdout from ApprovedFileInventory", e);
+                  log.error("Error reading stdout from ApprovedFileInventoryCli", e);
                 }
               });
       Thread stderrThread =
@@ -52,7 +52,7 @@ final class MojoHelper {
                     new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
                   stderr.lines().forEach(log::error);
                 } catch (IOException e) {
-                  log.error("Error reading stderr from ApprovedFileInventory", e);
+                  log.error("Error reading stderr from ApprovedFileInventoryCli", e);
                 }
               });
       stdoutThread.start();
@@ -63,13 +63,13 @@ final class MojoHelper {
       stderrThread.join();
       if (exitCode != 0) {
         throw new MojoExecutionException(
-            "ApprovedFileInventory exited with code %d".formatted(exitCode));
+            "ApprovedFileInventoryCli exited with code %d".formatted(exitCode));
       }
     } catch (IOException e) {
-      throw new MojoExecutionException("Failed to execute ApprovedFileInventory", e);
+      throw new MojoExecutionException("Failed to execute ApprovedFileInventoryCli", e);
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
-      throw new MojoExecutionException("Interrupted while running ApprovedFileInventory", e);
+      throw new MojoExecutionException("Interrupted while running ApprovedFileInventoryCli", e);
     }
   }
 

@@ -49,7 +49,7 @@ public final class ApproveJPlugin implements Plugin<Project> {
                                 task.setDescription(definition.description());
                                 task.setClasspath(testClasspath);
                                 task.getMainClass()
-                                    .set("org.approvej.approve.ApprovedFileInventory");
+                                    .set("org.approvej.approve.ApprovedFileInventoryCli");
                                 task.args(definition.arg());
                               }));
             });

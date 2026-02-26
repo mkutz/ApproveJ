@@ -42,7 +42,7 @@ class MojoHelperTest {
             expectedJava,
             "-cp",
             expectedClasspath,
-            "org.approvej.approve.ApprovedFileInventory",
+            "org.approvej.approve.ApprovedFileInventoryCli",
             command);
   }
 }
