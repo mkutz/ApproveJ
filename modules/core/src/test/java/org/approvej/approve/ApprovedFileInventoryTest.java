@@ -6,9 +6,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.TreeMap;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.ArrayList;
+import java.util.List;
+import org.approvej.review.FileReviewResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -16,115 +16,210 @@ class ApprovedFileInventoryTest {
 
   @TempDir private Path tempDir;
 
-  private Path inventoryFile;
+  @Test
+  void loadInventory_non_existent_file() {
+    var inventory =
+        ApprovedFileInventory.loadInventory(tempDir.resolve("does-not-exist.properties"));
 
-  @BeforeEach
-  void setUp() {
-    inventoryFile = tempDir.resolve("inventory.properties");
-    ApprovedFileInventory.reset(inventoryFile);
-  }
-
-  @AfterEach
-  void tearDown() {
-    ApprovedFileInventory.reset();
+    assertThat(inventory.entries()).isEmpty();
   }
 
   @Test
-  void writeInventory() {
-    ApprovedFileInventory.addEntry(
-        Path.of("src/test/MyTest-myTest-approved.txt"), "com.example.MyTest#myTest");
+  void loadInventory_valid_file() throws IOException {
+    Path file = tempDir.resolve("inventory.properties");
+    writeString(
+        file,
+        """
+        # ApproveJ Approved File Inventory (auto-generated, do not edit)
+        src/test/MyTest-myTest-approved.txt = com.example.MyTest#myTest
+        """,
+        StandardOpenOption.CREATE);
 
-    ApprovedFileInventory.writeInventory();
+    var inventory = ApprovedFileInventory.loadInventory(file);
 
-    TreeMap<Path, InventoryEntry> inventory = ApprovedFileInventory.loadInventory();
-    assertThat(inventory.values())
+    assertThat(inventory.entries())
         .containsExactly(
             new InventoryEntry(
                 Path.of("src/test/MyTest-myTest-approved.txt"), "com.example.MyTest#myTest"));
   }
 
   @Test
-  void writeInventory_multiple_entries() {
-    ApprovedFileInventory.addEntry(Path.of("src/test/BTest-b-approved.txt"), "com.example.BTest#b");
-    ApprovedFileInventory.addEntry(Path.of("src/test/ATest-a-approved.txt"), "com.example.ATest#a");
+  void findLeftovers() {
+    var inventory =
+        new ApprovedFileInventory(
+            List.of(
+                new InventoryEntry(
+                    Path.of("src/test/NonExistent-test-approved.txt"),
+                    "com.nonexistent.NonExistentTest#test")));
 
-    ApprovedFileInventory.writeInventory();
+    var leftovers = inventory.findLeftovers();
 
-    TreeMap<Path, InventoryEntry> inventory = ApprovedFileInventory.loadInventory();
-    assertThat(inventory).hasSize(2);
-    assertThat(inventory.firstKey()).isEqualTo(Path.of("src/test/ATest-a-approved.txt"));
+    assertThat(leftovers).hasSize(1);
+    assertThat(leftovers.getFirst().relativePath())
+        .isEqualTo(Path.of("src/test/NonExistent-test-approved.txt"));
+    assertThat(leftovers.getFirst().testReference())
+        .isEqualTo("com.nonexistent.NonExistentTest#test");
   }
 
   @Test
-  void writeInventory_named_approvals() {
-    ApprovedFileInventory.addEntry(
-        Path.of("src/test/MyTest-myTest-alpha-approved.txt"), "com.example.MyTest#myTest");
-    ApprovedFileInventory.addEntry(
-        Path.of("src/test/MyTest-myTest-beta-approved.txt"), "com.example.MyTest#myTest");
+  void findLeftovers_missing_method() {
+    var inventory =
+        new ApprovedFileInventory(
+            List.of(
+                new InventoryEntry(
+                    Path.of("src/test/ApprovedFileInventoryTest-nonExistent-approved.txt"),
+                    "org.approvej.approve.ApprovedFileInventoryTest#nonExistentMethod")));
 
-    ApprovedFileInventory.writeInventory();
+    var leftovers = inventory.findLeftovers();
 
-    TreeMap<Path, InventoryEntry> inventory = ApprovedFileInventory.loadInventory();
-    assertThat(inventory.values())
-        .hasSize(2)
-        .contains(
-            new InventoryEntry(
-                Path.of("src/test/MyTest-myTest-alpha-approved.txt"), "com.example.MyTest#myTest"),
-            new InventoryEntry(
-                Path.of("src/test/MyTest-myTest-beta-approved.txt"), "com.example.MyTest#myTest"));
+    assertThat(leftovers).hasSize(1);
+    assertThat(leftovers.getFirst().testReference())
+        .isEqualTo("org.approvej.approve.ApprovedFileInventoryTest#nonExistentMethod");
   }
 
   @Test
-  void writeInventory_replaces_entries_for_executed_methods() throws IOException {
-    writeString(
-        inventoryFile,
-        """
-        # ApproveJ Approved File Inventory (auto-generated, do not edit)
-        src/test/MyTest-myTest-alpha-approved.txt = com.example.MyTest#myTest
-        src/test/MyTest-myTest-beta-approved.txt = com.example.MyTest#myTest
-        """,
-        StandardOpenOption.CREATE);
+  void findLeftovers_existing_method() {
+    var inventory =
+        new ApprovedFileInventory(
+            List.of(
+                new InventoryEntry(
+                    Path.of("src/test/ApprovedFileInventoryTest-findLeftovers-approved.txt"),
+                    "org.approvej.approve.ApprovedFileInventoryTest#findLeftovers_existing_method")));
 
-    ApprovedFileInventory.addEntry(
-        Path.of("src/test/MyTest-myTest-gamma-approved.txt"), "com.example.MyTest#myTest");
-    ApprovedFileInventory.addEntry(
-        Path.of("src/test/MyTest-myTest-beta-approved.txt"), "com.example.MyTest#myTest");
+    var leftovers = inventory.findLeftovers();
 
-    ApprovedFileInventory.writeInventory();
-
-    TreeMap<Path, InventoryEntry> inventory = ApprovedFileInventory.loadInventory();
-    assertThat(inventory.values())
-        .hasSize(2)
-        .contains(
-            new InventoryEntry(
-                Path.of("src/test/MyTest-myTest-gamma-approved.txt"), "com.example.MyTest#myTest"),
-            new InventoryEntry(
-                Path.of("src/test/MyTest-myTest-beta-approved.txt"), "com.example.MyTest#myTest"));
-    assertThat(inventory).doesNotContainKey(Path.of("src/test/MyTest-myTest-alpha-approved.txt"));
+    assertThat(leftovers).isEmpty();
   }
 
   @Test
-  void writeInventory_preserves_entries_for_unexecuted_methods() throws IOException {
-    writeString(
-        inventoryFile,
-        """
-        # ApproveJ Approved File Inventory (auto-generated, do not edit)
-        src/test/OtherTest-other-approved.txt = com.example.OtherTest#other
-        """,
-        StandardOpenOption.CREATE);
+  void removeLeftovers() throws IOException {
+    Path leftoverFile = tempDir.resolve("leftover-approved.txt");
+    writeString(leftoverFile, "old content", StandardOpenOption.CREATE);
 
-    ApprovedFileInventory.addEntry(
-        Path.of("src/test/MyTest-myTest-approved.txt"), "com.example.MyTest#myTest");
+    Path validFile = tempDir.resolve("valid-approved.txt");
 
-    ApprovedFileInventory.writeInventory();
+    var inventory =
+        new ApprovedFileInventory(
+            List.of(
+                new InventoryEntry(leftoverFile, "com.nonexistent.NonExistentTest#test"),
+                new InventoryEntry(
+                    validFile, "org.approvej.approve.ApprovedFileInventoryTest#removeLeftovers")));
 
-    TreeMap<Path, InventoryEntry> inventory = ApprovedFileInventory.loadInventory();
-    assertThat(inventory.values())
-        .hasSize(2)
-        .contains(
-            new InventoryEntry(
-                Path.of("src/test/OtherTest-other-approved.txt"), "com.example.OtherTest#other"),
-            new InventoryEntry(
-                Path.of("src/test/MyTest-myTest-approved.txt"), "com.example.MyTest#myTest"));
+    Path inventoryPath = tempDir.resolve("inventory.properties");
+    var result = inventory.removeLeftovers(inventoryPath);
+
+    assertThat(result.removed()).hasSize(1);
+    assertThat(result.failed()).isEmpty();
+    assertThat(leftoverFile).doesNotExist();
+  }
+
+  @Test
+  void approveAll() throws IOException {
+    Path receivedFile = tempDir.resolve("MyTest-myMethod-received.txt");
+    writeString(receivedFile, "received content", StandardOpenOption.CREATE);
+    Path approvedFile = tempDir.resolve("MyTest-myMethod-approved.txt");
+    writeString(approvedFile, "old approved content", StandardOpenOption.CREATE);
+
+    var inventory =
+        new ApprovedFileInventory(
+            List.of(new InventoryEntry(approvedFile, "com.example.MyTest#myMethod")));
+
+    var result = inventory.approveAll();
+
+    assertThat(result.approved()).containsExactly(approvedFile);
+    assertThat(result.failed()).isEmpty();
+    assertThat(receivedFile).doesNotExist();
+    assertThat(approvedFile).exists().hasContent("received content");
+  }
+
+  @Test
+  void approveAll_no_received_files() {
+    var inventory = new ApprovedFileInventory(List.of());
+
+    var result = inventory.approveAll();
+
+    assertThat(result.approved()).isEmpty();
+    assertThat(result.failed()).isEmpty();
+  }
+
+  @Test
+  void approveAll_only_received_file() throws IOException {
+    Path receivedFile = tempDir.resolve("MyTest-myMethod-received.txt");
+    writeString(receivedFile, "received content", StandardOpenOption.CREATE);
+    Path approvedFile = tempDir.resolve("MyTest-myMethod-approved.txt");
+
+    var inventory =
+        new ApprovedFileInventory(
+            List.of(new InventoryEntry(approvedFile, "com.example.MyTest#myMethod")));
+
+    var result = inventory.approveAll();
+
+    assertThat(result.approved()).containsExactly(approvedFile);
+    assertThat(result.failed()).isEmpty();
+    assertThat(receivedFile).doesNotExist();
+    assertThat(approvedFile).exists().hasContent("received content");
+  }
+
+  @Test
+  void reviewUnapproved() throws IOException {
+    Path receivedFile = tempDir.resolve("MyTest-myMethod-received.txt");
+    writeString(receivedFile, "received content", StandardOpenOption.CREATE);
+    Path approvedFile = tempDir.resolve("MyTest-myMethod-approved.txt");
+    writeString(approvedFile, "approved content", StandardOpenOption.CREATE);
+
+    var inventory =
+        new ApprovedFileInventory(
+            List.of(new InventoryEntry(approvedFile, "com.example.MyTest#myMethod")));
+
+    var reviewedProviders = new ArrayList<PathProvider>();
+    var reviewed =
+        inventory.reviewUnapproved(
+            pathProvider -> {
+              reviewedProviders.add(pathProvider);
+              return new FileReviewResult(false);
+            });
+
+    assertThat(reviewed).hasSize(1);
+    assertThat(reviewedProviders).hasSize(1);
+    assertThat(reviewedProviders.getFirst().receivedPath()).isEqualTo(receivedFile.normalize());
+    assertThat(reviewedProviders.getFirst().approvedPath()).isEqualTo(approvedFile.normalize());
+  }
+
+  @Test
+  void reviewUnapproved_no_received_files() {
+    var inventory = new ApprovedFileInventory(List.of());
+
+    var reviewed = inventory.reviewUnapproved(pathProvider -> new FileReviewResult(false));
+
+    assertThat(reviewed).isEmpty();
+  }
+
+  @Test
+  void saveInventory_creates_parent_directories() {
+    Path inventoryPath = tempDir.resolve("nested/dir/inventory.properties");
+    var inventory =
+        new ApprovedFileInventory(
+            List.of(
+                new InventoryEntry(
+                    Path.of("src/test/MyTest-myTest-approved.txt"), "com.example.MyTest#myTest")));
+
+    inventory.saveInventory(inventoryPath);
+
+    assertThat(inventoryPath).exists();
+    var loaded = ApprovedFileInventory.loadInventory(inventoryPath);
+    assertThat(loaded.entries()).hasSize(1);
+  }
+
+  @Test
+  void saveInventory_empty_inventory_deletes_file() throws IOException {
+    Path inventoryPath = tempDir.resolve("inventory.properties");
+    writeString(inventoryPath, "some = content", StandardOpenOption.CREATE);
+    assertThat(inventoryPath).exists();
+
+    var inventory = new ApprovedFileInventory(List.of());
+
+    inventory.saveInventory(inventoryPath);
+
+    assertThat(inventoryPath).doesNotExist();
   }
 }

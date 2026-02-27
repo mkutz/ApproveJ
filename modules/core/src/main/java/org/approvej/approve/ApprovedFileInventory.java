@@ -1,108 +1,174 @@
 package org.approvej.approve;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Properties;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
+import org.approvej.review.FileReviewer;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 /**
- * Tracks approved files in an inventory so that leftover files (from renamed or deleted tests) can
- * be detected and cleaned up.
+ * Wraps a loaded approved file inventory and provides domain operations like {@link
+ * #findLeftovers()}, {@link #removeLeftovers(Path)}, {@link #approveAll()}, and {@link
+ * #reviewUnapproved(FileReviewer)}.
  *
- * <p>During a test run, each {@code byFile()} call records the approved file path and its
- * originating test method. At JVM shutdown, the inventory is merged with any existing inventory
- * file and written to {@code .approvej/inventory.properties}.
+ * <p>Recording approved files during test execution is handled separately by {@link
+ * ApprovedFileInventoryUpdater}.
  */
 @NullMarked
 public class ApprovedFileInventory {
 
-  private static final Path DEFAULT_INVENTORY_FILE = Path.of(".approvej/inventory.properties");
+  private static final Logger LOGGER = Logger.getLogger(ApprovedFileInventory.class.getName());
+
   private static final String HEADER =
       "# ApproveJ Approved File Inventory (auto-generated, do not edit)";
 
-  private static final ConcurrentHashMap<Path, InventoryEntry> entries = new ConcurrentHashMap<>();
-  private static final ConcurrentHashMap<String, Boolean> executedMethods =
-      new ConcurrentHashMap<>();
-  private static final AtomicReference<@Nullable Thread> shutdownHook = new AtomicReference<>();
+  private final List<InventoryEntry> inventory;
 
-  private static final AtomicReference<Path> inventoryFile =
-      new AtomicReference<>(DEFAULT_INVENTORY_FILE);
-
-  private ApprovedFileInventory() {}
-
-  /**
-   * Records an approved file path in the inventory.
-   *
-   * @param pathProvider the path provider for the approved file
-   */
-  public static void registerApprovedFile(PathProvider pathProvider) {
-    TestMethod testMethod;
-    try {
-      testMethod = StackTraceTestFinderUtil.currentTestMethod();
-    } catch (TestMethodNotFoundInStackTraceError e) {
-      return;
-    }
-
-    String testReference =
-        "%s#%s".formatted(testMethod.testClass().getName(), testMethod.testCaseName());
-
-    addEntry(pathProvider.approvedPath(), testReference);
-
-    Thread hook = new Thread(ApprovedFileInventory::writeInventory, "ApproveJ-Inventory-Writer");
-    if (shutdownHook.compareAndSet(null, hook)) {
-      Runtime.getRuntime().addShutdownHook(hook);
-    }
+  ApprovedFileInventory(List<InventoryEntry> inventory) {
+    this.inventory = inventory;
   }
 
-  static void writeInventory() {
-    TreeMap<Path, InventoryEntry> merged = loadInventory();
-
-    merged
-        .entrySet()
-        .removeIf(entry -> executedMethods.containsKey(entry.getValue().testReference()));
-    merged.putAll(entries);
-
-    saveInventory(merged);
+  /** Returns the inventory entries. */
+  List<InventoryEntry> entries() {
+    return List.copyOf(inventory);
   }
 
   /**
-   * Loads the inventory from the properties file.
+   * Loads the inventory from the given properties file.
    *
-   * @return a mutable map of approved file paths to their inventory entries
+   * @param inventoryPath the path to the inventory properties file
+   * @return a new {@link ApprovedFileInventory} wrapping the loaded entries
    */
-  static TreeMap<Path, InventoryEntry> loadInventory() {
-    TreeMap<Path, InventoryEntry> result = new TreeMap<>();
-    Path inventoryPath = inventoryFile.get();
+  static ApprovedFileInventory loadInventory(Path inventoryPath) {
     if (!Files.exists(inventoryPath)) {
-      return result;
+      return new ApprovedFileInventory(List.of());
     }
-    Properties properties = new Properties();
     try (BufferedReader reader = Files.newBufferedReader(inventoryPath)) {
+      Properties properties = new Properties();
       properties.load(reader);
+      return new ApprovedFileInventory(
+          properties.stringPropertyNames().stream()
+              .map(key -> new InventoryEntry(Path.of(key), properties.getProperty(key)))
+              .sorted(Comparator.comparing(InventoryEntry::relativePath))
+              .toList());
     } catch (IOException e) {
-      System.err.printf("Failed to read inventory file: %s%n", e.getMessage());
-      return result;
+      LOGGER.warning("Failed to read inventory file: %s".formatted(e.getMessage()));
+      return new ApprovedFileInventory(List.of());
     }
-    properties
-        .stringPropertyNames()
-        .forEach(
-            key -> {
-              Path path = Path.of(key);
-              result.put(path, new InventoryEntry(path, properties.getProperty(key)));
-            });
-    return result;
   }
 
-  static void saveInventory(TreeMap<Path, InventoryEntry> inventory) {
-    Path inventoryPath = inventoryFile.get();
+  /**
+   * Finds leftover inventory entries whose test methods no longer exist.
+   *
+   * @return a list of leftover inventory entries
+   */
+  List<InventoryEntry> findLeftovers() {
+    return inventory.stream()
+        .filter(
+            entry -> {
+              try {
+                return stream(Class.forName(entry.className()).getDeclaredMethods())
+                    .noneMatch(method -> method.getName().equals(entry.methodName()));
+              } catch (ClassNotFoundException e) {
+                return true;
+              }
+            })
+        .toList();
+  }
+
+  /** Result of a {@link #removeLeftovers(Path)} operation. */
+  record CleanupResult(List<InventoryEntry> removed, List<InventoryEntry> failed) {}
+
+  /**
+   * Removes leftover approved files and updates the inventory.
+   *
+   * @param inventoryPath the path to the inventory properties file to update
+   * @return the result containing the list of removed and failed leftover entries
+   */
+  CleanupResult removeLeftovers(Path inventoryPath) {
+    List<InventoryEntry> leftovers = findLeftovers();
+    if (leftovers.isEmpty()) {
+      return new CleanupResult(leftovers, List.of());
+    }
+
+    List<InventoryEntry> removed = new ArrayList<>();
+    List<InventoryEntry> failed = new ArrayList<>();
+    leftovers.forEach(
+        entry -> {
+          try {
+            Files.deleteIfExists(entry.relativePath());
+            removed.add(entry);
+          } catch (IOException e) {
+            failed.add(entry);
+          }
+        });
+
+    saveInventory(inventoryPath);
+
+    return new CleanupResult(removed, failed);
+  }
+
+  /** Result of an {@link #approveAll()} operation. */
+  record ApproveResult(List<Path> approved, List<Path> failed) {}
+
+  /**
+   * Approves all unapproved files by moving each received file to its corresponding approved file.
+   *
+   * @return the result containing the list of approved and failed file paths
+   */
+  ApproveResult approveAll() {
+    List<Path> approved = new ArrayList<>();
+    List<Path> failed = new ArrayList<>();
+
+    inventory.stream()
+        .map(entry -> PathProviders.approvedPath(entry.relativePath()))
+        .filter(pathProvider -> Files.exists(pathProvider.receivedPath()))
+        .forEach(
+            pathProvider -> {
+              try {
+                Files.move(
+                    pathProvider.receivedPath(), pathProvider.approvedPath(), REPLACE_EXISTING);
+                approved.add(pathProvider.approvedPath());
+              } catch (IOException e) {
+                failed.add(pathProvider.receivedPath());
+              }
+            });
+
+    return new ApproveResult(approved, failed);
+  }
+
+  /**
+   * Finds all unapproved files (those with a received file present) and reviews them using the
+   * given {@link FileReviewer}.
+   *
+   * @param reviewer the {@link FileReviewer} to use for reviewing each unapproved file
+   * @return the list of reviewed {@link PathProvider}s
+   */
+  List<PathProvider> reviewUnapproved(FileReviewer reviewer) {
+    return inventory.stream()
+        .map(entry -> PathProviders.approvedPath(entry.relativePath()))
+        .filter(pathProvider -> Files.exists(pathProvider.receivedPath()))
+        .sorted(Comparator.comparing(PathProvider::approvedPath))
+        .peek(reviewer::apply)
+        .toList();
+  }
+
+  /**
+   * Writes the inventory to the given properties file.
+   *
+   * @param inventoryPath the path to write the inventory to
+   */
+  void saveInventory(Path inventoryPath) {
     try {
       if (inventory.isEmpty()) {
         Files.deleteIfExists(inventoryPath);
@@ -112,7 +178,7 @@ public class ApprovedFileInventory {
             "%s%n%s"
                 .formatted(
                     HEADER,
-                    inventory.values().stream()
+                    inventory.stream()
                         .map(
                             e ->
                                 "%s = %s"
@@ -122,37 +188,11 @@ public class ApprovedFileInventory {
         Files.writeString(inventoryPath, content);
       }
     } catch (IOException e) {
-      System.err.printf("Failed to write inventory file: %s%n", e.getMessage());
+      LOGGER.warning("Failed to write inventory file: %s".formatted(e.getMessage()));
     }
   }
 
   private static String escapeKey(String key) {
     return key.replace("\\", "\\\\").replace(" ", "\\ ").replace("=", "\\=").replace(":", "\\:");
-  }
-
-  /** Adds an entry directly. For testing only. */
-  static void addEntry(Path relativePath, String testReference) {
-    entries.put(relativePath, new InventoryEntry(relativePath, testReference));
-    executedMethods.put(testReference, Boolean.TRUE);
-  }
-
-  /** Resets static state and sets the inventory file path. For testing only. */
-  static void reset(Path testInventoryFile) {
-    entries.clear();
-    executedMethods.clear();
-    Thread hook = shutdownHook.getAndSet(null);
-    if (hook != null) {
-      try {
-        Runtime.getRuntime().removeShutdownHook(hook);
-      } catch (IllegalStateException e) {
-        // JVM is already shutting down
-      }
-    }
-    inventoryFile.set(testInventoryFile);
-  }
-
-  /** Resets static state to defaults. For testing only. */
-  static void reset() {
-    reset(DEFAULT_INVENTORY_FILE);
   }
 }

@@ -6,9 +6,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.TreeMap;
-import org.approvej.review.FileReviewResult;
+import java.util.List;
+import org.approvej.approve.ApprovedFileInventoryCli.CliResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -16,134 +15,103 @@ class ApprovedFileInventoryCliTest {
 
   @TempDir private Path tempDir;
 
-  private TreeMap<Path, InventoryEntry> inventory(InventoryEntry... entries) {
-    var map = new TreeMap<Path, InventoryEntry>();
-    for (InventoryEntry entry : entries) {
-      map.put(entry.relativePath(), entry);
-    }
-    return map;
+  private ApprovedFileInventory inventory(InventoryEntry... entries) {
+    return new ApprovedFileInventory(List.of(entries));
   }
 
   @Test
-  void findLeftovers() {
-    var cli =
-        new ApprovedFileInventoryCli(
+  void findLeftovers_no_leftovers() {
+    CliResult result = ApprovedFileInventoryCli.findLeftovers(inventory());
+
+    assertThat(result.output()).isEqualTo("No leftover approved files found.");
+    assertThat(result.exitCode()).isZero();
+  }
+
+  @Test
+  void findLeftovers_with_leftovers() {
+    CliResult result =
+        ApprovedFileInventoryCli.findLeftovers(
             inventory(
                 new InventoryEntry(
                     Path.of("src/test/NonExistent-test-approved.txt"),
                     "com.nonexistent.NonExistentTest#test")));
 
-    var leftovers = cli.findLeftovers();
-
-    assertThat(leftovers).hasSize(1);
-    assertThat(leftovers.getFirst().relativePath())
-        .isEqualTo(Path.of("src/test/NonExistent-test-approved.txt"));
-    assertThat(leftovers.getFirst().testReference())
-        .isEqualTo("com.nonexistent.NonExistentTest#test");
+    assertThat(result.output()).startsWith("Leftover approved files:");
+    assertThat(result.output()).contains("NonExistent-test-approved.txt");
+    assertThat(result.output()).contains("com.nonexistent.NonExistentTest#test");
+    assertThat(result.exitCode()).isZero();
   }
 
   @Test
-  void findLeftovers_missing_method() {
-    var cli =
-        new ApprovedFileInventoryCli(
-            inventory(
-                new InventoryEntry(
-                    Path.of("src/test/ApprovedFileInventoryCliTest-nonExistent-approved.txt"),
-                    "org.approvej.approve.ApprovedFileInventoryCliTest#nonExistentMethod")));
+  void cleanup_no_leftovers() {
+    Path inventoryPath = tempDir.resolve("inventory.properties");
+    CliResult result = ApprovedFileInventoryCli.cleanup(inventory(), inventoryPath);
 
-    var leftovers = cli.findLeftovers();
-
-    assertThat(leftovers).hasSize(1);
-    assertThat(leftovers.getFirst().testReference())
-        .isEqualTo("org.approvej.approve.ApprovedFileInventoryCliTest#nonExistentMethod");
+    assertThat(result.output()).isEqualTo("No leftover approved files found.");
+    assertThat(result.exitCode()).isZero();
   }
 
   @Test
-  void removeLeftovers() throws IOException {
+  void cleanup_with_leftovers() throws IOException {
     Path leftoverFile = tempDir.resolve("leftover-approved.txt");
     writeString(leftoverFile, "old content", StandardOpenOption.CREATE);
 
-    Path validFile = tempDir.resolve("valid-approved.txt");
+    Path inventoryPath = tempDir.resolve("inventory.properties");
+    CliResult result =
+        ApprovedFileInventoryCli.cleanup(
+            inventory(new InventoryEntry(leftoverFile, "com.nonexistent.NonExistentTest#test")),
+            inventoryPath);
 
-    var inventoryMap =
-        inventory(
-            new InventoryEntry(leftoverFile, "com.nonexistent.NonExistentTest#test"),
-            new InventoryEntry(
-                validFile, "org.approvej.approve.ApprovedFileInventoryCliTest#removeLeftovers"));
-
-    var cli = new ApprovedFileInventoryCli(inventoryMap);
-
-    var result = cli.removeLeftovers();
-
-    assertThat(result.removed()).hasSize(1);
-    assertThat(result.failures()).isZero();
-    assertThat(leftoverFile).doesNotExist();
-    assertThat(inventoryMap).doesNotContainKey(leftoverFile).containsKey(validFile);
+    assertThat(result.output()).startsWith("Removed leftover approved files:");
+    assertThat(result.output()).contains("leftover-approved.txt");
+    assertThat(result.exitCode()).isZero();
   }
 
   @Test
-  void approveAll() throws IOException {
+  void approveAll_no_unapproved() {
+    CliResult result = ApprovedFileInventoryCli.approveAll(inventory());
+
+    assertThat(result.output()).isEqualTo("No unapproved files found.");
+    assertThat(result.exitCode()).isZero();
+  }
+
+  @Test
+  void approveAll_with_unapproved() throws IOException {
     Path receivedFile = tempDir.resolve("MyTest-myMethod-received.txt");
     writeString(receivedFile, "received content", StandardOpenOption.CREATE);
     Path approvedFile = tempDir.resolve("MyTest-myMethod-approved.txt");
     writeString(approvedFile, "old approved content", StandardOpenOption.CREATE);
 
-    var cli =
-        new ApprovedFileInventoryCli(
+    CliResult result =
+        ApprovedFileInventoryCli.approveAll(
             inventory(new InventoryEntry(approvedFile, "com.example.MyTest#myMethod")));
 
-    var result = cli.approveAll();
-
-    assertThat(result.approved()).containsExactly(approvedFile);
-    assertThat(result.failures()).isZero();
-    assertThat(receivedFile).doesNotExist();
-    assertThat(approvedFile).exists().hasContent("received content");
+    assertThat(result.output()).startsWith("Approved files:");
+    assertThat(result.output()).contains("MyTest-myMethod-approved.txt");
+    assertThat(result.exitCode()).isZero();
   }
 
   @Test
-  void approveAll_no_received_files() {
-    var cli = new ApprovedFileInventoryCli(inventory());
+  void reviewUnapproved_no_unapproved() {
+    CliResult result = ApprovedFileInventoryCli.reviewUnapproved(inventory());
 
-    var result = cli.approveAll();
-
-    assertThat(result.approved()).isEmpty();
-    assertThat(result.failures()).isZero();
+    assertThat(result.output()).isEqualTo("No unapproved files found.");
+    assertThat(result.exitCode()).isZero();
   }
 
   @Test
-  void reviewUnapproved() throws IOException {
+  void reviewUnapproved_with_unapproved() throws IOException {
     Path receivedFile = tempDir.resolve("MyTest-myMethod-received.txt");
     writeString(receivedFile, "received content", StandardOpenOption.CREATE);
     Path approvedFile = tempDir.resolve("MyTest-myMethod-approved.txt");
     writeString(approvedFile, "approved content", StandardOpenOption.CREATE);
 
-    var cli =
-        new ApprovedFileInventoryCli(
+    CliResult result =
+        ApprovedFileInventoryCli.reviewUnapproved(
             inventory(new InventoryEntry(approvedFile, "com.example.MyTest#myMethod")));
 
-    var reviewedProviders = new ArrayList<PathProvider>();
-    cli.reviewUnapproved(
-        pathProvider -> {
-          reviewedProviders.add(pathProvider);
-          return new FileReviewResult(false);
-        });
-
-    assertThat(reviewedProviders).hasSize(1);
-    assertThat(reviewedProviders.getFirst().receivedPath()).isEqualTo(receivedFile.normalize());
-    assertThat(reviewedProviders.getFirst().approvedPath()).isEqualTo(approvedFile.normalize());
-  }
-
-  @Test
-  void reviewUnapproved_no_received_files() {
-    var cli = new ApprovedFileInventoryCli(inventory());
-
-    var reviewedProviders = new ArrayList<PathProvider>();
-    cli.reviewUnapproved(
-        pathProvider -> {
-          reviewedProviders.add(pathProvider);
-          return new FileReviewResult(false);
-        });
-
-    assertThat(reviewedProviders).isEmpty();
+    assertThat(result.output()).startsWith("Unapproved files:");
+    assertThat(result.output()).contains("MyTest-myMethod-received.txt");
+    assertThat(result.exitCode()).isZero();
   }
 }

@@ -1,136 +1,104 @@
 package org.approvej.approve;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import static java.util.Arrays.stream;
+import static java.util.stream.Collectors.joining;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
+import org.approvej.approve.ApprovedFileInventory.ApproveResult;
+import org.approvej.approve.ApprovedFileInventory.CleanupResult;
 import org.approvej.configuration.Configuration;
-import org.approvej.review.FileReviewer;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * CLI actions for the approved file inventory.
+ * Thin CLI wrapper for the approved file inventory.
  *
- * <p>Operates on a given inventory map, separating business logic from the static recording side in
- * {@link ApprovedFileInventory}. The {@link #main(String[])} method loads the inventory from disk
- * and delegates to instance methods.
+ * <p>All business logic lives in {@link ApprovedFileInventory}. This class is responsible only for
+ * formatting domain results into CLI output with appropriate exit codes.
  */
 @NullMarked
 final class ApprovedFileInventoryCli {
 
-  private final TreeMap<Path, InventoryEntry> inventory;
+  record CliResult(String output, int exitCode) {}
 
-  ApprovedFileInventoryCli(TreeMap<Path, InventoryEntry> inventory) {
-    this.inventory = inventory;
-  }
+  private ApprovedFileInventoryCli() {}
 
-  /**
-   * Finds leftover inventory entries whose test methods no longer exist.
-   *
-   * @return a list of leftover inventory entries
-   */
-  List<InventoryEntry> findLeftovers() {
-    return inventory.values().stream().filter(ApprovedFileInventoryCli::isLeftover).toList();
-  }
-
-  private static boolean isLeftover(InventoryEntry entry) {
-    try {
-      return stream(Class.forName(entry.className()).getDeclaredMethods())
-          .noneMatch(method -> method.getName().equals(entry.methodName()));
-    } catch (ClassNotFoundException e) {
-      return true;
-    }
-  }
-
-  /** Result of a {@link #removeLeftovers()} operation. */
-  record CleanupResult(List<InventoryEntry> removed, int failures) {}
-
-  /**
-   * Removes leftover approved files and updates the inventory.
-   *
-   * @return the result containing the list of removed leftover entries and the number of failures
-   */
-  CleanupResult removeLeftovers() {
-    List<InventoryEntry> leftovers = findLeftovers();
+  static CliResult findLeftovers(ApprovedFileInventory inventory) {
+    List<InventoryEntry> leftovers = inventory.findLeftovers();
     if (leftovers.isEmpty()) {
-      return new CleanupResult(leftovers, 0);
+      return new CliResult("No leftover approved files found.", 0);
     }
-
-    List<InventoryEntry> removed = new ArrayList<>();
-    int failures = 0;
-    for (InventoryEntry leftover : leftovers) {
-      try {
-        Files.deleteIfExists(leftover.relativePath());
-        inventory.remove(leftover.relativePath());
-        removed.add(leftover);
-      } catch (IOException e) {
-        System.err.printf(
-            "Failed to delete leftover file: %s (%s: %s)%n",
-            leftover.relativePath(), e.getClass().getSimpleName(), e.getMessage());
-        failures++;
-      }
-    }
-
-    ApprovedFileInventory.saveInventory(inventory);
-
-    return new CleanupResult(removed, failures);
+    return new CliResult(
+        leftovers.stream()
+            .map(
+                leftover ->
+                    "  %s\n    from %s"
+                        .formatted(leftover.relativePath().toUri(), leftover.testReference()))
+            .collect(joining("\n", "Leftover approved files:\n", "")),
+        0);
   }
 
-  /** Result of an {@link #approveAll()} operation. */
-  record ApproveResult(List<Path> approved, int failures) {}
-
-  /**
-   * Approves all unapproved files by moving each received file to its corresponding approved file.
-   *
-   * @return the result containing the list of approved file paths that were updated and the number
-   *     of failures
-   */
-  ApproveResult approveAll() {
-    List<Path> approved = new ArrayList<>();
-    int failures = 0;
-    for (Path approvedPath : inventory.keySet()) {
-      Path received = PathProviders.approvedPath(approvedPath).receivedPath();
-      if (!Files.exists(received)) {
-        continue;
-      }
-      try {
-        Files.move(received, approvedPath, REPLACE_EXISTING);
-        approved.add(approvedPath);
-      } catch (IOException e) {
-        System.err.printf("Failed to approve %s: %s%n", received, e.getMessage());
-        failures++;
-      }
+  static CliResult cleanup(ApprovedFileInventory inventory, Path inventoryPath) {
+    CleanupResult result = inventory.removeLeftovers(inventoryPath);
+    if (result.removed().isEmpty() && result.failed().isEmpty()) {
+      return new CliResult("No leftover approved files found.", 0);
     }
-    return new ApproveResult(approved, failures);
+    String output =
+        result.removed().stream()
+            .map(leftover -> "  %s".formatted(leftover.relativePath().toUri()))
+            .collect(joining("\n", "Removed leftover approved files:\n", ""));
+    if (!result.failed().isEmpty()) {
+      if (!output.isEmpty()) {
+        output += "\n";
+      }
+      output +=
+          result.failed().stream()
+              .map(entry -> "  %s".formatted(entry.relativePath()))
+              .collect(
+                  joining(
+                      "\n",
+                      "Failed to delete %d leftover file(s):\n".formatted(result.failed().size()),
+                      ""));
+      return new CliResult(output, 1);
+    }
+    return new CliResult(output, 0);
   }
 
-  /**
-   * Reviews all unapproved files using the given {@link FileReviewer}.
-   *
-   * @param reviewer the {@link FileReviewer} to use for reviewing each unapproved file
-   */
-  void reviewUnapproved(FileReviewer reviewer) {
-    var unapprovedEntries =
-        inventory.keySet().stream()
-            .map(PathProviders::approvedPath)
-            .filter(pathProvider -> Files.exists(pathProvider.receivedPath()))
-            .sorted(java.util.Comparator.comparing(PathProvider::approvedPath))
-            .toList();
-    if (unapprovedEntries.isEmpty()) {
-      System.out.println("No unapproved files found.");
-      return;
+  static CliResult approveAll(ApprovedFileInventory inventory) {
+    ApproveResult result = inventory.approveAll();
+    if (result.approved().isEmpty() && result.failed().isEmpty()) {
+      return new CliResult("No unapproved files found.", 0);
     }
-    System.out.println("Unapproved files:");
-    unapprovedEntries.forEach(
-        pathProvider -> {
-          System.out.printf("  %s%n", pathProvider.receivedPath().toUri());
-          reviewer.apply(pathProvider);
-        });
+    String output =
+        result.approved().stream()
+            .map(path -> "  %s".formatted(path.toUri()))
+            .collect(joining("\n", "Approved files:\n", ""));
+    if (!result.failed().isEmpty()) {
+      if (!output.isEmpty()) {
+        output += "\n";
+      }
+      output +=
+          result.failed().stream()
+              .map("  %s"::formatted)
+              .collect(
+                  joining(
+                      "\n",
+                      "Failed to approve %d file(s):\n".formatted(result.failed().size()),
+                      ""));
+      return new CliResult(output, 1);
+    }
+    return new CliResult(output, 0);
+  }
+
+  static CliResult reviewUnapproved(ApprovedFileInventory inventory) {
+    var reviewed = inventory.reviewUnapproved(Configuration.configuration.defaultFileReviewer());
+    if (reviewed.isEmpty()) {
+      return new CliResult("No unapproved files found.", 0);
+    }
+    String output =
+        reviewed.stream()
+            .map(pathProvider -> "  %s".formatted(pathProvider.receivedPath().toUri()))
+            .collect(joining("\n", "Unapproved files:\n", ""));
+    return new CliResult(output, 0);
   }
 
   /**
@@ -149,63 +117,26 @@ final class ApprovedFileInventoryCli {
       System.exit(1);
     }
 
-    ApprovedFileInventoryCli cli =
-        new ApprovedFileInventoryCli(ApprovedFileInventory.loadInventory());
+    Path inventoryPath = ApprovedFileInventoryUpdater.DEFAULT_INVENTORY_FILE;
+    ApprovedFileInventory inventory = ApprovedFileInventory.loadInventory(inventoryPath);
 
     String command = args[0];
-    switch (command) {
-      case "--find-leftovers" -> {
-        List<InventoryEntry> leftovers = cli.findLeftovers();
-        if (leftovers.isEmpty()) {
-          System.out.println("No leftover approved files found.");
-        } else {
-          System.out.println("Leftover approved files:");
-          leftovers.forEach(
-              leftover ->
-                  System.out.printf(
-                      "  %s%n    from %s%n",
-                      leftover.relativePath().toUri(), leftover.testReference()));
-        }
-      }
-      case "--cleanup" -> {
-        CleanupResult cleanupResult = cli.removeLeftovers();
-        if (cleanupResult.removed().isEmpty() && cleanupResult.failures() == 0) {
-          System.out.println("No leftover approved files found.");
-        } else {
-          if (!cleanupResult.removed().isEmpty()) {
-            System.out.println("Removed leftover approved files:");
-            cleanupResult
-                .removed()
-                .forEach(leftover -> System.out.printf("  %s%n", leftover.relativePath().toUri()));
+    CliResult result =
+        switch (command) {
+          case "--find-leftovers" -> findLeftovers(inventory);
+          case "--cleanup" -> cleanup(inventory, inventoryPath);
+          case "--approve-all" -> approveAll(inventory);
+          case "--review-unapproved" -> reviewUnapproved(inventory);
+          default -> {
+            System.err.printf("Unknown command: %s%n", command);
+            System.err.println(usage);
+            yield new CliResult("", 1);
           }
-          if (cleanupResult.failures() > 0) {
-            System.err.printf("Failed to delete %d leftover file(s).%n", cleanupResult.failures());
-            System.exit(1);
-          }
-        }
-      }
-      case "--approve-all" -> {
-        ApproveResult result = cli.approveAll();
-        if (result.approved().isEmpty() && result.failures() == 0) {
-          System.out.println("No unapproved files found.");
-        } else {
-          if (!result.approved().isEmpty()) {
-            System.out.println("Approved files:");
-            result.approved().forEach(path -> System.out.printf("  %s%n", path.toUri()));
-          }
-          if (result.failures() > 0) {
-            System.err.printf("Failed to approve %d file(s).%n", result.failures());
-            System.exit(1);
-          }
-        }
-      }
-      case "--review-unapproved" ->
-          cli.reviewUnapproved(Configuration.configuration.defaultFileReviewer());
-      default -> {
-        System.err.printf("Unknown command: %s%n", command);
-        System.err.println(usage);
-        System.exit(1);
-      }
+        };
+
+    if (!result.output().isEmpty()) {
+      System.out.println(result.output());
     }
+    System.exit(result.exitCode());
   }
 }
