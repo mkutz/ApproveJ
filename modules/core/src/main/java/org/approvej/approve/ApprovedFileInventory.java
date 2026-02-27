@@ -177,16 +177,13 @@ public class ApprovedFileInventory {
       } else {
         Files.createDirectories(inventoryPath.getParent());
         String content =
-            "%s%n%s"
-                .formatted(
-                    HEADER,
-                    inventory.stream()
-                        .map(
-                            e ->
-                                "%s = %s"
-                                    .formatted(
-                                        escapeKey(e.relativePath().toString()), e.testReference()))
-                        .collect(joining("\n", "", "\n")));
+            inventory.stream()
+                .map(
+                    entry ->
+                        "%s = %s"
+                            .formatted(
+                                escapeKey(entry.relativePath().toString()), entry.testReference()))
+                .collect(joining("\n", HEADER + "\n", "\n"));
         Files.writeString(inventoryPath, content);
       }
     } catch (IOException e) {
