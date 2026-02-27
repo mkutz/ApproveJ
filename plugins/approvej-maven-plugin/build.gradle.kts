@@ -30,6 +30,7 @@ testing {
         dependencies {
           implementation(platform(libs.junit.bom))
           implementation(libs.junit.jupiter.api)
+          implementation(libs.junit.jupiter.params)
           implementation(libs.assertj.core)
 
           runtimeOnly(libs.junit.platform.launcher)

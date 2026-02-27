@@ -37,7 +37,7 @@ public class ApprovedFileInventory {
 
   ApprovedFileInventory(List<InventoryEntry> inventory, Path inventoryPath) {
     this.inventory = inventory;
-    this.inventoryPath = inventoryPath;
+    this.inventoryPath = inventoryPath.toAbsolutePath();
   }
 
   /** Returns the inventory entries. */

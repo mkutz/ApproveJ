@@ -51,7 +51,7 @@ public final class ApprovedFileInventoryCli {
       }
       output +=
           result.failed().stream()
-              .map(entry -> "  %s".formatted(entry.relativePath()))
+              .map(entry -> "  %s".formatted(entry.relativePath().toUri()))
               .collect(
                   joining(
                       "\n",

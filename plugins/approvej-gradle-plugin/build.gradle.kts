@@ -37,7 +37,7 @@ gradlePlugin {
       id = "org.approvej"
       implementationClass = "org.approvej.gradle.ApproveJPlugin"
       displayName = "ApproveJ"
-      description = "Find and remove leftover approved files"
+      description = "Manage approved files"
       tags = listOf("testing", "approval-testing", "snapshot-testing")
     }
   }
