@@ -4,6 +4,7 @@ import static java.nio.file.Files.writeString;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
@@ -65,6 +66,30 @@ class ApprovedFileInventoryCliTest {
   }
 
   @Test
+  void cleanup_with_failed_deletion() throws IOException {
+    Path readOnlyDir = tempDir.resolve("readonly");
+    Files.createDirectory(readOnlyDir);
+    Path leftoverFile = readOnlyDir.resolve("leftover-approved.txt");
+    writeString(leftoverFile, "old content", StandardOpenOption.CREATE);
+    readOnlyDir.toFile().setWritable(false);
+
+    try {
+      CliResult result =
+          ApprovedFileInventoryCli.cleanup(
+              new ApprovedFileInventory(
+                  List.of(new InventoryEntry(leftoverFile, "com.nonexistent.NonExistentTest#test")),
+                  tempDir.resolve("inventory.properties")));
+
+      assertThat(result.output())
+          .contains("Failed to delete 1 leftover file(s):")
+          .contains("leftover-approved.txt");
+      assertThat(result.exitCode()).isEqualTo(1);
+    } finally {
+      readOnlyDir.toFile().setWritable(true);
+    }
+  }
+
+  @Test
   void approveAll_no_unapproved() {
     CliResult result = ApprovedFileInventoryCli.approveAll(inventory());
 
@@ -86,6 +111,31 @@ class ApprovedFileInventoryCliTest {
     assertThat(result.output()).startsWith("Approved files:");
     assertThat(result.output()).contains("MyTest-myMethod-approved.txt");
     assertThat(result.exitCode()).isZero();
+  }
+
+  @Test
+  void approveAll_with_failed_approval() throws IOException {
+    Path readOnlyDir = tempDir.resolve("readonly");
+    Files.createDirectory(readOnlyDir);
+    Path receivedFile = readOnlyDir.resolve("MyTest-myMethod-received.txt");
+    writeString(receivedFile, "received content", StandardOpenOption.CREATE);
+    Path approvedFile = readOnlyDir.resolve("MyTest-myMethod-approved.txt");
+    readOnlyDir.toFile().setWritable(false);
+
+    try {
+      CliResult result =
+          ApprovedFileInventoryCli.approveAll(
+              new ApprovedFileInventory(
+                  List.of(new InventoryEntry(approvedFile, "com.example.MyTest#myMethod")),
+                  tempDir.resolve("inventory.properties")));
+
+      assertThat(result.output())
+          .contains("Failed to approve 1 file(s):")
+          .contains("MyTest-myMethod-received.txt");
+      assertThat(result.exitCode()).isEqualTo(1);
+    } finally {
+      readOnlyDir.toFile().setWritable(true);
+    }
   }
 
   @Test
