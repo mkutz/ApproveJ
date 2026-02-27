@@ -168,7 +168,7 @@ Make sure you have run all relevant tests with the inventory enabled at least on
 == Reviewing Unapproved Files
 
 After running your tests, some may have failed because the received value differs from the approved value.
-Instead of reviewing each failure individually, you can use the `reviewUnapproved` task/goal to open all unapproved files in the configured default <<reviewing,file reviewer>> at once.
+Instead of reviewing each failure individually, you can use the review-unapproved task/goal to open all unapproved files in the configured default <<reviewing,file reviewer>> at once.
 
 [source,bash]
 ----
@@ -186,7 +186,7 @@ This scans the inventory for approved files that have a corresponding received f
 == Approving All Received Files
 
 If you are confident that all received files are correct, you can approve them all at once.
-The `approveAll` task/goal moves every received file to its corresponding approved file, replacing the previous content.
+The approve-all task/goal moves every received file to its corresponding approved file, replacing the previous content.
 
 [source,bash]
 ----

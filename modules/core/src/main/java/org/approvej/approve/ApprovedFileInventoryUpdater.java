@@ -55,11 +55,16 @@ public final class ApprovedFileInventoryUpdater {
 
     addEntry(new InventoryEntry(pathProvider.approvedPath(), testReference));
 
-    Thread hook =
-        new Thread(ApprovedFileInventoryUpdater::writeInventory, "ApproveJ-Inventory-Writer");
-    if (shutdownHook.compareAndSet(null, hook)) {
-      Runtime.getRuntime().addShutdownHook(hook);
-    }
+    shutdownHook.updateAndGet(
+        existing -> {
+          if (existing != null) {
+            return existing;
+          }
+          Thread hook =
+              new Thread(ApprovedFileInventoryUpdater::writeInventory, "ApproveJ-Inventory-Writer");
+          Runtime.getRuntime().addShutdownHook(hook);
+          return hook;
+        });
   }
 
   static void writeInventory() {
