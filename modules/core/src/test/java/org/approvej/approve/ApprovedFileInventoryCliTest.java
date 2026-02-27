@@ -2,6 +2,7 @@ package org.approvej.approve;
 
 import static java.nio.file.Files.writeString;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -71,7 +72,7 @@ class ApprovedFileInventoryCliTest {
     Files.createDirectory(readOnlyDir);
     Path leftoverFile = readOnlyDir.resolve("leftover-approved.txt");
     writeString(leftoverFile, "old content", StandardOpenOption.CREATE);
-    readOnlyDir.toFile().setWritable(false);
+    assumeTrue(readOnlyDir.toFile().setWritable(false), "cannot make directory read-only");
 
     try {
       CliResult result =
@@ -120,7 +121,7 @@ class ApprovedFileInventoryCliTest {
     Path receivedFile = readOnlyDir.resolve("MyTest-myMethod-received.txt");
     writeString(receivedFile, "received content", StandardOpenOption.CREATE);
     Path approvedFile = readOnlyDir.resolve("MyTest-myMethod-approved.txt");
-    readOnlyDir.toFile().setWritable(false);
+    assumeTrue(readOnlyDir.toFile().setWritable(false), "cannot make directory read-only");
 
     try {
       CliResult result =
