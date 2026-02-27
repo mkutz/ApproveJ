@@ -75,7 +75,7 @@ public final class ApprovedFileInventoryUpdater {
             .sorted(Comparator.comparing(InventoryEntry::relativePath))
             .toList();
 
-    new ApprovedFileInventory(merged).saveInventory(path);
+    new ApprovedFileInventory(merged, path).saveInventory();
   }
 
   /** Adds an entry directly. For testing only. */

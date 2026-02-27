@@ -18,7 +18,7 @@ import org.jspecify.annotations.NullMarked;
 
 /**
  * Wraps a loaded approved file inventory and provides domain operations like {@link
- * #findLeftovers()}, {@link #removeLeftovers(Path)}, {@link #approveAll()}, and {@link
+ * #findLeftovers()}, {@link #removeLeftovers()}, {@link #approveAll()}, and {@link
  * #reviewUnapproved(FileReviewer)}.
  *
  * <p>Recording approved files during test execution is handled separately by {@link
@@ -33,9 +33,11 @@ public class ApprovedFileInventory {
       "# ApproveJ Approved File Inventory (auto-generated, do not edit)";
 
   private final List<InventoryEntry> inventory;
+  private final Path inventoryPath;
 
-  ApprovedFileInventory(List<InventoryEntry> inventory) {
+  ApprovedFileInventory(List<InventoryEntry> inventory, Path inventoryPath) {
     this.inventory = inventory;
+    this.inventoryPath = inventoryPath;
   }
 
   /** Returns the inventory entries. */
@@ -51,7 +53,7 @@ public class ApprovedFileInventory {
    */
   static ApprovedFileInventory loadInventory(Path inventoryPath) {
     if (!Files.exists(inventoryPath)) {
-      return new ApprovedFileInventory(List.of());
+      return new ApprovedFileInventory(List.of(), inventoryPath);
     }
     try (BufferedReader reader = Files.newBufferedReader(inventoryPath)) {
       Properties properties = new Properties();
@@ -60,10 +62,11 @@ public class ApprovedFileInventory {
           properties.stringPropertyNames().stream()
               .map(key -> new InventoryEntry(Path.of(key), properties.getProperty(key)))
               .sorted(Comparator.comparing(InventoryEntry::relativePath))
-              .toList());
+              .toList(),
+          inventoryPath);
     } catch (IOException e) {
       LOGGER.warning("Failed to read inventory file: %s".formatted(e.getMessage()));
-      return new ApprovedFileInventory(List.of());
+      return new ApprovedFileInventory(List.of(), inventoryPath);
     }
   }
 
@@ -86,16 +89,15 @@ public class ApprovedFileInventory {
         .toList();
   }
 
-  /** Result of a {@link #removeLeftovers(Path)} operation. */
+  /** Result of a {@link #removeLeftovers()} operation. */
   record CleanupResult(List<InventoryEntry> removed, List<InventoryEntry> failed) {}
 
   /**
    * Removes leftover approved files and updates the inventory.
    *
-   * @param inventoryPath the path to the inventory properties file to update
    * @return the result containing the list of removed and failed leftover entries
    */
-  CleanupResult removeLeftovers(Path inventoryPath) {
+  CleanupResult removeLeftovers() {
     List<InventoryEntry> leftovers = findLeftovers();
     if (leftovers.isEmpty()) {
       return new CleanupResult(leftovers, List.of());
@@ -113,7 +115,7 @@ public class ApprovedFileInventory {
           }
         });
 
-    saveInventory(inventoryPath);
+    saveInventory();
 
     return new CleanupResult(removed, failed);
   }
@@ -163,12 +165,8 @@ public class ApprovedFileInventory {
         .toList();
   }
 
-  /**
-   * Writes the inventory to the given properties file.
-   *
-   * @param inventoryPath the path to write the inventory to
-   */
-  void saveInventory(Path inventoryPath) {
+  /** Writes the inventory to the inventory file it was loaded from. */
+  void saveInventory() {
     try {
       if (inventory.isEmpty()) {
         Files.deleteIfExists(inventoryPath);

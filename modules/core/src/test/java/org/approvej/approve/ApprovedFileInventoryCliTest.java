@@ -16,7 +16,7 @@ class ApprovedFileInventoryCliTest {
   @TempDir private Path tempDir;
 
   private ApprovedFileInventory inventory(InventoryEntry... entries) {
-    return new ApprovedFileInventory(List.of(entries));
+    return new ApprovedFileInventory(List.of(entries), tempDir.resolve("inventory.properties"));
   }
 
   @Test
@@ -44,8 +44,7 @@ class ApprovedFileInventoryCliTest {
 
   @Test
   void cleanup_no_leftovers() {
-    Path inventoryPath = tempDir.resolve("inventory.properties");
-    CliResult result = ApprovedFileInventoryCli.cleanup(inventory(), inventoryPath);
+    CliResult result = ApprovedFileInventoryCli.cleanup(inventory());
 
     assertThat(result.output()).isEqualTo("No leftover approved files found.");
     assertThat(result.exitCode()).isZero();
@@ -56,11 +55,9 @@ class ApprovedFileInventoryCliTest {
     Path leftoverFile = tempDir.resolve("leftover-approved.txt");
     writeString(leftoverFile, "old content", StandardOpenOption.CREATE);
 
-    Path inventoryPath = tempDir.resolve("inventory.properties");
     CliResult result =
         ApprovedFileInventoryCli.cleanup(
-            inventory(new InventoryEntry(leftoverFile, "com.nonexistent.NonExistentTest#test")),
-            inventoryPath);
+            inventory(new InventoryEntry(leftoverFile, "com.nonexistent.NonExistentTest#test")));
 
     assertThat(result.output()).startsWith("Removed leftover approved files:");
     assertThat(result.output()).contains("leftover-approved.txt");
