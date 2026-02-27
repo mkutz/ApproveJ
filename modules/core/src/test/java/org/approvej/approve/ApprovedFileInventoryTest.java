@@ -117,6 +117,13 @@ class ApprovedFileInventoryTest {
     assertThat(result.removed()).hasSize(1);
     assertThat(result.failed()).isEmpty();
     assertThat(leftoverFile).doesNotExist();
+
+    var savedInventory = ApprovedFileInventory.loadInventory(inventoryPath());
+    assertThat(savedInventory.entries())
+        .containsExactly(
+            new InventoryEntry(
+                validFile, "org.approvej.approve.ApprovedFileInventoryTest#removeLeftovers"))
+        .doesNotContain(new InventoryEntry(leftoverFile, "com.nonexistent.NonExistentTest#test"));
   }
 
   @Test

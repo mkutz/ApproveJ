@@ -115,7 +115,9 @@ public class ApprovedFileInventory {
           }
         });
 
-    saveInventory();
+    new ApprovedFileInventory(
+            inventory.stream().filter(entry -> !removed.contains(entry)).toList(), inventoryPath)
+        .saveInventory();
 
     return new CleanupResult(removed, failed);
   }
