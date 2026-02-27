@@ -159,12 +159,14 @@ public class ApprovedFileInventory {
    * @return the list of reviewed {@link PathProvider}s
    */
   List<PathProvider> reviewUnapproved(FileReviewer reviewer) {
-    return inventory.stream()
-        .map(entry -> PathProviders.approvedPath(entry.relativePath()))
-        .filter(pathProvider -> Files.exists(pathProvider.receivedPath()))
-        .sorted(Comparator.comparing(PathProvider::approvedPath))
-        .peek(reviewer::apply)
-        .toList();
+    List<PathProvider> unapproved =
+        inventory.stream()
+            .map(entry -> PathProviders.approvedPath(entry.relativePath()))
+            .filter(pathProvider -> Files.exists(pathProvider.receivedPath()))
+            .sorted(Comparator.comparing(PathProvider::approvedPath))
+            .toList();
+    unapproved.forEach(reviewer::apply);
+    return unapproved;
   }
 
   /** Writes the inventory to the inventory file it was loaded from. */
