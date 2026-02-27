@@ -11,7 +11,7 @@ import static org.approvej.review.Reviewers.script;
 import java.nio.file.Path;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import org.approvej.approve.ApprovedFileInventory;
+import org.approvej.approve.ApprovedFileInventoryUpdater;
 import org.approvej.approve.Approver;
 import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviders;
@@ -203,7 +203,7 @@ public class ApprovalBuilder<T> {
     PathProvider updatedPathProvider =
         pathProvider.filenameAffix(name).filenameExtension(filenameExtension);
     if (configuration.inventoryEnabled()) {
-      ApprovedFileInventory.registerApprovedFile(updatedPathProvider);
+      ApprovedFileInventoryUpdater.registerApprovedFile(updatedPathProvider);
     }
     if (!(value instanceof String)) {
       printed().byFile(updatedPathProvider);
