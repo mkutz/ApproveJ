@@ -15,7 +15,7 @@ import org.jspecify.annotations.NullMarked;
  * formatting domain results into CLI output with appropriate exit codes.
  */
 @NullMarked
-final class ApprovedFileInventoryCli {
+public final class ApprovedFileInventoryCli {
 
   record CliResult(String output, int exitCode) {}
 
