@@ -2,7 +2,6 @@ package org.approvej.approve;
 
 import static java.util.stream.Collectors.joining;
 
-import java.nio.file.Path;
 import java.util.List;
 import org.approvej.approve.ApprovedFileInventory.ApproveResult;
 import org.approvej.approve.ApprovedFileInventory.CleanupResult;
@@ -37,8 +36,8 @@ final class ApprovedFileInventoryCli {
         0);
   }
 
-  static CliResult cleanup(ApprovedFileInventory inventory, Path inventoryPath) {
-    CleanupResult result = inventory.removeLeftovers(inventoryPath);
+  static CliResult cleanup(ApprovedFileInventory inventory) {
+    CleanupResult result = inventory.removeLeftovers();
     if (result.removed().isEmpty() && result.failed().isEmpty()) {
       return new CliResult("No leftover approved files found.", 0);
     }
@@ -117,14 +116,14 @@ final class ApprovedFileInventoryCli {
       System.exit(1);
     }
 
-    Path inventoryPath = ApprovedFileInventoryUpdater.DEFAULT_INVENTORY_FILE;
-    ApprovedFileInventory inventory = ApprovedFileInventory.loadInventory(inventoryPath);
+    ApprovedFileInventory inventory =
+        ApprovedFileInventory.loadInventory(ApprovedFileInventoryUpdater.DEFAULT_INVENTORY_FILE);
 
     String command = args[0];
     CliResult result =
         switch (command) {
           case "--find-leftovers" -> findLeftovers(inventory);
-          case "--cleanup" -> cleanup(inventory, inventoryPath);
+          case "--cleanup" -> cleanup(inventory);
           case "--approve-all" -> approveAll(inventory);
           case "--review-unapproved" -> reviewUnapproved(inventory);
           default -> {

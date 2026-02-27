@@ -16,17 +16,20 @@ class ApprovedFileInventoryTest {
 
   @TempDir private Path tempDir;
 
+  private Path inventoryPath() {
+    return tempDir.resolve("inventory.properties");
+  }
+
   @Test
   void loadInventory_non_existent_file() {
-    var inventory =
-        ApprovedFileInventory.loadInventory(tempDir.resolve("does-not-exist.properties"));
+    var inventory = ApprovedFileInventory.loadInventory(inventoryPath());
 
     assertThat(inventory.entries()).isEmpty();
   }
 
   @Test
   void loadInventory_valid_file() throws IOException {
-    Path file = tempDir.resolve("inventory.properties");
+    Path file = inventoryPath();
     writeString(
         file,
         """
@@ -50,7 +53,8 @@ class ApprovedFileInventoryTest {
             List.of(
                 new InventoryEntry(
                     Path.of("src/test/NonExistent-test-approved.txt"),
-                    "com.nonexistent.NonExistentTest#test")));
+                    "com.nonexistent.NonExistentTest#test")),
+            inventoryPath());
 
     var leftovers = inventory.findLeftovers();
 
@@ -68,7 +72,8 @@ class ApprovedFileInventoryTest {
             List.of(
                 new InventoryEntry(
                     Path.of("src/test/ApprovedFileInventoryTest-nonExistent-approved.txt"),
-                    "org.approvej.approve.ApprovedFileInventoryTest#nonExistentMethod")));
+                    "org.approvej.approve.ApprovedFileInventoryTest#nonExistentMethod")),
+            inventoryPath());
 
     var leftovers = inventory.findLeftovers();
 
@@ -84,7 +89,8 @@ class ApprovedFileInventoryTest {
             List.of(
                 new InventoryEntry(
                     Path.of("src/test/ApprovedFileInventoryTest-findLeftovers-approved.txt"),
-                    "org.approvej.approve.ApprovedFileInventoryTest#findLeftovers_existing_method")));
+                    "org.approvej.approve.ApprovedFileInventoryTest#findLeftovers_existing_method")),
+            inventoryPath());
 
     var leftovers = inventory.findLeftovers();
 
@@ -103,10 +109,10 @@ class ApprovedFileInventoryTest {
             List.of(
                 new InventoryEntry(leftoverFile, "com.nonexistent.NonExistentTest#test"),
                 new InventoryEntry(
-                    validFile, "org.approvej.approve.ApprovedFileInventoryTest#removeLeftovers")));
+                    validFile, "org.approvej.approve.ApprovedFileInventoryTest#removeLeftovers")),
+            inventoryPath());
 
-    Path inventoryPath = tempDir.resolve("inventory.properties");
-    var result = inventory.removeLeftovers(inventoryPath);
+    var result = inventory.removeLeftovers();
 
     assertThat(result.removed()).hasSize(1);
     assertThat(result.failed()).isEmpty();
@@ -122,7 +128,8 @@ class ApprovedFileInventoryTest {
 
     var inventory =
         new ApprovedFileInventory(
-            List.of(new InventoryEntry(approvedFile, "com.example.MyTest#myMethod")));
+            List.of(new InventoryEntry(approvedFile, "com.example.MyTest#myMethod")),
+            inventoryPath());
 
     var result = inventory.approveAll();
 
@@ -134,7 +141,7 @@ class ApprovedFileInventoryTest {
 
   @Test
   void approveAll_no_received_files() {
-    var inventory = new ApprovedFileInventory(List.of());
+    var inventory = new ApprovedFileInventory(List.of(), inventoryPath());
 
     var result = inventory.approveAll();
 
@@ -150,7 +157,8 @@ class ApprovedFileInventoryTest {
 
     var inventory =
         new ApprovedFileInventory(
-            List.of(new InventoryEntry(approvedFile, "com.example.MyTest#myMethod")));
+            List.of(new InventoryEntry(approvedFile, "com.example.MyTest#myMethod")),
+            inventoryPath());
 
     var result = inventory.approveAll();
 
@@ -169,7 +177,8 @@ class ApprovedFileInventoryTest {
 
     var inventory =
         new ApprovedFileInventory(
-            List.of(new InventoryEntry(approvedFile, "com.example.MyTest#myMethod")));
+            List.of(new InventoryEntry(approvedFile, "com.example.MyTest#myMethod")),
+            inventoryPath());
 
     var reviewedProviders = new ArrayList<PathProvider>();
     var reviewed =
@@ -187,7 +196,7 @@ class ApprovedFileInventoryTest {
 
   @Test
   void reviewUnapproved_no_received_files() {
-    var inventory = new ApprovedFileInventory(List.of());
+    var inventory = new ApprovedFileInventory(List.of(), inventoryPath());
 
     var reviewed = inventory.reviewUnapproved(pathProvider -> new FileReviewResult(false));
 
@@ -196,30 +205,31 @@ class ApprovedFileInventoryTest {
 
   @Test
   void saveInventory_creates_parent_directories() {
-    Path inventoryPath = tempDir.resolve("nested/dir/inventory.properties");
+    Path nestedPath = tempDir.resolve("nested/dir/inventory.properties");
     var inventory =
         new ApprovedFileInventory(
             List.of(
                 new InventoryEntry(
-                    Path.of("src/test/MyTest-myTest-approved.txt"), "com.example.MyTest#myTest")));
+                    Path.of("src/test/MyTest-myTest-approved.txt"), "com.example.MyTest#myTest")),
+            nestedPath);
 
-    inventory.saveInventory(inventoryPath);
+    inventory.saveInventory();
 
-    assertThat(inventoryPath).exists();
-    var loaded = ApprovedFileInventory.loadInventory(inventoryPath);
+    assertThat(nestedPath).exists();
+    var loaded = ApprovedFileInventory.loadInventory(nestedPath);
     assertThat(loaded.entries()).hasSize(1);
   }
 
   @Test
   void saveInventory_empty_inventory_deletes_file() throws IOException {
-    Path inventoryPath = tempDir.resolve("inventory.properties");
-    writeString(inventoryPath, "some = content", StandardOpenOption.CREATE);
-    assertThat(inventoryPath).exists();
+    Path path = inventoryPath();
+    writeString(path, "some = content", StandardOpenOption.CREATE);
+    assertThat(path).exists();
 
-    var inventory = new ApprovedFileInventory(List.of());
+    var inventory = new ApprovedFileInventory(List.of(), path);
 
-    inventory.saveInventory(inventoryPath);
+    inventory.saveInventory();
 
-    assertThat(inventoryPath).doesNotExist();
+    assertThat(path).doesNotExist();
   }
 }
