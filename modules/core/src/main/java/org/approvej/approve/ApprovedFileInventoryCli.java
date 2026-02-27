@@ -30,7 +30,7 @@ public final class ApprovedFileInventoryCli {
         leftovers.stream()
             .map(
                 leftover ->
-                    "  %s\n    from %s"
+                    "  %s%n    from %s"
                         .formatted(leftover.relativePath().toUri(), leftover.testReference()))
             .collect(joining("\n", "Leftover approved files:\n", "")),
         0);
@@ -55,7 +55,7 @@ public final class ApprovedFileInventoryCli {
               .collect(
                   joining(
                       "\n",
-                      "Failed to delete %d leftover file(s):\n".formatted(result.failed().size()),
+                      "Failed to delete %d leftover file(s):%n".formatted(result.failed().size()),
                       ""));
       return new CliResult(output, 1);
     }
@@ -81,7 +81,7 @@ public final class ApprovedFileInventoryCli {
               .collect(
                   joining(
                       "\n",
-                      "Failed to approve %d file(s):\n".formatted(result.failed().size()),
+                      "Failed to approve %d file(s):%n".formatted(result.failed().size()),
                       ""));
       return new CliResult(output, 1);
     }
