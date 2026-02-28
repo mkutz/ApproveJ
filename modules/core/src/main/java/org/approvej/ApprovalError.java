@@ -32,7 +32,9 @@ public class ApprovalError extends AssertionError {
    * previouslyApproved, including the paths to the approved and received files.
    *
    * <p>The file paths are included in the error message so that IDEs can make them clickable,
-   * enabling seamless navigation to the relevant files.
+   * enabling seamless navigation to the relevant files. Both paths must be non-null for the file
+   * path information to be included in the message, as they always come in pairs from a {@link
+   * org.approvej.approve.PathProvider}.
    *
    * @param previouslyApproved the previously approved value
    * @param received the received value
