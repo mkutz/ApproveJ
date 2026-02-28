@@ -177,3 +177,32 @@ Or you can create a method that returns a link:{javadoc-url}/core/org/approvej/a
 That way the filename extension of the used `Printer` is set just before approval.
 
 In that case, you might want to take advantage of the link:{javadoc-url}/core/org/approvej/approve/StackTraceTestFinderUtil.html[`StackTraceTestFinderUtil`] class to find the test source path or the current test method based on the current stack trace.
+
+
+[id=dangling_approval_detection]
+== Dangling Approval Detection
+
+If you call `approve()` without a concluding terminal method (`by()`, `byFile()`, or `byValue()`), the test will silently pass without any approval actually happening.
+To catch this mistake, you can annotate your test class with link:{javadoc-url}/core/org/approvej/ApprovalTest.html[`@ApprovalTest`].
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/BasicsDocTest.java[tag=approval_test_annotation]
+class MyTest {
+  // ...
+}
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approval_test_annotation]
+class MyTest {
+  // ...
+}
+----
+
+This registers a JUnit Jupiter extension that checks after each test method whether all `approve()` calls were concluded.
+If any were not, the test fails with a link:{javadoc-url}/core/org/approvej/DanglingApprovalError.html[`DanglingApprovalError`].
+
+The extension is safe to use with parallel test execution.

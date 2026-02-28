@@ -9,6 +9,7 @@ import static org.approvej.print.PrintFormat.DEFAULT_FILENAME_EXTENSION;
 import static org.approvej.review.Reviewers.script;
 
 import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import org.approvej.approve.ApprovedFileInventoryUpdater;
@@ -63,13 +64,19 @@ public class ApprovalBuilder<T> {
   private final String name;
   private final String filenameExtension;
   private final FileReviewer fileReviewer;
+  private final AtomicBoolean concluded;
 
   private ApprovalBuilder(
-      T value, String name, String filenameExtension, FileReviewer fileReviewer) {
+      T value,
+      String name,
+      String filenameExtension,
+      FileReviewer fileReviewer,
+      AtomicBoolean concluded) {
     this.value = value;
     this.name = name;
     this.filenameExtension = filenameExtension;
     this.fileReviewer = fileReviewer;
+    this.concluded = concluded;
   }
 
   /**
@@ -80,8 +87,9 @@ public class ApprovalBuilder<T> {
    * @param <T> the type of the value to approve
    */
   public static <T> ApprovalBuilder<T> approve(T value) {
+    AtomicBoolean concluded = DanglingApprovalTracker.register();
     return new ApprovalBuilder<>(
-        value, "", DEFAULT_FILENAME_EXTENSION, configuration.defaultFileReviewer());
+        value, "", DEFAULT_FILENAME_EXTENSION, configuration.defaultFileReviewer(), concluded);
   }
 
   /**
@@ -93,7 +101,7 @@ public class ApprovalBuilder<T> {
    * @return a copy of this with the given {@link #name}
    */
   public ApprovalBuilder<T> named(String name) {
-    return new ApprovalBuilder<>(value, name, filenameExtension, fileReviewer);
+    return new ApprovalBuilder<>(value, name, filenameExtension, fileReviewer, concluded);
   }
 
   /**
@@ -103,7 +111,8 @@ public class ApprovalBuilder<T> {
    * @return a copy of this with the printed {@link #value}
    */
   public ApprovalBuilder<String> printedBy(Function<? super T, String> printer) {
-    return new ApprovalBuilder<>(printer.apply(value), name, filenameExtension, fileReviewer);
+    return new ApprovalBuilder<>(
+        printer.apply(value), name, filenameExtension, fileReviewer, concluded);
   }
 
   /**
@@ -114,7 +123,11 @@ public class ApprovalBuilder<T> {
    */
   public ApprovalBuilder<String> printedAs(PrintFormat<? super T> printFormat) {
     return new ApprovalBuilder<>(
-        printFormat.printer().apply(value), name, printFormat.filenameExtension(), fileReviewer);
+        printFormat.printer().apply(value),
+        name,
+        printFormat.filenameExtension(),
+        fileReviewer,
+        concluded);
   }
 
   /**
@@ -135,7 +148,8 @@ public class ApprovalBuilder<T> {
    * @return a copy of this with the scrubbed {@link #value}
    */
   public ApprovalBuilder<T> scrubbedOf(UnaryOperator<T> scrubber) {
-    return new ApprovalBuilder<>(scrubber.apply(value), name, filenameExtension, fileReviewer);
+    return new ApprovalBuilder<>(
+        scrubber.apply(value), name, filenameExtension, fileReviewer, concluded);
   }
 
   /**
@@ -148,7 +162,7 @@ public class ApprovalBuilder<T> {
    * @see org.approvej.review.Reviewers
    */
   public ApprovalBuilder<T> reviewedBy(FileReviewer fileReviewer) {
-    return new ApprovalBuilder<>(value, name, filenameExtension, fileReviewer);
+    return new ApprovalBuilder<>(value, name, filenameExtension, fileReviewer, concluded);
   }
 
   /**
@@ -175,8 +189,10 @@ public class ApprovalBuilder<T> {
    * @throws ApprovalError if the approval fails
    */
   public void by(final Function<String, ApprovalResult> approver) {
+    concluded.set(true);
     if (!(value instanceof String)) {
       printed().by(approver);
+      return;
     }
     ApprovalResult result = approver.apply(String.valueOf(value));
     if (result.needsApproval()) {
@@ -200,6 +216,7 @@ public class ApprovalBuilder<T> {
    * @throws ApprovalError if the approval fails
    */
   public void byFile(PathProvider pathProvider) {
+    concluded.set(true);
     PathProvider updatedPathProvider =
         pathProvider.filenameAffix(name).filenameExtension(filenameExtension);
     if (configuration.inventoryEnabled()) {

@@ -20,6 +20,9 @@ import org.approvej.scrub.Scrubbers.uuids
 import org.assertj.core.api.Assumptions.assumeThat
 import org.junit.jupiter.api.Test
 
+// tag::approval_test_annotation[]
+@org.approvej.ApprovalTest
+// end::approval_test_annotation[]
 class BasicsDocTest {
 
   @Test
