@@ -18,7 +18,10 @@ java {
 
 repositories { mavenCentral() }
 
-dependencies { api(libs.jspecify) }
+dependencies {
+  api(libs.jspecify)
+  compileOnly(libs.junit.jupiter.api)
+}
 
 testing {
   suites {
