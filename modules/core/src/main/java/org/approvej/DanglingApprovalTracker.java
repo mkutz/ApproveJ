@@ -1,6 +1,5 @@
 package org.approvej;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -14,8 +13,8 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>Each call to {@link ApprovalBuilder#approve(Object)} registers a token scoped to the current
  * thread. After each test, the {@link DanglingApprovalExtension} calls {@link #checkAndReset()} to
- * detect unconcluded tokens on that thread. A shutdown hook catches dangling tokens when no
- * extension is active.
+ * detect unconcluded tokens on that thread. Additionally, a JVM shutdown hook performs a final
+ * check and reports any remaining dangling approvals at process shutdown.
  *
  * <p>Thread-scoping ensures parallel test execution does not cause interference between tests.
  */
@@ -23,7 +22,7 @@ import org.jspecify.annotations.Nullable;
 final class DanglingApprovalTracker {
 
   private static final ThreadLocal<List<AtomicBoolean>> threadTokens =
-      ThreadLocal.withInitial(ArrayList::new);
+      ThreadLocal.withInitial(java.util.ArrayList::new);
   private static final ConcurrentLinkedDeque<AtomicBoolean> allTokens =
       new ConcurrentLinkedDeque<>();
   private static final AtomicReference<@Nullable Thread> shutdownHook = new AtomicReference<>();
@@ -32,7 +31,9 @@ final class DanglingApprovalTracker {
 
   static AtomicBoolean register() {
     AtomicBoolean token = new AtomicBoolean(false);
-    threadTokens.get().add(token);
+    List<AtomicBoolean> tokens = threadTokens.get();
+    tokens.removeIf(AtomicBoolean::get);
+    tokens.add(token);
     allTokens.removeIf(AtomicBoolean::get);
     allTokens.add(token);
     shutdownHook.updateAndGet(
@@ -57,6 +58,7 @@ final class DanglingApprovalTracker {
   static void checkAndReset() {
     List<AtomicBoolean> tokens = threadTokens.get();
     boolean hasDangling = tokens.stream().anyMatch(token -> !token.get());
+    allTokens.removeAll(tokens);
     tokens.clear();
     if (hasDangling) {
       throw new DanglingApprovalError();
