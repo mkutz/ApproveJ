@@ -1,0 +1,107 @@
+package org.approvej.intellij;
+
+import com.intellij.diff.DiffContentFactory;
+import com.intellij.diff.DiffManager;
+import com.intellij.diff.requests.SimpleDiffRequest;
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
+import java.io.IOException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+/** Utility methods for working with ApproveJ received and approved files. */
+final class ReceivedFileUtil {
+
+  private ReceivedFileUtil() {}
+
+  private static final String RECEIVED = "-received";
+  private static final String APPROVED = "-approved";
+
+  /**
+   * Returns {@code true} if the given file's name contains {@code -received} before the extension.
+   */
+  static boolean isReceivedFile(@Nullable VirtualFile file) {
+    return file != null && isReceivedFileName(file.getName());
+  }
+
+  /** Returns {@code true} if the given filename contains {@code -received} before the extension. */
+  static boolean isReceivedFileName(@Nullable String filename) {
+    return filename != null && receivedIndex(filename) >= 0;
+  }
+
+  /**
+   * Returns the approved filename for the given received filename, or {@code null} if the filename
+   * is not a received filename.
+   */
+  static @Nullable String toApprovedFileName(@Nullable String filename) {
+    int index = receivedIndex(filename);
+    if (index < 0) return null;
+    return filename.substring(0, index) + APPROVED + filename.substring(index + RECEIVED.length());
+  }
+
+  /**
+   * Returns the sibling approved {@link VirtualFile} for the given received file, or {@code null}
+   * if no approved file exists.
+   */
+  static @Nullable VirtualFile findApprovedFile(@NotNull VirtualFile receivedFile) {
+    String approvedName = toApprovedFileName(receivedFile.getName());
+    if (approvedName == null) return null;
+    VirtualFile parent = receivedFile.getParent();
+    if (parent == null) return null;
+    return parent.findChild(approvedName);
+  }
+
+  /** Opens IntelliJ's diff viewer comparing the received file with the approved file. */
+  static void openDiff(@NotNull Project project, @NotNull VirtualFile receivedFile) {
+    VirtualFile approvedFile = findApprovedFile(receivedFile);
+    var contentFactory = DiffContentFactory.getInstance();
+    var receivedContent = contentFactory.create(project, receivedFile);
+    var approvedContent =
+        approvedFile != null
+            ? contentFactory.create(project, approvedFile)
+            : contentFactory.createEmpty();
+    var request =
+        new SimpleDiffRequest(
+            "ApproveJ: " + receivedFile.getName(),
+            receivedContent,
+            approvedContent,
+            receivedFile.getName(),
+            approvedFile != null ? approvedFile.getName() : "(no approved file)");
+    DiffManager.getInstance().showDiff(project, request);
+  }
+
+  /**
+   * Copies the received file content to the approved file (creating it if needed) and deletes the
+   * received file. The operation is wrapped in a {@link WriteCommandAction} to support undo.
+   */
+  static void approve(@NotNull Project project, @NotNull VirtualFile receivedFile) {
+    String approvedName = toApprovedFileName(receivedFile.getName());
+    if (approvedName == null) return;
+    WriteCommandAction.runWriteCommandAction(
+        project,
+        "Approve Received",
+        null,
+        () -> {
+          try {
+            VirtualFile parent = receivedFile.getParent();
+            VirtualFile approvedFile = parent.findChild(approvedName);
+            if (approvedFile == null) {
+              approvedFile = parent.createChildData(ReceivedFileUtil.class, approvedName);
+            }
+            approvedFile.setBinaryContent(receivedFile.contentsToByteArray());
+            receivedFile.delete(ReceivedFileUtil.class);
+          } catch (IOException e) {
+            throw new RuntimeException("Failed to approve received file", e);
+          }
+        });
+  }
+
+  private static int receivedIndex(String filename) {
+    if (filename == null) return -1;
+    int receivedDotIndex = filename.lastIndexOf(RECEIVED + ".");
+    if (receivedDotIndex >= 0) return receivedDotIndex;
+    if (filename.endsWith(RECEIVED)) return filename.length() - RECEIVED.length();
+    return -1;
+  }
+}

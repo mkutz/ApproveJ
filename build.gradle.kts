@@ -104,7 +104,7 @@ sonar {
 spotless {
   format("misc") {
     target("**/*.md", "**/*.xml", "**/*.yml", "**/*.yaml", "**/*.html", "**/*.css", ".gitignore")
-    targetExclude("**/build/**/*", "**/.idea/**")
+    targetExclude("**/build/**/*", "**/.idea/**", "**/.intellijPlatform/**")
     trimTrailingWhitespace()
     endWithNewline()
     leadingTabsToSpaces(2)
@@ -133,7 +133,7 @@ spotless {
 
   groovy {
     target("**/*.groovy")
-    targetExclude("**/build/**/*")
+    targetExclude("**/build/**/*", "**/idea-sandbox/**")
     greclipse()
     leadingTabsToSpaces(2)
   }

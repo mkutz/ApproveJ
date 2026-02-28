@@ -1,0 +1,32 @@
+<idea-plugin>
+  <id>org.approvej.intellij</id>
+  <name>ApproveJ</name>
+  <vendor>ApproveJ</vendor>
+
+  <description><![CDATA[
+    Approval testing support for ApproveJ.
+    Provides diff viewing and one-click approval of <code>.received</code> files.
+  ]]></description>
+
+  <depends>com.intellij.modules.platform</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <editorNotificationProvider
+        implementation="org.approvej.intellij.ReceivedFileEditorNotificationProvider"/>
+  </extensions>
+
+  <actions>
+    <group id="ApproveJ" text="ApproveJ" popup="true">
+      <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+      <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+      <action id="ApproveJ.CompareReceivedWithApproved"
+          class="org.approvej.intellij.CompareReceivedWithApprovedAction"
+          text="Compare with Approved"
+          description="Open diff viewer comparing received file with approved file"/>
+      <action id="ApproveJ.ApproveReceived"
+          class="org.approvej.intellij.ApproveReceivedAction"
+          text="Approve Received"
+          description="Copy received file content to approved file and delete received file"/>
+    </group>
+  </actions>
+</idea-plugin>

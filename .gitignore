@@ -12,3 +12,4 @@ docs/**
 pages
 banner-*.*
 .approvej
+.intellijPlatform

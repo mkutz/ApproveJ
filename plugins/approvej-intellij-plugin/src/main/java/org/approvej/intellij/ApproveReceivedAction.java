@@ -1,0 +1,33 @@
+package org.approvej.intellij;
+
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Action that approves a received file by copying its content to the approved file and deleting the
+ * received file.
+ */
+public final class ApproveReceivedAction extends AnAction {
+
+  @Override
+  public void update(@NotNull AnActionEvent event) {
+    VirtualFile file = event.getData(CommonDataKeys.VIRTUAL_FILE);
+    event.getPresentation().setEnabledAndVisible(ReceivedFileUtil.isReceivedFile(file));
+  }
+
+  @Override
+  public @NotNull ActionUpdateThread getActionUpdateThread() {
+    return ActionUpdateThread.BGT;
+  }
+
+  @Override
+  public void actionPerformed(@NotNull AnActionEvent event) {
+    VirtualFile file = event.getData(CommonDataKeys.VIRTUAL_FILE);
+    if (file == null || event.getProject() == null) return;
+    ReceivedFileUtil.approve(event.getProject(), file);
+  }
+}
