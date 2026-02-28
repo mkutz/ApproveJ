@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -20,6 +21,8 @@ import org.jspecify.annotations.Nullable;
  */
 @NullMarked
 final class DanglingApprovalTracker {
+
+  private static final Logger LOGGER = Logger.getLogger(DanglingApprovalTracker.class.getName());
 
   private static final ThreadLocal<List<AtomicBoolean>> threadTokens =
       ThreadLocal.withInitial(java.util.ArrayList::new);
@@ -59,14 +62,14 @@ final class DanglingApprovalTracker {
     List<AtomicBoolean> tokens = threadTokens.get();
     boolean hasDangling = tokens.stream().anyMatch(token -> !token.get());
     allTokens.removeAll(tokens);
-    tokens.clear();
+    threadTokens.remove();
     if (hasDangling) {
       throw new DanglingApprovalError();
     }
   }
 
   static void reset() {
-    threadTokens.get().clear();
+    threadTokens.remove();
     allTokens.clear();
     Thread hook = shutdownHook.getAndSet(null);
     if (hook != null) {
@@ -81,8 +84,8 @@ final class DanglingApprovalTracker {
   private static void reportDanglingOnShutdown() {
     allTokens.removeIf(AtomicBoolean::get);
     if (!allTokens.isEmpty()) {
-      System.err.println(
-          "WARNING: Dangling approval detected."
+      LOGGER.warning(
+          "Dangling approval detected."
               + " Call by(), byFile(), or byValue() to conclude the approval.");
     }
     allTokens.clear();
