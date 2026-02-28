@@ -1,0 +1,31 @@
+<idea-plugin>
+  <id>org.approvej.intellij</id>
+  <name>ApproveJ</name>
+  <vendor url="https://approvej.org">ApproveJ</vendor>
+
+  <description><![CDATA[
+    IntelliJ IDEA integration for <a href="https://approvej.org">ApproveJ</a> approval testing.<br/>
+    <ul>
+      <li>Gutter icons next to ApproveJ test methods for quick execution.</li>
+      <li>Side-by-side diff viewer triggered directly from test failure output.</li>
+      <li>One-click "Approve" button to overwrite the approved file with the actual file.</li>
+    </ul>
+  ]]></description>
+
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.java</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <codeInsight.lineMarkerProvider
+      language="JAVA"
+      implementationClass="org.approvej.intellij.ApproveJLineMarkerProvider"/>
+  </extensions>
+
+  <actions>
+    <action
+      id="ApproveJ.ApproveFile"
+      class="org.approvej.intellij.ApproveAction"
+      text="Approve"
+      description="Overwrite the approved file with the actual file"/>
+  </actions>
+</idea-plugin>

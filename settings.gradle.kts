@@ -8,6 +8,8 @@ include("modules:core")
 
 include("plugins:approvej-gradle-plugin")
 
+include("plugins:approvej-intellij-plugin")
+
 include("plugins:approvej-maven-plugin")
 
 include("modules:json-jackson")
