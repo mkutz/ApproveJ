@@ -1,5 +1,6 @@
 package org.approvej.approve;
 
+import org.approvej.ApprovalError;
 import org.approvej.ApprovalResult;
 
 /**
@@ -12,4 +13,16 @@ import org.approvej.ApprovalResult;
  */
 public record FileApprovalResult(
     String previouslyApproved, String received, PathProvider pathProvider)
-    implements ApprovalResult {}
+    implements ApprovalResult {
+
+  @Override
+  public void throwIfNotApproved() {
+    if (needsApproval()) {
+      throw new ApprovalError(
+          previouslyApproved(),
+          received(),
+          pathProvider.approvedPath(),
+          pathProvider.receivedPath());
+    }
+  }
+}
