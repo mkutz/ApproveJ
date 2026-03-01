@@ -2,7 +2,7 @@ import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
   java
-  id("org.jetbrains.intellij.platform") version "2.5.0"
+  alias(libs.plugins.intellij.platform)
 }
 
 java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
@@ -26,7 +26,7 @@ intellijPlatform {
 
 dependencies {
   intellijPlatform {
-    intellijIdeaCommunity("2025.1")
+    intellijIdeaCommunity(libs.versions.intellij.ide)
     testFramework(TestFrameworkType.Platform)
   }
 

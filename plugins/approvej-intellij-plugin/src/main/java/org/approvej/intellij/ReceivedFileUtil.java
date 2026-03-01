@@ -22,12 +22,7 @@ final class ReceivedFileUtil {
    * Returns {@code true} if the given file's name contains {@code -received} before the extension.
    */
   static boolean isReceivedFile(@Nullable VirtualFile file) {
-    return file != null && isReceivedFileName(file.getName());
-  }
-
-  /** Returns {@code true} if the given filename contains {@code -received} before the extension. */
-  static boolean isReceivedFileName(@Nullable String filename) {
-    return filename != null && receivedIndex(filename) >= 0;
+    return file != null && receivedIndex(file.getName()) >= 0;
   }
 
   /**
@@ -41,15 +36,30 @@ final class ReceivedFileUtil {
   }
 
   /**
+   * Returns the base filename (without any {@code -received} or {@code -approved} infix) for the
+   * given received filename, or {@code null} if the filename is not a received filename.
+   */
+  static @Nullable String toBaseFileName(@Nullable String filename) {
+    int index = receivedIndex(filename);
+    if (index < 0) return null;
+    return filename.substring(0, index) + filename.substring(index + RECEIVED.length());
+  }
+
+  /**
    * Returns the sibling approved {@link VirtualFile} for the given received file, or {@code null}
-   * if no approved file exists.
+   * if no approved file exists. Checks for both the default {@code -approved} infix and a custom
+   * approved file without the infix.
    */
   static @Nullable VirtualFile findApprovedFile(@NotNull VirtualFile receivedFile) {
-    String approvedName = toApprovedFileName(receivedFile.getName());
-    if (approvedName == null) return null;
     VirtualFile parent = receivedFile.getParent();
     if (parent == null) return null;
-    return parent.findChild(approvedName);
+    String approvedName = toApprovedFileName(receivedFile.getName());
+    if (approvedName == null) return null;
+    VirtualFile approvedFile = parent.findChild(approvedName);
+    if (approvedFile != null) return approvedFile;
+    String baseName = toBaseFileName(receivedFile.getName());
+    if (baseName == null) return null;
+    return parent.findChild(baseName);
   }
 
   /** Opens IntelliJ's diff viewer comparing the received file with the approved file. */
@@ -64,10 +74,10 @@ final class ReceivedFileUtil {
     var request =
         new SimpleDiffRequest(
             "ApproveJ: " + receivedFile.getName(),
-            receivedContent,
             approvedContent,
-            receivedFile.getName(),
-            approvedFile != null ? approvedFile.getName() : "(no approved file)");
+            receivedContent,
+            approvedFile != null ? approvedFile.getName() : "(no approved file)",
+            receivedFile.getName());
     DiffManager.getInstance().showDiff(project, request);
   }
 
@@ -85,6 +95,9 @@ final class ReceivedFileUtil {
         () -> {
           try {
             VirtualFile parent = receivedFile.getParent();
+            if (parent == null) {
+              return;
+            }
             VirtualFile approvedFile = parent.findChild(approvedName);
             if (approvedFile == null) {
               approvedFile = parent.createChildData(ReceivedFileUtil.class, approvedName);

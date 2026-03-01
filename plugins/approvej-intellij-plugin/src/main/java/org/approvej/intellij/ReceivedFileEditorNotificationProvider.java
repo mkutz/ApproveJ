@@ -12,8 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Shows a warning banner when a {@code .received} file is opened, with actions to compare or
- * approve.
+ * Shows an info banner when a {@code .received} file is opened, with actions to compare or approve.
  */
 public final class ReceivedFileEditorNotificationProvider
     implements EditorNotificationProvider, DumbAware {
@@ -23,7 +22,7 @@ public final class ReceivedFileEditorNotificationProvider
       @NotNull Project project, @NotNull VirtualFile file) {
     if (!ReceivedFileUtil.isReceivedFile(file)) return null;
     return fileEditor -> {
-      var panel = new EditorNotificationPanel(fileEditor, EditorNotificationPanel.Status.Warning);
+      var panel = new EditorNotificationPanel(fileEditor, EditorNotificationPanel.Status.Info);
       panel.setText("This is an ApproveJ received file that has not been approved yet.");
       panel.createActionLabel(
           "Compare with Approved", () -> ReceivedFileUtil.openDiff(project, file));

@@ -1,8 +1,10 @@
 [versions]
-junit = "6.0.3"
 assertj = "3.27.7"
+intellij-ide = "2025.1"
+intellij-platform = "2.5.0"
 jackson2 = "2.21.1"
 jackson3 = "3.1.0"
+junit = "6.0.3"
 maven = "3.9.12"
 wiremock = "3.13.2"
 
@@ -32,6 +34,7 @@ wiremock = { module = "org.wiremock:wiremock", version.ref = "wiremock" }
 [plugins]
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version = "4.0.5" }
 asciidoctor-pdf = { id = "org.asciidoctor.jvm.pdf", version = "4.0.5" }
+intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-platform" }
 jreleaser = { id = "org.jreleaser", version = "1.23.0" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.3.10" }
 maven-plugin-development = { id = "org.gradlex.maven-plugin-development", version = "1.0.3" }
