@@ -9,8 +9,17 @@
   ]]></description>
 
   <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.java</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+    <localInspection
+        language="UAST"
+        groupName="ApproveJ"
+        shortName="DanglingApproval"
+        displayName="Dangling approval"
+        enabledByDefault="true"
+        level="WARNING"
+        implementationClass="org.approvej.intellij.DanglingApprovalInspection"/>
     <editorNotificationProvider
         implementation="org.approvej.intellij.ReceivedFileEditorNotificationProvider"/>
   </extensions>
