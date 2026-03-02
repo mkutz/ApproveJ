@@ -32,7 +32,7 @@ wiremock = { module = "org.wiremock:wiremock", version.ref = "wiremock" }
 [plugins]
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version = "4.0.5" }
 asciidoctor-pdf = { id = "org.asciidoctor.jvm.pdf", version = "4.0.5" }
-jreleaser = { id = "org.jreleaser", version = "1.20.0" }
+jreleaser = { id = "org.jreleaser", version = "1.23.0" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.3.10" }
 maven-plugin-development = { id = "org.gradlex.maven-plugin-development", version = "1.0.3" }
 plugin-publish = { id = "com.gradle.plugin-publish", version = "2.0.0" }
