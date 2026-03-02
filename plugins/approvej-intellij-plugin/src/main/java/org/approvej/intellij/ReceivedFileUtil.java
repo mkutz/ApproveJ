@@ -7,6 +7,7 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.io.IOException;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,11 +19,16 @@ final class ReceivedFileUtil {
   private static final String RECEIVED = "-received";
   private static final String APPROVED = "-approved";
 
+  /** Returns {@code true} if the given filename contains {@code -received} before the extension. */
+  static boolean isReceivedFileName(@Nullable String filename) {
+    return receivedIndex(filename) >= 0;
+  }
+
   /**
    * Returns {@code true} if the given file's name contains {@code -received} before the extension.
    */
   static boolean isReceivedFile(@Nullable VirtualFile file) {
-    return file != null && receivedIndex(file.getName()) >= 0;
+    return file != null && isReceivedFileName(file.getName());
   }
 
   /**
@@ -46,6 +52,17 @@ final class ReceivedFileUtil {
   }
 
   /**
+   * Returns an ordered list of candidate approved filenames for the given received filename:
+   * approved name first, then base name (without {@code -approved}/{@code -received} infix).
+   */
+  static @NotNull List<String> approvedFileNameCandidates(@NotNull String receivedFileName) {
+    String approvedName = toApprovedFileName(receivedFileName);
+    String baseName = toBaseFileName(receivedFileName);
+    if (approvedName == null || baseName == null) return List.of();
+    return List.of(approvedName, baseName);
+  }
+
+  /**
    * Returns the sibling approved {@link VirtualFile} for the given received file, or {@code null}
    * if no approved file exists. Checks for both the default {@code -approved} infix and a custom
    * approved file without the infix.
@@ -53,13 +70,11 @@ final class ReceivedFileUtil {
   static @Nullable VirtualFile findApprovedFile(@NotNull VirtualFile receivedFile) {
     VirtualFile parent = receivedFile.getParent();
     if (parent == null) return null;
-    String approvedName = toApprovedFileName(receivedFile.getName());
-    if (approvedName == null) return null;
-    VirtualFile approvedFile = parent.findChild(approvedName);
-    if (approvedFile != null) return approvedFile;
-    String baseName = toBaseFileName(receivedFile.getName());
-    if (baseName == null) return null;
-    return parent.findChild(baseName);
+    for (String candidate : approvedFileNameCandidates(receivedFile.getName())) {
+      VirtualFile approvedFile = parent.findChild(candidate);
+      if (approvedFile != null) return approvedFile;
+    }
+    return null;
   }
 
   /** Opens IntelliJ's diff viewer comparing the received file with the approved file. */
