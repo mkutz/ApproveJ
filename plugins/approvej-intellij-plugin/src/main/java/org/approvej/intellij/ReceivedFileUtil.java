@@ -98,7 +98,7 @@ final class ReceivedFileUtil {
             if (parent == null) {
               return;
             }
-            VirtualFile approvedFile = parent.findChild(approvedName);
+            VirtualFile approvedFile = findApprovedFile(receivedFile);
             if (approvedFile == null) {
               approvedFile = parent.createChildData(ReceivedFileUtil.class, approvedName);
             }
