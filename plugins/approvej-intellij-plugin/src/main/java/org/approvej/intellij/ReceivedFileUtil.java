@@ -11,10 +11,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.BiConsumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,12 +22,26 @@ final class ReceivedFileUtil {
 
   private ReceivedFileUtil() {}
 
-  private static final Pattern RECEIVED_PATTERN =
-      Pattern.compile("(?<prefix>.+)-received(?<extension>\\..++)?$");
+  private static final String RECEIVED_INFIX = "-received";
+
+  /**
+   * Finds the last occurrence of {@code -received} in the filename and returns the index, or {@code
+   * -1} if the filename does not contain the infix in a valid position (not at the start, and
+   * followed only by an optional extension).
+   */
+  private static int findReceivedIndex(@NotNull String filename) {
+    int index = filename.lastIndexOf(RECEIVED_INFIX);
+    if (index <= 0) return -1;
+    String suffix = filename.substring(index + RECEIVED_INFIX.length());
+    if (suffix.isEmpty() || suffix.charAt(0) == '.') {
+      return index;
+    }
+    return -1;
+  }
 
   /** Returns {@code true} if the given filename contains {@code -received} before the extension. */
   static boolean isReceivedFileName(@NotNull String filename) {
-    return RECEIVED_PATTERN.matcher(filename).matches();
+    return findReceivedIndex(filename) > 0;
   }
 
   /**
@@ -45,11 +56,11 @@ final class ReceivedFileUtil {
    * is not a received filename.
    */
   static @Nullable String toApprovedFileName(@NotNull String filename) {
-    Matcher matcher = RECEIVED_PATTERN.matcher(filename);
-    if (!matcher.matches()) return null;
-    return matcher.group("prefix")
+    int index = findReceivedIndex(filename);
+    if (index < 0) return null;
+    return filename.substring(0, index)
         + "-approved"
-        + Objects.requireNonNullElse(matcher.group("extension"), "");
+        + filename.substring(index + RECEIVED_INFIX.length());
   }
 
   /**
@@ -57,9 +68,9 @@ final class ReceivedFileUtil {
    * given received filename, or {@code null} if the filename is not a received filename.
    */
   static @Nullable String toBaseFileName(@NotNull String filename) {
-    Matcher matcher = RECEIVED_PATTERN.matcher(filename);
-    if (!matcher.matches()) return null;
-    return matcher.group("prefix") + Objects.requireNonNullElse(matcher.group("extension"), "");
+    int index = findReceivedIndex(filename);
+    if (index < 0) return null;
+    return filename.substring(0, index) + filename.substring(index + RECEIVED_INFIX.length());
   }
 
   /**
