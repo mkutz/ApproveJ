@@ -76,21 +76,22 @@ The manual's structure should be
 7. Reviewing:
    What is reviewing and why do I want to do it?
    How can I manually/automatically review any diff between received and approved files?
-8. Cleanup:
+8. Extensions:
+   One sub-chapter for each of the extension [modules](modules) that are not [core](modules/core).
+   Why would I use this extension and how do I use it?
+   Needs to include dependency coordinates for Gradle and Maven.
+   Sub-chapters: JSON with Jackson, YAML with Jackson, HTTP.
+9. Cleanup:
    Why would I need to clean up, what's the problem with leftovers?
    How can I clean up leftovers?
    How can I batch-review all unapproved files in the project?
    How can I approve all unapproved files in the project?
-9. Modules:
-   One chapter for each of the [modules](modules) that are not [core](modules/core).
-   Why would I use this module and how do I use it?
-   Needs to include dependency coordinates for Gradle and Maven.
 10. Configuration:
-   Reference of all configuration parameters.
-   How do I generally change parameters and which way is the right one for what?
-   What does X do? What's its default value? Why would I change it?
+    Reference of all configuration parameters.
+    How do I generally change parameters and which way is the right one for what?
+    What does X do? What's its default value? Why would I change it?
 11. Cheat Sheet:
-   Very quick reference of things people are likely to want to look up later.
+    Very quick reference of things people are likely to want to look up later.
 
 The chapters' content should be written in a how-to guide style.
 
