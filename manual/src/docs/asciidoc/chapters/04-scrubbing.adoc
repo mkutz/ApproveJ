@@ -21,12 +21,12 @@ In the following example, the two dynamic properties are scrubbed with the built
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=scrubbing]
+include::../../../test/java/examples/java/ScrubbingDocTest.java[tag=scrubbing]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=scrubbing]
+include::../../../test/kotlin/examples/kotlin/ScrubbingDocTest.kt[tag=scrubbing]
 ----
 <1> replaces the published date with a numbered placeholder
 <2> replaces the id UUID with a numbered placeholder
@@ -35,7 +35,7 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=scrubbing]
 [source]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicsDocTest-scrubbing-approved.txt[]
+include::../../../test/java/examples/java/ScrubbingDocTest-scrubbing-approved.txt[]
 ----
 
 Generally a built-in `Scrubber` uses a replacement function that replaces all matches with a numbered placeholder in the form of `[<label> <counter>]` (e.g. `[uuid 1]`, `[date 2]`, …).
@@ -50,19 +50,19 @@ In case this isn't enough, you can also provide a custom link:{javadoc-url}/core
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=custom_scrubbing]
+include::../../../test/java/examples/java/ScrubbingDocTest.java[tag=custom_scrubbing]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=custom_scrubbing]
+include::../../../test/kotlin/examples/kotlin/ScrubbingDocTest.kt[tag=custom_scrubbing]
 ----
 <1> this custom `Scrubber` specifically replaces the number property of the `Contact` with a constant
 
 [source]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicsDocTest-custom_scrubbing-approved.txt[]
+include::../../../test/java/examples/java/ScrubbingDocTest-custom_scrubbing-approved.txt[]
 ----
 
 Note that this `Scrubber` is a `Scrubber<Contact>` and not a `Scrubber<String>`.

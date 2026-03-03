@@ -20,12 +20,12 @@ You can use this format by calling the `printedAs` method on the builder.
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=multi_line_string_format]
+include::../../../test/java/examples/java/PrintingDocTest.java[tag=multi_line_string_format]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=multi_line_string_format]
+include::../../../test/kotlin/examples/kotlin/PrintingDocTest.kt[tag=multi_line_string_format]
 ----
 <1> applies the `MultiLineStringPrinter` and returns a new `ApprovalBuilder<String>`
 
@@ -34,7 +34,7 @@ Now the approved file will look like this
 [source,text]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicsDocTest-multi_line_string_format-approved.txt[]
+include::../../../test/java/examples/java/PrintingDocTest-multi_line_string_format-approved.txt[]
 ----
 
 
@@ -46,12 +46,12 @@ You can provide a custom `Function<T, String>` to the builder's `printedBy` meth
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=custom_printer_function]
+include::../../../test/java/examples/java/PrintingDocTest.java[tag=custom_printer_function]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=custom_printer_function]
+include::../../../test/kotlin/examples/kotlin/PrintingDocTest.kt[tag=custom_printer_function]
 ----
 <1> applies the given `Function` and returns a new `ApprovalBuilder<String>`
 
@@ -60,7 +60,7 @@ So the content of the approved file will look like this
 [source]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicsDocTest-custom_printer_function-approved.txt[]
+include::../../../test/java/examples/java/PrintingDocTest-custom_printer_function-approved.txt[]
 ----
 
 
@@ -78,12 +78,12 @@ E.g. the following format will print a `Person` as a YAML string.
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=person_yaml_print_format]
+include::../../../testFixtures/java/examples/PersonYamlPrintFormat.java[tag=person_yaml_print_format]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=person_yaml_print_format]
+include::../../../test/kotlin/examples/kotlin/PrintingDocTest.kt[tag=person_yaml_print_format]
 ----
 
 The resulting file will look like this
@@ -91,7 +91,7 @@ The resulting file will look like this
 [source,yaml]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicsDocTest-custom_print_format-approved.yaml[]
+include::../../../test/java/examples/java/PrintingDocTest-custom_print_format-approved.yaml[]
 ----
 
 

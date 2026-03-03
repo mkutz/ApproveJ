@@ -25,12 +25,12 @@ You can choose the link:{javadoc-url}/core/org/approvej/review/FileReviewer.html
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_reviewedBy_fileReviewer]
+include::../../../test/java/examples/java/ReviewingDocTest.java[tag=approve_reviewedBy_fileReviewer]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_reviewedBy_fileReviewer]
+include::../../../test/kotlin/examples/kotlin/ReviewingDocTest.kt[tag=approve_reviewedBy_fileReviewer]
 ----
 <1> sets the given script to be executed to support the review
 <2> executes the review script if the received value differs from the approved value
@@ -48,12 +48,12 @@ You will probably want to check the changed files before committing them to vers
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_reviewedBy_automatic]
+include::../../../test/java/examples/java/ReviewingDocTest.java[tag=approve_reviewedBy_automatic]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_reviewedBy_automatic]
+include::../../../test/kotlin/examples/kotlin/ReviewingDocTest.kt[tag=approve_reviewedBy_automatic]
 ----
 
 

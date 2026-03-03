@@ -15,12 +15,12 @@ It also does not allow to use a diff tool to compare the result with the previou
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_inplace]
+include::../../../test/java/examples/java/ApprovingDocTest.java[tag=approve_inplace]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_inplace]
+include::../../../test/kotlin/examples/kotlin/ApprovingDocTest.kt[tag=approve_inplace]
 ----
 
 
@@ -56,12 +56,12 @@ You can make this explicit by using the link:{javadoc-url}/core/org/approvej/app
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_file_next_to_test]
+include::../../../test/java/examples/java/ApprovingDocTest.java[tag=approve_file_next_to_test]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_next_to_test]
+include::../../../test/kotlin/examples/kotlin/ApprovingDocTest.kt[tag=approve_file_next_to_test]
 ----
 <1> defines the `PathProvider` explicitly, same as just calling `byFile()`
 
@@ -86,12 +86,12 @@ In that case, you might want to provide a <<custom_print_format>> and override t
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_file_custom_extension]
+include::../../../test/java/examples/java/ApprovingDocTest.java[tag=approve_file_custom_extension]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_custom_extension]
+include::../../../test/kotlin/examples/kotlin/ApprovingDocTest.kt[tag=approve_file_custom_extension]
 ----
 <1> this printer will create a YAML version of the object
 <2> so it makes sense to change the filename extension, so your IDE will apply appropriate syntax highlighting
@@ -114,12 +114,12 @@ In that case, you can use the link:{javadoc-url}/core/org/approvej/approve/PathP
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_file_nextToTestInSubdirectory]
+include::../../../test/java/examples/java/ApprovingDocTest.java[tag=approve_file_nextToTestInSubdirectory]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_nextToTestInSubdirectory]
+include::../../../test/kotlin/examples/kotlin/ApprovingDocTest.kt[tag=approve_file_nextToTestInSubdirectory]
 ----
 
 .File structure with subdirectory
@@ -141,22 +141,22 @@ Otherwise, the word `received` will be added at the end of the filename.
 
 For example
 
-- `src/test/resources/BasicsDocTest-approve_file_approved_path-approved.yaml` ->
-`src/test/resources/BasicsDocTest-approve_file_approved_path-received.yaml`
-- `src/test/resources/BasicsDocTest-approve_file_approved_path.yaml` ->
-`src/test/resources/BasicsDocTest-approve_file_approved_path-received.yaml`.
+- `src/test/resources/ApprovingDocTest-approve_file_approved_path-approved.yaml` ->
+`src/test/resources/ApprovingDocTest-approve_file_approved_path-received.yaml`
+- `src/test/resources/ApprovingDocTest-approve_file_approved_path.yaml` ->
+`src/test/resources/ApprovingDocTest-approve_file_approved_path-received.yaml`.
 
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_file_approved_path]
+include::../../../test/java/examples/java/ApprovingDocTest.java[tag=approve_file_approved_path]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_file_approved_path]
+include::../../../test/kotlin/examples/kotlin/ApprovingDocTest.kt[tag=approve_file_approved_path]
 ----
-<1> this will expect the approved file at this path, the received file will be created next to it at `src/test/resources/BasicsDocTest-approve_file_approved_path-received.yaml`
+<1> this will expect the approved file at this path, the received file will be created next to it at `src/test/resources/ApprovingDocTest-approve_file_approved_path-received.yaml`
 
 .File structure with given path
 ----
@@ -188,7 +188,7 @@ To catch this mistake, you can annotate your test class with link:{javadoc-url}/
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=approval_test_annotation]
+include::../../../test/java/examples/java/ApprovingDocTest.java[tag=approval_test_annotation]
 class MyTest {
   // ...
 }
@@ -196,7 +196,7 @@ class MyTest {
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approval_test_annotation]
+include::../../../test/kotlin/examples/kotlin/ApprovingDocTest.kt[tag=approval_test_annotation]
 class MyTest {
   // ...
 }

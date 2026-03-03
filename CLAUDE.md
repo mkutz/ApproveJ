@@ -47,6 +47,58 @@ It provides a fluent API to compare actual values against previously approved "g
 - **manual** - AsciiDoc documentation (code samples included from tests in `manual/src/test`)
 
 
+## End-User Documentation
+
+The manual is used as ApproveJ's homepage.
+Any new feature needs to be documented.
+The manual's structure should be
+
+1. Introduction:
+   What is approval testing and why would I want to use it?
+   What is ApproveJ and why would I want to use it?
+2. Getting Started:
+   What do I need to have/do to use ApproveJ?
+3. Basics:
+   How do I make the simplest approvals without any additional concept?
+   How can I have multiple approvals per test?
+4. Printing:
+   What is printing, why should I care?
+   How do I use any of the built-in print formats?
+   How cab I implement my own Printer/PrintFormat?
+5. Scrubbing:
+   What is scrubbing and when do I want to do it, what alternatives exist?
+   How do I use built-in scrubbers, which are there?
+   How can I build my own scrubbers?
+6. Approving:
+   How can I change the way approvals are done?
+   How can I put approved/received files in different places?
+   How can I do approvals inplace (without files), and what are the trade-offs?
+7. Reviewing:
+   What is reviewing and why do I want to do it?
+   How can I manually/automatically review any diff between received and approved files?
+8. Cleanup:
+   Why would I need to clean up, what's the problem with leftovers?
+   How can I clean up leftovers?
+   How can I batch-review all unapproved files in the project?
+   How can I approve all unapproved files in the project?
+9. Modules:
+   One chapter for each of the [modules](modules) that are not [core](modules/core).
+   Why would I use this module and how do I use it?
+   Needs to include dependency coordinates for Gradle and Maven.
+10. Configuration:
+   Reference of all configuration parameters.
+   How do I generally change parameters and which way is the right one for what?
+   What does X do? What's its default value? Why would I change it?
+11. Cheat Sheet:
+   Very quick reference of things people are likely to want to look up later.
+
+The chapters' content should be written in a how-to guide style.
+
+If code is shown in the manual it should generally be included from the tests located in the manual module, to make sure it always works and gets automatically refactored along with the other code in the project.
+Each chapter should have a dedicated Code file in the Kotlin and the Java source sets.
+If there's a variant for Java and Kotlin, or Gradle and Maven, the code blocks should be put in tabs on top of each other to make the manual more compact.
+
+
 ## Architecture
 
 The approval flow is:
