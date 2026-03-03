@@ -117,7 +117,8 @@ final class DanglingApprovalInspection extends AbstractBaseUastLocalInspectionTo
         UElement parent = current.getUastParent();
         if (parent instanceof UQualifiedReferenceExpression qualRef) {
           UExpression selector = qualRef.getSelector();
-          if (selector instanceof UCallExpression selectorCall) {
+          if (selector instanceof UCallExpression selectorCall
+              && selectorCall.getMethodName() != null) {
             lastMethodName = selectorCall.getMethodName();
             current = qualRef;
             continue;
