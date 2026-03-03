@@ -3,8 +3,6 @@ package org.approvej.intellij;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -15,12 +13,7 @@ public final class ApproveReceivedAction extends AnAction {
 
   @Override
   public void update(@NotNull AnActionEvent event) {
-    VirtualFile file = event.getData(CommonDataKeys.VIRTUAL_FILE);
-    event
-        .getPresentation()
-        .setEnabledAndVisible(
-            ReceivedFileUtil.isReceivedFile(file)
-                && ReceivedFileUtil.findApprovedFile(file) != null);
+    event.getPresentation().setEnabledAndVisible(ReceivedFileUtil.isActionAvailable(event));
   }
 
   @Override
@@ -30,10 +23,8 @@ public final class ApproveReceivedAction extends AnAction {
 
   @Override
   public void actionPerformed(@NotNull AnActionEvent event) {
-    VirtualFile file = event.getData(CommonDataKeys.VIRTUAL_FILE);
-    if (file == null || event.getProject() == null) return;
-    VirtualFile approvedFile = ReceivedFileUtil.findApprovedFile(file);
-    if (approvedFile == null) return;
-    ReceivedFileUtil.approve(event.getProject(), file, approvedFile);
+    ReceivedFileUtil.withReceivedAndApproved(
+        event,
+        (received, approved) -> ReceivedFileUtil.approve(event.getProject(), received, approved));
   }
 }

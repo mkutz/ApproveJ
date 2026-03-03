@@ -9,6 +9,7 @@ import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ReceivedFileUtilPlatformTest extends BasePlatformTestCase {
 
@@ -102,6 +103,57 @@ public class ReceivedFileUtilPlatformTest extends BasePlatformTestCase {
     assertFalse(presentation.isEnabledAndVisible());
   }
 
+  public void testIsActionAvailable_received_with_approved() {
+    myFixture.addFileToProject("MyTest.byValue-received.txt", "received");
+    myFixture.addFileToProject("MyTest.byValue-approved.txt", "approved");
+    VirtualFile received = myFixture.findFileInTempDir("MyTest.byValue-received.txt");
+
+    assertTrue(ReceivedFileUtil.isActionAvailable(createEvent(received)));
+  }
+
+  public void testIsActionAvailable_received_without_approved() {
+    myFixture.addFileToProject("MyTest.byValue-received.txt", "received");
+    VirtualFile received = myFixture.findFileInTempDir("MyTest.byValue-received.txt");
+
+    assertFalse(ReceivedFileUtil.isActionAvailable(createEvent(received)));
+  }
+
+  public void testIsActionAvailable_non_received_file() {
+    myFixture.addFileToProject("MyTest.java", "class MyTest {}");
+    VirtualFile file = myFixture.findFileInTempDir("MyTest.java");
+
+    assertFalse(ReceivedFileUtil.isActionAvailable(createEvent(file)));
+  }
+
+  public void testWithReceivedAndApproved_invokes_action() {
+    myFixture.addFileToProject("MyTest.byValue-received.txt", "received");
+    myFixture.addFileToProject("MyTest.byValue-approved.txt", "approved");
+    VirtualFile received = myFixture.findFileInTempDir("MyTest.byValue-received.txt");
+    AtomicReference<VirtualFile> capturedReceived = new AtomicReference<>();
+    AtomicReference<VirtualFile> capturedApproved = new AtomicReference<>();
+
+    ReceivedFileUtil.withReceivedAndApproved(
+        createEvent(received),
+        (r, a) -> {
+          capturedReceived.set(r);
+          capturedApproved.set(a);
+        });
+
+    assertEquals("MyTest.byValue-received.txt", capturedReceived.get().getName());
+    assertEquals("MyTest.byValue-approved.txt", capturedApproved.get().getName());
+  }
+
+  public void testWithReceivedAndApproved_does_nothing_without_approved() {
+    myFixture.addFileToProject("MyTest.byValue-received.txt", "received");
+    VirtualFile received = myFixture.findFileInTempDir("MyTest.byValue-received.txt");
+    AtomicReference<VirtualFile> capturedReceived = new AtomicReference<>();
+
+    ReceivedFileUtil.withReceivedAndApproved(
+        createEvent(received), (r, a) -> capturedReceived.set(r));
+
+    assertNull(capturedReceived.get());
+  }
+
   public void testApprove_copies_content_and_deletes_received() throws Exception {
     myFixture.addFileToProject("MyTest.byValue-received.txt", "new content");
     myFixture.addFileToProject("MyTest.byValue-approved.txt", "old content");
@@ -114,13 +166,17 @@ public class ReceivedFileUtilPlatformTest extends BasePlatformTestCase {
     assertEquals("new content", new String(approved.contentsToByteArray()));
   }
 
-  private Presentation updateAction(AnAction action, VirtualFile file) {
+  private AnActionEvent createEvent(VirtualFile file) {
     var dataContext =
         SimpleDataContext.builder()
             .add(CommonDataKeys.VIRTUAL_FILE, file)
             .add(CommonDataKeys.PROJECT, getProject())
             .build();
-    var event = AnActionEvent.createEvent(dataContext, null, "test", ActionUiKind.NONE, null);
+    return AnActionEvent.createEvent(dataContext, null, "test", ActionUiKind.NONE, null);
+  }
+
+  private Presentation updateAction(AnAction action, VirtualFile file) {
+    var event = createEvent(file);
     ActionUtil.performDumbAwareUpdate(action, event, false);
     return event.getPresentation();
   }

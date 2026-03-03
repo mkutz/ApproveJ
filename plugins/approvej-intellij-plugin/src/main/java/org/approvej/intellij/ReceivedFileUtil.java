@@ -3,6 +3,8 @@ package org.approvej.intellij;
 import com.intellij.diff.DiffContentFactory;
 import com.intellij.diff.DiffManager;
 import com.intellij.diff.requests.SimpleDiffRequest;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
@@ -10,6 +12,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
@@ -83,6 +86,28 @@ final class ReceivedFileUtil {
       if (approvedFile != null) return approvedFile;
     }
     return null;
+  }
+
+  /**
+   * Returns {@code true} if the event's virtual file is a received file with an existing approved
+   * counterpart.
+   */
+  static boolean isActionAvailable(@NotNull AnActionEvent event) {
+    VirtualFile file = event.getData(CommonDataKeys.VIRTUAL_FILE);
+    return isReceivedFile(file) && findApprovedFile(file) != null;
+  }
+
+  /**
+   * Extracts the received and approved files from the event and passes them to the given action.
+   * Does nothing if the files cannot be resolved.
+   */
+  static void withReceivedAndApproved(
+      @NotNull AnActionEvent event, @NotNull BiConsumer<VirtualFile, VirtualFile> action) {
+    VirtualFile file = event.getData(CommonDataKeys.VIRTUAL_FILE);
+    if (file == null || event.getProject() == null) return;
+    VirtualFile approvedFile = findApprovedFile(file);
+    if (approvedFile == null) return;
+    action.accept(file, approvedFile);
   }
 
   /** Opens IntelliJ's diff viewer comparing the received file with the approved file. */
