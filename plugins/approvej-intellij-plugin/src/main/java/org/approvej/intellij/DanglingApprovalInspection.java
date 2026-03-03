@@ -23,6 +23,7 @@ import org.jetbrains.uast.UExpression;
 import org.jetbrains.uast.ULambdaExpression;
 import org.jetbrains.uast.UMethod;
 import org.jetbrains.uast.UQualifiedReferenceExpression;
+import org.jetbrains.uast.visitor.AbstractUastVisitor;
 
 /**
  * Inspection that detects dangling {@code approve()} calls that are not concluded with a terminal
@@ -38,44 +39,39 @@ final class DanglingApprovalInspection extends AbstractBaseUastLocalInspectionTo
   @Override
   public ProblemDescriptor @Nullable [] checkMethod(
       @NotNull UMethod method, @NotNull InspectionManager manager, boolean isOnTheFly) {
-    List<ProblemDescriptor> problems = new ArrayList<>();
-    method.accept(
-        new DanglingApprovalVisitor() {
-          @Override
-          void onDanglingApproval(PsiElement approveElement, PsiElement chainEndElement) {
-            problems.add(
-                manager.createProblemDescriptor(
-                    approveElement,
-                    chainEndElement,
-                    "Dangling approval: call by(), byFile(), or byValue() to conclude",
-                    ProblemHighlightType.WARNING,
-                    isOnTheFly,
-                    new AppendTerminalMethodFix("byFile()"),
-                    new AppendTerminalMethodFix("byValue(\"\")")));
-          }
-        });
+    var visitor = new DanglingApprovalVisitor();
+    method.accept(visitor);
+    List<ProblemDescriptor> problems =
+        visitor.danglingApprovals.stream()
+            .map(
+                dangling ->
+                    manager.createProblemDescriptor(
+                        dangling.approveElement,
+                        dangling.chainEndElement,
+                        "Dangling approval: call by(), byFile(), or byValue() to conclude",
+                        ProblemHighlightType.WARNING,
+                        isOnTheFly,
+                        new AppendTerminalMethodFix("byFile()"),
+                        new AppendTerminalMethodFix("byValue(\"\")")))
+            .toList();
     return problems.isEmpty() ? null : problems.toArray(ProblemDescriptor.EMPTY_ARRAY);
   }
 
   @Override
   public @NotNull String getStaticDescription() {
-    return "Reports <code>approve()</code> calls on <code>ApprovalBuilder</code> that are not "
-        + "concluded with a terminal method (<code>by()</code>, <code>byFile()</code>, or "
-        + "<code>byValue()</code>). A missing terminal call means the approval is never actually "
-        + "checked, causing a <code>DanglingApprovalError</code> at runtime.";
+    return """
+    Reports <code>approve()</code> calls on <code>ApprovalBuilder</code> that are not \
+    concluded with a terminal method (<code>by()</code>, <code>byFile()</code>, or \
+    <code>byValue()</code>). A missing terminal call means the approval is never actually \
+    checked, causing a <code>DanglingApprovalError</code> at runtime.\
+    """;
   }
 
-  private static class AppendTerminalMethodFix implements LocalQuickFix {
-
-    private final String methodCall;
-
-    AppendTerminalMethodFix(String methodCall) {
-      this.methodCall = methodCall;
-    }
+  private record AppendTerminalMethodFix(String methodCall) implements LocalQuickFix {
 
     @Override
     public @NotNull String getName() {
-      return "Conclude with ." + methodCall;
+      return "Conclude with .%s".formatted(methodCall);
     }
 
     @Override
@@ -92,15 +88,16 @@ final class DanglingApprovalInspection extends AbstractBaseUastLocalInspectionTo
           PsiDocumentManager.getInstance(project).getDocument(chainEnd.getContainingFile());
       if (document == null) return;
 
-      document.insertString(chainEnd.getTextRange().getEndOffset(), "." + methodCall);
+      document.insertString(chainEnd.getTextRange().getEndOffset(), ".%s".formatted(methodCall));
       PsiDocumentManager.getInstance(project).commitDocument(document);
     }
   }
 
-  private abstract static class DanglingApprovalVisitor
-      extends org.jetbrains.uast.visitor.AbstractUastVisitor {
+  private record DanglingApproval(PsiElement approveElement, PsiElement chainEndElement) {}
 
-    abstract void onDanglingApproval(PsiElement approveElement, PsiElement chainEndElement);
+  private static final class DanglingApprovalVisitor extends AbstractUastVisitor {
+
+    final List<DanglingApproval> danglingApprovals = new ArrayList<>();
 
     @Override
     public boolean visitCallExpression(@NotNull UCallExpression node) {
@@ -141,7 +138,7 @@ final class DanglingApprovalInspection extends AbstractBaseUastLocalInspectionTo
       if (approveSourcePsi == null) return false;
       if (chainEndSourcePsi == null) chainEndSourcePsi = approveSourcePsi;
 
-      onDanglingApproval(approveSourcePsi, chainEndSourcePsi);
+      danglingApprovals.add(new DanglingApproval(approveSourcePsi, chainEndSourcePsi));
       return false;
     }
   }

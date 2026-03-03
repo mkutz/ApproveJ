@@ -8,6 +8,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,12 +19,12 @@ final class ReceivedFileUtil {
 
   private ReceivedFileUtil() {}
 
-  private static final String RECEIVED = "-received";
-  private static final String APPROVED = "-approved";
+  private static final Pattern RECEIVED_PATTERN =
+      Pattern.compile("(?<prefix>.+)-received(?<extension>\\..+)?$");
 
   /** Returns {@code true} if the given filename contains {@code -received} before the extension. */
-  static boolean isReceivedFileName(@Nullable String filename) {
-    return receivedIndex(filename) >= 0;
+  static boolean isReceivedFileName(@NotNull String filename) {
+    return RECEIVED_PATTERN.matcher(filename).matches();
   }
 
   /**
@@ -35,20 +38,22 @@ final class ReceivedFileUtil {
    * Returns the approved filename for the given received filename, or {@code null} if the filename
    * is not a received filename.
    */
-  static @Nullable String toApprovedFileName(@Nullable String filename) {
-    int index = receivedIndex(filename);
-    if (index < 0) return null;
-    return filename.substring(0, index) + APPROVED + filename.substring(index + RECEIVED.length());
+  static @Nullable String toApprovedFileName(@NotNull String filename) {
+    Matcher matcher = RECEIVED_PATTERN.matcher(filename);
+    if (!matcher.matches()) return null;
+    return matcher.group("prefix")
+        + "-approved"
+        + Objects.requireNonNullElse(matcher.group("extension"), "");
   }
 
   /**
    * Returns the base filename (without any {@code -received} or {@code -approved} infix) for the
    * given received filename, or {@code null} if the filename is not a received filename.
    */
-  static @Nullable String toBaseFileName(@Nullable String filename) {
-    int index = receivedIndex(filename);
-    if (index < 0) return null;
-    return filename.substring(0, index) + filename.substring(index + RECEIVED.length());
+  static @Nullable String toBaseFileName(@NotNull String filename) {
+    Matcher matcher = RECEIVED_PATTERN.matcher(filename);
+    if (!matcher.matches()) return null;
+    return matcher.group("prefix") + Objects.requireNonNullElse(matcher.group("extension"), "");
   }
 
   /**
@@ -78,58 +83,40 @@ final class ReceivedFileUtil {
   }
 
   /** Opens IntelliJ's diff viewer comparing the received file with the approved file. */
-  static void openDiff(@NotNull Project project, @NotNull VirtualFile receivedFile) {
-    VirtualFile approvedFile = findApprovedFile(receivedFile);
+  static void openDiff(
+      @NotNull Project project,
+      @NotNull VirtualFile receivedFile,
+      @NotNull VirtualFile approvedFile) {
     var contentFactory = DiffContentFactory.getInstance();
-    var receivedContent = contentFactory.create(project, receivedFile);
-    var approvedContent =
-        approvedFile != null
-            ? contentFactory.create(project, approvedFile)
-            : contentFactory.createEmpty();
     var request =
         new SimpleDiffRequest(
             "ApproveJ: " + receivedFile.getName(),
-            approvedContent,
-            receivedContent,
-            approvedFile != null ? approvedFile.getName() : "(no approved file)",
+            contentFactory.create(project, approvedFile),
+            contentFactory.create(project, receivedFile),
+            approvedFile.getName(),
             receivedFile.getName());
     DiffManager.getInstance().showDiff(project, request);
   }
 
   /**
-   * Copies the received file content to the approved file (creating it if needed) and deletes the
-   * received file. The operation is wrapped in a {@link WriteCommandAction} to support undo.
+   * Copies the received file content to the approved file and deletes the received file. The
+   * operation is wrapped in a {@link WriteCommandAction} to support undo.
    */
-  static void approve(@NotNull Project project, @NotNull VirtualFile receivedFile) {
-    String approvedName = toApprovedFileName(receivedFile.getName());
-    if (approvedName == null) return;
+  static void approve(
+      @NotNull Project project,
+      @NotNull VirtualFile receivedFile,
+      @NotNull VirtualFile approvedFile) {
     WriteCommandAction.runWriteCommandAction(
         project,
         "Approve Received",
         null,
         () -> {
           try {
-            VirtualFile parent = receivedFile.getParent();
-            if (parent == null) {
-              return;
-            }
-            VirtualFile approvedFile = findApprovedFile(receivedFile);
-            if (approvedFile == null) {
-              approvedFile = parent.createChildData(ReceivedFileUtil.class, approvedName);
-            }
             approvedFile.setBinaryContent(receivedFile.contentsToByteArray());
             receivedFile.delete(ReceivedFileUtil.class);
           } catch (IOException e) {
             throw new RuntimeException("Failed to approve received file", e);
           }
         });
-  }
-
-  private static int receivedIndex(String filename) {
-    if (filename == null) return -1;
-    int receivedDotIndex = filename.lastIndexOf(RECEIVED + ".");
-    if (receivedDotIndex >= 0) return receivedDotIndex;
-    if (filename.endsWith(RECEIVED)) return filename.length() - RECEIVED.length();
-    return -1;
   }
 }

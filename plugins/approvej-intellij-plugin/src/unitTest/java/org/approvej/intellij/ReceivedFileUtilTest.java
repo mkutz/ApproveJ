@@ -17,11 +17,6 @@ class ReceivedFileUtilTest {
   }
 
   @Test
-  void isReceivedFileName_null() {
-    assertThat(ReceivedFileUtil.isReceivedFileName(null)).isFalse();
-  }
-
-  @Test
   void toApprovedFileName() {
     assertThat(ReceivedFileUtil.toApprovedFileName("MyTest.byValue-received.txt"))
         .isEqualTo("MyTest.byValue-approved.txt");
@@ -45,11 +40,6 @@ class ReceivedFileUtilTest {
   }
 
   @Test
-  void toApprovedFileName_null() {
-    assertThat(ReceivedFileUtil.toApprovedFileName(null)).isNull();
-  }
-
-  @Test
   void toBaseFileName() {
     assertThat(ReceivedFileUtil.toBaseFileName("MyTest.byValue-received.txt"))
         .isEqualTo("MyTest.byValue.txt");
@@ -70,11 +60,6 @@ class ReceivedFileUtilTest {
   @Test
   void toBaseFileName_not_received() {
     assertThat(ReceivedFileUtil.toBaseFileName("MyTest.java")).isNull();
-  }
-
-  @Test
-  void toBaseFileName_null() {
-    assertThat(ReceivedFileUtil.toBaseFileName(null)).isNull();
   }
 
   @Test

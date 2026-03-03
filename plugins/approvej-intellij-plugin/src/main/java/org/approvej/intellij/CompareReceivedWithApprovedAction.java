@@ -13,7 +13,11 @@ public final class CompareReceivedWithApprovedAction extends AnAction {
   @Override
   public void update(@NotNull AnActionEvent event) {
     VirtualFile file = event.getData(CommonDataKeys.VIRTUAL_FILE);
-    event.getPresentation().setEnabledAndVisible(ReceivedFileUtil.isReceivedFile(file));
+    event
+        .getPresentation()
+        .setEnabledAndVisible(
+            ReceivedFileUtil.isReceivedFile(file)
+                && ReceivedFileUtil.findApprovedFile(file) != null);
   }
 
   @Override
@@ -25,6 +29,8 @@ public final class CompareReceivedWithApprovedAction extends AnAction {
   public void actionPerformed(@NotNull AnActionEvent event) {
     VirtualFile file = event.getData(CommonDataKeys.VIRTUAL_FILE);
     if (file == null || event.getProject() == null) return;
-    ReceivedFileUtil.openDiff(event.getProject(), file);
+    VirtualFile approvedFile = ReceivedFileUtil.findApprovedFile(file);
+    if (approvedFile == null) return;
+    ReceivedFileUtil.openDiff(event.getProject(), file, approvedFile);
   }
 }

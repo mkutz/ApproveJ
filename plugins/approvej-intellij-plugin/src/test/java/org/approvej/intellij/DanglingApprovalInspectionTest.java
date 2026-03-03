@@ -11,7 +11,7 @@ public class DanglingApprovalInspectionTest extends LightJavaCodeInsightFixtureT
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    myFixture.enableInspections(DanglingApprovalInspection.class);
+    myFixture.enableInspections(new DanglingApprovalInspection());
     myFixture.addClass(
         """
         package org.approvej;

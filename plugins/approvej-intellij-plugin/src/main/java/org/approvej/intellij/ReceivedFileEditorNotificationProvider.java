@@ -21,12 +21,19 @@ public final class ReceivedFileEditorNotificationProvider
   public @Nullable Function<? super FileEditor, ? extends JComponent> collectNotificationData(
       @NotNull Project project, @NotNull VirtualFile file) {
     if (!ReceivedFileUtil.isReceivedFile(file)) return null;
+    VirtualFile approvedFile = ReceivedFileUtil.findApprovedFile(file);
     return fileEditor -> {
       var panel = new EditorNotificationPanel(fileEditor, EditorNotificationPanel.Status.Info);
-      panel.setText("This is an ApproveJ received file that has not been approved yet.");
-      panel.createActionLabel(
-          "Compare with Approved", () -> ReceivedFileUtil.openDiff(project, file));
-      panel.createActionLabel("Approve", () -> ReceivedFileUtil.approve(project, file));
+      if (approvedFile != null) {
+        panel.setText("This is an ApproveJ received file that has not been approved yet.");
+        panel.createActionLabel(
+            "Compare with Approved", () -> ReceivedFileUtil.openDiff(project, file, approvedFile));
+        panel.createActionLabel(
+            "Approve", () -> ReceivedFileUtil.approve(project, file, approvedFile));
+      } else {
+        panel.setText(
+            "This is an ApproveJ received file. No matching approved file was found nearby.");
+      }
       return panel;
     };
   }
