@@ -1,4 +1,5 @@
-= Basics
+[id=basics]
+= Basics -- your first approval test
 
 The general entry point to start an approval is the static initializer `approve` of the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`].
 It takes the object which you want to approve as an argument and returns a builder to configure the approval with a fluent API.

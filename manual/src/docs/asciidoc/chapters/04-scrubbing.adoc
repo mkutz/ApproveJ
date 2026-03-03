@@ -4,7 +4,14 @@
 Sometimes you might not be able to control the exact output of the object you want to approve.
 For example, if the result object contains a timestamp or a generated ID, you might want to ignore these for the approval.
 
+If you can control the test data, you may prefer to use fixed values (e.g. a constant UUID or a frozen clock) instead of scrubbing.
+Scrubbing is the right choice when the dynamic data comes from code you do not control, or when fixing the data would make the test less realistic.
+
 You can do this by using the `scrubbedOf` method of the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`] and provide a link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber`]/`UnaryOperator<T>` implementation.
+
+NOTE: Most built-in scrubbers are `Scrubber<String>` implementations — they work on the string representation, not on the original object.
+If you are approving a POJO, you need to <<printing,print>> first so the scrubbers can match against the resulting text.
+Call `printed()` to apply the <<default_print_format,configured default print format>>, or use `printedAs()`/`printedBy()` to choose one explicitly.
 
 For instance, in the following `BlogPost` POJO there are two generated fields:
 
@@ -21,12 +28,12 @@ In the following example, the two dynamic properties are scrubbed with the built
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=scrubbing]
+include::../../../test/java/examples/java/ScrubbingDocTest.java[tag=scrubbing]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=scrubbing]
+include::../../../test/kotlin/examples/kotlin/ScrubbingDocTest.kt[tag=scrubbing]
 ----
 <1> replaces the published date with a numbered placeholder
 <2> replaces the id UUID with a numbered placeholder
@@ -35,14 +42,228 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=scrubbing]
 [source]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicsDocTest-scrubbing-approved.txt[]
+include::../../../test/java/examples/java/ScrubbingDocTest-scrubbing-approved.txt[]
 ----
 
-Generally a built-in `Scrubber` uses a replacement function that replaces all matches with a numbered placeholder in the form of `[<label> <counter>]` (e.g. `[uuid 1]`, `[date 2]`, …).
-Note that two matches of the same (e.g. the same UUID in two places) will be replaced with the same placeholder, so you can still see that two scrubbed values were equal.
+[id=built_in_scrubbers]
+== Available built-in Scrubbers
+
+All built-in link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber`] implementations are available via the link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html[`Scrubbers`] utility class.
+
+[id=built_in_scrubbers_string]
+=== String Scrubbers
+
+[cols="2,2,1"]
+|===
+|Factory Method |Description |Example Match
+
+|`strings(String first, String... more)`
+|Scrubs exact occurrences of the given strings.
+Useful when dynamic values are known upfront (e.g. from test setup).
+|`strings("Jane")` matches `Jane`
+
+|`stringsMatching(String pattern)` / `stringsMatching(Pattern pattern)`
+|Scrubs all substrings matching a regular expression.
+|`stringsMatching("\\d\{5}")` matches `12345`
+
+|`uuids()`
+|Scrubs UUID strings.
+|`550e8400-e29b-41d4-a716-446655440000`
+|===
 
 
-== Custom `Scrubber`
+[id=built_in_scrubbers_date_time]
+=== Date/Time Scrubbers
+
+All date/time scrubbers use a `DateTimeFormatter` pattern internally to generate a matching regex.
+Use `dateTimeFormat(pattern)` for custom patterns, or one of the pre-configured methods below.
+
+[cols="2,2,1"]
+|===
+|Factory Method |Description |Example Match
+
+|`dateTimeFormat(String pattern)`
+|Scrubs date/time strings matching a `DateTimeFormatter` pattern.
+|`dateTimeFormat("dd.MM.yyyy")` matches `25.02.2019`
+
+|`dateTimeFormat(String pattern, Locale locale)`
+|Same as above with a specific locale for locale-sensitive patterns (e.g. month names).
+|`dateTimeFormat("d MMM yyyy", Locale.US)` matches `25 Feb 2019`
+
+|`isoLocalDates()`
+|Scrubs ISO local dates (`yyyy-MM-dd`).
+|`2019-02-25`
+
+|`isoOffsetDates()`
+|Scrubs ISO dates with UTC offset (`yyyy-MM-ddXXX`).
+|`2019-02-25+02:00`
+
+|`isoDates()`
+|Scrubs ISO dates with optional offset.
+|`2019-02-25` or `2019-02-25+02:00`
+
+|`isoLocalTimes()`
+|Scrubs ISO local times with optional fractional seconds.
+|`12:34:56` or `12:34:56.123`
+
+|`isoOffsetTimes()`
+|Scrubs ISO times with UTC offset.
+|`12:34:56+02:00`
+
+|`isoTimes()`
+|Scrubs ISO times with optional offset.
+|`12:34:56` or `12:34:56.123+02:00`
+
+|`isoLocalDateTimes()`
+|Scrubs ISO local date-times.
+|`2019-02-25T12:34:56`
+
+|`isoOffsetDateTimes()`
+|Scrubs ISO date-times with UTC offset.
+|`2019-02-25T12:34:56+02:00`
+
+|`isoZonedDateTimes()`
+|Scrubs ISO date-times with offset and time zone ID.
+|`2019-02-25T12:34:56+02:00[Europe/Berlin]`
+
+|`isoDateTimes()`
+|Scrubs ISO date-times with optional offset and time zone.
+Matches all of the above date-time variants.
+|`2019-02-25T12:34:56`
+
+|`isoInstants()`
+|Scrubs ISO instants (UTC timestamps).
+|`2019-02-25T12:34:56.789Z`
+
+|`isoOrdinalDates()`
+|Scrubs ISO ordinal dates (day of year).
+|`2019-056`
+
+|`isoWeekDates()`
+|Scrubs ISO week dates.
+|`2019-W09-1`
+
+|`basicIsoDates()`
+|Scrubs basic ISO dates without separators.
+|`20190225`
+
+|`rfc1123DateTimes()`
+|Scrubs RFC 1123 date-times (HTTP headers). Always uses `Locale.US`.
+|`Mon, 25 Feb 2019 12:34:56 GMT`
+|===
+
+
+[id=built_in_scrubbers_field]
+=== Field Scrubbers
+
+[cols="2,3"]
+|===
+|Factory Method |Description
+
+|`field(Class<T> type, String fieldName)`
+|Replaces the value of a named field with `null` on objects of the given type.
+Works on the original object _before_ printing — use with `scrubbedOf` before `printedAs`.
+|===
+
+
+[id=built_in_scrubbers_extension]
+=== Extension Scrubbers
+
+The following scrubbers are provided by extension modules.
+See <<extensions>> for details and dependency coordinates.
+
+[cols="2,3"]
+|===
+|Factory Method |Description
+
+|`JsonPointerScrubber.jsonPointer(String pointer)`
+|Scrubs a JSON node identified by a https://datatracker.ietf.org/doc/html/rfc6901[JSON Pointer] path (e.g. `"/id"`).
+Useful when only some values of a matching pattern need scrubbing.
+
+|`HttpScrubbers.headerValue(String headerName)`
+|Scrubs the value of an HTTP header by name.
+
+|`HttpScrubbers.hostHeaderValue()`
+|Scrubs the `Host` header value (varies by port).
+
+|`HttpScrubbers.userAgentHeaderValue()`
+|Scrubs the `User-agent` header value (varies by JVM version).
+|===
+
+
+[id=replacements]
+== Replacements -- control what scrubbed values become
+
+By default, built-in scrubbers replace each match with a numbered placeholder like `[uuid 1]`, `[datetime 1]`.
+If the same value appears more than once, it gets the same number, so you can still see that two scrubbed values were equal.
+
+You can change this behavior by calling the `replacement` method on a scrubber to choose a different link:{javadoc-url}/core/org/approvej/scrub/Replacement.html[`Replacement`] function.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/ScrubbingDocTest.java[tag=replacement_labeled]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/ScrubbingDocTest.kt[tag=replacement_labeled]
+----
+<1> replaces the UUID with a fixed label `[id]` instead of the default `[uuid 1]`
+<2> masks the date-time, replacing each digit with `1` and each letter with `a` or `A`
+
+[source]
+.Approved file
+----
+include::../../../test/java/examples/java/ScrubbingDocTest-replacement_labeled-approved.txt[]
+----
+
+The following replacement functions are available via the link:{javadoc-url}/core/org/approvej/scrub/Replacements.html[`Replacements`] utility class:
+
+[cols="2,2,1"]
+|===
+|Factory Method |Description |Example Output
+
+|`numbered(String label)`
+|Replaces with `[label #]` where `#` is the number of the distinct match.
+This is the default for built-in scrubbers.
+|`[uuid 1]`, `[uuid 2]`
+
+|`numbered()`
+|Same as `numbered("scrubbed")`.
+|`[scrubbed 1]`, `[scrubbed 2]`
+
+|`labeled(String label)`
+|Replaces every match with the same fixed label `[label]`, regardless of how many distinct values are found.
+|`[id]`
+
+|`string(String replacement)`
+|Replaces every match with the given static string.
+|`"***"`
+
+|`relativeDate()`
+|Replaces date matches with a human-readable relative duration.
+Only available on <<built_in_scrubbers_date_time,date/time scrubbers>>.
+|`[today]`, `[yesterday]`, `[in 13 days]`
+
+|`relativeDateTime()`
+|Replaces date-time matches with a human-readable relative duration including time.
+Only available on <<built_in_scrubbers_date_time,date/time scrubbers>>.
+|`[now]`, `[10s ago]`, `[in 1d 23h 59m 59s]`
+
+|`masking()`
+|Masks each character: uppercase letters become `A`, lowercase become `a`, digits become `1`.
+Preserves the structure of the original value.
+Good for fixed-length strings like order numbers or date patterns.
+|`"ORD-123"` -> `"AAA-111"`
+|===
+
+You can also implement a custom `Replacement<String>` as a lambda.
+It receives the matched string and a count (the number of the distinct match) and returns the replacement.
+
+
+[id=custom_scrubber]
+== Build your own Scrubber
 
 The link:{javadoc-url}/core/org/approvej/scrub/RegexScrubber.html[`RegexScrubber`] already allows for a lot of special custom cases.
 In case this isn't enough, you can also provide a custom link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber<T>`]/`UnaryOperator<T>` implementation to the builder's `scrubbedOf` method.
@@ -50,30 +271,22 @@ In case this isn't enough, you can also provide a custom link:{javadoc-url}/core
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=custom_scrubbing]
+include::../../../test/java/examples/java/ScrubbingDocTest.java[tag=custom_scrubbing]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=custom_scrubbing]
+include::../../../test/kotlin/examples/kotlin/ScrubbingDocTest.kt[tag=custom_scrubbing]
 ----
 <1> this custom `Scrubber` specifically replaces the number property of the `Contact` with a constant
 
 [source]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicsDocTest-custom_scrubbing-approved.txt[]
+include::../../../test/java/examples/java/ScrubbingDocTest-custom_scrubbing-approved.txt[]
 ----
 
 Note that this `Scrubber` is a `Scrubber<Contact>` and not a `Scrubber<String>`.
 Hence, it is necessary to apply it _before_ the `Printer` is applied.
 
 In case you want to reuse the `Scrubber`, you can also define in a separate class implementing the link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber<T>`] interface.
-
-
-== Built-In `Scrubbers` & `Replacements`
-
-All built-in link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber`] implementations are available via the link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html[`Scrubbers`] utility class.
-
-Note that link:{javadoc-url}/core/org/approvej/scrub/RegexScrubber.html[RegexScrubber] implementations also allow to change the link:{javadoc-url}/core/org/approvej/scrub/Replacement.html[`Replacement`] function.
-Built-in implementation can be found in the link:{javadoc-url}/core/org/approvej/scrub/Replacements.html[`Replacements`] utility class.

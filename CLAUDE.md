@@ -47,6 +47,80 @@ It provides a fluent API to compare actual values against previously approved "g
 - **manual** - AsciiDoc documentation (code samples included from tests in `manual/src/test`)
 
 
+## End-User Documentation
+
+The manual is used as ApproveJ's homepage.
+Any new feature needs to be documented.
+The manual's structure should be
+
+1. Introduction:
+   What is approval testing and why would I want to use it?
+   What is ApproveJ and why would I want to use it?
+   Show a before/after comparison (traditional assertions vs. approval test).
+2. Getting Started:
+   What do I need to have/do to use ApproveJ?
+3. Basics:
+   How do I make the simplest approvals without any additional concept?
+   How can I have multiple approvals per test?
+4. Printing:
+   What is printing, why should I care?
+   How do I use any of the built-in print formats?
+   How can I implement my own Printer/PrintFormat?
+   How do I configure a global default print format?
+5. Scrubbing:
+   What is scrubbing and when do I want to do it, what alternatives exist?
+   Which built-in scrubbers are there and what does each one match?
+   What are replacements and how do I change what scrubbed values become?
+   How can I build my own scrubbers?
+6. Approving:
+   How can I change the way approvals are done?
+   How can I put approved/received files in different places?
+   How can I do approvals inplace (without files), and what are the trade-offs?
+7. Reviewing:
+   What is reviewing and why do I want to do it?
+   How do I configure a diff tool (with practical examples for common IDEs/tools)?
+   How can I automatically review any diff between received and approved files?
+8. Extensions:
+   One sub-chapter for each of the extension [modules](modules) that are not [core](modules/core).
+   Why would I use this extension and how do I use it?
+   Needs to include dependency coordinates for Gradle and Maven.
+   Sub-chapters: JSON with Jackson (print POJOs as JSON, pretty print JSON strings, JSON field scrubbing),
+   YAML with Jackson (print POJOs as YAML),
+   HTTP (catch integration risks by approving outgoing HTTP requests).
+9. Build Plugins:
+   How do I set up the Gradle/Maven plugin?
+   How can I clean up leftover approved files?
+   How can I batch-review all unapproved files in the project?
+   How can I approve all unapproved files in the project?
+   How does the inventory work? How can I disable it?
+10. Configuration:
+    How are configuration sources resolved (priority order)?
+    How can I register custom print formats and reviewers via SPI?
+    (Individual properties are documented in their respective chapters and the cheat sheet.)
+11. Cheat Sheet:
+    Very quick reference of things people are likely to want to look up later.
+12. API Reference:
+    Links to the Javadoc for each module.
+
+### Manual Content Principles
+
+The chapters' content should be written in a how-to guide style.
+
+- **Configuration first**: When a feature can be configured globally (print formats, reviewers), lead with configuration and show `printedAs()`/`reviewedBy()` as per-test overrides.
+- **Common before expert**: Present built-in/common content before custom/advanced content (e.g., built-in scrubbers before custom scrubbers).
+- **Print format sections should mention global configuration**: Each section describing a print format (including in extension chapters) should show how to set it as the default via `approvej.properties`.
+
+If code is shown in the manual it should generally be included from the tests located in the manual module, to make sure it always works and gets automatically refactored along with the other code in the project.
+Each chapter should have a dedicated Code file in the Kotlin and the Java source sets.
+If there's a variant for Java and Kotlin, or Gradle and Maven, the code blocks should be put in tabs on top of each other to make the manual more compact.
+
+### AsciiDoc Anchor Conventions
+
+- All headings down to `===` (h3) must have explicit `[id=...]` anchors.
+- Anchors are named by concept, not the explaining subtitle (e.g., `scrubbing` not `scrubbing_make_random_parts_static`).
+- h3 anchors are prefixed with their parent h2 anchor (e.g., `approve_by_file_next_to_test`, `built_in_scrubbers_date_time`).
+
+
 ## Architecture
 
 The approval flow is:

@@ -5,27 +5,37 @@ While some `toString` implementations already are quite good, they typically ret
 This is fine as long as you only have a few properties.
 However, if you have a lot of properties, it is much easier to read the result if it is formatted nicely.
 
-In order to change the way objects are being transformed to strings, you can use the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#printedBy(java.util.function.Function)[`ApprovalBuilder`'s `printedBy` method] with a link:{javadoc-url}/core/org/approvej/print/Printer.html[`Printer`]/`Function<T, String>`, or its link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#printedAs(org.approvej.print.PrintFormat))[`printedAs` method] with a  link:{javadoc-url}/core/org/approvej/print/PrintFormat.html[`PrintFormat`].
+The most common way to change the print format is to <<default_print_format,configure a global default>>.
+For individual overrides, you can use the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#printedAs(org.approvej.print.PrintFormat))[`printedAs` method] with a link:{javadoc-url}/core/org/approvej/print/PrintFormat.html[`PrintFormat`], or the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#printedBy(java.util.function.Function)[`printedBy` method] with a `Function<T, String>`.
 
-In addition to the printing method, the `Printer`, the `PrinterFormat` also provides a filename extension, that will be used if the value is written to a file (see <<approve_by_file>>).
+In addition to the printing method, a `PrintFormat` also provides a filename extension, that will be used if the value is written to a file (see <<approve_by_file>>).
 
 
-== Generic Multi Line String Print Format
+[id=multi_line_string]
+== Print each property on its own line
 
 ApproveJ provides a generic link:{javadoc-url}/core/org/approvej/print/MultiLineStringPrintFormat.html[`MultiLineStringPrintFormat`] that will print the object with each of its properties on a new line to make comparing the result easier.
 In addition to field-backed properties, it discovers getter-only properties via `getXxx()` and `isXxx()` methods (the latter only for `boolean`/`Boolean` return types, per the JavaBeans convention).
 Field-backed properties appear first in declaration order, followed by getter-only properties alphabetically.
-You can use this format by calling the `printedAs` method on the builder.
+
+To use this format for all approvals, <<default_print_format,configure it as the default>>:
+
+[source,properties]
+----
+defaultPrintFormat = multiLineString
+----
+
+Alternatively, apply it to a single approval via `printedAs`:
 
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=multi_line_string_format]
+include::../../../test/java/examples/java/PrintingDocTest.java[tag=multi_line_string_format]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=multi_line_string_format]
+include::../../../test/kotlin/examples/kotlin/PrintingDocTest.kt[tag=multi_line_string_format]
 ----
 <1> applies the `MultiLineStringPrinter` and returns a new `ApprovalBuilder<String>`
 
@@ -34,24 +44,24 @@ Now the approved file will look like this
 [source,text]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicsDocTest-multi_line_string_format-approved.txt[]
+include::../../../test/java/examples/java/PrintingDocTest-multi_line_string_format-approved.txt[]
 ----
 
 
 [id=custom_printer_function]
-== Custom Printer Function
+== Use a custom function to print
 
 You can provide a custom `Function<T, String>` to the builder's `printedBy` method.
 
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=custom_printer_function]
+include::../../../test/java/examples/java/PrintingDocTest.java[tag=custom_printer_function]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=custom_printer_function]
+include::../../../test/kotlin/examples/kotlin/PrintingDocTest.kt[tag=custom_printer_function]
 ----
 <1> applies the given `Function` and returns a new `ApprovalBuilder<String>`
 
@@ -60,12 +70,12 @@ So the content of the approved file will look like this
 [source]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicsDocTest-custom_printer_function-approved.txt[]
+include::../../../test/java/examples/java/PrintingDocTest-custom_printer_function-approved.txt[]
 ----
 
 
 [id=custom_print_format]
-== Custom Printer Format
+== Implement a reusable PrintFormat
 
 For more complex cases, you can implement your own link:{javadoc-url}/core/org/approvej/print/PrinterFormat.html[`PrinterFormat`].
 
@@ -78,12 +88,12 @@ E.g. the following format will print a `Person` as a YAML string.
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/BasicsDocTest.java[tag=person_yaml_print_format]
+include::../../../testFixtures/java/examples/PersonYamlPrintFormat.java[tag=person_yaml_print_format]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=person_yaml_print_format]
+include::../../../test/kotlin/examples/kotlin/PrintingDocTest.kt[tag=person_yaml_print_format]
 ----
 
 The resulting file will look like this
@@ -91,10 +101,19 @@ The resulting file will look like this
 [source,yaml]
 .Approved file
 ----
-include::../../../test/java/examples/java/BasicsDocTest-custom_print_format-approved.yaml[]
+include::../../../test/java/examples/java/PrintingDocTest-custom_print_format-approved.yaml[]
 ----
 
 
+[id=default_print_format]
 == Configure the Default Print Format Globally
 
-See <<configuration>> on how to configure a global default print format.
+Instead of calling `printedAs` on every approval, you can set a project-wide default in your `approvej.properties`:
+
+[source,properties]
+----
+defaultPrintFormat = multiLineString
+----
+
+Any built-in alias (`singleLineString`, `multiLineString`, `json`, `yaml`) or a fully-qualified class name works here.
+See <<configuration>> for all available configuration sources and options.

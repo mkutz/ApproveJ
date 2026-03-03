@@ -66,6 +66,33 @@ public class ExampleClass {
 
   // end::blog_post_pojo[]
 
+  // tag::order_summary[]
+  public record OrderSummary(
+      String orderId,
+      String customerName,
+      String shippingAddress,
+      List<String> items,
+      int itemCount,
+      double subtotal,
+      double tax,
+      double total,
+      String status) {}
+
+  // end::order_summary[]
+
+  public static OrderSummary createOrderSummary() {
+    return new OrderSummary(
+        "ORD-12345",
+        "Jane Smith",
+        "123 Main St, Springfield",
+        List.of("Widget A", "Gadget B", "Doohickey C"),
+        3,
+        59.97,
+        4.80,
+        64.77,
+        "confirmed");
+  }
+
   public static Contact createContact(String name, String email, String phoneNumber) {
     return new Contact(name, email, phoneNumber);
   }

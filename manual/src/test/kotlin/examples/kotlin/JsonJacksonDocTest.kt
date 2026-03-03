@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.json.JsonMapper
 import examples.ExampleClass.Tag.ENTERTAINMENT
 import examples.ExampleClass.Tag.NEWS
+import examples.ExampleClass.createPerson
 import examples.ExampleClass.createTaggedBlogPost
+import java.time.LocalDate
 import org.approvej.ApprovalBuilder.approve
 import org.approvej.approve.Approvers.file
 import org.approvej.approve.PathProviders.nextToTest
@@ -17,6 +19,17 @@ import org.junit.jupiter.api.Test
 class JsonJacksonDocTest {
 
   private val jsonMapper = JsonMapper.builder().build()
+
+  @Test
+  fun `print json`() {
+    // tag::print_json[]
+    val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
+
+    approve(person)
+      .printedAs(json()) // <1>
+      .byFile()
+    // end::print_json[]
+  }
 
   @Test
   @Throws(JsonProcessingException::class)
