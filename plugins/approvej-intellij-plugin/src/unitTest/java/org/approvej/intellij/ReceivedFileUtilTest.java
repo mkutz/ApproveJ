@@ -79,4 +79,9 @@ class ReceivedFileUtilTest {
     assertThat(ReceivedFileUtil.approvedFileNameCandidates("MyTest.byValue-body-received.json"))
         .containsExactly("MyTest.byValue-body-approved.json", "MyTest.byValue-body.json");
   }
+
+  @Test
+  void approvedFileNameCandidates_not_received() {
+    assertThat(ReceivedFileUtil.approvedFileNameCandidates("MyTest.java")).isEmpty();
+  }
 }
