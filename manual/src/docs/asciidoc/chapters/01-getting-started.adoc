@@ -4,7 +4,7 @@
 [id=requirements]
 == Requirements
 
-In oder to use ApproveJ you need a JDK 21 or higher.
+In order to use ApproveJ you need a JDK 21 or higher.
 
 
 [id=dependencies]

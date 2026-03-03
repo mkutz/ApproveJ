@@ -80,7 +80,7 @@ Will approve the following value:
 include::../../../test/java/examples/java/BasicsDocTest-approve_pojos-approved.txt[]
 ----
 
-See <<printing>> if need a more sophisticated way of printing.
+See <<printing>> if you need a more sophisticated way of printing.
 
 
 [id=named]

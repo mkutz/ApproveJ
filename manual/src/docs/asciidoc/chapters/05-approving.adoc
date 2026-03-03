@@ -82,7 +82,7 @@ include::../../../test/kotlin/examples/kotlin/ApprovingDocTest.kt[tag=approve_fi
 
 The link:{javadoc-url}/core/org/approvej/approve/PathProviderBuilder.html#filenameExtension(java.lang.String)[`PathProviderBuilder.filenameExtension`] method gives you the opportunity to use a different file extension for the approved and received files.
 
-NOTE:: most of the time you probably want to do this because you're using a special printer that creates a specific format (e.g. JSON, XML, YAML, …).
+NOTE: Most of the time you probably want to do this because you're using a special printer that creates a specific format (e.g. JSON, XML, YAML, …).
 In that case, you might want to provide a <<custom_print_format>> and override the `filenameExtension` method of the `Printer` instead of changing the filename extension here.
 
 [source,java,indent=0,role="primary"]
@@ -111,7 +111,7 @@ include::../../../test/kotlin/examples/kotlin/ApprovingDocTest.kt[tag=approve_fi
 [id=approve_by_file_subdirectory]
 === In a Subdirectory
 
-If you have test classes with a lot of approval tests, there a quite a lot of files created next to the test class.
+If you have test classes with a lot of approval tests, there are quite a lot of files created next to the test class.
 In that case, you can use the link:{javadoc-url}/core/org/approvej/approve/PathProviderBuilder.html#nextToTestInSubdirectory()[`PathProviderBuilder.nextToTestInSubdirectory`] to put all the files in a subdirectory named after the test class.
 
 [source,java,indent=0,role="primary"]
@@ -140,7 +140,7 @@ include::../../../test/kotlin/examples/kotlin/ApprovingDocTest.kt[tag=approve_fi
 === Given Path
 
 Alternatively, you can simply specify the path of the approved file.
-If the given approved file path contains the word `approved` just before the filename extension, it will be replaced with `received` in the to determine the received file path.
+If the given approved file path contains the word `approved` just before the filename extension, it will be replaced with `received` to determine the received file path.
 Otherwise, the word `received` will be added at the end of the filename.
 
 For example
