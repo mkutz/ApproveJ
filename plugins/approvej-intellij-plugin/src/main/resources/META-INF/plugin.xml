@@ -22,6 +22,11 @@
         implementationClass="org.approvej.intellij.DanglingApprovalInspection"/>
     <editorNotificationProvider
         implementation="org.approvej.intellij.ReceivedFileEditorNotificationProvider"/>
+    <editorNotificationProvider
+        implementation="org.approvej.intellij.ApprovedFileEditorNotificationProvider"/>
+    <codeInsight.lineMarkerProvider
+        language="UAST"
+        implementationClass="org.approvej.intellij.ApproveCallLineMarkerProvider"/>
   </extensions>
 
   <actions>
