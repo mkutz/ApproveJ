@@ -26,6 +26,7 @@ intellijPlatform {
     vendor { name = "ApproveJ" }
     ideaVersion { sinceBuild = "251" }
   }
+  publishing { token = providers.environmentVariable("INTELLIJ_MARKETPLACE_TOKEN") }
 }
 
 /* Use JUnit 5.11 for IntelliJ platform tests to avoid version conflicts with IntelliJ's test
