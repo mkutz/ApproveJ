@@ -20,7 +20,7 @@ final class ReceivedFileUtil {
   private ReceivedFileUtil() {}
 
   private static final Pattern RECEIVED_PATTERN =
-      Pattern.compile("(?<prefix>.+)-received(?<extension>\\..+)?$");
+      Pattern.compile("(?<prefix>.+)-received(?<extension>\\..++)?$");
 
   /** Returns {@code true} if the given filename contains {@code -received} before the extension. */
   static boolean isReceivedFileName(@NotNull String filename) {
