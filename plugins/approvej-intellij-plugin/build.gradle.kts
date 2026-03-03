@@ -30,9 +30,6 @@ intellijPlatform {
 
 /* Use JUnit 5.11 for IntelliJ platform tests to avoid version conflicts with IntelliJ's test
 framework */
-val junitVersion = "5.11.3"
-val junitPlatformVersion = "1.11.3"
-
 dependencies {
   intellijPlatform {
     intellijIdeaCommunity(libs.versions.intellij.ide)
@@ -42,29 +39,32 @@ dependencies {
   }
 
   testImplementation(libs.assertj.core)
-  testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
-  testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
-  testImplementation("org.opentest4j:opentest4j:1.3.0")
-  testImplementation("junit:junit:4.13.2")
+  testImplementation(libs.junit5.jupiter.api)
+  testImplementation(libs.junit5.jupiter.params)
+  testImplementation(libs.opentest4j)
+  testImplementation(libs.junit4)
 
-  testRuntimeOnly("org.junit.platform:junit-platform-launcher:$junitPlatformVersion")
-  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
-  testRuntimeOnly("org.junit.vintage:junit-vintage-engine:$junitVersion")
+  testRuntimeOnly(libs.junit5.platform.launcher)
+  testRuntimeOnly(libs.junit5.jupiter.engine)
+  testRuntimeOnly(libs.junit5.vintage.engine)
 }
 
 // Force JUnit 5.11 versions over JUnit 6 from BOM
+val junit5Version = libs.versions.junit5.get()
+val junit5PlatformVersion = libs.versions.junitPlatform5.get()
+
 configurations.testRuntimeClasspath {
   resolutionStrategy.eachDependency {
-    if (requested.group == "org.junit.platform") useVersion(junitPlatformVersion)
-    if (requested.group == "org.junit.jupiter") useVersion(junitVersion)
-    if (requested.group == "org.junit.vintage") useVersion(junitVersion)
+    if (requested.group == "org.junit.platform") useVersion(junit5PlatformVersion)
+    if (requested.group == "org.junit.jupiter") useVersion(junit5Version)
+    if (requested.group == "org.junit.vintage") useVersion(junit5Version)
   }
 }
 
 configurations.testCompileClasspath {
   resolutionStrategy.eachDependency {
-    if (requested.group == "org.junit.platform") useVersion(junitPlatformVersion)
-    if (requested.group == "org.junit.jupiter") useVersion(junitVersion)
+    if (requested.group == "org.junit.platform") useVersion(junit5PlatformVersion)
+    if (requested.group == "org.junit.jupiter") useVersion(junit5Version)
   }
 }
 
