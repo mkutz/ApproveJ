@@ -9,6 +9,20 @@ updates:
       - dependency-name: com.diffplug.spotless
         update-types:
         - version-update:semver-major
+      # JUnit 5 and JUnit 4 are pinned for IntelliJ platform test compatibility.
+      # Blocking major updates prevents Dependabot from bumping JUnit 5 to 6.
+      - dependency-name: org.junit.jupiter:*
+        update-types:
+        - version-update:semver-major
+      - dependency-name: org.junit.platform:*
+        update-types:
+        - version-update:semver-major
+      - dependency-name: org.junit.vintage:*
+        update-types:
+        - version-update:semver-major
+      - dependency-name: junit:junit
+        update-types:
+        - version-update:semver-major
   - package-ecosystem: github-actions
     directory: /
     schedule:

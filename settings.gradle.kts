@@ -10,6 +10,8 @@ include("plugins:approvej-gradle-plugin")
 
 include("plugins:approvej-maven-plugin")
 
+include("plugins:approvej-intellij-plugin")
+
 include("modules:json-jackson")
 
 include("modules:json-jackson3")
