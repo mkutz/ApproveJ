@@ -1,3 +1,4 @@
+[id=cheat_sheet]
 = Cheat Sheet
 
 Quick reference for the ApproveJ public API, organized by the approval flow.
@@ -7,6 +8,7 @@ TIP: A link:pdf/approvej-cheat-sheet.pdf[printable PDF version] of this cheat sh
 endif::[]
 
 
+[id=cheat_sheet_entry_point]
 == Entry Point
 
 [cols="2,3"]
@@ -57,6 +59,7 @@ endif::[]
 |===
 
 
+[id=cheat_sheet_print_formats]
 == Print Formats
 
 [cols="2,3"]
@@ -89,8 +92,10 @@ endif::[]
 |===
 
 
+[id=cheat_sheet_scrubbers]
 == Scrubbers
 
+[id=cheat_sheet_scrubbers_string]
 === String Scrubbers
 
 [cols="2,3"]
@@ -110,6 +115,7 @@ endif::[]
 |Scrub UUID strings
 |===
 
+[id=cheat_sheet_scrubbers_date_time]
 === Date/Time Scrubbers
 
 [cols="2,3"]
@@ -174,6 +180,7 @@ endif::[]
 |Scrub RFC 1123 date-times
 |===
 
+[id=cheat_sheet_scrubbers_field]
 === Field Scrubbers
 
 [cols="2,3"]
@@ -184,6 +191,7 @@ endif::[]
 |Scrub a field value on objects of the given type
 |===
 
+[id=cheat_sheet_scrubbers_json]
 === JSON Scrubbers
 
 [cols="2,3"]
@@ -194,6 +202,7 @@ endif::[]
 |Scrub a JSON node at the given JSON Pointer path
 |===
 
+[id=cheat_sheet_scrubbers_http]
 === HTTP Scrubbers
 
 [cols="2,3"]
@@ -211,6 +220,7 @@ endif::[]
 |===
 
 
+[id=cheat_sheet_replacements]
 == Replacements
 
 [cols="2,3"]
@@ -240,6 +250,7 @@ endif::[]
 |===
 
 
+[id=cheat_sheet_approvers]
 == Approvers & Path Providers
 
 [cols="2,3"]
@@ -260,6 +271,7 @@ endif::[]
 |===
 
 
+[id=cheat_sheet_reviewers]
 == File Reviewers
 
 [cols="2,3"]
@@ -277,6 +289,7 @@ endif::[]
 |===
 
 
+[id=cheat_sheet_build_plugin]
 == Build Plugin Tasks
 
 [cols="2,3"]
@@ -309,6 +322,7 @@ endif::[]
 |===
 
 
+[id=cheat_sheet_configuration]
 == Configuration Properties
 
 [cols="2,2,1"]

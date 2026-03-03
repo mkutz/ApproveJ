@@ -2,6 +2,7 @@ package examples.java;
 
 import static examples.ExampleClass.Tag.ENTERTAINMENT;
 import static examples.ExampleClass.Tag.NEWS;
+import static examples.ExampleClass.createPerson;
 import static examples.ExampleClass.createTaggedBlogPost;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.approve.Approvers.file;
@@ -14,12 +15,25 @@ import static org.approvej.scrub.Scrubbers.uuids;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import examples.ExampleClass.Person;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class JsonJacksonDocTest {
 
   ObjectMapper jsonMapper = JsonMapper.builder().build();
+
+  @Test
+  void print_json() {
+    // tag::print_json[]
+    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+
+    approve(person)
+        .printedAs(json()) // <1>
+        .byFile();
+    // end::print_json[]
+  }
 
   @Test
   void scrub_json_pointer() throws JsonProcessingException {

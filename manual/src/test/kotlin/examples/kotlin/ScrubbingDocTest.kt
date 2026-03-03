@@ -5,6 +5,8 @@ import examples.ExampleClass.createBlogPost
 import examples.ExampleClass.createContact
 import org.approvej.ApprovalBuilder.approve
 import org.approvej.print.MultiLineStringPrintFormat.multiLineString
+import org.approvej.scrub.Replacements.labeled
+import org.approvej.scrub.Replacements.masking
 import org.approvej.scrub.Scrubbers.dateTimeFormat
 import org.approvej.scrub.Scrubbers.uuids
 import org.junit.jupiter.api.Test
@@ -24,6 +26,20 @@ class ScrubbingDocTest {
       .scrubbedOf(uuids()) // <2>
       .byFile()
     // end::scrubbing[]
+  }
+
+  @Test
+  fun `replacement labeled`() {
+    // tag::replacement_labeled[]
+    val blogPost =
+      createBlogPost("Latest News", "Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
+
+    approve(blogPost)
+      .printedAs(multiLineString())
+      .scrubbedOf(uuids().replacement(labeled("id"))) // <1>
+      .scrubbedOf(dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX").replacement(masking())) // <2>
+      .byFile()
+    // end::replacement_labeled[]
   }
 
   @Test

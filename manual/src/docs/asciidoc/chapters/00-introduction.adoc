@@ -1,31 +1,74 @@
+[id=introduction]
 = Introduction
 
+[id=approval_testing]
 == Approval Testing
 
 Approval testing is a technique that allows you to compare the output of your code with a known good/previously approved output.
 
 An approval test case will only succeed, if the actually received output is equal to the previously approved output.
 
-If the received output is different from the approved output, the test will fail and leave it to human reviewer to approve received output or to fix the code.
+If the received output is different from the approved output, the test will fail and leave it to a human reviewer to approve the received output or to fix the code.
 
-Approval testing is especially useful for testing complex objects or large data sets, where it is impractical to write individual assertions for each property.
+Approval testing is especially useful when:
+
+- You are testing complex objects or large data sets, where writing individual assertions for each property would be impractical and fragile.
+- You want to catch unintended changes in serialized output (JSON, XML, YAML, etc.).
+- You are testing against legacy code where the expected output is hard to describe with assertions but easy to verify visually.
+- You want to replace long chains of `assertEquals` calls with a single, readable golden master file.
+
+Consider testing a method that returns a summary object:
+
+[source,java,indent=0]
+.OrderSummary record
+----
+include::../../../testFixtures/java/examples/ExampleClass.java[tag=order_summary]
+----
+
+With traditional assertions, you need to check each field individually — and it's easy to miss one:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/IntroductionDocTest.java[tag=traditional_assertions]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/IntroductionDocTest.kt[tag=traditional_assertions]
+----
+<1> The `total` field is never checked — the compiler won't catch this.
+
+With approval testing, the entire object is captured automatically:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/IntroductionDocTest.java[tag=approval_test]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/IntroductionDocTest.kt[tag=approval_test]
+----
+
+The approved file contains every field, making missing checks impossible:
+
+[source,text]
+.Approved file
+----
+include::../../../test/java/examples/java/IntroductionDocTest-approval_test-approved.txt[]
+----
 
 
+[id=approvej]
 == ApproveJ
 
 ApproveJ is a Java implementation of approval testing with a builder-based fluent API, several built-in tools, and optional extension points.
 
+- **No dependencies** in the core module — works with any JVM project.
+- **Fluent builder API** — chain printing, scrubbing, and approval in a single expression.
+- **Extensible** — bring your own print formats, scrubbers, and reviewers, or use the built-in ones for JSON, YAML, and HTTP.
+- **IDE-friendly** — approved files live next to your tests, with correct file extensions for syntax highlighting.
+
 To review the code, file issues or suggest changes, please visit the project's link:https://github.com/mkutz/approvej[GitHub page].
-
-
-== API Reference
-
-Javadoc for each module is available here:
-
-- link:{javadoc-url}/core/index.html[core] -- core framework
-- link:{javadoc-url}/http/index.html[http] -- HTTP stub server
-- link:{javadoc-url}/http-wiremock/index.html[http-wiremock] -- WireMock adapter
-- link:{javadoc-url}/json-jackson/index.html[json-jackson] -- JSON support (Jackson 2.x)
-- link:{javadoc-url}/json-jackson3/index.html[json-jackson3] -- JSON support (Jackson 3.x)
-- link:{javadoc-url}/yaml-jackson/index.html[yaml-jackson] -- YAML support (Jackson 2.x)
-- link:{javadoc-url}/yaml-jackson3/index.html[yaml-jackson3] -- YAML support (Jackson 3.x)

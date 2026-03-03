@@ -1,0 +1,167 @@
+[id=build_plugins]
+= Build Plugins -- manage approved and received files
+
+When you rename or delete a test method, its approved file stays behind on disk.
+Over time these leftover files accumulate and clutter the repository.
+
+ApproveJ provides build plugins for Gradle and Maven that help you clean up leftovers, batch-review unapproved files, and approve received files across the project.
+These plugins use an inventory that ApproveJ maintains automatically during test runs.
+
+
+[id="build_plugins_setup"]
+== Setup
+
+
+[id=build_plugins_setup_gradle]
+=== Gradle Plugin
+
+.Gradle
+[source,groovy,subs=attributes+,role="primary"]
+----
+plugins {
+  id 'org.approvej' version '{revnumber}'
+}
+----
+.Gradle.kts
+[source,kotlin,subs=attributes+,role="secondary"]
+----
+plugins {
+  id("org.approvej") version "{revnumber}"
+}
+----
+
+NOTE: The plugin requires the Java plugin to be applied in the same project.
+
+
+[id=build_plugins_setup_maven]
+=== Maven Plugin
+
+[source,xml,subs=attributes+]
+----
+<plugin>
+  <groupId>org.approvej</groupId>
+  <artifactId>approvej-maven-plugin</artifactId>
+  <version>{revnumber}</version>
+</plugin>
+----
+
+
+[id="build_plugins_cleanup"]
+== Clean Up Leftover Files
+
+An approved file is considered a leftover when its originating test method no longer exists in the compiled test classes.
+
+[source,bash]
+----
+# Gradle
+./gradlew approvejFindLeftovers  # list leftovers without deleting
+./gradlew approvejCleanup        # find and remove leftovers
+
+# Maven
+mvn approvej:find-leftovers
+mvn approvej:cleanup
+----
+
+A typical cleanup workflow:
+
+1. Run your tests locally so the inventory is populated.
+2. Run the find-leftovers task/goal to see which approved files are leftovers.
+3. Run the cleanup task/goal to delete the leftover files.
+4. Commit the updated inventory and the removal of leftover files.
+
+WARNING: Only approved files that have been recorded in the inventory can be detected as leftovers.
+Make sure you have run all relevant tests at least once before cleaning up.
+
+
+[id="build_plugins_review_unapproved"]
+== Review Unapproved Files
+
+After running your tests, some may have failed because the received value differs from the approved value.
+Instead of reviewing each failure individually, you can open all unapproved files in the configured default <<reviewing,file reviewer>> at once.
+
+[source,bash]
+----
+# Gradle
+./gradlew approvejReviewUnapproved
+
+# Maven
+mvn approvej:review-unapproved
+----
+
+This scans the inventory for approved files that have a corresponding received file and opens each pair in the file reviewer.
+
+
+[id="build_plugins_approve_all"]
+== Approve All Received Files
+
+If you are confident that all received files are correct, you can approve them all at once.
+This moves every received file to its corresponding approved file, replacing the previous content.
+
+[source,bash]
+----
+# Gradle
+./gradlew approvejApproveAll
+
+# Maven
+mvn approvej:approve-all
+----
+
+WARNING: This overwrites all approved files with their received counterparts without review.
+Make sure you check the changes before committing them to version control.
+
+
+[id="build_plugins_inventory"]
+== The Approved File Inventory
+
+The build plugin tasks rely on an inventory file that ApproveJ maintains automatically.
+Every time a test calls `byFile()`, ApproveJ records the approved file path and the originating test method.
+At the end of the test run, all entries are merged into a project-level inventory file:
+
+----
+.approvej/inventory.properties
+----
+
+The file uses Java Properties format.
+Each entry maps a relative file path to the test reference that created it:
+
+[source,properties]
+----
+src/test/resources/MyTest-myTest-approved.txt = com.example.MyTest#myTest
+----
+
+TIP: Commit `.approvej/inventory.properties` to version control so that the inventory is shared across the team.
+
+The inventory is updated incrementally.
+Only entries for test methods that ran in the current execution are refreshed.
+Entries for tests that did not run are preserved.
+
+
+[id="build_plugins_disable_inventory"]
+=== Disable the Inventory
+
+The inventory is controlled by the `inventoryEnabled` property.
+
+|===
+|Environment |Default
+
+|Local development (no `CI` environment variable)
+|`true`
+
+|CI (the `CI` environment variable is set)
+|`false`
+|===
+
+You can override this default in any <<configuration_sources,configuration source>>:
+
+.`src/test/resources/approvej.properties`
+[source,properties]
+----
+inventoryEnabled = true
+----
+
+Or via environment variable:
+
+[source,bash]
+----
+export APPROVEJ_INVENTORY_ENABLED=false
+----

@@ -1,54 +1,25 @@
-= HTTP
+[id=http]
+= HTTP -- catch integration risks
 
-ApproveJ provides capabilities to approval test HTTP requests sent by your software component.
-The core concept is the link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequest.html[`ReceivedHttpRequest`] record, which captures the method, URI, headers, and body of an HTTP request.
+Unlike the JSON and YAML extensions, which provide print formats for specific data formats, the HTTP extension addresses a different concern: **integration risk**.
 
-HTTP approval testing follows the same <<printing,print>>, <<scrubbing,scrub>>, and <<approving,approve>> flow as any other value, with dedicated print formats and scrubbers for HTTP data.
-
-There are two ways to capture HTTP requests for approval:
-
-* **`HttpStubServer`** – A lightweight stub server included in the `http` module.
-Use this when you need a simple way to capture requests without additional dependencies.
-* **WireMock Adapter** – An adapter in the `http-wiremock` module that converts WireMock requests.
-Use this when you already have WireMock in your test setup.
+When your application calls an external HTTP API, a code change can silently alter the requests you send — a different path, a missing header, a changed body format.
+These issues often go unnoticed until they break in production.
+The HTTP extension lets you write simple contract tests that approve the exact HTTP requests your code sends.
+If a request changes, the approval test fails and shows you exactly what changed.
 
 
-== Common Concepts
+[id=http_dependencies]
+== Dependencies
+
+There are two ways to capture outgoing HTTP requests.
+Choose the one that fits your test setup.
 
 
-=== `ReceivedHttpRequest`
+[id=http_dependencies_stub_server]
+=== `HttpStubServer`
 
-The link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequest.html[`ReceivedHttpRequest`] is a record that holds the captured request data:
-
-* `method()` – The HTTP method (GET, POST, etc.)
-* `uri()` – The request URI including path and query parameters
-* `headers()` – A sorted map of header names to values
-* `body()` – The request body as a string
-
-
-=== `ReceivedHttpRequestPrintFormat`
-
-The link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequestPrintFormat.html[`ReceivedHttpRequestPrintFormat`] prints requests in the https://www.jetbrains.com/help/idea/exploring-http-syntax.html[HTTP request file format], which is readable and supported by many IDEs.
-
-Files are saved with the `.http` extension.
-
-
-=== HTTP Scrubbers
-
-The link:{javadoc-url}/http/org/approvej/http/HttpScrubbers.html[`HttpScrubbers`] utility provides scrubbers for common dynamic HTTP headers:
-
-* `hostHeaderValue()` – Scrubs the `Host` header (varies by port)
-* `userAgentHeaderValue()` – Scrubs the `User-agent` header (varies by JVM version)
-* `headerValue(name)` – Scrubs any header by name
-
-
-== `HttpStubServer`
-
-The link:{javadoc-url}/http/org/approvej/http/HttpStubServer.html[`HttpStubServer`] is a simple HTTP server based on the JVM's built-in link:https://docs.oracle.com/en/java/javase/21/docs/api/jdk.httpserver/com/sun/net/httpserver/package-summary.html[HttpServer].
-It automatically records all received requests.
-
-
-=== Dependency
+A lightweight stub server included in the `http` module, with no additional dependencies.
 
 .Gradle
 [source,groovy,subs=attributes+,role="primary"]
@@ -71,58 +42,10 @@ implementation("org.approvej:http:{revnumber}")
 ----
 
 
-=== Usage
+[id=http_dependencies_wiremock]
+=== WireMock Adapter
 
-Initialize the server and configure your component to use its address:
-
-[source,java,indent=0,role="primary"]
-.Java
-----
-include::../../../test/java/examples/java/HttpDocTest.java[tag=initialize]
-----
-[source,kotlin,indent=0,role="secondary"]
-.Kotlin
-----
-include::../../../test/kotlin/examples/kotlin/HttpDocTest.kt[tag=initialize]
-----
-
-The server stores all received requests.
-You can retrieve and approve them:
-
-[source,java,indent=0,role="primary"]
-.Java
-----
-include::../../../test/java/examples/java/HttpDocTest.java[tag=approve_http_request]
-----
-[source,kotlin,indent=0,role="secondary"]
-.Kotlin
-----
-include::../../../test/kotlin/examples/kotlin/HttpDocTest.kt[tag=approve_http_request]
-----
-
-The approved files look like this:
-
-[source,httprequest,indent=0]
-.Simple GET request
-----
-include::../../../test/java/examples/java/HttpDocTest-approve_http_request-cheeper-approved.http[]
-----
-
-[source,httprequest,indent=0]
-.POST request with Authorization header
-----
-include::../../../test/java/examples/java/HttpDocTest-approve_http_request-prycy-approved.http[]
-----
-
-
-== WireMock Adapter
-
-If you already use https://wiremock.org/[WireMock] in your tests, the `http-wiremock` module provides a utility to convert WireMock requests to `ReceivedHttpRequest` for approval.
-
-
-=== Dependency
-
-The adapter requires both the `http` module and WireMock.
+If you already use https://wiremock.org/[WireMock] in your tests, the `http-wiremock` module provides a utility to convert WireMock requests for approval.
 
 .Gradle
 [source,groovy,subs=attributes+,role="primary"]
@@ -157,9 +80,50 @@ implementation("org.wiremock:wiremock:3.10.0")
 ----
 
 
-=== Usage
+[id=http_capture_requests]
+== Capture Outgoing Requests
 
-Use link:{javadoc-url}/http-wiremock/org/approvej/http/wiremock/WireMockRequests.html[`WireMockRequests.toReceivedHttpRequest()`] to convert WireMock's `Request` objects:
+To approve the HTTP requests your code sends, you need to intercept them.
+Point your component at a stub server instead of the real API, then retrieve and approve the captured requests.
+
+
+[id=http_capture_requests_stub_server]
+=== Using `HttpStubServer`
+
+The link:{javadoc-url}/http/org/approvej/http/HttpStubServer.html[`HttpStubServer`] is a simple HTTP server based on the JVM's built-in link:https://docs.oracle.com/en/java/javase/21/docs/api/jdk.httpserver/com/sun/net/httpserver/package-summary.html[HttpServer].
+It automatically records all received requests and replies with a configurable response.
+
+Initialize the server and configure your component to use its address:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/HttpDocTest.java[tag=initialize]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/HttpDocTest.kt[tag=initialize]
+----
+
+Then call your component and approve the captured requests:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/HttpDocTest.java[tag=approve_http_request]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/HttpDocTest.kt[tag=approve_http_request]
+----
+
+
+[id=http_capture_requests_wiremock]
+=== Using WireMock
+
+Use link:{javadoc-url}/http-wiremock/org/approvej/http/wiremock/WireMockRequests.html[`WireMockRequests.toReceivedHttpRequest()`] to convert WireMock's `Request` objects to link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequest.html[`ReceivedHttpRequest`]:
 
 [source,java,indent=0]
 ----
@@ -188,3 +152,35 @@ wireMockServer.getAllServeEvents().stream()
 
 NOTE: WireMock's `getAllServeEvents()` returns events in reverse chronological order (most recent first).
 If you need chronological order, reverse the list.
+
+
+[id=http_print_format]
+== Print as HTTP Request Files
+
+The link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequestPrintFormat.html[`ReceivedHttpRequestPrintFormat`] prints captured requests in the https://www.jetbrains.com/help/idea/exploring-http-syntax.html[HTTP request file format].
+This format is human-readable and supported by many IDEs, which can even execute the requests directly from the approved file.
+
+Files are saved with the `.http` extension.
+
+[source,httprequest,indent=0]
+.Simple GET request
+----
+include::../../../test/java/examples/java/HttpDocTest-approve_http_request-cheeper-approved.http[]
+----
+
+[source,httprequest,indent=0]
+.POST request with Authorization header
+----
+include::../../../test/java/examples/java/HttpDocTest-approve_http_request-prycy-approved.http[]
+----
+
+
+[id=http_scrubbers]
+== HTTP Scrubbers
+
+Some HTTP headers contain values that change between test runs — the host varies by port, and the user-agent varies by JVM version.
+The link:{javadoc-url}/http/org/approvej/http/HttpScrubbers.html[`HttpScrubbers`] utility provides scrubbers for these common cases:
+
+* `hostHeaderValue()` – Scrubs the `Host` header (varies by port)
+* `userAgentHeaderValue()` – Scrubs the `User-agent` header (varies by JVM version)
+* `headerValue(name)` – Scrubs any header by name

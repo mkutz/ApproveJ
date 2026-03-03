@@ -1,10 +1,13 @@
+[id=getting_started]
 = Getting Started
 
+[id=requirements]
 == Requirements
 
 In oder to use ApproveJ you need a JDK 21 or higher.
 
 
+[id=dependencies]
 == Dependencies
 
 To use ApproveJ in your own project, you need to add it as a dependency.
@@ -31,6 +34,7 @@ testImplementation("org.approvej:core:{revnumber}")
 ----
 
 
+[id=dependencies_bom]
 === Bill of Materials (BOM)
 
 If you want to use more than one module in the same project, you can use ApproveJ's bill of materials (BOM) and omit the explicit version for the other modules.

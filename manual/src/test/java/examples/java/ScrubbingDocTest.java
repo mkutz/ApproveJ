@@ -4,6 +4,8 @@ import static examples.ExampleClass.createBlogPost;
 import static examples.ExampleClass.createContact;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.print.MultiLineStringPrintFormat.multiLineString;
+import static org.approvej.scrub.Replacements.labeled;
+import static org.approvej.scrub.Replacements.masking;
 import static org.approvej.scrub.Scrubbers.dateTimeFormat;
 import static org.approvej.scrub.Scrubbers.uuids;
 
@@ -25,6 +27,20 @@ class ScrubbingDocTest {
         .scrubbedOf(uuids()) // <2>
         .byFile(); // <3>
     // end::scrubbing[]
+  }
+
+  @Test
+  void replacement_labeled() {
+    // tag::replacement_labeled[]
+    var blogPost =
+        createBlogPost("Latest News", "Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
+
+    approve(blogPost)
+        .printedAs(multiLineString())
+        .scrubbedOf(uuids().replacement(labeled("id"))) // <1>
+        .scrubbedOf(dateTimeFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX").replacement(masking())) // <2>
+        .byFile();
+    // end::replacement_labeled[]
   }
 
   @Test

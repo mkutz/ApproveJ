@@ -5,7 +5,7 @@ You conclude the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`Appr
 
 
 [id=approve_by_value]
-== Approve by Value
+== Approve inline without files
 
 The link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byValue(java.lang.String)[`ApprovalBuilder.byValue()`] method will use an link:{javadoc-url}/core/org/approvej/approve/InplaceApprover.html[`InplaceApprover`] to approve the received value by comparison with a directly provided previously approved value.
 That way, the approved value is plainly visible in the test code.
@@ -47,6 +47,7 @@ Any existing received value will be overwritten by this.
 You can use a diff tool of your choice to compare the two files and merge values that you want to approve.
 
 
+[id=approve_by_file_next_to_test]
 === Next to Test
 
 By default, the `FileApprover` will put the received and approved files next to the test class and name them like the test case method.
@@ -76,6 +77,7 @@ include::../../../test/kotlin/examples/kotlin/ApprovingDocTest.kt[tag=approve_fi
 ----
 
 
+[id=approve_by_file_custom_extension]
 === Custom Filename Extension
 
 The link:{javadoc-url}/core/org/approvej/approve/PathProviderBuilder.html#filenameExtension(java.lang.String)[`PathProviderBuilder.filenameExtension`] method gives you the opportunity to use a different file extension for the approved and received files.
@@ -106,6 +108,7 @@ include::../../../test/kotlin/examples/kotlin/ApprovingDocTest.kt[tag=approve_fi
 ----
 
 
+[id=approve_by_file_subdirectory]
 === In a Subdirectory
 
 If you have test classes with a lot of approval tests, there a quite a lot of files created next to the test class.
@@ -133,6 +136,7 @@ include::../../../test/kotlin/examples/kotlin/ApprovingDocTest.kt[tag=approve_fi
 ----
 
 
+[id=approve_by_file_given_path]
 === Given Path
 
 Alternatively, you can simply specify the path of the approved file.
@@ -169,6 +173,7 @@ include::../../../test/kotlin/examples/kotlin/ApprovingDocTest.kt[tag=approve_fi
 ----
 
 
+[id=approve_by_file_custom_path_provider]
 === Custom `PathProvider`/`PathProviderBuilder`
 
 You can also define your own link:{javadoc-url}/core/org/approvej/approve/PathProvider.html[`PathProvider`] and pass it to the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byFile(org.approvej.approve.PathProvider)[`byFile`] method.
@@ -180,7 +185,7 @@ In that case, you might want to take advantage of the link:{javadoc-url}/core/or
 
 
 [id=dangling_approval_detection]
-== Dangling Approval Detection
+== Catch forgotten approvals
 
 If you call `approve()` without a concluding terminal method (`by()`, `byFile()`, or `byValue()`), the test will silently pass without any approval actually happening.
 To catch this mistake, you can annotate your test class with link:{javadoc-url}/core/org/approvej/ApprovalTest.html[`@ApprovalTest`].

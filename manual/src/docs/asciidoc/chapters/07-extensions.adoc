@@ -1,5 +1,5 @@
 [id=extensions]
-= Extensions
+= Extensions -- format-specific printing and scrubbing
 
 ApproveJ's core module has no external dependencies.
 For integration with popular libraries, ApproveJ provides optional extension modules that add format-specific printing, scrubbing, and more.

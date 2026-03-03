@@ -1,0 +1,15 @@
+OrderSummary [
+  orderId=ORD-12345,
+  customerName=Jane Smith,
+  shippingAddress=123 Main St, Springfield,
+  items=[
+    Widget A,
+    Gadget B,
+    Doohickey C
+  ],
+  itemCount=3,
+  subtotal=59.97,
+  tax=4.8,
+  total=64.77,
+  status=confirmed
+]

@@ -1,3 +1,4 @@
+[id=yaml_jackson]
 = YAML with Jackson
 
 ApproveJ provides YAML support via https://github.com/FasterXML/jackson[Jackson] in two modules:
@@ -13,8 +14,10 @@ Both modules register with the same alias `"yaml"`, and having both on the class
 
 Since Jackson is a provided dependency, you need to add it explicitly.
 
+[id=yaml_jackson_dependencies]
 == Dependencies
 
+[id=yaml_jackson_dependencies_jackson_2]
 === Jackson 2.x
 
 .Gradle
@@ -58,6 +61,7 @@ implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.0")
 </dependency>
 ----
 
+[id=yaml_jackson_dependencies_jackson_3]
 === Jackson 3.x
 
 .Gradle
@@ -100,6 +104,7 @@ NOTE: Jackson 3 has Java date/time support built-in, so no separate `jackson-dat
 
 The YAML module provides a `YamlPrintFormat` (see <<printing>>) for rendering objects as YAML in the approval flow.
 
+[id=yaml_jackson_dependencies_imports]
 === Import Differences
 
 The API is identical between both modules.
@@ -117,9 +122,19 @@ Only the import statements differ:
 |===
 
 
+[id=yaml_print]
 == Print as YAML
 
 The link:{javadoc-url}/yaml-jackson/org/approvej/yaml/jackson/YamlPrintFormat.html[`YamlPrintFormat`] allows to print any object in YAML format.
+
+To use YAML as the default print format for all approvals, <<default_print_format,configure it globally>>:
+
+[source,properties]
+----
+defaultPrintFormat = yaml
+----
+
+Alternatively, apply it to a single approval via `printedAs`:
 
 [source,java,indent=0,role="primary"]
 .Java
