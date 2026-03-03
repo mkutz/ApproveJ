@@ -4,6 +4,7 @@ import com.intellij.diff.DiffContentFactory;
 import com.intellij.diff.DiffManager;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.io.IOException;
@@ -16,6 +17,8 @@ import org.jetbrains.annotations.Nullable;
 
 /** Utility methods for working with ApproveJ received and approved files. */
 final class ReceivedFileUtil {
+
+  private static final Logger LOG = Logger.getInstance(ReceivedFileUtil.class);
 
   private ReceivedFileUtil() {}
 
@@ -115,7 +118,7 @@ final class ReceivedFileUtil {
             approvedFile.setBinaryContent(receivedFile.contentsToByteArray());
             receivedFile.delete(ReceivedFileUtil.class);
           } catch (IOException e) {
-            throw new RuntimeException("Failed to approve received file", e);
+            LOG.error("Failed to approve received file", e);
           }
         });
   }
