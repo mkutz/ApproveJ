@@ -18,7 +18,7 @@ repositories {
 
 intellijPlatform {
   pluginConfiguration {
-    id = "org.approvej.intellij"
+    id = "approvej"
     name = "ApproveJ"
     version = project.version.toString()
     description =
