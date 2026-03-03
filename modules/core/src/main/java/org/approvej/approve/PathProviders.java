@@ -64,7 +64,7 @@ public final class PathProviders {
 
   /**
    * Creates a {@link PathProvider} that uses a stack trace to determine the paths of the approved
-   * and received files in a subdirectory named after the currect test class simple name.
+   * and received files in a subdirectory named after the current test class simple name.
    *
    * @return a new {@link PathProvider}
    */
