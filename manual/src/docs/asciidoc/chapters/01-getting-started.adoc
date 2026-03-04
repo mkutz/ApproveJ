@@ -77,3 +77,10 @@ implementation("org.approvej:json-jackson")
   <!-- … -->
 </project>
 ----
+
+
+[id=ide_support]
+== IDE Support
+
+If you use IntelliJ IDEA, install the https://plugins.jetbrains.com/plugin/30468-approvej[ApproveJ plugin] for integrated diff viewing, one-click approval, and navigation between tests and approved files.
+See <<intellij_plugin>> for details.

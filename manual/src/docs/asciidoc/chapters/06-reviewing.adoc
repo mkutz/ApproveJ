@@ -48,6 +48,8 @@ Here are configuration examples for common diff tools:
 defaultFileReviewerScript = idea diff --wait "{receivedFile}" "{approvedFile}"
 ----
 
+TIP: The <<intellij_plugin,ApproveJ IntelliJ plugin>> lets you view diffs and approve received files directly in the IDE — handy when you want to review changes without re-running the test to trigger the reviewer script.
+
 [source,properties]
 .VS Code (blocking)
 ----

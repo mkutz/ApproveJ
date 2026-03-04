@@ -130,10 +130,10 @@ final class ReceivedFileUtil {
     var request =
         new SimpleDiffRequest(
             "ApproveJ: " + receivedFile.getName(),
-            contentFactory.create(project, approvedFile),
             contentFactory.create(project, receivedFile),
-            approvedFile.getName(),
-            receivedFile.getName());
+            contentFactory.create(project, approvedFile),
+            receivedFile.getName(),
+            approvedFile.getName());
     DiffManager.getInstance().showDiff(project, request);
   }
 

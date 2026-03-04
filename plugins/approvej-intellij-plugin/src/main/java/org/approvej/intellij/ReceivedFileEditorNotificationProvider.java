@@ -4,6 +4,7 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiMethod;
 import com.intellij.ui.EditorNotificationPanel;
 import com.intellij.ui.EditorNotificationProvider;
 import java.util.function.Function;
@@ -22,6 +23,8 @@ public final class ReceivedFileEditorNotificationProvider
       @NotNull Project project, @NotNull VirtualFile file) {
     if (!ReceivedFileUtil.isReceivedFile(file)) return null;
     VirtualFile approvedFile = ReceivedFileUtil.findApprovedFile(file);
+    PsiMethod targetMethod =
+        approvedFile != null ? InventoryUtil.findTestMethod(approvedFile, project) : null;
     return fileEditor -> {
       var panel = new EditorNotificationPanel(fileEditor, EditorNotificationPanel.Status.Info);
       if (approvedFile != null) {
@@ -33,6 +36,9 @@ public final class ReceivedFileEditorNotificationProvider
       } else {
         panel.setText(
             "This is an ApproveJ received file. No matching approved file was found nearby.");
+      }
+      if (targetMethod != null) {
+        panel.createActionLabel("Navigate to Test", () -> targetMethod.navigate(true));
       }
       return panel;
     };
