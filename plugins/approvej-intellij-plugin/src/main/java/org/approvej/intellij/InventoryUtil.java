@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
@@ -76,16 +77,49 @@ final class InventoryUtil {
   }
 
   private static @NotNull Properties loadInventory(@NotNull VirtualFile projectDir) {
-    Properties properties = new Properties();
-    VirtualFile inventoryFile = projectDir.findFileByRelativePath(".approvej/inventory.properties");
-    if (inventoryFile == null) return properties;
+    Properties merged = new Properties();
+    VfsUtil.visitChildrenRecursively(
+        projectDir,
+        new VirtualFileVisitor<Void>() {
+          @Override
+          public boolean visitFile(@NotNull VirtualFile file) {
+            if (file.isDirectory()) {
+              String name = file.getName();
+              if (name.startsWith(".") && !name.equals(".approvej")) return false;
+              if (name.equals("build") || name.equals("target") || name.equals("out")) return false;
+              return true;
+            }
+            if (file.getName().equals("inventory.properties")
+                && file.getParent() != null
+                && ".approvej".equals(file.getParent().getName())) {
+              loadAndMerge(file, projectDir, merged);
+            }
+            return true;
+          }
+        });
+    return merged;
+  }
+
+  private static void loadAndMerge(
+      @NotNull VirtualFile inventoryFile,
+      @NotNull VirtualFile projectDir,
+      @NotNull Properties merged) {
+    VirtualFile moduleDir = inventoryFile.getParent().getParent();
+    String prefix = VfsUtil.getRelativePath(moduleDir, projectDir);
+
+    Properties props = new Properties();
     try (var reader =
         new InputStreamReader(inventoryFile.getInputStream(), StandardCharsets.ISO_8859_1)) {
-      properties.load(reader);
+      props.load(reader);
     } catch (IOException e) {
       LOG.warn("Failed to read inventory file: %s".formatted(inventoryFile.getPath()), e);
+      return;
     }
-    return properties;
+
+    for (String key : props.stringPropertyNames()) {
+      String projectRelativeKey = (prefix == null || prefix.isEmpty()) ? key : prefix + "/" + key;
+      merged.setProperty(projectRelativeKey, props.getProperty(key));
+    }
   }
 
   private static @Nullable TestReference parseTestReference(@NotNull String testReference) {
