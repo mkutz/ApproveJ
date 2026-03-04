@@ -12,8 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Shows an info banner when an approved file is opened, with an action to jump to the test method
- * that produces it.
+ * Shows an info banner when an approved file is opened, with an action to navigate to the test
+ * method that produces it.
  */
 public final class ApprovedFileEditorNotificationProvider implements EditorNotificationProvider {
 
@@ -33,7 +33,7 @@ public final class ApprovedFileEditorNotificationProvider implements EditorNotif
             "Compare with Received", () -> ReceivedFileUtil.openDiff(project, receivedFile, file));
       }
       if (targetMethod != null) {
-        panel.createActionLabel("Jump to Test", () -> targetMethod.navigate(true));
+        panel.createActionLabel("Navigate to Test", () -> targetMethod.navigate(true));
       }
       return panel;
     };

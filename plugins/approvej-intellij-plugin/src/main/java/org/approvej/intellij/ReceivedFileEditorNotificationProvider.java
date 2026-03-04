@@ -38,7 +38,7 @@ public final class ReceivedFileEditorNotificationProvider
             "This is an ApproveJ received file. No matching approved file was found nearby.");
       }
       if (targetMethod != null) {
-        panel.createActionLabel("Jump to Test", () -> targetMethod.navigate(true));
+        panel.createActionLabel("Navigate to Test", () -> targetMethod.navigate(true));
       }
       return panel;
     };
