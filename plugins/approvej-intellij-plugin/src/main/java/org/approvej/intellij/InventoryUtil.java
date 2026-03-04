@@ -2,108 +2,88 @@ package org.approvej.intellij;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.search.GlobalSearchScope;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** Reads and queries {@code .approvej/inventory.properties} files within the project. */
+/** Reads and queries the {@code .approvej/inventory.properties} file within the project. */
 final class InventoryUtil {
 
   private static final Logger LOG = Logger.getInstance(InventoryUtil.class);
 
-  private static final String INVENTORY_PATH = ".approvej/inventory.properties";
-
   private InventoryUtil() {}
 
-  /** A reference to a test method: fully qualified class name and method name. */
-  record TestReference(@NotNull String className, @NotNull String methodName) {}
-
-  /** Finds all {@code .approvej/inventory.properties} files in the project. */
-  static @NotNull List<VirtualFile> findInventoryFiles(@NotNull Project project) {
-    VirtualFile baseDir = project.getBaseDir();
-    if (baseDir == null) return List.of();
-
-    List<VirtualFile> result = new ArrayList<>();
-    collectInventoryFiles(baseDir, result);
-    return result;
-  }
-
-  private static void collectInventoryFiles(
-      @NotNull VirtualFile dir, @NotNull List<VirtualFile> result) {
-    VirtualFile approvejDir = dir.findChild(".approvej");
-    if (approvejDir != null && approvejDir.isDirectory()) {
-      VirtualFile inventoryFile = approvejDir.findChild("inventory.properties");
-      if (inventoryFile != null && !inventoryFile.isDirectory()) {
-        result.add(inventoryFile);
-      }
-    }
-    for (VirtualFile child : dir.getChildren()) {
-      if (child.isDirectory()
-          && !child.getName().startsWith(".")
-          && !child.getName().equals("build")
-          && !child.getName().equals("target")) {
-        collectInventoryFiles(child, result);
-      }
-    }
-  }
-
   /**
-   * Looks up the approved file in inventory files and returns the test reference, or {@code null}
-   * if not found.
+   * Looks up the approved file in the inventory and returns the test reference, or {@code null} if
+   * not found.
    */
   static @Nullable TestReference findTestReference(
       @NotNull VirtualFile approvedFile, @NotNull Project project) {
-    for (VirtualFile inventoryFile : findInventoryFiles(project)) {
-      VirtualFile moduleRoot = inventoryFile.getParent().getParent();
-      String relativePath = VfsUtil.getRelativePath(approvedFile, moduleRoot);
-      if (relativePath == null) continue;
+    VirtualFile projectDir = ProjectUtil.guessProjectDir(project);
+    if (projectDir == null) return null;
 
-      Properties properties = loadProperties(inventoryFile);
-      String testReference = properties.getProperty(relativePath);
-      if (testReference != null) {
-        return parseTestReference(testReference);
-      }
-    }
-    return null;
+    Properties inventory = loadInventory(projectDir);
+    String relativePath = VfsUtil.getRelativePath(approvedFile, projectDir);
+    if (relativePath == null) return null;
+
+    String testReference = inventory.getProperty(relativePath);
+    return testReference != null ? parseTestReference(testReference) : null;
   }
 
   /**
-   * Reverse lookup: finds all approved files for a given test method by searching all inventory
-   * entries for matching {@code ClassName#methodName} values.
+   * Reverse lookup: finds all approved files for a given test method by searching inventory entries
+   * for matching {@code ClassName#methodName} values.
    */
   static @NotNull List<VirtualFile> findApprovedFiles(
       @NotNull String className, @NotNull String methodName, @NotNull Project project) {
-    String testReference = className + "#" + methodName;
-    List<VirtualFile> result = new ArrayList<>();
+    VirtualFile projectDir = ProjectUtil.guessProjectDir(project);
+    if (projectDir == null) return List.of();
 
-    for (VirtualFile inventoryFile : findInventoryFiles(project)) {
-      VirtualFile moduleRoot = inventoryFile.getParent().getParent();
-      Properties properties = loadProperties(inventoryFile);
-      for (String key : properties.stringPropertyNames()) {
-        if (testReference.equals(properties.getProperty(key))) {
-          VirtualFile approvedFile = moduleRoot.findFileByRelativePath(key);
-          if (approvedFile != null) {
-            result.add(approvedFile);
-          }
-        }
-      }
-    }
-    return result;
+    Properties inventory = loadInventory(projectDir);
+    String testReference = "%s#%s".formatted(className, methodName);
+    return inventory.stringPropertyNames().stream()
+        .filter(key -> testReference.equals(inventory.getProperty(key)))
+        .map(projectDir::findFileByRelativePath)
+        .filter(Objects::nonNull)
+        .toList();
   }
 
-  private static @NotNull Properties loadProperties(@NotNull VirtualFile file) {
+  /**
+   * Finds the test method that produces the given file by looking it up in the inventory and
+   * resolving the class and method, or returns {@code null} if not found.
+   */
+  static @Nullable PsiMethod findTestMethod(@NotNull VirtualFile file, @NotNull Project project) {
+    TestReference ref = findTestReference(file, project);
+    if (ref == null) return null;
+    PsiClass psiClass =
+        JavaPsiFacade.getInstance(project)
+            .findClass(ref.className(), GlobalSearchScope.projectScope(project));
+    if (psiClass == null) return null;
+    PsiMethod[] methods = psiClass.findMethodsByName(ref.methodName(), false);
+    return methods.length > 0 ? methods[0] : null;
+  }
+
+  private static @NotNull Properties loadInventory(@NotNull VirtualFile projectDir) {
     Properties properties = new Properties();
-    try (var reader = new InputStreamReader(file.getInputStream(), StandardCharsets.ISO_8859_1)) {
+    VirtualFile inventoryFile = projectDir.findFileByRelativePath(".approvej/inventory.properties");
+    if (inventoryFile == null) return properties;
+    try (var reader =
+        new InputStreamReader(inventoryFile.getInputStream(), StandardCharsets.ISO_8859_1)) {
       properties.load(reader);
     } catch (IOException e) {
-      LOG.warn("Failed to read inventory file: " + file.getPath(), e);
+      LOG.warn("Failed to read inventory file: %s".formatted(inventoryFile.getPath()), e);
     }
     return properties;
   }

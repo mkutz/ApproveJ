@@ -5,7 +5,8 @@
 
   <description><![CDATA[
     Approval testing support for ApproveJ.
-    Provides diff viewing and one-click approval of <code>.received</code> files.
+    Provides diff viewing, one-click approval, bidirectional navigation between
+    test code and approved files, and a dangling approval inspection.
   ]]></description>
 
   <depends>com.intellij.modules.platform</depends>

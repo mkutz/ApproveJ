@@ -7,10 +7,8 @@ import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiMethod;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -19,10 +17,8 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.uast.UBlockExpression;
 import org.jetbrains.uast.UCallExpression;
 import org.jetbrains.uast.UElement;
-import org.jetbrains.uast.UExpression;
 import org.jetbrains.uast.ULambdaExpression;
 import org.jetbrains.uast.UMethod;
-import org.jetbrains.uast.UQualifiedReferenceExpression;
 import org.jetbrains.uast.visitor.AbstractUastVisitor;
 
 /**
@@ -33,7 +29,6 @@ import org.jetbrains.uast.visitor.AbstractUastVisitor;
  */
 public final class DanglingApprovalInspection extends AbstractBaseUastLocalInspectionTool {
 
-  private static final String APPROVAL_BUILDER_CLASS = "org.approvej.ApprovalBuilder";
   private static final Set<String> TERMINAL_METHODS = Set.of("by", "byFile", "byValue");
 
   @Override
@@ -102,33 +97,12 @@ public final class DanglingApprovalInspection extends AbstractBaseUastLocalInspe
 
     @Override
     public boolean visitCallExpression(@NotNull UCallExpression node) {
-      if (!"approve".equals(node.getMethodName())) return false;
+      if (!ApproveCallUtil.isApproveCall(node)) return false;
 
-      PsiMethod method = node.resolve();
-      if (method == null) return false;
-      PsiClass containingClass = method.getContainingClass();
-      if (containingClass == null
-          || !APPROVAL_BUILDER_CLASS.equals(containingClass.getQualifiedName())) {
-        return false;
-      }
+      ApproveCallUtil.ChainWalkResult chain = ApproveCallUtil.findTerminalCall(node);
+      UElement current = chain.chainEnd();
 
-      UElement current = node;
-      String lastMethodName = "approve";
-      while (true) {
-        UElement parent = current.getUastParent();
-        if (parent instanceof UQualifiedReferenceExpression qualRef) {
-          UExpression selector = qualRef.getSelector();
-          if (selector instanceof UCallExpression selectorCall
-              && selectorCall.getMethodName() != null) {
-            lastMethodName = selectorCall.getMethodName();
-            current = qualRef;
-            continue;
-          }
-        }
-        break;
-      }
-
-      if (TERMINAL_METHODS.contains(lastMethodName)) return false;
+      if (TERMINAL_METHODS.contains(chain.lastMethodName())) return false;
 
       UElement chainParent = current.getUastParent();
       if (!(chainParent instanceof UBlockExpression || chainParent instanceof ULambdaExpression)) {

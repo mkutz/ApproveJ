@@ -19,10 +19,13 @@ Install the plugin from the https://plugins.jetbrains.com/plugin/30468-approvej[
 [id=intellij_plugin_diff_viewer]
 == Diff Viewer and One-Click Approval
 
-When a test produces a `.received` file, the plugin shows a banner at the top of the file with two actions:
+When a test produces a `.received` file, the plugin shows a banner at the top of the file with actions:
 
 - **Compare with Approved** — opens a side-by-side diff between the received and approved file.
 - **Approve** — copies the received file over the approved file in one click.
+- **Jump to Test** — navigates to the test method that produced the file.
+
+Similarly, when an approved file has a pending received file, its banner offers a **Compare with Received** action.
 
 .Banner on a received file offering to compare or approve
 image::received-file-banner.png[Banner on a received file with "Compare with Approved" and "Approve" actions,width=100%]
@@ -40,7 +43,7 @@ The plugin provides bidirectional navigation between test code and approved file
 
 - **Test → Approved file**: A gutter icon appears next to `approve()...byFile()` call chains.
 Click it to jump directly to the corresponding approved file.
-- **Approved file → Test**: A banner on approved files offers a "Jump to Test" action that navigates back to the `approve()` call.
+- **Approved/Received file → Test**: Banners on approved and received files offer a "Jump to Test" action that navigates back to the `approve()` call.
 
 .Gutter icon on an `approve()` call chain linking to the approved file
 image::gutter-icon.png[Gutter icon on an approve call chain linking to the approved file,width=100%]

@@ -13,13 +13,11 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.uast.UCallExpression;
-import org.jetbrains.uast.UElement;
-import org.jetbrains.uast.UExpression;
 import org.jetbrains.uast.UMethod;
-import org.jetbrains.uast.UQualifiedReferenceExpression;
 import org.jetbrains.uast.UastUtils;
 
 /**
@@ -28,17 +26,16 @@ import org.jetbrains.uast.UastUtils;
  */
 public final class ApproveCallLineMarkerProvider extends RelatedItemLineMarkerProvider {
 
-  private static final String APPROVAL_BUILDER_CLASS = "org.approvej.ApprovalBuilder";
   private static final Icon ICON = AllIcons.FileTypes.Text;
 
   @Override
   protected void collectNavigationMarkers(
       @NotNull PsiElement element,
       @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
-    UCallExpression callExpression = asApproveCall(element);
+    UCallExpression callExpression = ApproveCallUtil.asApproveCall(element);
     if (callExpression == null) return;
 
-    if (!isTerminatedByByFile(callExpression)) return;
+    if (!"byFile".equals(ApproveCallUtil.findTerminalCall(callExpression).lastMethodName())) return;
 
     UMethod uMethod = UastUtils.getParentOfType(callExpression, UMethod.class);
     if (uMethod == null) return;
@@ -56,7 +53,7 @@ public final class ApproveCallLineMarkerProvider extends RelatedItemLineMarkerPr
 
     PsiManager psiManager = PsiManager.getInstance(project);
     List<PsiFile> targets =
-        approvedFiles.stream().map(psiManager::findFile).filter(f -> f != null).toList();
+        approvedFiles.stream().map(psiManager::findFile).filter(Objects::nonNull).toList();
     if (targets.isEmpty()) return;
 
     NavigationGutterIconBuilder<PsiElement> builder =
@@ -64,53 +61,8 @@ public final class ApproveCallLineMarkerProvider extends RelatedItemLineMarkerPr
             .setTargets(targets)
             .setTooltipText(
                 targets.size() == 1
-                    ? "Navigate to " + approvedFiles.get(0).getName()
+                    ? "Navigate to %s".formatted(approvedFiles.getFirst().getName())
                     : "Navigate to approved file");
     result.add(builder.createLineMarkerInfo(element));
-  }
-
-  /**
-   * Returns the UAST call expression if the given PSI element is the identifier of an {@code
-   * approve()} call on {@code ApprovalBuilder}, or {@code null} otherwise.
-   */
-  private static UCallExpression asApproveCall(@NotNull PsiElement element) {
-    // Only process leaf identifiers to avoid duplicate markers
-    if (element.getFirstChild() != null) return null;
-
-    UElement uElement = org.jetbrains.uast.UastUtils.getUParentForIdentifier(element);
-    if (!(uElement instanceof UCallExpression callExpression)) return null;
-    if (!"approve".equals(callExpression.getMethodName())) return null;
-
-    PsiMethod method = callExpression.resolve();
-    if (method == null) return null;
-    PsiClass containingClass = method.getContainingClass();
-    if (containingClass == null
-        || !APPROVAL_BUILDER_CLASS.equals(containingClass.getQualifiedName())) {
-      return null;
-    }
-    return callExpression;
-  }
-
-  /**
-   * Walks the UAST parent chain from the approve() call to check if the chain ends with {@code
-   * byFile()}.
-   */
-  private static boolean isTerminatedByByFile(@NotNull UCallExpression approveCall) {
-    UElement current = approveCall;
-    String lastMethodName = "approve";
-    while (true) {
-      UElement parent = current.getUastParent();
-      if (parent instanceof UQualifiedReferenceExpression qualRef) {
-        UExpression selector = qualRef.getSelector();
-        if (selector instanceof UCallExpression selectorCall
-            && selectorCall.getMethodName() != null) {
-          lastMethodName = selectorCall.getMethodName();
-          current = qualRef;
-          continue;
-        }
-      }
-      break;
-    }
-    return "byFile".equals(lastMethodName);
   }
 }

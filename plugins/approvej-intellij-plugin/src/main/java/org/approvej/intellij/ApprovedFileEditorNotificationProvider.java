@@ -3,10 +3,7 @@ package org.approvej.intellij;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.JavaPsiFacade;
-import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.ui.EditorNotificationPanel;
 import com.intellij.ui.EditorNotificationProvider;
 import java.util.function.Function;
@@ -25,26 +22,20 @@ public final class ApprovedFileEditorNotificationProvider implements EditorNotif
       @NotNull Project project, @NotNull VirtualFile file) {
     if (!ApprovedFileUtil.isApprovedFile(file)) return null;
 
-    InventoryUtil.TestReference testRef = InventoryUtil.findTestReference(file, project);
-    PsiMethod targetMethod = testRef != null ? resolveMethod(testRef, project) : null;
+    PsiMethod targetMethod = InventoryUtil.findTestMethod(file, project);
+    VirtualFile receivedFile = ApprovedFileUtil.findReceivedFile(file);
 
     return fileEditor -> {
       var panel = new EditorNotificationPanel(fileEditor, EditorNotificationPanel.Status.Info);
       panel.setText("This is an ApproveJ approved file.");
+      if (receivedFile != null) {
+        panel.createActionLabel(
+            "Compare with Received", () -> ReceivedFileUtil.openDiff(project, receivedFile, file));
+      }
       if (targetMethod != null) {
         panel.createActionLabel("Jump to Test", () -> targetMethod.navigate(true));
       }
       return panel;
     };
-  }
-
-  private static @Nullable PsiMethod resolveMethod(
-      @NotNull InventoryUtil.TestReference ref, @NotNull Project project) {
-    PsiClass psiClass =
-        JavaPsiFacade.getInstance(project)
-            .findClass(ref.className(), GlobalSearchScope.projectScope(project));
-    if (psiClass == null) return null;
-    PsiMethod[] methods = psiClass.findMethodsByName(ref.methodName(), false);
-    return methods.length > 0 ? methods[0] : null;
   }
 }

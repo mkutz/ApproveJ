@@ -1,6 +1,5 @@
 package org.approvej.intellij;
 
-import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl;
 import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase;
 
 public class ApproveCallLineMarkerProviderTest extends LightJavaCodeInsightFixtureTestCase {
@@ -33,16 +32,14 @@ public class ApproveCallLineMarkerProviderTest extends LightJavaCodeInsightFixtu
             }
         }
         """);
-    myFixture.doHighlighting();
 
-    var markers =
-        DaemonCodeAnalyzerImpl.getLineMarkers(myFixture.getEditor().getDocument(), getProject());
+    var gutters = myFixture.findAllGutters();
     assertTrue(
-        "No line markers expected for byValue() chain",
-        markers.stream()
+        "No gutter icons expected for byValue() chain",
+        gutters.stream()
             .noneMatch(
-                m -> {
-                  String tooltip = m.getLineMarkerTooltip();
+                g -> {
+                  String tooltip = g.getTooltipText();
                   return tooltip != null && tooltip.contains("approved");
                 }));
   }
@@ -58,16 +55,14 @@ public class ApproveCallLineMarkerProviderTest extends LightJavaCodeInsightFixtu
             }
         }
         """);
-    myFixture.doHighlighting();
 
-    var markers =
-        DaemonCodeAnalyzerImpl.getLineMarkers(myFixture.getEditor().getDocument(), getProject());
+    var gutters = myFixture.findAllGutters();
     assertTrue(
-        "No line markers expected for unrelated approve() method",
-        markers.stream()
+        "No gutter icons expected for unrelated approve() method",
+        gutters.stream()
             .noneMatch(
-                m -> {
-                  String tooltip = m.getLineMarkerTooltip();
+                g -> {
+                  String tooltip = g.getTooltipText();
                   return tooltip != null && tooltip.contains("approved");
                 }));
   }
