@@ -1,5 +1,5 @@
 [id=build_plugins]
-= Build Plugins -- manage approved and received files
+= Build Plugins -- Manage Approved and Received Files
 
 When you rename or delete a test method, its approved file stays behind on disk.
 Over time these leftover files accumulate and clutter the repository.

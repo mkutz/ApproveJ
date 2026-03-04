@@ -1,5 +1,5 @@
 [id=basics]
-= Basics -- your first approval test
+= Basics -- Your First Approval Test
 
 The general entry point to start an approval is the static initializer `approve` of the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`].
 It takes the object which you want to approve as an argument and returns a builder to configure the approval with a fluent API.
@@ -8,7 +8,7 @@ It takes the object which you want to approve as an argument and returns a build
 [id="approve_strings"]
 == Approve Strings
 
-If you have anything that returns an arbitrary string, you can simply build an approval like this
+If you have anything that returns an arbitrary string, you can simply build an approval like this.
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -23,7 +23,7 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_strin
 <1> creates an `ApprovalBuilder<String>`
 <2> compares result to a previously approved value stored in a file next to the test and fails the test if the result differs
 
-Executing such a test, will create two files next to the test code file named like `<TestClass>-<testMethod>-received.txt` and `<TestClass>-<testMethod>-approved.txt`.
+Executing such a test will create two files next to the test code file named like `<TestClass>-<testMethod>-received.txt` and `<TestClass>-<testMethod>-approved.txt`.
 
 The received file will always contain a string representation of the object you want to approve at the last execution.
 
@@ -50,7 +50,7 @@ You can adjust various details of this process:
 
 Of course, you might want to approve more complex objects than just strings.
 
-For example a simple POJO like this
+For example, a simple POJO like this.
 
 [source,java,indent=0]
 .Person POJO
@@ -70,7 +70,7 @@ include::../../../test/java/examples/java/BasicsDocTest.java[tag=approve_pojos]
 ----
 include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_pojos]
 ----
-<1> creates an `ApprovalBuilder<Person>` approve the person
+<1> creates an `ApprovalBuilder<Person>` to approve the person
 
 Will approve the following value:
 
@@ -84,7 +84,7 @@ See <<printing>> if you need a more sophisticated way of printing.
 
 
 [id=named]
-== Named Approvals -- approve multiple values per test case
+== Named Approvals -- Approve Multiple Values per Test Case
 
 Optionally, you can assign a specific name for an approval.
 When you <<approve_by_file>> the chosen name will be added to the filename to help identify the specific approval.

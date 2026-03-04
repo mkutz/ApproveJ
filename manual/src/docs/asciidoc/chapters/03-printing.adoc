@@ -1,18 +1,18 @@
 [id="printing"]
-= Printing -- customize how values are turned into Strings
+= Printing -- Customize How Values Are Turned into Strings
 
 While some `toString` implementations already are quite good, they typically return a one-liner.
 This is fine as long as you only have a few properties.
 However, if you have a lot of properties, it is much easier to read the result if it is formatted nicely.
 
 The most common way to change the print format is to <<default_print_format,configure a global default>>.
-For individual overrides, you can use the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#printedAs(org.approvej.print.PrintFormat))[`printedAs` method] with a link:{javadoc-url}/core/org/approvej/print/PrintFormat.html[`PrintFormat`], or the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#printedBy(java.util.function.Function)[`printedBy` method] with a `Function<T, String>`.
+For individual overrides, you can use the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#printedAs(org.approvej.print.PrintFormat)[`printedAs` method] with a link:{javadoc-url}/core/org/approvej/print/PrintFormat.html[`PrintFormat`], or the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#printedBy(java.util.function.Function)[`printedBy` method] with a `Function<T, String>`.
 
 In addition to the printing method, a `PrintFormat` also provides a filename extension that will be used if the value is written to a file (see <<approve_by_file>>).
 
 
 [id=multi_line_string]
-== Print each property on its own line
+== Print Each Property on Its Own Line
 
 ApproveJ provides a generic link:{javadoc-url}/core/org/approvej/print/MultiLineStringPrintFormat.html[`MultiLineStringPrintFormat`] that will print the object with each of its properties on a new line to make comparing the result easier.
 In addition to field-backed properties, it discovers getter-only properties via `getXxx()` and `isXxx()` methods (the latter only for `boolean`/`Boolean` return types, per the JavaBeans convention).
@@ -49,7 +49,7 @@ include::../../../test/java/examples/java/PrintingDocTest-multi_line_string_form
 
 
 [id=custom_printer_function]
-== Use a custom function to print
+== Use a Custom Function to Print
 
 You can provide a custom `Function<T, String>` to the builder's `printedBy` method.
 
@@ -75,13 +75,13 @@ include::../../../test/java/examples/java/PrintingDocTest-custom_printer_functio
 
 
 [id=custom_print_format]
-== Implement a reusable PrintFormat
+== Implement a Reusable PrintFormat
 
 For more complex cases, you can implement your own link:{javadoc-url}/core/org/approvej/print/PrintFormat.html[`PrintFormat`].
 
 This will allow you to also override the `filenameExtension` method.
 If you use a link:{javadoc-url}/core/org/approvej/approve/FileApprover.html[`FileApprover`] (see <<approve_by_file>>), it will be used to determine the files' filename extension.
-This is useful, if your `Printer` creates a certain format (e.g. JSON, XML, YAML, …).
+This is useful if your `Printer` creates a certain format (e.g. JSON, XML, YAML, …).
 
 E.g. the following format will print a `Person` as a YAML string.
 

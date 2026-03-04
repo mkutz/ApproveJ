@@ -169,7 +169,7 @@ include::../../../test/java/examples/java/JsonJacksonDocTest-pretty_print_json_s
 
 
 [id=json_field_scrubbing]
-== Scrub specific JSON fields
+== Scrub Specific JSON Fields
 
 The link:{javadoc-url}/json-jackson/org/approvej/json/jackson/JsonPointerScrubber.html[`JsonPointerScrubber`] can be used to scrub a JSON node identified by a https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/latest/com/fasterxml/jackson/core/JsonPointer.html[`JsonPointer`].
 

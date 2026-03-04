@@ -6,7 +6,7 @@
 
 Approval testing is a technique that allows you to compare the output of your code with a known good/previously approved output.
 
-An approval test case will only succeed, if the actually received output is equal to the previously approved output.
+An approval test case will only succeed if the actual received output is equal to the previously approved output.
 
 If the received output is different from the approved output, the test will fail and leave it to a human reviewer to approve the received output or to fix the code.
 

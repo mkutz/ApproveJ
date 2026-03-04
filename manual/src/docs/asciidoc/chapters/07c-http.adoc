@@ -1,5 +1,5 @@
 [id=http]
-= HTTP -- catch integration risks
+= HTTP -- Catch Integration Risks
 
 Unlike the JSON and YAML extensions, which provide print formats for specific data formats, the HTTP extension addresses a different concern: **integration risk**.
 

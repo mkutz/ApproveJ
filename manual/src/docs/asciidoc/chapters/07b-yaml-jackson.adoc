@@ -125,7 +125,7 @@ Only the import statements differ:
 [id=yaml_print]
 == Print as YAML
 
-The link:{javadoc-url}/yaml-jackson/org/approvej/yaml/jackson/YamlPrintFormat.html[`YamlPrintFormat`] allows to print any object in YAML format.
+The link:{javadoc-url}/yaml-jackson/org/approvej/yaml/jackson/YamlPrintFormat.html[`YamlPrintFormat`] allows you to print any object in YAML format.
 
 To use YAML as the default print format for all approvals, <<default_print_format,configure it globally>>:
 
@@ -150,7 +150,7 @@ include::../../../test/kotlin/examples/kotlin/YamlJacksonDocTest.kt[tag=print_ya
 
 Creates the following approved file:
 
-[source,json]
+[source,yaml]
 .Approved file
 ----
 include::../../../test/java/examples/java/YamlJacksonDocTest-print_yaml-approved.yaml[]

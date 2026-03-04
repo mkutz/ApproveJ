@@ -1,0 +1,158 @@
+[id=custom_extensions]
+= Custom Extensions -- Your Own Scrubbers, Print Formats, and Reviewers
+
+While ApproveJ ships with a range of built-in scrubbers, print formats, and file reviewers, you can create your own.
+A custom scrubber lets you strip domain-specific dynamic data (e.g. email addresses, internal IDs) that the built-in scrubbers do not cover.
+Custom print formats and file reviewers go a step further: by implementing the provider SPI, they integrate seamlessly with ApproveJ's configuration system and can be set as global defaults via `approvej.properties`.
+
+
+[id=custom_extensions_scrubber]
+== Custom Scrubber
+
+The <<scrubbing,scrubbing chapter>> shows how to pass a lambda to `scrubbedOf()` for one-off cases.
+When you want to reuse a scrubber across tests, implement the link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber`] interface as a class.
+
+The `Scrubber` interface has three type parameters:
+
+[source,java]
+----
+interface Scrubber<I extends Scrubber<I, T, R>, T, R>
+    extends UnaryOperator<T> {
+  // …
+}
+----
+
+- `T` -- the type of value being scrubbed (usually `String`)
+- `R` -- the type of the replacement value (usually `String`)
+- `I` -- the scrubber's own type (a self-referential generic so that `replacement()` returns the correct type)
+
+For the most common case -- scrubbing strings -- you can implement link:{javadoc-url}/core/org/approvej/scrub/StringScrubber.html[`StringScrubber`], which binds all three parameters to `Scrubber<StringScrubber, String, String>`.
+This means you only need to implement two methods:
+
+- `String apply(String value)` -- perform the actual scrubbing
+- `StringScrubber replacement(Replacement<String> replacement)` -- return a copy with a different replacement strategy
+
+Here is a scrubber that replaces email addresses:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/EmailScrubber.java[]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/EmailScrubber.kt[]
+----
+
+<1> Implement `StringScrubber` to get the right type bindings
+<2> Provide a sensible default replacement
+<3> `apply` performs the actual scrubbing -- find matches and replace them
+<4> `replacement` returns a new instance with the given replacement strategy, keeping the scrubber immutable
+
+Use it like any built-in scrubber:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/CustomExtensionsDocTest.java[tag=custom_scrubber]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/CustomExtensionsDocTest.kt[tag=custom_scrubber]
+----
+
+[source]
+.Approved file
+----
+include::../../../test/java/examples/java/CustomExtensionsDocTest-custom_scrubber-approved.txt[]
+----
+
+Because the scrubber implements `replacement()`, callers can swap the replacement strategy:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/CustomExtensionsDocTest.java[tag=custom_scrubber_replacement]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/CustomExtensionsDocTest.kt[tag=custom_scrubber_replacement]
+----
+<1> `replacement()` returns a new scrubber -- the original is unchanged
+
+[source]
+.Approved file
+----
+include::../../../test/java/examples/java/CustomExtensionsDocTest-custom_scrubber_replacement-approved.txt[]
+----
+
+
+[id=custom_extensions_print_format_provider]
+== Custom Print Format Provider
+
+The <<printing,printing chapter>> shows how to pass a `PrintFormat` instance to `printedAs()`.
+If you want your custom print format to be usable as a global default via `approvej.properties`, implement both `PrintFormat<T>` and `PrintFormatProvider<T>`.
+The provider SPI makes your format available by alias, just like the built-in ones.
+
+1. Implement `PrintFormat<T>` and `PrintFormatProvider<T>`
+2. Register via `META-INF/services/org.approvej.configuration.Provider`
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/ScreamingPrintFormat.java[]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/ScreamingPrintFormat.kt[]
+----
+
+.`src/test/resources/META-INF/services/org.approvej.configuration.Provider`
+[source]
+----
+examples.java.ScreamingPrintFormat
+----
+
+Now you can set it as the default in `approvej.properties`:
+
+[source,properties]
+----
+defaultPrintFormat = screaming
+----
+
+
+[id=custom_extensions_reviewer_provider]
+== Custom File Reviewer Provider
+
+Similarly, you can create a custom file reviewer and register it via SPI to make it available as a global default.
+
+1. Implement `FileReviewer` and `FileReviewerProvider`
+2. Register via `META-INF/services/org.approvej.configuration.Provider`
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/LoggingFileReviewer.java[]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/LoggingFileReviewer.kt[]
+----
+
+.`META-INF/services/org.approvej.configuration.Provider`
+[source]
+----
+examples.java.LoggingFileReviewer
+----
+
+Now you can set it as the default in `approvej.properties`:
+
+[source,properties]
+----
+defaultFileReviewer = logging
+----

@@ -1,11 +1,11 @@
 [id=approving]
-= Approving -- adjust the verification
+= Approving -- Adjust the Verification
 
 You conclude the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`] by specifying `by` which link:{javadoc-url}/core/org/approvej/approve/Approver.html[`Approver`] the received value should be approved.
 
 
 [id=approve_by_value]
-== Approve inline without files
+== Approve Inline Without Files
 
 The link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byValue(java.lang.String)[`ApprovalBuilder.byValue()`] method will use an link:{javadoc-url}/core/org/approvej/approve/InplaceApprover.html[`InplaceApprover`] to approve the received value by comparison with a directly provided previously approved value.
 That way, the approved value is plainly visible in the test code.
@@ -27,7 +27,7 @@ include::../../../test/kotlin/examples/kotlin/ApprovingDocTest.kt[tag=approve_in
 [id=approve_by_file]
 == Approve by File
 
-The link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byFile()[`ApprovalBuilder.byFile()`] method will use a link:{javadoc-url}/core/org/approvej/approve/FileApprover.html[`FileApprover`] to approve the received value by comparison a previously approved value stored in a file.
+The link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byFile()[`ApprovalBuilder.byFile()`] method will use a link:{javadoc-url}/core/org/approvej/approve/FileApprover.html[`FileApprover`] to approve the received value by comparison with a previously approved value stored in a file.
 It is used in most of the examples above.
 
 If no approved file exists, it will be created as an empty _approved_ file.
@@ -185,7 +185,7 @@ In that case, you might want to take advantage of the link:{javadoc-url}/core/or
 
 
 [id=dangling_approval_detection]
-== Catch forgotten approvals
+== Catch Forgotten Approvals
 
 If you call `approve()` without a concluding terminal method (`by()`, `byFile()`, or `byValue()`), the test will silently pass without any approval actually happening.
 To catch this mistake, you can annotate your test class with link:{javadoc-url}/core/org/approvej/ApprovalTest.html[`@ApprovalTest`].

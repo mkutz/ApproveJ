@@ -234,7 +234,7 @@ endif::[]
 |Replace with numbered placeholder using default label
 
 |`Replacements.labeled(String label)`
-|Replace with `[scrubbed label]`
+|Replace with `[label]`
 
 |`Replacements.string(String replacement)`
 |Replace with a fixed string
@@ -246,7 +246,7 @@ endif::[]
 |Replace with relative date-time
 
 |`Replacements.masking()`
-|Replace characters with `*`
+|Mask characters (`A` → `A`, `a` → `a`, `0` → `1`)
 |===
 
 

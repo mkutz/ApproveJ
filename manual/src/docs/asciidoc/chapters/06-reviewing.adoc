@@ -1,5 +1,5 @@
 [id="reviewing"]
-= Reviewing -- check differences
+= Reviewing -- Check Differences
 
 If the received value differs from the previously approved, ApproveJ will by default simply fail the test.
 You then need to review the differences and decide if these are to be approved or actually were not intended.
@@ -76,7 +76,7 @@ You can also set this per project in `src/test/resources/approvej.properties` or
 
 
 [id=single_test_reviewer]
-== Override the reviewer for a single test
+== Override the Reviewer for a Single Test
 
 In rare cases you may want to use a different reviewer for a specific test.
 You can do so by calling the `reviewedBy` method on the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`ApprovalBuilder`].

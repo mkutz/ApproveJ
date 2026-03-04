@@ -1,5 +1,5 @@
 [id=configuration]
-= Configuration -- global defaults and environment settings
+= Configuration -- Global Defaults and Environment Settings
 
 ApproveJ can be configured through multiple mechanisms to customize its default behavior.
 This allows you to set global defaults, override them per project, and further override them via environment variables.
@@ -22,76 +22,3 @@ This hierarchy allows you to:
 - Further override them via environment variables (useful for CI/CD pipelines)
 
 See the <<cheat_sheet_configuration,cheat sheet>> for a complete list of all supported properties.
-
-
-[id="custom_extensions"]
-== Custom Extensions
-
-ApproveJ uses a Service Provider Interface (SPI) mechanism that allows you to register custom print formats and reviewers.
-These can then be referenced by alias in the configuration.
-
-
-[id=custom_extensions_print_format_provider]
-=== Custom Print Format Provider
-
-To create a custom print format that can be configured via alias:
-
-1. Implement `PrintFormat<T>` and `PrintFormatProvider<T>`
-2. Register it via `META-INF/services/org.approvej.configuration.Provider`
-
-[source,java,indent=0,role="primary"]
-.Java
-----
-include::../../../test/java/examples/java/ScreamingPrintFormat.java[]
-----
-[source,kotlin,indent=0,role="secondary"]
-.Kotlin
-----
-include::../../../test/kotlin/examples/kotlin/ScreamingPrintFormat.kt[]
-----
-
-.`src/test/resources/META-INF/services/org.approvej.configuration.Provider`
-[source]
-----
-examples.java.ScreamingPrintFormat
-----
-
-Now you can use it in configuration:
-
-[source,properties]
-----
-defaultPrintFormat = screaming
-----
-
-
-[id=custom_extensions_reviewer_provider]
-=== Custom File Reviewer Provider
-
-To create a custom file reviewer that can be configured via alias:
-
-1. Implement `FileReviewer` and `FileReviewerProvider`
-2. Register it via `META-INF/services/org.approvej.configuration.Provider`
-
-[source,java,indent=0,role="primary"]
-.Java
-----
-include::../../../test/java/examples/java/LoggingFileReviewer.java[]
-----
-[source,kotlin,indent=0,role="secondary"]
-.Kotlin
-----
-include::../../../test/kotlin/examples/kotlin/LoggingFileReviewer.kt[]
-----
-
-.`META-INF/services/org.approvej.configuration.Provider`
-[source]
-----
-examples.java.LoggingFileReviewer
-----
-
-Now you can use it in configuration:
-
-[source,properties]
-----
-defaultFileReviewer = logging
-----

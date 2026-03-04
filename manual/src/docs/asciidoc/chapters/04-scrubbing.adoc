@@ -1,5 +1,5 @@
 [id=scrubbing]
-= Scrubbing -- make random parts static
+= Scrubbing -- Make Random Parts Static
 
 Sometimes you might not be able to control the exact output of the object you want to approve.
 For example, if the result object contains a timestamp or a generated ID, you might want to ignore these for the approval.
@@ -23,7 +23,7 @@ include::../../../testFixtures/java/examples/ExampleClass.java[tag=blog_post_poj
 <1> the `id` is a UUID that's being generated randomly, and
 <2> the `published` is a `LocalDateTime` set to now.
 
-In the following example, the two dynamic properties are scrubbed with the built-in Scrubbers for link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html#uuids()[`uuids`] and link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html#instants(java.time.format.DateTimeFormatter)[`instants`].
+In the following example, the two dynamic properties are scrubbed with the built-in Scrubbers for link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html#dateTimeFormat(java.lang.String)[`dateTimeFormat`] and link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html#uuids()[`uuids`].
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -46,7 +46,7 @@ include::../../../test/java/examples/java/ScrubbingDocTest-scrubbing-approved.tx
 ----
 
 [id=built_in_scrubbers]
-== Available built-in Scrubbers
+== Available Built-in Scrubbers
 
 All built-in link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber`] implementations are available via the link:{javadoc-url}/core/org/approvej/scrub/Scrubbers.html[`Scrubbers`] utility class.
 
@@ -192,7 +192,7 @@ Useful when only some values of a matching pattern need scrubbing.
 
 
 [id=replacements]
-== Replacements -- control what scrubbed values become
+== Replacements -- Control What Scrubbed Values Become
 
 By default, built-in scrubbers replace each match with a numbered placeholder like `[uuid 1]`, `[datetime 1]`.
 If the same value appears more than once, it gets the same number, so you can still see that two scrubbed values were equal.
@@ -263,7 +263,7 @@ It receives the matched string and a count (the number of the distinct match) an
 
 
 [id=custom_scrubber]
-== Build your own Scrubber
+== Build Your Own Scrubber
 
 The link:{javadoc-url}/core/org/approvej/scrub/RegexScrubber.html[`RegexScrubber`] already allows for a lot of special custom cases.
 In case this isn't enough, you can also provide a custom link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber<T>`]/`UnaryOperator<T>` implementation to the builder's `scrubbedOf` method.
@@ -289,4 +289,5 @@ include::../../../test/java/examples/java/ScrubbingDocTest-custom_scrubbing-appr
 Note that this `Scrubber` is a `Scrubber<Contact>` and not a `Scrubber<String>`.
 Hence, it is necessary to apply it _before_ the `Printer` is applied.
 
-In case you want to reuse the `Scrubber`, you can also define in a separate class implementing the link:{javadoc-url}/core/org/approvej/scrub/Scrubber.html[`Scrubber<T>`] interface.
+If you want to reuse a scrubber across tests, you can implement the `Scrubber` interface as a standalone class.
+See <<custom_extensions_scrubber>> for a full walkthrough.
