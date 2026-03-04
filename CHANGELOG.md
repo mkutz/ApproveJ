@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v1.4.1
+
+### approvej-intellij-plugin
+
+* 🐞 **Fix navigation in multi-module Gradle projects**
+  The IntelliJ plugin only looked for a single inventory file at the project root.
+  In multi-module projects each module writes its own `.approvej/inventory.properties`,
+  so navigation features (gutter icons, editor banners) found nothing.
+  The plugin now discovers and merges all inventory files across modules.
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.4...v1.4.1
+
+
 ## v1.4
 
 ### core
