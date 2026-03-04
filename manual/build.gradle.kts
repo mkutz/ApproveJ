@@ -61,6 +61,7 @@ tasks.register<org.asciidoctor.gradle.jvm.pdf.AsciidoctorPdfTask>("cheatSheetPdf
 
 asciidoctorj {
   setVersion("3.0.0")
+  logLevel = LogLevel.WARN
   modules {
     diagram.use()
     pdf.version("2.3.19")

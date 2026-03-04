@@ -28,7 +28,7 @@ It provides a fluent API to compare actual values against previously approved "g
 ./gradlew javadoc
 
 # Build website (manual + Javadoc) for approvej.org
-./update-pages <version>   # e.g., ./update-pages 0.12
+./gradlew updatePages -Pversion=<version>   # e.g., ./update-pages 1.3.2
 ```
 
 
