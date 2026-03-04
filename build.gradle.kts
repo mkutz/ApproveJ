@@ -67,6 +67,7 @@ jreleaser {
     github {
       overwrite = true
       update { enabled = true }
+      changelog { external.set(layout.projectDirectory.file("RELEASE_NOTES.md")) }
     }
   }
 }

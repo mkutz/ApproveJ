@@ -47,6 +47,8 @@ jobs:
       - run: ./gradlew :plugins:approvej-intellij-plugin:publishPlugin -Pversion=${{ github.event.inputs.version }}
         env:
           INTELLIJ_MARKETPLACE_TOKEN: ${{ secrets.INTELLIJ_MARKETPLACE_TOKEN }}
+      - name: Extract release notes for version
+        run: awk '/^## v${{ github.event.inputs.version }}$/{found=1; next} /^## v/{if(found) exit} found' CHANGELOG.md > RELEASE_NOTES.md
       - run: ./gradlew jreleaserFullRelease -Pversion=${{ github.event.inputs.version }} --git-root-search --stacktrace
       - uses: actions/upload-artifact@v7
         with:

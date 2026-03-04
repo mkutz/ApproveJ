@@ -1,0 +1,164 @@
+# Changelog
+
+
+## v1.4
+
+### core
+
+* 🛡️ **Dangling approval detection**
+  ApproveJ now detects `approve()` calls that are missing a terminal method (`byFile`, `byValue`, `by`).
+  Annotate your test class with `@ApprovalTest` to enable a JUnit `AfterEachCallback` that fails
+  the test when a dangling approval is found. A shutdown hook provides a fallback warning when
+  the extension is not active.
+
+
+### 🆕 approvej-intellij-plugin
+
+A new IntelliJ IDEA plugin reduces friction when working with `.received` files directly in your IDE:
+
+* 👀 **Diff viewer**
+  Open a side-by-side diff between the received and approved file from the editor notification
+  banner or via context menu actions in the Project View and Editor.
+
+* ✅ **One-click approve**
+  Approve a received file with a single click — copies received to approved and deletes the
+  received file. The action is undoable via IntelliJ's undo mechanism.
+
+* 🧭 **Bidirectional navigation**
+  Gutter icons on `approve()…byFile()` chains navigate to the approved file.
+  When a received file exists, a popup offers to compare or navigate to either file.
+  Editor banners on approved and received files link back to the test method via inventory lookup.
+
+* 🔍 **Dangling approval inspection**
+  A UAST-based code inspection highlights `approve()` calls not concluded with a terminal method
+  and offers quick fixes to append `.byFile()` or `.byValue("")`.
+
+See [manual](https://approvej.org/#intellij_plugin)
+
+
+### manual
+
+* 📖 **Restructured and polished documentation**
+  The manual has been reorganized for usability: chapters follow a clearer progression,
+  custom extensions moved to the Extensions chapter, and typos and grammar have been fixed throughout.
+
+* 📖 **New IntelliJ Plugin chapter**
+  A dedicated chapter documents installation, diff viewer, one-click approval, navigation,
+  and dangling approval inspection with screenshots.
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.3.2...v1.4
+
+
+## v1.3.2
+
+### plugins
+
+Note that the Gradle plugin is still pending release on the Gradle Plugin portal.
+
+* 👀 review all unapproved files
+  The new task/goal allows to trigger a review on all remaining unapproved received files via `gradle approvejReviewUnapproved` or `mvn approvej:review-unapproved` without needing to re-run all other tests.
+  This uses the currently configured `defaultFileReviewerScript` or `defaultFileReviewer`.
+  See [manual](https://approvej.org/#cleanup_review_unapproved)
+
+* 🙈 auto-approve all received files
+  The new task/goal in the build tool plugins allows to automatically approve all remaining received files in a project via `gradle approvejApproveAll` or `mvn approvej:approve-all`.
+  Just like the automatic file reviewer, you should only use this if you still review the changes before committing them to version control!
+  See [manual](https://approvej.org/#cleanup_approve_all)
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.3.1...v1.3.2
+
+
+## v1.3.1
+
+### core
+
+* 🐞 this release fixes a nasty bug, which caused ApproveJ to misplace approved files in a wrong folders like `bin` instead of next to test source as intended (see #200)
+  This probably happened for quite some time and was only now discovered via the new inventory mechanism released in v1.3.
+
+
+## v1.3
+
+### core
+
+* 📋 new inventory mechanism
+  ApproveJ now keeps all created approved files in an inventory file (`.approvej/inventory.properties` in your project).
+  This file allows to implement a cleanup mechanism (see below)
+
+
+### approvej-gradle-plugin & approvej-maven-plugin
+
+* ⚙️ [cleanup mechanism](https://approvej.org/#cleanup)
+  You can now get a list of all approved files that no longer have a corresponding test by executing `./gradlew approvejFindLeftovers` /`mvn approvej:find-leftovers`
+  Running `./gradlew approvejCleanup`/`mvn approvej:cleanup` automatically deletes those files for you.
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.2.2...v1.3
+
+
+## v1.2.2
+
+ab5140c Defer staging repository discovery to projectsEvaluated
+da4fdcc Discover staging repositories dynamically for JReleaser
+fc12451 Document dependency sorting convention
+5a22ed4 Bump org.junit.platform:junit-platform-launcher from 6.0.2 to 6.0.3
+e750fed Bump junit from 6.0.2 to 6.0.3
+
+
+## v1.2.1
+
+### core
+
+* 🔍 getter-only property discovery in `MultiLineStringPrintFormat`
+  `get*` and `is*` methods without backing fields are now discovered and included as properties, consistent with the Jackson-based formats.
+  Field-backed properties appear in declaration order, followed by getter-only properties alphabetically; sorted mode interleaves all by name.
+  ⚠️ Note that this is a potential breaking change as your approved files will now contain additional lines
+
+
+### json-jackson & json-jackson3
+
+* 🪲 the order of method-only properties is now deterministic
+  Before, the properties defined by getters (`get*` or `is*`) were printed in arbitrary order.
+  Now these properties are printed in alphabetic order after the field-backed properties, which are still in order of declaration.
+  Resolves #173
+  ⚠️ Note that this is a potential breaking change the order of properties in you existing approved files might be different
+
+
+### yaml-jackson & yaml-jackson3
+
+* 🎯 deterministic property ordering is now applied to YAML output, matching the behavior of the JSON modules.
+  ⚠️ Note that this is a potential breaking change the order of properties in you existing approved files might be different
+
+
+### manual
+
+* 📖 added cheat sheet (HTML and printable PDF), cross-references between chapters, and CI/CD guidance
+* 📖 documented getter-only property discovery
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.2...v1.2.1
+
+
+## v1.2
+
+### json-jackson & yaml-jackson
+
+* ⚠️ potentially breaking change: both modules now require you to define the Jackson dependency yourself.
+  If you're using ApproveJ in a Spring Boot service or a similar setting, you probably already have that.
+
+
+### 🆕 json-jackson3 & yaml-jackson3
+
+Technically new modules, that allow to use Jackson 3 (instead of Jackson 2 as used by json-jackson and yaml-jackson).
+The APIs are identical, though.
+
+
+### 🆕 http
+
+The mew module can be used to test the integration with external service.
+
+* 🥸 the [`HttpStubServer`](https://approvej.org/javadoc/http/org/approvej/http/HttpStubServer.html) can be used to simulate the service and store the received requests for approval.
+  If you already use WireMock, you can simply use the [`http-wiremock`](https://approvej.org/#_wiremock_adapter) dependency to get some adapter logic.
+
+* 🖨️ received HTTP requests can be printed as http request files (as [defined by JetBrains](https://www.jetbrains.com/help/idea/exploring-http-syntax.html)) using the new [ReceivedHttpRequestPrintFormat](https://approvej.org/javadoc/http/org/approvej/http/ReceivedHttpRequestPrintFormat.html)
+
+* 🧽 [scrubbers](https://approvej.org/#_http_scrubbers) for headers are included
+
+Check the [manual](https://approvej.org/#_http) for more details.
