@@ -82,13 +82,18 @@ public final class ApproveCallLineMarkerProvider extends LineMarkerProviderDescr
         approvedFiles.stream().map(psiManager::findFile).filter(Objects::nonNull).toList();
     if (targets.isEmpty()) return;
 
-    List<VirtualFile> receivedFiles =
-        approvedFiles.stream()
-            .map(ApprovedFileUtil::findReceivedFile)
-            .filter(Objects::nonNull)
-            .toList();
+    VirtualFile firstApprovedWithReceived = null;
+    VirtualFile matchingReceived = null;
+    for (VirtualFile approved : approvedFiles) {
+      VirtualFile received = ApprovedFileUtil.findReceivedFile(approved);
+      if (received != null) {
+        firstApprovedWithReceived = approved;
+        matchingReceived = received;
+        break;
+      }
+    }
 
-    if (receivedFiles.isEmpty()) {
+    if (firstApprovedWithReceived == null) {
       NavigationGutterIconBuilder<PsiElement> builder =
           NavigationGutterIconBuilder.create(ICON)
               .setTargets(targets)
@@ -98,8 +103,8 @@ public final class ApproveCallLineMarkerProvider extends LineMarkerProviderDescr
                       : "Navigate to approved file");
       result.add(builder.createLineMarkerInfo(element));
     } else {
-      VirtualFile approvedFile = approvedFiles.getFirst();
-      VirtualFile receivedFile = receivedFiles.getFirst();
+      VirtualFile approvedFile = firstApprovedWithReceived;
+      VirtualFile receivedFile = matchingReceived;
       var markerInfo =
           new LineMarkerInfo<>(
               element,

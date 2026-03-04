@@ -23,7 +23,7 @@ When a test produces a `.received` file, the plugin shows a banner at the top of
 
 - **Compare with Approved** — opens a side-by-side diff between the received and approved file.
 - **Approve** — copies the received file over the approved file in one click.
-- **Jump to Test** — navigates to the test method that produced the file.
+- **Navigate to Test** — navigates to the test method that produced the file.
 
 Similarly, when an approved file has a pending received file, its banner offers a **Compare with Received** action.
 
@@ -42,14 +42,14 @@ These actions are also available from the context menu on `.received` files in t
 The plugin provides bidirectional navigation between test code and approved files:
 
 - **Test → Approved file**: A gutter icon appears next to `approve()...byFile()` call chains.
-Click it to jump directly to the corresponding approved file.
-- **Approved/Received file → Test**: Banners on approved and received files offer a "Jump to Test" action that navigates back to the `approve()` call.
+Click it to navigate directly to the corresponding approved file.
+- **Approved/Received file → Test**: Banners on approved and received files offer a "Navigate to Test" action that navigates back to the `approve()` call.
 
 .Gutter icon on an `approve()` call chain linking to the approved file
 image::gutter-icon.png[Gutter icon on an approve call chain linking to the approved file,width=100%]
 
-.Banner on an approved file offering to jump to the test
-image::approved-file-banner.png[Banner on an approved file with "Jump to Test" action,width=100%]
+.Banner on an approved file offering to navigate to the test
+image::approved-file-banner.png[Banner on an approved file with "Navigate to Test" action,width=100%]
 
 
 [id=intellij_plugin_inspection]
