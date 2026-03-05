@@ -105,7 +105,7 @@ sonar {
 spotless {
   format("misc") {
     target("**/*.md", "**/*.xml", "**/*.yml", "**/*.yaml", "**/*.html", "**/*.css", ".gitignore")
-    targetExclude("**/build/**/*", "**/.idea/**", "**/.intellijPlatform/**")
+    targetExclude("**/build/**/*", "**/.idea/**", "**/.intellijPlatform/**", "**/node_modules/**")
     trimTrailingWhitespace()
     endWithNewline()
     leadingTabsToSpaces(2)

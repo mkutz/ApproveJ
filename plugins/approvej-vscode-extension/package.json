@@ -1,0 +1,107 @@
+{
+  "name": "approvej",
+  "displayName": "ApproveJ",
+  "description": "Approval testing support for ApproveJ: diff viewing, one-click approval, and navigation between test code and approved files.",
+  "version": "0.1.0",
+  "publisher": "approvej",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/approvej/approvej"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Testing"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "approvej.compareWithApproved",
+        "title": "Compare with Approved",
+        "category": "ApproveJ"
+      },
+      {
+        "command": "approvej.approveReceived",
+        "title": "Approve Received",
+        "category": "ApproveJ"
+      },
+      {
+        "command": "approvej.compareWithReceived",
+        "title": "Compare with Received",
+        "category": "ApproveJ"
+      },
+      {
+        "command": "approvej.navigateToTest",
+        "title": "Navigate to Test",
+        "category": "ApproveJ"
+      },
+      {
+        "command": "approvej.navigateToApprovedFile",
+        "title": "Navigate to Approved File",
+        "category": "ApproveJ"
+      }
+    ],
+    "submenus": [
+      {
+        "id": "approvej.submenu",
+        "label": "ApproveJ"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "submenu": "approvej.submenu",
+          "when": "resourceFilename =~ /-(received|approved)(\\.|$)/",
+          "group": "approvej"
+        }
+      ],
+      "editor/context": [
+        {
+          "submenu": "approvej.submenu",
+          "when": "resourceFilename =~ /-(received|approved)(\\.|$)/",
+          "group": "approvej"
+        }
+      ],
+      "approvej.submenu": [
+        {
+          "command": "approvej.compareWithApproved",
+          "when": "resourceFilename =~ /^.+-received(\\.|$)/"
+        },
+        {
+          "command": "approvej.approveReceived",
+          "when": "resourceFilename =~ /^.+-received(\\.|$)/"
+        },
+        {
+          "command": "approvej.compareWithReceived",
+          "when": "resourceFilename =~ /^.+-approved(\\.|$)/"
+        },
+        {
+          "command": "approvej.navigateToTest",
+          "when": "resourceFilename =~ /-(received|approved)(\\.|$)/"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "mocha out/test/**/*.test.js",
+    "package": "vsce package",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.0.0",
+    "mocha": "^11.0.0",
+    "typescript": "^5.7.0"
+  }
+}
