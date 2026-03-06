@@ -12,6 +12,8 @@ include("plugins:approvej-maven-plugin")
 
 include("plugins:approvej-intellij-plugin")
 
+include("plugins:approvej-vscode-extension")
+
 include("modules:json-jackson")
 
 include("modules:json-jackson3")

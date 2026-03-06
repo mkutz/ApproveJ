@@ -23,6 +23,10 @@ updates:
       - dependency-name: junit:junit
         update-types:
         - version-update:semver-major
+  - package-ecosystem: npm
+    directory: /plugins/approvej-vscode-extension
+    schedule:
+      interval: weekly
   - package-ecosystem: github-actions
     directory: /
     schedule:

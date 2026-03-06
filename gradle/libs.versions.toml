@@ -44,6 +44,7 @@ wiremock = { module = "org.wiremock:wiremock", version.ref = "wiremock" }
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version = "4.0.5" }
 asciidoctor-pdf = { id = "org.asciidoctor.jvm.pdf", version = "4.0.5" }
 intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-platform" }
+node = { id = "com.github.node-gradle.node", version = "7.1.0" }
 jreleaser = { id = "org.jreleaser", version = "1.23.0" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.3.10" }
 maven-plugin-development = { id = "org.gradlex.maven-plugin-development", version = "1.0.3" }
