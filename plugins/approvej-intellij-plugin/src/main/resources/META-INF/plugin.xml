@@ -13,6 +13,13 @@
   <depends>com.intellij.modules.java</depends>
 
   <extensions defaultExtensionNs="com.intellij">
+    <dependencySupport kind="java" coordinate="org.approvej:core" displayName="ApproveJ"/>
+    <dependencySupport kind="java" coordinate="org.approvej:http" displayName="ApproveJ"/>
+    <dependencySupport kind="java" coordinate="org.approvej:http-wiremock" displayName="ApproveJ"/>
+    <dependencySupport kind="java" coordinate="org.approvej:json-jackson" displayName="ApproveJ"/>
+    <dependencySupport kind="java" coordinate="org.approvej:json-jackson3" displayName="ApproveJ"/>
+    <dependencySupport kind="java" coordinate="org.approvej:yaml-jackson" displayName="ApproveJ"/>
+    <dependencySupport kind="java" coordinate="org.approvej:yaml-jackson3" displayName="ApproveJ"/>
     <localInspection
         language="UAST"
         groupName="ApproveJ"
