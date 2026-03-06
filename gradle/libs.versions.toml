@@ -7,7 +7,7 @@ jackson3 = "3.1.0"
 junit = "6.0.3"
 junit5 = "5.11.3"
 junitPlatform5 = "1.11.3"
-maven = "3.9.12"
+maven = "3.9.13"
 wiremock = "3.13.2"
 
 [libraries]
