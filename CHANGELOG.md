@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v1.4.2
+
+### approvej-intellij-plugin
+
+* ✨ **Plugin recommendations via dependency support**
+  IntelliJ now suggests the ApproveJ plugin when a project uses any ApproveJ dependency.
+
+* 🎨 **Custom gutter icons**
+  Gutter markers use dedicated ApproveJ icons: green for approved, orange when a received file exists.
+
+* 📝 **Improved Marketplace listing**
+  Richer plugin description with feature list and automated change notes from the changelog.
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.4.1...v1.4.2
+
+
 ## v1.4.1
 
 ### approvej-intellij-plugin
