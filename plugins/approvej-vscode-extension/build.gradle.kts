@@ -32,6 +32,20 @@ val npmPackage by
     outputs.dir(layout.projectDirectory)
   }
 
+val npmSetVersion by
+  tasks.registering(com.github.gradle.node.npm.task.NpmTask::class) {
+    args =
+      listOf("version", project.version.toString(), "--no-git-tag-version", "--allow-same-version")
+  }
+
+val npmPublish by
+  tasks.registering(com.github.gradle.node.npm.task.NpxTask::class) {
+    dependsOn(npmSetVersion, npmCompile)
+    command = "vsce"
+    args = listOf("publish")
+    environment = mapOf("VSCE_PAT" to (System.getenv("VSCE_PAT") ?: ""))
+  }
+
 tasks.register("check") { dependsOn(npmTest) }
 
 tasks.register("clean") { delete("out", "node_modules") }

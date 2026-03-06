@@ -47,6 +47,9 @@ jobs:
       - run: ./gradlew :plugins:approvej-intellij-plugin:publishPlugin -Pversion=${{ github.event.inputs.version }}
         env:
           INTELLIJ_MARKETPLACE_TOKEN: ${{ secrets.INTELLIJ_MARKETPLACE_TOKEN }}
+      - run: ./gradlew :plugins:approvej-vscode-extension:npmPublish -Pversion=${{ github.event.inputs.version }}
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
       - name: Extract release notes for version
         run: awk '/^## v${{ github.event.inputs.version }}$/{found=1; next} /^## v/{if(found) exit} found' CHANGELOG.md > RELEASE_NOTES.md
       - run: ./gradlew jreleaserFullRelease -Pversion=${{ github.event.inputs.version }} --git-root-search --stacktrace
