@@ -22,11 +22,56 @@ intellijPlatform {
     name = "ApproveJ"
     version = project.version.toString()
     description =
-      "Approval testing support for ApproveJ: diff viewer and one-click approval of .received files."
+      """
+      <p>IDE support for <a href="https://approvej.org">ApproveJ</a>, an approval testing library for the JVM.</p>
+
+      <h3>Features</h3>
+      <ul>
+        <li><b>Diff viewer</b> — side-by-side comparison of received and approved files from
+            editor banners, context menus, or gutter icon popups.</li>
+        <li><b>One-click approve</b> — approve a received file with a single click; fully undoable.</li>
+        <li><b>Bidirectional navigation</b> — gutter icons on <code>approve()…byFile()</code> chains
+            navigate to the approved file. Editor banners on approved and received files link back
+            to the test method.</li>
+        <li><b>Dangling approval inspection</b> — highlights <code>approve()</code> calls missing a
+            terminal method and offers quick fixes.</li>
+      </ul>
+
+      <p>See the <a href="https://approvej.org/#intellij_plugin">documentation</a> for details.</p>
+      """
+        .trimIndent()
     vendor { name = "ApproveJ" }
     ideaVersion { sinceBuild = "251" }
+    changeNotes = provider { extractChangeNotes(project.version.toString()) }
   }
   publishing { token = providers.environmentVariable("INTELLIJ_MARKETPLACE_TOKEN") }
+}
+
+fun extractChangeNotes(version: String): String {
+  val changelog = rootProject.file("CHANGELOG.md")
+  if (!changelog.exists()) return ""
+  val lines = changelog.readLines()
+  val versionStart = lines.indexOfFirst { it.trimEnd() == "## v$version" }
+  if (versionStart == -1) return ""
+  val versionEnd =
+    lines
+      .drop(versionStart + 1)
+      .indexOfFirst { it.startsWith("## v") }
+      .let { if (it == -1) lines.size else it + versionStart + 1 }
+  val versionLines = lines.subList(versionStart + 1, versionEnd)
+  val pluginStart =
+    versionLines.indexOfFirst { it.trimEnd().matches(Regex("###.*approvej-intellij-plugin")) }
+  if (pluginStart == -1) return ""
+  val pluginEnd =
+    versionLines
+      .drop(pluginStart + 1)
+      .indexOfFirst { it.startsWith("### ") }
+      .let { if (it == -1) versionLines.size else it + pluginStart + 1 }
+  return versionLines
+    .subList(pluginStart + 1, pluginEnd)
+    .filter { !it.startsWith("**Full Changelog**") }
+    .joinToString("\n")
+    .trim()
 }
 
 /* Use JUnit 5.11 for IntelliJ platform tests to avoid version conflicts with IntelliJ's test
