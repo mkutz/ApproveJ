@@ -11,6 +11,8 @@ plugins {
 
 java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
 
+sonar { properties { property("sonar.coverage.exclusions", "src/main/java/**") } }
+
 repositories {
   mavenCentral()
   intellijPlatform { defaultRepositories() }
