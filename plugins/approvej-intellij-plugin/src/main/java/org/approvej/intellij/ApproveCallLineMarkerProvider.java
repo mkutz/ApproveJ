@@ -3,7 +3,6 @@ package org.approvej.intellij;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
@@ -21,7 +20,6 @@ import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import javax.swing.Icon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.uast.UCallExpression;
@@ -35,11 +33,14 @@ import org.jetbrains.uast.UastUtils;
  */
 public final class ApproveCallLineMarkerProvider extends LineMarkerProviderDescriptor {
 
-  private static final Icon ICON = AllIcons.FileTypes.Text;
-
   @Override
   public String getName() {
     return "ApproveJ approved file";
+  }
+
+  @Override
+  public javax.swing.@Nullable Icon getIcon() {
+    return ApproveJIcons.APPROVED;
   }
 
   @Override
@@ -95,7 +96,7 @@ public final class ApproveCallLineMarkerProvider extends LineMarkerProviderDescr
 
     if (firstApprovedWithReceived == null) {
       NavigationGutterIconBuilder<PsiElement> builder =
-          NavigationGutterIconBuilder.create(ICON)
+          NavigationGutterIconBuilder.create(ApproveJIcons.APPROVED)
               .setTargets(targets)
               .setTooltipText(
                   targets.size() == 1
@@ -109,7 +110,7 @@ public final class ApproveCallLineMarkerProvider extends LineMarkerProviderDescr
           new LineMarkerInfo<>(
               element,
               element.getTextRange(),
-              ICON,
+              ApproveJIcons.APPROVAL_PENDING,
               psi -> "Received and approved files",
               (MouseEvent e, PsiElement elt) ->
                   showPopup(e, elt.getProject(), receivedFile, approvedFile),
