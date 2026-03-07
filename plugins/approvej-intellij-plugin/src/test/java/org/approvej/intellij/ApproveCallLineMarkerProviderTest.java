@@ -14,6 +14,7 @@ public class ApproveCallLineMarkerProviderTest extends LightJavaCodeInsightFixtu
             public static <T> ApprovalBuilder<T> approve(T value) { return null; }
             public ApprovalBuilder<T> printedAs(Object format) { return this; }
             public ApprovalBuilder<T> scrubbedOf(Object scrubber) { return this; }
+            public ApprovalBuilder<T> named(String name) { return this; }
             public void byFile() {}
             public void byValue(java.lang.String expected) {}
             public Object by(Object approver) { return null; }

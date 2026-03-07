@@ -3,6 +3,7 @@ package org.approvej.intellij;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.uast.UCallExpression;
@@ -67,6 +68,34 @@ final class ApproveCallUtil {
       break;
     }
     return new ChainWalkResult(lastMethodName, current);
+  }
+
+  /**
+   * Walks the UAST parent chain from an {@code approve()} call and returns the string literal
+   * argument of a {@code .named()} call in the chain, or {@code null} if no such call exists.
+   */
+  static @Nullable String findNamedArgument(@NotNull UCallExpression approveCall) {
+    UElement current = approveCall;
+    while (true) {
+      UElement parent = current.getUastParent();
+      if (parent instanceof UQualifiedReferenceExpression qualRef) {
+        UExpression selector = qualRef.getSelector();
+        if (selector instanceof UCallExpression selectorCall
+            && "named".equals(selectorCall.getMethodName())) {
+          List<UExpression> args = selectorCall.getValueArguments();
+          if (args.size() == 1) {
+            Object evaluated = args.getFirst().evaluate();
+            if (evaluated instanceof String s) {
+              return s;
+            }
+          }
+        }
+        current = qualRef;
+        continue;
+      }
+      break;
+    }
+    return null;
   }
 
   record ChainWalkResult(String lastMethodName, UElement chainEnd) {}

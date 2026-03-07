@@ -74,8 +74,17 @@ public final class ApproveCallLineMarkerProvider extends LineMarkerProviderDescr
     String methodName = psiMethod.getName();
     Project project = element.getProject();
 
+    String namedArg = ApproveCallUtil.findNamedArgument(callExpression);
+
     List<VirtualFile> approvedFiles =
         InventoryUtil.findApprovedFiles(className, methodName, project);
+    if (namedArg != null) {
+      String affix = "-%s-approved".formatted(namedArg);
+      approvedFiles = approvedFiles.stream().filter(f -> f.getName().contains(affix)).toList();
+    } else if (approvedFiles.size() > 1) {
+      String unnamed = "%s-approved".formatted(methodName);
+      approvedFiles = approvedFiles.stream().filter(f -> f.getName().contains(unnamed)).toList();
+    }
     if (approvedFiles.isEmpty()) return;
 
     PsiManager psiManager = PsiManager.getInstance(project);
