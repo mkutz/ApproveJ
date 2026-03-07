@@ -91,7 +91,11 @@ public final class ApproveJRenamePsiElementProcessor extends RenamePsiElementPro
   private static @NotNull Map<PsiElement, String> prepareMethodRenaming(
       @NotNull PsiMethod method, @NotNull String newMethodName) {
     PsiClass containingClass = method.getContainingClass();
-    if (containingClass == null || containingClass.getQualifiedName() == null) return Map.of();
+    if (containingClass == null
+        || containingClass.getQualifiedName() == null
+        || containingClass.getName() == null) {
+      return Map.of();
+    }
 
     String className = containingClass.getQualifiedName();
     String oldMethodName = method.getName();
@@ -140,9 +144,7 @@ public final class ApproveJRenamePsiElementProcessor extends RenamePsiElementPro
       }
     }
 
-    if (!pathRenames.isEmpty()) {
-      InventoryUtil.updateEntries(project, pathRenames, Map.of(oldTestReference, newTestReference));
-    }
+    InventoryUtil.updateEntries(project, pathRenames, Map.of(oldTestReference, newTestReference));
     return renames;
   }
 
@@ -207,7 +209,7 @@ public final class ApproveJRenamePsiElementProcessor extends RenamePsiElementPro
       }
     }
 
-    if (!pathRenames.isEmpty()) {
+    if (!pathRenames.isEmpty() || !testReferenceRenames.isEmpty()) {
       InventoryUtil.updateEntries(project, pathRenames, testReferenceRenames);
     }
     return renames;

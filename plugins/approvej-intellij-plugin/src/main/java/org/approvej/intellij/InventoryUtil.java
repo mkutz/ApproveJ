@@ -123,7 +123,10 @@ final class InventoryUtil {
 
   private static @Nullable String modulePrefix(
       @NotNull VirtualFile inventoryFile, @NotNull VirtualFile projectDir) {
-    VirtualFile moduleDir = inventoryFile.getParent().getParent();
+    VirtualFile inventoryDir = inventoryFile.getParent();
+    if (inventoryDir == null) return null;
+    VirtualFile moduleDir = inventoryDir.getParent();
+    if (moduleDir == null) return null;
     return VfsUtil.getRelativePath(moduleDir, projectDir);
   }
 
@@ -174,16 +177,17 @@ final class InventoryUtil {
       String value = properties.getProperty(key);
 
       String newProjectRelKey = pathRenames.get(projectRelKey);
+      String newKey = key;
       if (newProjectRelKey != null) {
-        String newKey =
+        newKey =
             (prefix == null || prefix.isEmpty())
                 ? newProjectRelKey
                 : newProjectRelKey.substring(prefix.length() + 1);
-        String newValue = testReferenceRenames.getOrDefault(value, value);
-        updated.setProperty(newKey, newValue);
+      }
+      String newValue = testReferenceRenames.getOrDefault(value, value);
+      updated.setProperty(newKey, newValue);
+      if (!newKey.equals(key) || !newValue.equals(value)) {
         changed = true;
-      } else {
-        updated.setProperty(key, value);
       }
     }
 
