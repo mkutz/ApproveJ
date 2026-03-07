@@ -35,6 +35,8 @@
     <codeInsight.lineMarkerProvider
         language="UAST"
         implementationClass="org.approvej.intellij.ApproveCallLineMarkerProvider"/>
+    <renamePsiElementProcessor order="last"
+        implementation="org.approvej.intellij.ApproveJRenamePsiElementProcessor"/>
   </extensions>
 
   <actions>
