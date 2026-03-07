@@ -1,7 +1,6 @@
 package org.approvej.intellij;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
@@ -144,7 +143,6 @@ public final class ApproveJRenamePsiElementProcessor extends RenamePsiElementPro
 
     Project project = clazz.getProject();
     PsiManager psiManager = PsiManager.getInstance(project);
-    VirtualFile projectDir = ProjectUtil.guessProjectDir(project);
     Map<PsiElement, String> renames = new HashMap<>();
     Set<VirtualFile> renamedDirectories = new HashSet<>();
 
