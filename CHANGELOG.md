@@ -1,6 +1,17 @@
 # Changelog
 
 
+## Unreleased
+
+### approvej-intellij-plugin
+
+* ✨ **Rename refactoring support for approved files**
+  When renaming a test class or method via IntelliJ's refactoring (Shift+F6),
+  approved and received files are now automatically renamed along with it.
+  Supports both Java and Kotlin, next-to-test and subdirectory naming patterns,
+  affixed files, and keeps the inventory in sync.
+
+
 ## v1.4.2
 
 ### approvej-intellij-plugin
