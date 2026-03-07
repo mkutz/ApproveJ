@@ -37,6 +37,8 @@
         implementationClass="org.approvej.intellij.ApproveCallLineMarkerProvider"/>
     <renamePsiElementProcessor order="last"
         implementation="org.approvej.intellij.ApproveJRenamePsiElementProcessor"/>
+    <refactoring.elementListenerProvider
+        implementation="org.approvej.intellij.ApproveJRefactoringListenerProvider"/>
   </extensions>
 
   <actions>

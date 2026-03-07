@@ -2,7 +2,6 @@ package org.approvej.intellij;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectUtil;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
@@ -67,14 +66,14 @@ public final class ApproveJRenamePsiElementProcessor extends RenamePsiElementPro
     return name;
   }
 
-  private static @Nullable PsiMethod resolveMethod(@NotNull PsiElement element) {
+  static @Nullable PsiMethod resolveMethod(@NotNull PsiElement element) {
     if (element instanceof PsiMethod method) return method;
     UElement uElement = toUElement(element);
     if (uElement instanceof UMethod uMethod) return uMethod.getJavaPsi();
     return null;
   }
 
-  private static @Nullable PsiClass resolveClass(@NotNull PsiElement element) {
+  static @Nullable PsiClass resolveClass(@NotNull PsiElement element) {
     if (element instanceof PsiClass clazz) return clazz;
     UElement uElement = toUElement(element);
     if (uElement instanceof UClass uClass) return uClass.getJavaPsi();
@@ -106,60 +105,35 @@ public final class ApproveJRenamePsiElementProcessor extends RenamePsiElementPro
         InventoryUtil.findApprovedFiles(className, oldMethodName, project);
     if (approvedFiles.isEmpty()) return Map.of();
 
-    VirtualFile projectDir = ProjectUtil.guessProjectDir(project);
     Map<PsiElement, String> renames = new HashMap<>();
-    Map<String, String> pathRenames = new HashMap<>();
-    String oldTestReference = "%s#%s".formatted(className, oldMethodName);
-    String newTestReference = "%s#%s".formatted(className, newMethodName);
-
     PsiManager psiManager = PsiManager.getInstance(project);
     for (VirtualFile approvedFile : approvedFiles) {
-      RenameResult result =
-          renameFileForMethodChange(
-              approvedFile, simpleClassName, oldMethodName, newMethodName, psiManager, projectDir);
-      renames.putAll(result.renames());
-      pathRenames.putAll(result.pathRenames());
+      addMethodFileRename(
+          approvedFile, simpleClassName, oldMethodName, newMethodName, psiManager, renames);
 
       VirtualFile receivedFile = ApprovedFileUtil.findReceivedFile(approvedFile);
       if (receivedFile != null) {
-        RenameResult receivedResult =
-            renameFileForMethodChange(
-                receivedFile, simpleClassName, oldMethodName, newMethodName, psiManager, null);
-        renames.putAll(receivedResult.renames());
+        addMethodFileRename(
+            receivedFile, simpleClassName, oldMethodName, newMethodName, psiManager, renames);
       }
     }
-
-    InventoryUtil.updateEntries(project, pathRenames, Map.of(oldTestReference, newTestReference));
     return renames;
   }
 
-  private static @NotNull RenameResult renameFileForMethodChange(
+  private static void addMethodFileRename(
       @NotNull VirtualFile file,
       @NotNull String simpleClassName,
       @NotNull String oldMethodName,
       @NotNull String newMethodName,
       @NotNull PsiManager psiManager,
-      @Nullable VirtualFile projectDir) {
+      @NotNull Map<PsiElement, String> renames) {
     String newFileName =
         computeNewFileName(file.getName(), simpleClassName, oldMethodName, newMethodName);
-    if (newFileName == null) return RenameResult.EMPTY;
-
-    Map<PsiElement, String> renames = new HashMap<>();
+    if (newFileName == null) return;
     PsiFile psiFile = psiManager.findFile(file);
     if (psiFile != null) {
       renames.put(psiFile, newFileName);
     }
-    Map<String, String> pathRenames = new HashMap<>();
-    String path = relativePath(projectDir, file);
-    if (path != null) {
-      pathRenames.put(
-          path, path.substring(0, path.length() - file.getName().length()) + newFileName);
-    }
-    return new RenameResult(renames, pathRenames);
-  }
-
-  private record RenameResult(Map<PsiElement, String> renames, Map<String, String> pathRenames) {
-    static final RenameResult EMPTY = new RenameResult(Map.of(), Map.of());
   }
 
   private static @NotNull Map<PsiElement, String> prepareClassRenaming(
@@ -173,116 +147,59 @@ public final class ApproveJRenamePsiElementProcessor extends RenamePsiElementPro
     VirtualFile projectDir = ProjectUtil.guessProjectDir(project);
     Map<PsiElement, String> renames = new HashMap<>();
     Set<VirtualFile> renamedDirectories = new HashSet<>();
-    Map<String, String> pathRenames = new HashMap<>();
-    Map<String, String> testReferenceRenames = new HashMap<>();
-
-    String packageName = qualifiedName.substring(0, qualifiedName.length() - oldClassName.length());
-    String newQualifiedName = packageName + newClassName;
 
     for (PsiMethod method : clazz.getMethods()) {
       String methodName = method.getName();
       List<VirtualFile> approvedFiles =
           InventoryUtil.findApprovedFiles(qualifiedName, methodName, project);
 
-      String oldTestReference = "%s#%s".formatted(qualifiedName, methodName);
-      String newTestReference = "%s#%s".formatted(newQualifiedName, methodName);
-      if (!approvedFiles.isEmpty()) {
-        testReferenceRenames.put(oldTestReference, newTestReference);
-      }
-
       for (VirtualFile approvedFile : approvedFiles) {
-        RenameResult fileResult =
-            renameFileForClassChange(
-                approvedFile, oldClassName, newClassName, psiManager, projectDir);
-        renames.putAll(fileResult.renames());
-        pathRenames.putAll(fileResult.pathRenames());
+        addClassFileRename(approvedFile, oldClassName, newClassName, psiManager, renames);
 
         VirtualFile receivedFile = ApprovedFileUtil.findReceivedFile(approvedFile);
         if (receivedFile != null) {
-          RenameResult receivedResult =
-              renameFileForClassChange(
-                  receivedFile, oldClassName, newClassName, psiManager, projectDir);
-          renames.putAll(receivedResult.renames());
-          pathRenames.putAll(receivedResult.pathRenames());
+          addClassFileRename(receivedFile, oldClassName, newClassName, psiManager, renames);
         }
 
-        RenameResult dirResult =
-            renameDirForClassChange(
-                approvedFile,
-                oldClassName,
-                newClassName,
-                psiManager,
-                renamedDirectories,
-                projectDir);
-        renames.putAll(dirResult.renames());
-        pathRenames.putAll(dirResult.pathRenames());
+        addClassDirRename(
+            approvedFile, oldClassName, newClassName, psiManager, renamedDirectories, renames);
       }
-    }
-
-    if (!pathRenames.isEmpty() || !testReferenceRenames.isEmpty()) {
-      InventoryUtil.updateEntries(project, pathRenames, testReferenceRenames);
     }
     return renames;
   }
 
-  private static @NotNull RenameResult renameFileForClassChange(
+  private static void addClassFileRename(
       @NotNull VirtualFile file,
       @NotNull String oldClassName,
       @NotNull String newClassName,
       @NotNull PsiManager psiManager,
-      @Nullable VirtualFile projectDir) {
+      @NotNull Map<PsiElement, String> renames) {
     String filename = file.getName();
-    if (!filename.startsWith(oldClassName + "-")) return RenameResult.EMPTY;
-
+    if (!filename.startsWith(oldClassName + "-")) return;
     String newFileName = newClassName + filename.substring(oldClassName.length());
-    Map<PsiElement, String> renames = new HashMap<>();
     PsiFile psiFile = psiManager.findFile(file);
     if (psiFile != null) {
       renames.put(psiFile, newFileName);
     }
-    Map<String, String> pathRenames = new HashMap<>();
-    String relativePath = relativePath(projectDir, file);
-    if (relativePath != null) {
-      pathRenames.put(
-          relativePath,
-          relativePath.substring(0, relativePath.length() - filename.length()) + newFileName);
-    }
-    return new RenameResult(renames, pathRenames);
   }
 
-  private static @NotNull RenameResult renameDirForClassChange(
+  private static void addClassDirRename(
       @NotNull VirtualFile file,
       @NotNull String oldClassName,
       @NotNull String newClassName,
       @NotNull PsiManager psiManager,
       @NotNull Set<VirtualFile> renamedDirectories,
-      @Nullable VirtualFile projectDir) {
+      @NotNull Map<PsiElement, String> renames) {
     VirtualFile parentDir = file.getParent();
     if (parentDir == null
         || !parentDir.getName().equals(oldClassName)
         || !renamedDirectories.add(parentDir)) {
-      return RenameResult.EMPTY;
+      return;
     }
-    Map<PsiElement, String> renames = new HashMap<>();
     PsiDirectory psiDir = psiManager.findDirectory(parentDir);
     if (psiDir != null) {
       renames.put(psiDir, newClassName);
     }
-    Map<String, String> pathRenames = new HashMap<>();
-    String oldDirPath = relativePath(projectDir, parentDir);
-    if (oldDirPath != null) {
-      String newDirPath =
-          oldDirPath.substring(0, oldDirPath.length() - oldClassName.length()) + newClassName;
-      for (VirtualFile child : parentDir.getChildren()) {
-        pathRenames.put(oldDirPath + "/" + child.getName(), newDirPath + "/" + child.getName());
-      }
-    }
-    return new RenameResult(renames, pathRenames);
-  }
-
-  private static @Nullable String relativePath(
-      @Nullable VirtualFile projectDir, @NotNull VirtualFile file) {
-    return projectDir != null ? VfsUtil.getRelativePath(file, projectDir) : null;
   }
 
   /**
