@@ -1,7 +1,7 @@
 # Changelog
 
 
-## Unreleased
+## v1.4.3
 
 * ✨ **Rename refactoring support for approved files**
   When renaming a test class or method via IntelliJ's refactoring (Shift+F6),
@@ -12,6 +12,12 @@
 * 🐞 **Fix gutter icon filtering for nextToTest naming pattern**
   Gutter icons now correctly match approved files using the default `nextToTest`
   naming pattern where filenames include the class name prefix.
+
+
+## v1.4.2.1
+
+* 🐞 **Fix missing gutter icons**
+  The SVG icon files were never committed, causing all gutter icons to fail silently.
 
 
 ## v1.4.2
