@@ -50,7 +50,7 @@ intellijPlatform {
 }
 
 fun extractChangeNotes(version: String): String {
-  val changelog = rootProject.file("CHANGELOG.md")
+  val changelog = project.file("CHANGELOG.md")
   if (!changelog.exists()) return ""
   val lines = changelog.readLines()
   val versionStart = lines.indexOfFirst { it.trimEnd() == "## v$version" }
@@ -60,20 +60,7 @@ fun extractChangeNotes(version: String): String {
       .drop(versionStart + 1)
       .indexOfFirst { it.startsWith("## v") }
       .let { if (it == -1) lines.size else it + versionStart + 1 }
-  val versionLines = lines.subList(versionStart + 1, versionEnd)
-  val pluginStart =
-    versionLines.indexOfFirst { it.trimEnd().matches(Regex("###.*approvej-intellij-plugin")) }
-  if (pluginStart == -1) return ""
-  val pluginEnd =
-    versionLines
-      .drop(pluginStart + 1)
-      .indexOfFirst { it.startsWith("### ") }
-      .let { if (it == -1) versionLines.size else it + pluginStart + 1 }
-  return versionLines
-    .subList(pluginStart + 1, pluginEnd)
-    .filter { !it.startsWith("**Full Changelog**") }
-    .joinToString("\n")
-    .trim()
+  return lines.subList(versionStart + 1, versionEnd).joinToString("\n").trim()
 }
 
 /* Use JUnit 5.11 for IntelliJ platform tests to avoid version conflicts with IntelliJ's test

@@ -1,0 +1,31 @@
+name: Publish IntelliJ Plugin
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Plugin version to publish (e.g. 1.4.3)'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: temurin
+
+      - uses: gradle/actions/setup-gradle@cd4b95f1dffd155d6d8f6b8c195a3ff2f9f77a5d
+
+      - run: ./gradlew :plugins:approvej-intellij-plugin:publishPlugin -Pversion=${{ github.event.inputs.version }}
+        env:
+          INTELLIJ_MARKETPLACE_TOKEN: ${{ secrets.INTELLIJ_MARKETPLACE_TOKEN }}
