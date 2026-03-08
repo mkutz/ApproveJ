@@ -20,6 +20,7 @@ import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.uast.UCallExpression;
@@ -39,7 +40,7 @@ public final class ApproveCallLineMarkerProvider extends LineMarkerProviderDescr
   }
 
   @Override
-  public javax.swing.@Nullable Icon getIcon() {
+  public @NotNull Icon getIcon() {
     return ApproveJIcons.APPROVED;
   }
 
@@ -74,8 +75,21 @@ public final class ApproveCallLineMarkerProvider extends LineMarkerProviderDescr
     String methodName = psiMethod.getName();
     Project project = element.getProject();
 
+    String namedArg = ApproveCallUtil.findNamedArgument(callExpression);
+
     List<VirtualFile> approvedFiles =
         InventoryUtil.findApprovedFiles(className, methodName, project);
+    String suffix = namedArg != null ? namedArg + "-approved" : methodName + "-approved";
+    approvedFiles =
+        approvedFiles.stream()
+            .filter(
+                approvedFile -> {
+                  String name = approvedFile.getNameWithoutExtension();
+                  if (!name.endsWith(suffix)) return false;
+                  int prefixLen = name.length() - suffix.length();
+                  return prefixLen == 0 || name.charAt(prefixLen - 1) == '-';
+                })
+            .toList();
     if (approvedFiles.isEmpty()) return;
 
     PsiManager psiManager = PsiManager.getInstance(project);

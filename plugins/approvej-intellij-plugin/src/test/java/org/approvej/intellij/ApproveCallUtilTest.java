@@ -17,6 +17,7 @@ public class ApproveCallUtilTest extends LightJavaCodeInsightFixtureTestCase {
         public class ApprovalBuilder<T> {
             public static <T> ApprovalBuilder<T> approve(T value) { return null; }
             public ApprovalBuilder<T> printedAs(Object format) { return this; }
+            public ApprovalBuilder<T> named(String name) { return this; }
             public void byFile() {}
             public void byValue(java.lang.String expected) {}
         }
@@ -138,6 +139,51 @@ public class ApproveCallUtilTest extends LightJavaCodeInsightFixtureTestCase {
             """);
 
     assertEquals("printedAs", ApproveCallUtil.findTerminalCall(call).lastMethodName());
+  }
+
+  public void testFindNamedArgument() {
+    UCallExpression call =
+        configureAndFindApproveCallExpression(
+            """
+            import static org.approvej.ApprovalBuilder.approve;
+            class Test {
+                void test() {
+                    appr<caret>ove("hello").named("first").byFile();
+                }
+            }
+            """);
+
+    assertEquals("first", ApproveCallUtil.findNamedArgument(call));
+  }
+
+  public void testFindNamedArgument_with_intermediate() {
+    UCallExpression call =
+        configureAndFindApproveCallExpression(
+            """
+            import static org.approvej.ApprovalBuilder.approve;
+            class Test {
+                void test() {
+                    appr<caret>ove("hello").printedAs(null).named("second").byFile();
+                }
+            }
+            """);
+
+    assertEquals("second", ApproveCallUtil.findNamedArgument(call));
+  }
+
+  public void testFindNamedArgument_absent() {
+    UCallExpression call =
+        configureAndFindApproveCallExpression(
+            """
+            import static org.approvej.ApprovalBuilder.approve;
+            class Test {
+                void test() {
+                    appr<caret>ove("hello").byFile();
+                }
+            }
+            """);
+
+    assertNull(ApproveCallUtil.findNamedArgument(call));
   }
 
   private PsiElement configureAndFindApproveIdentifier(String code) {
