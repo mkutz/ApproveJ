@@ -1,5 +1,6 @@
 [versions]
 assertj = "3.27.7"
+commonmark = "0.24.0"
 intellij-ide = "2025.1"
 intellij-platform = "2.11.0"
 jackson2 = "2.21.1"
@@ -13,6 +14,7 @@ wiremock = "3.13.2"
 [libraries]
 asciidoctor-block-switch = { module = "io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch", version = "0.6.3" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+commonmark = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
 awaitility = { module = "org.awaitility:awaitility", version = "4.3.0" }
 groovy = { module = "org.apache.groovy:groovy" , version = "5.0.4" }
 jackson2-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson2" }

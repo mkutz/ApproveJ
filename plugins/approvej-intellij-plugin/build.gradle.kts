@@ -1,6 +1,13 @@
 @file:Suppress("UnstableApiUsage")
 
+import org.commonmark.parser.Parser
+import org.commonmark.renderer.html.HtmlRenderer
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+
+buildscript {
+  repositories { mavenCentral() }
+  dependencies { classpath(libs.commonmark) }
+}
 
 plugins {
   java
@@ -60,7 +67,9 @@ fun extractChangeNotes(version: String): String {
       .drop(versionStart + 1)
       .indexOfFirst { it.startsWith("## v") }
       .let { if (it == -1) lines.size else it + versionStart + 1 }
-  return lines.subList(versionStart + 1, versionEnd).joinToString("\n").trim()
+  val markdown = lines.subList(versionStart + 1, versionEnd).joinToString("\n").trim()
+  val document = Parser.builder().build().parse(markdown)
+  return HtmlRenderer.builder().build().render(document).trim()
 }
 
 /* Use JUnit 5.11 for IntelliJ platform tests to avoid version conflicts with IntelliJ's test
