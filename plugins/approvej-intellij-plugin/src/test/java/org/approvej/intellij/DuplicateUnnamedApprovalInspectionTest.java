@@ -113,6 +113,26 @@ public class DuplicateUnnamedApprovalInspectionTest extends LightJavaCodeInsight
             .formatted(warning, warning));
   }
 
+  public void testNamed_with_non_constant_arg_excluded() {
+    myFixture.addClass(
+        """
+        package org.example;
+        public class Names {
+            public static String get() { return "dynamic"; }
+        }
+        """);
+    doHighlightTest(
+        """
+        import static org.approvej.ApprovalBuilder.approve;
+        class Test {
+            void test() {
+                approve("a").named(org.example.Names.get()).byFile();
+                approve("b").byFile();
+            }
+        }
+        """);
+  }
+
   public void testByFile_with_args_excluded() {
     doHighlightTest(
         """
