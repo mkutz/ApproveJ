@@ -1,7 +1,14 @@
 # Changelog
 
 
-## Unreleased
+## v1.4.3
+
+### core
+
+* 🐛 **Fix Windows file path handling in `StackTraceTestFinderUtil`**
+  Use `URL.toURI()` instead of `URL.getPath()` to avoid `InvalidPathException` on Windows.
+  Normalize backslashes before regex matching so file lookup works on both platforms.
+  ([#234](https://github.com/mkutz/ApproveJ/issues/234))
 
 
 ## v1.4
