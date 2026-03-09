@@ -11,6 +11,16 @@
   ([#234](https://github.com/mkutz/ApproveJ/issues/234))
 
 
+## v1.4.2
+
+IntelliJ plugin only, see [plugin changelog](plugins/approvej-intellij-plugin/CHANGELOG.md).
+
+
+## v1.4.1
+
+IntelliJ plugin only, see [plugin changelog](plugins/approvej-intellij-plugin/CHANGELOG.md).
+
+
 ## v1.4
 
 ### core
