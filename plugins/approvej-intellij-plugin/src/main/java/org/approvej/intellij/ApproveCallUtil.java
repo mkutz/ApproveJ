@@ -98,5 +98,27 @@ final class ApproveCallUtil {
     return null;
   }
 
+  /**
+   * Returns {@code true} if the UAST parent chain from an {@code approve()} call contains a {@code
+   * .named()} call, regardless of whether the argument is a constant.
+   */
+  static boolean hasNamedCall(@NotNull UCallExpression approveCall) {
+    UElement current = approveCall;
+    while (true) {
+      UElement parent = current.getUastParent();
+      if (parent instanceof UQualifiedReferenceExpression qualRef) {
+        UExpression selector = qualRef.getSelector();
+        if (selector instanceof UCallExpression selectorCall
+            && "named".equals(selectorCall.getMethodName())) {
+          return true;
+        }
+        current = qualRef;
+        continue;
+      }
+      break;
+    }
+    return false;
+  }
+
   record ChainWalkResult(String lastMethodName, UElement chainEnd) {}
 }

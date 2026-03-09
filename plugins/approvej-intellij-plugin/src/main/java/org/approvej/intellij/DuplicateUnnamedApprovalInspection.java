@@ -122,6 +122,7 @@ public final class DuplicateUnnamedApprovalInspection extends AbstractBaseUastLo
       if (approveSourcePsi == null || chainEndSourcePsi == null) return false;
 
       String namedArg = ApproveCallUtil.findNamedArgument(node);
+      if (namedArg == null && ApproveCallUtil.hasNamedCall(node)) return false;
       calls.add(new NoArgByFileCall(approveSourcePsi, chainEndSourcePsi, namedArg));
       return false;
     }
