@@ -1,6 +1,15 @@
 # Changelog
 
 
+## v1.4.4
+
+* ✨ **Duplicate unnamed approval inspection**
+  A new UAST-based inspection warns when a test method contains multiple no-arg `byFile()` calls
+  that resolve to the same approved file. Detects both unnamed duplicates and duplicate `.named()`
+  values. Offers a quick fix to insert `.named("TODO")` with the placeholder selected for
+  immediate editing.
+
+
 ## v1.4.3
 
 * ✨ **Rename refactoring support for approved files**
