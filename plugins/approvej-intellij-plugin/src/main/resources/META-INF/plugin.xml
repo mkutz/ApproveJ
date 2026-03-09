@@ -6,7 +6,8 @@
   <description><![CDATA[
     Approval testing support for ApproveJ.
     Provides diff viewing, one-click approval, bidirectional navigation between
-    test code and approved files, and a dangling approval inspection.
+    test code and approved files, dangling approval detection, and duplicate
+    unnamed approval detection.
   ]]></description>
 
   <depends>com.intellij.modules.platform</depends>
@@ -28,6 +29,14 @@
         enabledByDefault="true"
         level="WARNING"
         implementationClass="org.approvej.intellij.DanglingApprovalInspection"/>
+    <localInspection
+        language="UAST"
+        groupName="ApproveJ"
+        shortName="DuplicateUnnamedApproval"
+        displayName="Duplicate unnamed approval"
+        enabledByDefault="true"
+        level="WARNING"
+        implementationClass="org.approvej.intellij.DuplicateUnnamedApprovalInspection"/>
     <editorNotificationProvider
         implementation="org.approvej.intellij.ReceivedFileEditorNotificationProvider"/>
     <editorNotificationProvider
