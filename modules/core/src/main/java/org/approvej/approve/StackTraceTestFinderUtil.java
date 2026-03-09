@@ -4,6 +4,8 @@ import static java.util.Arrays.stream;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -61,11 +63,13 @@ public class StackTraceTestFinderUtil {
   public static Path findTestSourcePath(Method testMethod) {
     Class<?> declaringClass = testMethod.getDeclaringClass();
     int packageDepth = declaringClass.getPackageName().split("\\.").length;
-    String sourceSetName =
-        Path.of(declaringClass.getProtectionDomain().getCodeSource().getLocation().getPath())
-            .getFileName()
-            .toString()
-            .replace("-classes", "");
+    String sourceSetName;
+    try {
+      URI locationUri = declaringClass.getProtectionDomain().getCodeSource().getLocation().toURI();
+      sourceSetName = Path.of(locationUri).getFileName().toString().replace("-classes", "");
+    } catch (URISyntaxException e) {
+      throw new FileApproverError("Could not parse code source location", e);
+    }
     String packagePath = declaringClass.getPackageName().replace(".", "/");
     String pathRegex =
         "(?!(?:build|target|bin|out)/).*%s.*/%s/%s\\.(java|kt|groovy|scala)$"
@@ -75,7 +79,8 @@ public class StackTraceTestFinderUtil {
             Path.of(""),
             packageDepth + 10,
             (path, attributes) ->
-                attributes.isRegularFile() && path.normalize().toString().matches(pathRegex))) {
+                attributes.isRegularFile()
+                    && path.normalize().toString().replace('\\', '/').matches(pathRegex))) {
       List<Path> matches = pathStream.map(Path::normalize).toList();
       return switch (matches.size()) {
         case 0 -> throw new FileApproverError("Could not locate test source file");
