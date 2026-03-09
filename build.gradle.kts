@@ -48,8 +48,10 @@ subprojects {
 
 jreleaser {
   signing {
-    active = org.jreleaser.model.Active.ALWAYS
-    armored = true
+    pgp {
+      active = org.jreleaser.model.Active.ALWAYS
+      armored = true
+    }
   }
   deploy {
     maven {
