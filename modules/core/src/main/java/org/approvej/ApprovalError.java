@@ -21,9 +21,9 @@ public class ApprovalError extends AssertionError {
   public ApprovalError(String previouslyApproved, String received) {
     super(
         previouslyApproved.isEmpty()
-            ? "Missing approval for received%n  \"%s\"%n"
+            ? "Missing approval for received\n  \"%s\"\n"
                 .formatted(received.lines().collect(Collectors.joining(DELIMITER)))
-            : "Approval mismatch:%nexpected:%n  \"%s\"%n but was:%n  \"%s\"%n"
+            : "Approval mismatch:\nexpected:\n  \"%s\"\n but was:\n  \"%s\"\n"
                 .formatted(
                     previouslyApproved.lines().collect(joining(DELIMITER)),
                     received.lines().collect(joining(DELIMITER))));
