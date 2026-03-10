@@ -51,6 +51,19 @@ class FileApproverTest {
   }
 
   @Test
+  void apply_received_with_crlf() throws IOException {
+    PathProvider pathProvider =
+        approvedPath(tempDir.resolve("apply_received_with_crlf-approved.txt"));
+    Approver fileApprover = file(pathProvider);
+    writeString(pathProvider.approvedPath(), "line one\nline two\n", StandardOpenOption.CREATE);
+
+    ApprovalResult result = fileApprover.apply("line one\r\nline two");
+
+    assertThat(result.needsApproval()).isFalse();
+    assertThat(pathProvider.receivedPath()).doesNotExist();
+  }
+
+  @Test
   void apply_previously_accepted_differs() throws IOException {
     PathProvider pathProvider =
         approvedPath(tempDir.resolve("apply_previously_accepted_differs-approved.txt"));
