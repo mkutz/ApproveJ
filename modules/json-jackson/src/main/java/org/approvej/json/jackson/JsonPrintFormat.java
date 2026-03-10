@@ -65,10 +65,13 @@ public final class JsonPrintFormat<T> implements PrintFormat<T>, PrintFormatProv
   public Printer<T> printer() {
     return (T value) -> {
       try {
+        String result;
         if (value instanceof String string) {
-          return objectWriter.writeValueAsString(objectReader.readTree(string));
+          result = objectWriter.writeValueAsString(objectReader.readTree(string));
+        } else {
+          result = objectWriter.writeValueAsString(value);
         }
-        return objectWriter.writeValueAsString(value);
+        return result.replace("\r\n", "\n");
       } catch (JsonProcessingException e) {
         throw new JsonPrinterException(value, e);
       }
