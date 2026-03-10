@@ -41,7 +41,7 @@ record FileApprover(PathProvider pathProvider) implements Approver {
     ensureDirectory();
     handleOldApprovedFiles();
     ensureApprovedFile();
-    return check(readApprovedFile(), received.trim());
+    return check(readApprovedFile(), received.replace("\r\n", "\n").trim());
   }
 
   private void ensureDirectory() {
