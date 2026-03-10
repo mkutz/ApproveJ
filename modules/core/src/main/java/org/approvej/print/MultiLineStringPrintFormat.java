@@ -118,9 +118,9 @@ public record MultiLineStringPrintFormat(Printer<Object> printer)
           .map(element -> apply(element, indent))
           .collect(
               joining(
-                  ",%n%s".formatted(indent),
-                  "[%n%s".formatted(indent),
-                  "%n%s]".formatted(baseIndent)));
+                  ",\n%s".formatted(indent),
+                  "[\n%s".formatted(indent),
+                  "\n%s]".formatted(baseIndent)));
     }
 
     private String applyMap(Map<?, ?> map, String baseIndent) {
@@ -147,9 +147,9 @@ public record MultiLineStringPrintFormat(Printer<Object> printer)
           .map(property -> PAIR_FORMAT.formatted(property.name(), apply(property.value(), indent)))
           .collect(
               joining(
-                  ",%n%s".formatted(indent),
-                  "%s [%n%s".formatted(object.getClass().getSimpleName(), indent),
-                  "%n%s]".formatted(baseIndent)));
+                  ",\n%s".formatted(indent),
+                  "%s [\n%s".formatted(object.getClass().getSimpleName(), indent),
+                  "\n%s]".formatted(baseIndent)));
     }
 
     private List<Property> discoverProperties(Object object) {
