@@ -1,5 +1,6 @@
 package org.approvej.approve;
 
+import static java.nio.file.Files.readString;
 import static java.nio.file.Files.writeString;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -225,6 +226,22 @@ class ApprovedFileInventoryTest {
     assertThat(nestedPath).exists();
     var loaded = ApprovedFileInventory.loadInventory(nestedPath);
     assertThat(loaded.entries()).hasSize(1);
+  }
+
+  @Test
+  void saveInventory_uses_forward_slashes() throws IOException {
+    var inventory =
+        new ApprovedFileInventory(
+            List.of(
+                new InventoryEntry(
+                    Path.of("src\\test\\MyTest-myTest-approved.txt"), "com.example.MyTest#myTest")),
+            inventoryPath());
+
+    inventory.saveInventory();
+
+    var content = readString(inventoryPath());
+    assertThat(content).contains("src/test/MyTest-myTest-approved.txt");
+    assertThat(content).doesNotContain("\\");
   }
 
   @Test
