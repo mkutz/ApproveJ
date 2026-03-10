@@ -59,7 +59,7 @@ public record YamlPrintFormat<T>(ObjectWriter objectWriter)
   public Printer<T> printer() {
     return (T value) -> {
       try {
-        return objectWriter.writeValueAsString(value);
+        return objectWriter.writeValueAsString(value).replace("\r\n", "\n");
       } catch (JsonProcessingException e) {
         throw new YamlPrinterException(value, e);
       }
