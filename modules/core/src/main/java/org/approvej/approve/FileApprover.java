@@ -111,7 +111,7 @@ record FileApprover(PathProvider pathProvider) implements Approver {
   private String readApprovedFile() {
     Path approvedPath = pathProvider.approvedPath();
     try {
-      return readString(approvedPath).trim();
+      return readString(approvedPath).replace("\r\n", "\n").trim();
     } catch (IOException e) {
       throw new FileApproverError("Reading approved file %s failed".formatted(approvedPath), e);
     }
