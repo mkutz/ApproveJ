@@ -182,7 +182,8 @@ public class ApprovedFileInventory {
                     entry ->
                         "%s = %s"
                             .formatted(
-                                escapeKey(entry.relativePath().toString()), entry.testReference()))
+                                escapeKey(entry.relativePath().toString().replace('\\', '/')),
+                                entry.testReference()))
                 .collect(joining("\n", HEADER + "\n", "\n"));
         Files.writeString(inventoryPath, content);
       }
