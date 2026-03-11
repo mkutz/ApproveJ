@@ -18,6 +18,8 @@ import java.time.Instant;
 import java.util.Set;
 import org.approvej.ApprovalResult;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 class FileApproverTest {
@@ -147,6 +149,7 @@ class FileApproverTest {
   }
 
   @Test
+  @DisabledOnOs(OS.WINDOWS)
   void apply_no_write_access() {
     Approver fileApprover = file(approvedPath("/does/not/exist.txt"));
 
@@ -156,6 +159,7 @@ class FileApproverTest {
   }
 
   @Test
+  @DisabledOnOs(OS.WINDOWS)
   void apply_file_not_readable() throws IOException {
     PathProvider pathProvider =
         approvedPath(tempDir.resolve("apply_file_not_readable-approved.txt"));
@@ -169,6 +173,7 @@ class FileApproverTest {
   }
 
   @Test
+  @DisabledOnOs(OS.WINDOWS)
   void apply_file_not_writable() throws IOException {
     PathProvider pathProvider =
         approvedPath(tempDir.resolve("apply_file_not_writable-approved.txt"));

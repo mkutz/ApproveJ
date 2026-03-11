@@ -1,6 +1,37 @@
 # Changelog
 
 
+## v1.4.4
+
+### core
+
+* 🐛 **Fix CRLF/LF mismatch in file comparison**
+  Normalize `\r\n` to `\n` when reading approved files and when receiving printed values, so approvals work correctly on Windows.
+  ([#238](https://github.com/mkutz/ApproveJ/issues/238))
+
+* 🐛 **Fix inventory using OS-specific path separators**
+  Normalize backslashes to forward slashes when writing inventory entries, so the inventory file is portable across platforms.
+  ([#239](https://github.com/mkutz/ApproveJ/issues/239))
+
+* 🐛 **Use `\n` instead of `%n` in printers and `ApprovalError`**
+  Java's `%n` produces `\r\n` on Windows, making printer output platform-dependent.
+  All built-in printers now produce deterministic `\n` line endings.
+
+### json-jackson, json-jackson3, yaml-jackson & yaml-jackson3
+
+* 🐛 **Normalize CRLF in Jackson printer output**
+  Jackson's `DefaultPrettyPrinter` uses `System.lineSeparator()`, producing `\r\n` on Windows.
+  All Jackson-based print formats now normalize output to `\n`.
+
+### CI
+
+* ✅ **Add Windows CI job**
+  The PR build workflow now includes a `windows-latest` job to catch platform-specific regressions.
+  ([#236](https://github.com/mkutz/ApproveJ/issues/236))
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.4.3...v1.4.4
+
+
 ## v1.4.3
 
 ### core
