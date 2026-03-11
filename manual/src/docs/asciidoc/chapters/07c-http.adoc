@@ -8,6 +8,25 @@ These issues often go unnoticed until they break in production.
 The HTTP extension lets you write simple contract tests that approve the exact HTTP requests your code sends.
 If a request changes, the approval test fails and shows you exactly what changed.
 
+[plantuml,http-test-setup,svg]
+....
+skinparam style strictuml
+skinparam defaultFontSize 13
+skinparam backgroundColor transparent
+
+participant "Test" as test
+participant "Your Code" as code
+participant "HttpStubServer" as stub
+participant "ApproveJ" as approvej
+
+test -> code : call your code
+code -> stub : HTTP request
+stub --> code : stubbed response
+test -> stub : get captured requests
+test -> approvej : approve(request)
+approvej -> approvej : scrub, print, compare
+....
+
 
 [id=http_dependencies]
 == Dependencies

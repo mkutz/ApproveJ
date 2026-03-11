@@ -1,0 +1,220 @@
+[id=database]
+= Database -- Verify Database State
+
+When your code writes to a database — creating orders, importing records, running migrations — a code change can silently alter what ends up in the tables.
+The database extension lets you snapshot query results and approve them.
+If the data changes, the approval test fails and shows you exactly what changed.
+
+[plantuml,database-test-setup,svg]
+....
+skinparam style strictuml
+skinparam defaultFontSize 13
+skinparam backgroundColor transparent
+
+participant "Test" as test
+participant "Your Code" as code
+database "Database" as db
+participant "ApproveJ" as approvej
+
+test -> code : call your code
+code -> db : INSERT / UPDATE
+test -> db : snapshot query
+test -> approvej : approve(queryResult)
+approvej -> approvej : scrub, print, compare
+....
+
+
+[id=database_dependencies]
+== Dependencies
+
+The `database` module has no external dependencies beyond the JDK's `javax.sql` API.
+You need to provide a JDBC driver for your database (e.g., H2 for in-memory testing, or the driver for your production database).
+
+.Gradle
+[source,groovy,subs=attributes+,role="primary"]
+----
+implementation 'org.approvej:database:{revnumber}'
+----
+.Gradle.kts
+[source,kotlin,subs=attributes+,role="secondary"]
+----
+implementation("org.approvej:database:{revnumber}")
+----
+.Maven
+[source,xml,subs=attributes+,role="secondary"]
+----
+<dependency>
+  <groupId>org.approvej</groupId>
+  <artifactId>database</artifactId>
+  <version>{revnumber}</version>
+</dependency>
+----
+
+
+[id=database_datasource]
+== Getting the DataSource
+
+`DatabaseSnapshot.query()` takes a standard `javax.sql.DataSource`.
+How you obtain it depends on your test setup.
+
+
+[id=database_datasource_spring]
+=== Spring Boot
+
+In a Spring Boot test, inject the `DataSource` that Spring already manages:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+@SpringBootTest
+class OrderServiceTest {
+
+  @Autowired
+  DataSource dataSource;
+
+  @Test
+  void place_order() {
+    // ... call your service ...
+    approve(query(dataSource, "SELECT * FROM orders"))
+        .printedAs(queryResult())
+        .byFile();
+  }
+}
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+@SpringBootTest
+class OrderServiceTest {
+
+  @Autowired
+  lateinit var dataSource: DataSource
+
+  @Test
+  fun place_order() {
+    // ... call your service ...
+    approve(query(dataSource, "SELECT * FROM orders"))
+      .printedAs(queryResult())
+      .byFile()
+  }
+}
+----
+
+
+[id=database_datasource_plain]
+=== Plain JDBC
+
+Without a framework, create a `DataSource` directly.
+For example, with an H2 in-memory database:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+JdbcDataSource ds = new JdbcDataSource();
+ds.setURL("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
+DataSource dataSource = ds;
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+val ds = JdbcDataSource()
+ds.setURL("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
+val dataSource: DataSource = ds
+----
+
+
+[id=database_test_isolation]
+== Test Isolation
+
+Approving database state only works if the data is predictable.
+When multiple tests write to the same database, execution order or parallel runs can cause unexpected results.
+
+Common strategies to keep tests isolated:
+
+* **Separate database per test** — Use a fresh in-memory database (e.g., H2 with a unique URL per test) so each test starts with a clean slate.
+* **Transaction rollback** — Run each test in a transaction and roll back after the assertion.
+  Spring's `@Transactional` test support does this by default.
+* **Reset between tests** — Truncate or re-seed tables in a `@BeforeEach` method.
+* **Targeted queries** — Use `WHERE` clauses to query only the data created by the current test, so other rows don't affect the result.
+
+Regardless of which strategy you use, scrub any non-deterministic column values (auto-incremented IDs, timestamps) so the approved file stays stable.
+
+
+[id=database_snapshot]
+== Snapshot a Query
+
+Use link:{javadoc-url}/database/org/approvej/database/DatabaseSnapshot.html[`DatabaseSnapshot.query()`] to execute a SQL query and capture the result as a link:{javadoc-url}/database/org/approvej/database/QueryResult.html[`QueryResult`]:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/DatabaseDocTest.java[tag=snapshot]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/DatabaseDocTest.kt[tag=snapshot]
+----
+
+All cell values are converted to strings.
+`NULL` database values are rendered as the string `NULL`.
+
+
+[id=database_print_format]
+== Print as Markdown Table
+
+The link:{javadoc-url}/database/org/approvej/database/QueryResultPrintFormat.html[`QueryResultPrintFormat`] prints query results as a Markdown-compatible ASCII table.
+Files are saved with the `.md` extension.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/DatabaseDocTest.java[tag=approve]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/DatabaseDocTest.kt[tag=approve]
+----
+
+Creates the following approved file:
+
+[source,markdown]
+.Approved file
+----
+include::../../../test/java/examples/java/DatabaseDocTest-approve_query-approved.md[]
+----
+
+
+[id=database_scrubbers]
+== Database Scrubbers
+
+Some columns contain values that change between test runs — auto-incremented IDs, timestamps, or generated tokens.
+The link:{javadoc-url}/database/org/approvej/database/DatabaseScrubbers.html[`DatabaseScrubbers`] utility provides a scrubber for these cases:
+
+* `columnValue(name)` -- Scrubs all values in the named column (case-insensitive)
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/DatabaseDocTest.java[tag=scrub]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/DatabaseDocTest.kt[tag=scrub]
+----
+
+By default, a column named `id` is replaced with `[id]`.
+You can customize the replacement:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/DatabaseDocTest.java[tag=scrub_custom]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/DatabaseDocTest.kt[tag=scrub_custom]
+----
