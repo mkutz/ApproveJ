@@ -253,13 +253,13 @@ public class Scrubbers {
 
   /**
    * Creates a {@link DateTimeScrubber} for ISO-8601 instants, like {@code
-   * 2019-02-25T12:34:56.123456789+02:00}, or {@code 2019-02-25T12:34:56.123456789Z}.
+   * 2019-02-25T12:34:56.123456789Z}, or {@code 2019-02-25T12:34:56Z}.
    *
    * @return a {@link DateTimeScrubber} for ISO-8601 instants
    * @see DateTimeFormatter#ISO_INSTANT
    */
   public static DateTimeScrubber isoInstants() {
-    return dateTimeFormat("uuuu-MM-dd'T'HH:mm:ss.SX").replacement(numbered("isoInstant"));
+    return dateTimeFormat("uuuu-MM-dd'T'HH:mm:ss[.S]X").replacement(numbered("isoInstant"));
   }
 
   /**
