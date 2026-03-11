@@ -93,6 +93,97 @@ include::../../../test/kotlin/examples/kotlin/DatabaseDocTest.kt[tag=recording]
 For `PreparedStatement` s, the SQL template with `?` placeholders is recorded each time the statement is executed.
 
 
+[id=database_approve_sql_wiring]
+=== Wiring the RecordingDataSource
+
+Since `RecordingDataSource` implements `DataSource`, it can be passed anywhere a `DataSource` is expected.
+How you wire it depends on your test setup.
+
+In a **Spring Boot** test, the `DataSource` is managed by the Spring container and injected into your services automatically.
+To make sure your services use the `RecordingDataSource` instead of the real one, declare it as a `@Primary` bean via a `@TestConfiguration`:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+@SpringBootTest
+@Import(OrderServiceTest.RecordingConfig.class)
+class OrderServiceTest {
+
+  @TestConfiguration
+  static class RecordingConfig {
+    @Bean
+    @Primary
+    RecordingDataSource recordingDataSource(DataSource dataSource) {
+      return new RecordingDataSource(dataSource);
+    }
+  }
+
+  @Autowired
+  RecordingDataSource recordingDataSource;
+
+  @Autowired
+  OrderService orderService;
+
+  @BeforeEach
+  void setUp() {
+    recordingDataSource.resetRecordedQueries();
+  }
+
+  @Test
+  void place_order() {
+    orderService.placeOrder(new Order("Widget", 3));
+
+    approve(recordingDataSource.lastRecordedQuery())
+        .printedAs(sql())
+        .byFile();
+  }
+}
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+@SpringBootTest
+@Import(OrderServiceTest.RecordingConfig::class)
+class OrderServiceTest {
+
+  @TestConfiguration
+  class RecordingConfig {
+    @Bean
+    @Primary
+    fun recordingDataSource(dataSource: DataSource) =
+      RecordingDataSource(dataSource)
+  }
+
+  @Autowired
+  lateinit var recordingDataSource: RecordingDataSource
+
+  @Autowired
+  lateinit var orderService: OrderService
+
+  @BeforeEach
+  fun setUp() {
+    recordingDataSource.resetRecordedQueries()
+  }
+
+  @Test
+  fun place_order() {
+    orderService.placeOrder(Order("Widget", 3))
+
+    approve(recordingDataSource.lastRecordedQuery())
+      .printedAs(sql())
+      .byFile()
+  }
+}
+----
+
+The `@Primary` annotation ensures that Spring injects the `RecordingDataSource` into all beans that depend on `DataSource`.
+Since `RecordingDataSource` delegates all calls to the real `DataSource`, your code runs normally against the real database — the wrapper just records the SQL along the way.
+
+TIP: Call `resetRecordedQueries()` in `@BeforeEach` to ensure each test starts with a clean recording.
+
+With **plain JDBC**, simply wrap your `DataSource` before passing it to the code under test, as shown in the <<database_approve_sql,basic example>> above.
+
+
 [id=database_sql_print_format]
 === Pretty-Print SQL
 
