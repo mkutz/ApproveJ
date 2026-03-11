@@ -17,6 +17,7 @@ assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 commonmark = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
 awaitility = { module = "org.awaitility:awaitility", version = "4.3.0" }
 groovy = { module = "org.apache.groovy:groovy" , version = "5.0.4" }
+h2 = { module = "com.h2database:h2", version = "2.3.232" }
 jackson2-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson2" }
 jackson2-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson2" }
 jackson2-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson2" }
