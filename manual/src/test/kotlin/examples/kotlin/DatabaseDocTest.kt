@@ -5,6 +5,8 @@ import org.approvej.ApprovalBuilder.approve
 import org.approvej.database.DatabaseScrubbers.columnValue
 import org.approvej.database.DatabaseSnapshot.query
 import org.approvej.database.QueryResultPrintFormat.queryResult
+import org.approvej.database.RecordingDataSource
+import org.approvej.database.SqlPrintFormat.sql
 import org.assertj.core.api.Assertions.assertThat
 import org.h2.jdbcx.JdbcDataSource
 import org.junit.jupiter.api.BeforeEach
@@ -27,6 +29,22 @@ class DatabaseDocTest {
         stmt.execute("INSERT INTO users VALUES (2, 'Bob', 'bob@test.com')")
       }
     }
+  }
+
+  @Test
+  fun recording() {
+    // tag::recording[]
+    val recordingDs = RecordingDataSource(dataSource)
+
+    // ... pass recordingDs to your code instead of the real DataSource ...
+    recordingDs.connection.use { conn ->
+      conn.createStatement().use { stmt ->
+        stmt.executeQuery("SELECT id, name, email FROM users WHERE id = 1")
+      }
+    }
+
+    approve(recordingDs.lastRecordedQuery()).printedAs(sql()).byFile()
+    // end::recording[]
   }
 
   @Test
