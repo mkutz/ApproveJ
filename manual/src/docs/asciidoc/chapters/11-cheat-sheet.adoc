@@ -92,6 +92,9 @@ endif::[]
 
 |`QueryResultPrintFormat.queryResult()`
 |Print as Markdown table (requires `database`)
+
+|`SqlPrintFormat.sql()`
+|Pretty-print SQL with line breaks (requires `database`)
 |===
 
 

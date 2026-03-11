@@ -4,12 +4,14 @@ import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.database.DatabaseScrubbers.columnValue;
 import static org.approvej.database.DatabaseSnapshot.query;
 import static org.approvej.database.QueryResultPrintFormat.queryResult;
+import static org.approvej.database.SqlPrintFormat.sql;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 import java.sql.Statement;
 import javax.sql.DataSource;
 import org.approvej.database.QueryResult;
+import org.approvej.database.RecordingDataSource;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,21 @@ class DatabaseDocTest {
       stmt.execute("INSERT INTO users VALUES (1, 'Alice', 'alice@test.com')");
       stmt.execute("INSERT INTO users VALUES (2, 'Bob', 'bob@test.com')");
     }
+  }
+
+  @Test
+  void recording() throws Exception {
+    // tag::recording[]
+    RecordingDataSource recordingDs = new RecordingDataSource(dataSource);
+
+    // ... pass recordingDs to your code instead of the real DataSource ...
+    try (Connection conn = recordingDs.getConnection();
+        Statement stmt = conn.createStatement()) {
+      stmt.executeQuery("SELECT id, name, email FROM users WHERE id = 1");
+    }
+
+    approve(recordingDs.lastRecordedQuery()).printedAs(sql()).byFile();
+    // end::recording[]
   }
 
   @Test
