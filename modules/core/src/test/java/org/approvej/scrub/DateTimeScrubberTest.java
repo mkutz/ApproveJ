@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -243,6 +244,18 @@ class DateTimeScrubberTest {
                 .apply(
                     "isoInstant: %s"
                         .formatted(DateTimeFormatter.ISO_INSTANT.format(ZonedDateTime.now()))))
+        .isEqualTo("isoInstant: [isoInstant 1]");
+  }
+
+  @Test
+  void isoInstantsNoFractions() {
+    assertThat(
+            Scrubbers.isoInstants()
+                .apply(
+                    "isoInstant: %s"
+                        .formatted(
+                            DateTimeFormatter.ISO_INSTANT.format(
+                                ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS)))))
         .isEqualTo("isoInstant: [isoInstant 1]");
   }
 
