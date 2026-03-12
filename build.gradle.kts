@@ -47,6 +47,15 @@ subprojects {
 }
 
 jreleaser {
+  project {
+    copyright = "Michael Kutz"
+    authors = listOf("Michael Kutz")
+    license = "Apache-2.0"
+    links {
+      homepage = "https://approvej.org"
+      documentation = "https://approvej.org"
+    }
+  }
   signing {
     pgp {
       active = org.jreleaser.model.Active.ALWAYS
@@ -70,6 +79,19 @@ jreleaser {
       overwrite = true
       update { enabled = true }
       changelog { external.set(layout.projectDirectory.file("RELEASE_NOTES.md")) }
+    }
+  }
+  announce {
+    bluesky {
+      active = org.jreleaser.model.Active.RELEASE
+      host = "https://bsky.social"
+      status =
+        "\uD83D\uDE80 {{projectNameCapitalized}} {{projectVersion}} has been released! {{releaseNotesUrl}}"
+    }
+    mastodon {
+      active = org.jreleaser.model.Active.RELEASE
+      status =
+        "\uD83D\uDE80 {{projectNameCapitalized}} {{projectVersion}} has been released! {{releaseNotesUrl}}"
     }
   }
 }
