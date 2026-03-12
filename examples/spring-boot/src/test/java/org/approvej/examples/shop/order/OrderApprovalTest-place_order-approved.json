@@ -1,0 +1,21 @@
+{
+  "id" : "[uuid 1]",
+  "customerName" : "Alice",
+  "customerEmail" : "alice@example.com",
+  "status" : "PAID",
+  "items" : [ {
+    "id" : 1,
+    "product" : {
+      "id" : "[uuid 2]",
+      "name" : "Espresso Machine",
+      "description" : "Professional espresso machine",
+      "price" : 299.99,
+      "sku" : "ESP-100",
+      "createdAt" : "[isoInstant 1]"
+    },
+    "quantity" : 1,
+    "unitPrice" : 299.99
+  } ],
+  "paymentId" : "pay-abc-123",
+  "createdAt" : "[isoInstant 2]"
+}
