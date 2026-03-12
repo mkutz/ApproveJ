@@ -1,0 +1,12 @@
+POST /v1/charges
+Accept-encoding: gzip, deflate
+Authorization: Bearer test-token-123
+Connection: Upgrade, HTTP2-Settings
+Content-type: application/json
+Host: {{Host}}
+Http2-settings: AAEAAEAAAAIAAAAAAAMAAAAAAAQBAAAAAAUAAEAAAAYABgAA
+Transfer-encoding: chunked
+Upgrade: h2c
+User-agent: Java-http-client/21.0.10
+
+{"orderId":"[uuid 1]","amount":299.99,"currency":"EUR","customerEmail":"eve@example.com"}

@@ -1,0 +1,10 @@
+UPDATE
+  orders
+SET
+  created_at=?,
+  customer_email=?,
+  customer_name=?,
+  payment_id=?,
+  status=?
+WHERE
+  id=?
