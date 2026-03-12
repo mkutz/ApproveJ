@@ -1,6 +1,17 @@
 # Changelog
 
 
+## v1.4.5
+
+### core
+
+* 🐛 **Capture ISO instants without fractions of a second**
+  `Scrubbers.isoInstants()` now also matches instants without fractional seconds (e.g., `2019-02-25T12:34:56Z`).
+  Thanks to [@helgewessels](https://github.com/helgewessels) for the contribution!
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.4.4...v1.4.5
+
+
 ## v1.4.4
 
 ### core
