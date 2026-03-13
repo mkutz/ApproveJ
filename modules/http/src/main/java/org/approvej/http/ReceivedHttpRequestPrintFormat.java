@@ -37,16 +37,18 @@ public class ReceivedHttpRequestPrintFormat implements PrintFormat<ReceivedHttpR
   @Override
   public Printer<ReceivedHttpRequest> printer() {
     return (ReceivedHttpRequest request) -> {
-      StringBuilder sb = new StringBuilder();
-      sb.append("%s %s".formatted(request.method(), request.uri()));
+      StringBuilder stringBuilder = new StringBuilder();
+      stringBuilder.append("%s %s".formatted(request.method(), request.uri()));
       request
           .headers()
-          .forEach((key, value) -> sb.append("\n%s: %s".formatted(key, join(", ", value))));
+          .forEach(
+              (key, value) ->
+                  stringBuilder.append("\n").append("%s: %s".formatted(key, join(", ", value))));
 
       if (!request.body().isBlank()) {
-        sb.append("\n\n%s".formatted(request.body()));
+        stringBuilder.append("\n\n").append(request.body());
       }
-      return sb.toString();
+      return stringBuilder.toString();
     };
   }
 

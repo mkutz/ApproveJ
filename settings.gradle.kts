@@ -24,4 +24,8 @@ include("modules:http")
 
 include("modules:http-wiremock")
 
+include("modules:database-jdbc")
+
 include("manual")
+
+include("examples:spring-boot")

@@ -1,0 +1,265 @@
+[id=database]
+= Database JDBC -- Catch Changes to Queries and Data
+
+The database extension provides two complementary approaches to approval testing with databases:
+
+* **Approve the SQL** your code sends — catch unintended changes to queries, just like the <<http,HTTP extension>> catches changes to HTTP requests.
+No test database setup required.
+* **Approve the query results** — verify the actual state in the database after your code runs.
+
+[cols="1,1"]
+|===
+|Approve SQL |Approve query results
+
+|Catches changes in _what your code sends_
+|Catches changes in _what ends up in the database_
+
+|No test data or database state needed
+|Requires a database with predictable state
+
+|Uses `RecordingDataSource` + `SqlPrintFormat`
+|Uses `DatabaseSnapshot` + `MarkdownTablePrintFormat`
+|===
+
+
+[id=database_dependencies]
+== Dependencies
+
+The `database-jdbc` module has no external dependencies beyond the JDK's `javax.sql` API.
+You need to provide a JDBC driver for your database (e.g., H2 for in-memory testing, or the driver for your production database).
+
+.Gradle
+[source,groovy,subs=attributes+,role="primary"]
+----
+implementation 'org.approvej:database-jdbc:{revnumber}'
+----
+.Gradle.kts
+[source,kotlin,subs=attributes+,role="secondary"]
+----
+implementation("org.approvej:database-jdbc:{revnumber}")
+----
+.Maven
+[source,xml,subs=attributes+,role="secondary"]
+----
+<dependency>
+  <groupId>org.approvej</groupId>
+  <artifactId>database-jdbc</artifactId>
+  <version>{revnumber}</version>
+</dependency>
+----
+
+
+[id=database_approve_sql]
+== Approve SQL
+
+When your application talks to a database, a code change can silently alter the SQL it sends — a different `WHERE` clause, a missing `JOIN`, a changed column list.
+The `RecordingDataSource` intercepts and records all SQL statements your code executes, so you can approve them.
+
+[plantuml,database-sql-test-setup,svg]
+....
+skinparam style strictuml
+skinparam defaultFontSize 13
+skinparam backgroundColor transparent
+
+participant "Test" as test
+participant "Your Code" as code
+participant "RecordingDataSource" as recording
+database "Database" as db
+participant "ApproveJ" as approvej
+
+test -> code : call your code
+code -> recording : execute SQL
+recording -> db : delegate
+recording -> recording : record SQL
+test -> recording : get recorded queries
+test -> approvej : approve(sql)
+approvej -> approvej : print, compare
+....
+
+Wrap your application's `DataSource` with a link:{javadoc-url}/database-jdbc/org/approvej/database/jdbc/RecordingDataSource.html[`RecordingDataSource`], then pass it to your code.
+After execution, approve the recorded queries:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/DatabaseDocTest.java[tag=recording]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/DatabaseDocTest.kt[tag=recording]
+----
+
+For `PreparedStatement` s, the SQL template with `?` placeholders is recorded each time the statement is executed.
+
+
+[id=database_approve_sql_wiring]
+=== Wiring the RecordingDataSource in Spring Boot
+
+Since `RecordingDataSource` implements `DataSource`, it can be passed anywhere a `DataSource` is expected.
+With **plain JDBC**, simply wrap your `DataSource` before passing it to the code under test, as shown in the <<database_approve_sql,basic example>> above.
+
+In a **Spring Boot** test, the `DataSource` is managed by the container and injected into your services automatically.
+The following example from the Spring Boot example project shows a complete test class that wraps the `DataSource` with a `RecordingDataSource` and approves the recorded SQL:
+
+[source,java,indent=0]
+----
+include::../../../../../examples/spring-boot/src/test/java/org/approvej/examples/shop/order/OrderSqlApprovalTest.java[tag=spring_boot_database]
+----
+<1> `@Import` activates the `@TestConfiguration`.
+Without it, the inner class is ignored.
+<2> The injected `DataSource` is now the `RecordingDataSource` wrapper.
+<3> A `BeanPostProcessor` intercepts the `DataSource` bean and wraps it with `RecordingDataSource`.
+This ensures all beans — including your services and JPA — use the recording wrapper transparently.
+<4> Approve the last recorded SQL query using the <<database_sql_print_format,SQL print format>>.
+
+TIP: Call `resetRecordedQueries()` before exercising the code under test to ensure you only capture the SQL you care about.
+
+TIP: The first run creates a `-received.sql` file next to the test.
+Review it, rename it to `-approved.sql`, and re-run — the test passes.
+
+
+[id=database_sql_print_format]
+=== Pretty-Print SQL
+
+The link:{javadoc-url}/database-jdbc/org/approvej/database/jdbc/SqlPrintFormat.html[`SqlPrintFormat`] formats SQL with line breaks and indentation, making it easy to review in approved files.
+Files are saved with the `.sql` extension.
+
+A query like `SELECT u.id, u.name FROM users u WHERE u.active = 1 ORDER BY u.name` becomes:
+
+[source,sql]
+----
+SELECT
+  u.id,
+  u.name
+FROM
+  users u
+WHERE
+  u.active = 1
+ORDER BY
+  u.name
+----
+
+
+[id=database_approve_state]
+== Approve Query Results
+
+When you need to verify the actual data in the database — after a migration, an import, or a service call — you can snapshot the query results and approve them.
+
+[plantuml,database-state-test-setup,svg]
+....
+skinparam style strictuml
+skinparam defaultFontSize 13
+skinparam backgroundColor transparent
+
+participant "Test" as test
+participant "Your Code" as code
+database "Database" as db
+participant "ApproveJ" as approvej
+
+test -> code : call your code
+code -> db : INSERT / UPDATE
+test -> db : snapshot query
+test -> approvej : approve(queryResult)
+approvej -> approvej : scrub, print, compare
+....
+
+
+[id=database_approve_state_test_isolation]
+=== Test Isolation
+
+Approving database state only works if the data is predictable.
+When multiple tests write to the same database, execution order or parallel runs can cause unexpected results.
+
+Common strategies to keep tests isolated:
+
+* **Separate database per test** — Use a fresh in-memory database (e.g., H2 with a unique URL per test) so each test starts with a clean slate.
+* **Transaction rollback** — Run each test in a transaction and roll back after the assertion.
+  Spring's `@Transactional` test support does this by default.
+* **Reset between tests** — Truncate or re-seed tables in a `@BeforeEach` method.
+* **Targeted queries** — Use `WHERE` clauses to query only the data created by the current test, so other rows don't affect the result.
+
+Regardless of which strategy you use, scrub any non-deterministic column values (auto-incremented IDs, timestamps) so the approved file stays stable.
+
+
+[id=database_approve_state_snapshot]
+=== Snapshot a Query
+
+Use link:{javadoc-url}/database-jdbc/org/approvej/database/jdbc/DatabaseSnapshot.html[`DatabaseSnapshot.query()`] to execute a SQL query and capture the result as a link:{javadoc-url}/database-jdbc/org/approvej/database/jdbc/QueryResult.html[`QueryResult`].
+It takes a standard `javax.sql.DataSource` — in a **Spring Boot** test, inject the one Spring already manages; with **plain JDBC**, create one directly (e.g., H2's `JdbcDataSource`).
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/DatabaseDocTest.java[tag=snapshot]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/DatabaseDocTest.kt[tag=snapshot]
+----
+
+All cell values are converted to strings.
+`NULL` database values are rendered as the string `<null>`.
+
+If you already have a JDBC `ResultSet` (e.g., from your own `JdbcClient` or `JdbcTemplate` query), you can use `QueryResult.of(resultSet)` directly instead of going through `DatabaseSnapshot`.
+
+
+[id=database_approve_state_print_format]
+=== Print as Markdown Table
+
+The link:{javadoc-url}/database-jdbc/org/approvej/database/jdbc/MarkdownTablePrintFormat.html[`MarkdownTablePrintFormat`] prints query results as a Markdown-compatible ASCII table.
+Files are saved with the `.md` extension.
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/DatabaseDocTest.java[tag=approve]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/DatabaseDocTest.kt[tag=approve]
+----
+
+Creates the following approved file:
+
+[source,markdown]
+.Approved file
+----
+include::../../../test/java/examples/java/DatabaseDocTest-approve_query-approved.md[]
+----
+
+
+[id=database_scrubbers]
+== Database Scrubbers
+
+Some columns contain values that change between test runs — auto-incremented IDs, timestamps, or generated tokens.
+The link:{javadoc-url}/database-jdbc/org/approvej/database/jdbc/DatabaseScrubbers.html[`DatabaseScrubbers`] utility provides a scrubber for these cases:
+
+* `columnValue(name)` -- Scrubs all values in the named column (case-insensitive)
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/DatabaseDocTest.java[tag=scrub]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/DatabaseDocTest.kt[tag=scrub]
+----
+
+By default, a column named `id` is replaced with `[id]`.
+You can customize the replacement:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/DatabaseDocTest.java[tag=scrub_custom]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/DatabaseDocTest.kt[tag=scrub_custom]
+----

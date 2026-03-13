@@ -1,0 +1,7 @@
+---
+id: null
+name: "Espresso Machine"
+description: "Professional espresso machine"
+price: 299.99
+sku: "ESP-001"
+createdAt: "[isoInstant 1]"

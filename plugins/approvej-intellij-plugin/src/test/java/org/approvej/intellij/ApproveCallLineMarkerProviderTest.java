@@ -198,13 +198,14 @@ public class ApproveCallLineMarkerProviderTest extends LightJavaCodeInsightFixtu
   }
 
   private void addInventory(String... keysAndValues) {
-    var sb = new StringBuilder("# ApproveJ Approved File Inventory\n");
+    var stringBuilder = new StringBuilder("# ApproveJ Approved File Inventory\n");
     for (int i = 0; i < keysAndValues.length; i += 2) {
-      sb.append(keysAndValues[i].replace(" ", "\\ "))
+      stringBuilder
+          .append(keysAndValues[i].replace(" ", "\\ "))
           .append(" = ")
           .append(keysAndValues[i + 1])
           .append("\n");
     }
-    myFixture.addFileToProject(".approvej/inventory.properties", sb.toString());
+    myFixture.addFileToProject(".approvej/inventory.properties", stringBuilder.toString());
   }
 }

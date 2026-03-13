@@ -89,6 +89,12 @@ endif::[]
 
 |`ReceivedHttpRequestPrintFormat.httpRequest()`
 |Print as HTTP request format (requires `http`)
+
+|`MarkdownTablePrintFormat.markdownTable()`
+|Print as Markdown table (requires `database-jdbc`)
+
+|`SqlPrintFormat.sql()`
+|Pretty-print SQL with line breaks (requires `database-jdbc`)
 |===
 
 
@@ -217,6 +223,17 @@ endif::[]
 
 |`HttpScrubbers.userAgentHeaderValue()`
 |Scrub the `User-agent` header value
+|===
+
+[id=cheat_sheet_scrubbers_database]
+=== Database Scrubbers
+
+[cols="2,3"]
+|===
+|Factory Method |Description
+
+|`DatabaseScrubbers.columnValue(String columnName)`
+|Scrub all values in a column by name (case-insensitive)
 |===
 
 

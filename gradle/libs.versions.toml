@@ -9,6 +9,8 @@ junit = "6.0.3"
 junit5 = "5.11.3"
 junitPlatform5 = "1.11.3"
 maven = "3.9.14"
+spring-boot = "4.0.3"
+testcontainers = "2.0.3"
 wiremock = "3.13.2"
 
 [libraries]
@@ -17,17 +19,20 @@ assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 commonmark = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
 awaitility = { module = "org.awaitility:awaitility", version = "4.3.0" }
 groovy = { module = "org.apache.groovy:groovy" , version = "5.0.4" }
-jackson2-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson2" }
-jackson2-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson2" }
-jackson2-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson2" }
-jackson3-databind = { module = "tools.jackson.core:jackson-databind", version.ref = "jackson3" }
-jackson3-dataformat-yaml = { module = "tools.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson3" }
+h2 = { module = "com.h2database:h2", version = "2.3.232" }
+jackson2-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson2" }
+jackson2-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
+jackson2-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" }
+jackson2-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
+jackson3-bom = { module = "tools.jackson:jackson-bom", version.ref = "jackson3" }
+jackson3-databind = { module = "tools.jackson.core:jackson-databind" }
+jackson3-dataformat-yaml = { module = "tools.jackson.dataformat:jackson-dataformat-yaml" }
 jspecify = { module = "org.jspecify:jspecify", version = "1.0.0" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
-junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
-junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
-junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
-junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
+junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 junit4 = { module = "junit:junit", version = "4.13.2" }
 junit5-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
 junit5-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }
@@ -38,7 +43,15 @@ maven-core = { module = "org.apache.maven:maven-core", version.ref = "maven" }
 maven-plugin-annotations = { module = "org.apache.maven.plugin-tools:maven-plugin-annotations", version = "3.15.2" }
 maven-plugin-api = { module = "org.apache.maven:maven-plugin-api", version.ref = "maven" }
 opentest4j = { module = "org.opentest4j:opentest4j", version = "1.3.0" }
+postgresql = { module = "org.postgresql:postgresql", version = "42.7.7" }
+spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "spring-boot" }
+spring-boot-starter-data-jpa-test = { module = "org.springframework.boot:spring-boot-starter-data-jpa-test", version.ref = "spring-boot" }
+spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc", version.ref = "spring-boot" }
+spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test", version.ref = "spring-boot" }
+spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers", version.ref = "spring-boot" }
 spock = { module = "org.spockframework:spock-core", version = "2.4-M7-groovy-5.0" }
+testcontainers-junit-jupiter = { module = "org.testcontainers:testcontainers-junit-jupiter", version.ref = "testcontainers" }
+testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql", version.ref = "testcontainers" }
 testng = { module = "org.testng:testng", version = "7.12.0" }
 wiremock = { module = "org.wiremock:wiremock", version.ref = "wiremock" }
 
@@ -51,4 +64,6 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.3.10" }
 maven-plugin-development = { id = "org.gradlex.maven-plugin-development", version = "1.0.3" }
 plugin-publish = { id = "com.gradle.plugin-publish", version = "2.1.0" }
 sonar = { id = "org.sonarqube", version = "7.2.3.7755" }
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version = "1.1.7" }
 spotless = { id = "com.diffplug.spotless", version = "7.2.1" }
