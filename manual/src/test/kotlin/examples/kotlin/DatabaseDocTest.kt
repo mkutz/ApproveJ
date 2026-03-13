@@ -20,13 +20,13 @@ class DatabaseDocTest {
   fun setUp() {
     dataSource = JdbcDataSource()
     dataSource.setURL("jdbc:h2:mem:doc_${System.nanoTime()};DB_CLOSE_DELAY=-1")
-    dataSource.connection.use { conn: Connection ->
-      conn.createStatement().use { stmt ->
-        stmt.execute(
+    dataSource.connection.use { connection: Connection ->
+      connection.createStatement().use { statement ->
+        statement.execute(
           "CREATE TABLE users (id INT PRIMARY KEY, name VARCHAR(100), email VARCHAR(200))"
         )
-        stmt.execute("INSERT INTO users VALUES (1, 'Alice', 'alice@test.com')")
-        stmt.execute("INSERT INTO users VALUES (2, 'Bob', 'bob@test.com')")
+        statement.execute("INSERT INTO users VALUES (1, 'Alice', 'alice@test.com')")
+        statement.execute("INSERT INTO users VALUES (2, 'Bob', 'bob@test.com')")
       }
     }
   }
@@ -34,16 +34,16 @@ class DatabaseDocTest {
   @Test
   fun recording() {
     // tag::recording[]
-    val recordingDs = RecordingDataSource(dataSource)
+    val recordingDataSource = RecordingDataSource(dataSource)
 
-    // ... pass recordingDs to your code instead of the real DataSource ...
-    recordingDs.connection.use { conn ->
-      conn.createStatement().use { stmt ->
-        stmt.executeQuery("SELECT id, name, email FROM users WHERE id = 1")
+    // ... pass recordingDataSource to your code instead of the real DataSource ...
+    recordingDataSource.connection.use { connection ->
+      connection.createStatement().use { statement ->
+        statement.executeQuery("SELECT id, name, email FROM users WHERE id = 1")
       }
     }
 
-    approve(recordingDs.lastRecordedQuery()).printedAs(sql()).byFile()
+    approve(recordingDataSource.lastRecordedQuery()).printedAs(sql()).byFile()
     // end::recording[]
   }
 
