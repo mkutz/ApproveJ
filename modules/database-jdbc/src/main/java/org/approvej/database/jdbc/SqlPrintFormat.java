@@ -104,86 +104,12 @@ public class SqlPrintFormat implements PrintFormat<String> {
   }
 
   static String formatSql(String sql) {
-    List<String> tokens = tokenize(sql.strip());
-    StringBuilder result = new StringBuilder();
-    int indent = 0;
-    boolean afterClauseKeyword = false;
-    boolean needsSpace = false;
-
-    for (int i = 0; i < tokens.size(); i++) {
-      String token = tokens.get(i);
-
-      if (token.isBlank()) {
-        continue;
-      }
-
-      // Check for two-word keywords first
-      int secondWordIndex = findSecondWordIndex(tokens, i);
-      String twoWordKeyword =
-          secondWordIndex > 0 ? (token + " " + tokens.get(secondWordIndex)).toUpperCase() : null;
-
-      if (twoWordKeyword != null
-          && (isClauseKeyword(twoWordKeyword) || isSubKeyword(twoWordKeyword))) {
-        boolean isClause = isClauseKeyword(twoWordKeyword);
-        if (isClause) {
-          if (!result.isEmpty()) {
-            result.append("\n");
-          }
-          result.append("  ".repeat(indent));
-        } else {
-          result.append("\n");
-          result.append("  ".repeat(indent + 1));
-        }
-        result.append(twoWordKeyword);
-        i = secondWordIndex;
-        afterClauseKeyword = isClause;
-        needsSpace = !isClause;
-      } else if (isClauseKeyword(token.toUpperCase())) {
-        if (!result.isEmpty()) {
-          result.append("\n");
-        }
-        result.append("  ".repeat(indent));
-        result.append(token.toUpperCase());
-        afterClauseKeyword = true;
-        needsSpace = false;
-      } else if (isSubKeyword(token.toUpperCase())) {
-        result.append("\n");
-        result.append("  ".repeat(indent + 1));
-        result.append(token.toUpperCase());
-        afterClauseKeyword = false;
-        needsSpace = true;
-      } else if (",".equals(token)) {
-        result.append(",");
-        result.append("\n");
-        result.append("  ".repeat(indent + 1));
-        afterClauseKeyword = false;
-        needsSpace = false;
-      } else if ("(".equals(token)) {
-        if (afterClauseKeyword) {
-          result.append("\n");
-          result.append("  ".repeat(indent + 1));
-          afterClauseKeyword = false;
-        }
-        result.append("(");
-        needsSpace = false;
-      } else if (")".equals(token)) {
-        result.append(")");
-        afterClauseKeyword = false;
-        needsSpace = true;
-      } else {
-        if (afterClauseKeyword) {
-          result.append("\n");
-          result.append("  ".repeat(indent + 1));
-          afterClauseKeyword = false;
-        } else if (needsSpace) {
-          result.append(" ");
-        }
-        result.append(token);
-        needsSpace = true;
-      }
+    List<String> tokens = mergeKeywords(tokenize(sql.strip()));
+    SqlFormatter formatter = new SqlFormatter();
+    for (String token : tokens) {
+      formatter.process(token);
     }
-
-    return result.toString();
+    return formatter.toString();
   }
 
   private static List<String> tokenize(String sql) {
@@ -195,16 +121,36 @@ public class SqlPrintFormat implements PrintFormat<String> {
     return tokens;
   }
 
-  /**
-   * Finds the index of the second word after position i, skipping whitespace. Returns -1 if no
-   * second word is found.
-   */
-  private static int findSecondWordIndex(List<String> tokens, int i) {
-    int next = i + 1;
+  private static List<String> mergeKeywords(List<String> tokens) {
+    List<String> merged = new ArrayList<>();
+    int index = 0;
+    while (index < tokens.size()) {
+      String token = tokens.get(index);
+      if (token.isBlank()) {
+        index++;
+        continue;
+      }
+      int secondWordIndex = findSecondWordIndex(tokens, index);
+      if (secondWordIndex > 0) {
+        String twoWordKeyword = (token + " " + tokens.get(secondWordIndex)).toUpperCase();
+        if (CLAUSE_KEYWORDS.contains(twoWordKeyword) || SUB_KEYWORDS.contains(twoWordKeyword)) {
+          merged.add(twoWordKeyword);
+          index = secondWordIndex + 1;
+          continue;
+        }
+      }
+      merged.add(token);
+      index++;
+    }
+    return merged;
+  }
+
+  private static int findSecondWordIndex(List<String> tokens, int position) {
+    int next = position + 1;
     while (next < tokens.size() && tokens.get(next).isBlank()) {
       next++;
     }
-    if (next < tokens.size() && !tokens.get(next).isBlank() && isWord(tokens.get(next))) {
+    if (next < tokens.size() && isWord(tokens.get(next))) {
       return next;
     }
     return -1;
@@ -218,11 +164,84 @@ public class SqlPrintFormat implements PrintFormat<String> {
         && !token.startsWith("\"");
   }
 
-  private static boolean isClauseKeyword(String upper) {
-    return CLAUSE_KEYWORDS.contains(upper);
-  }
+  private static class SqlFormatter {
 
-  private static boolean isSubKeyword(String upper) {
-    return SUB_KEYWORDS.contains(upper);
+    private final StringBuilder result = new StringBuilder();
+    private boolean afterClauseKeyword = false;
+    private boolean needsSpace = false;
+
+    void process(String token) {
+      String upper = token.toUpperCase();
+      if (CLAUSE_KEYWORDS.contains(upper)) {
+        appendClause(upper);
+      } else if (SUB_KEYWORDS.contains(upper)) {
+        appendSubKeyword(upper);
+      } else if (",".equals(token)) {
+        appendComma();
+      } else if ("(".equals(token)) {
+        appendOpenParen();
+      } else if (")".equals(token)) {
+        appendCloseParen();
+      } else {
+        appendValue(token);
+      }
+    }
+
+    private void appendClause(String keyword) {
+      if (!result.isEmpty()) {
+        result.append("\n");
+      }
+      result.append(keyword);
+      afterClauseKeyword = true;
+      needsSpace = false;
+    }
+
+    private void appendSubKeyword(String keyword) {
+      result.append("\n");
+      result.append("  ");
+      result.append(keyword);
+      afterClauseKeyword = false;
+      needsSpace = true;
+    }
+
+    private void appendComma() {
+      result.append(",\n");
+      result.append("  ");
+      afterClauseKeyword = false;
+      needsSpace = false;
+    }
+
+    private void appendOpenParen() {
+      if (afterClauseKeyword) {
+        result.append("\n");
+        result.append("  ");
+        afterClauseKeyword = false;
+      }
+      result.append("(");
+      needsSpace = false;
+    }
+
+    private void appendCloseParen() {
+      result.append(")");
+      afterClauseKeyword = false;
+      needsSpace = true;
+    }
+
+    private void appendValue(String token) {
+      if (afterClauseKeyword) {
+        result.append("\n");
+        result.append("  ");
+        afterClauseKeyword = false;
+      } else if (needsSpace) {
+        result.append(" ");
+      }
+      result.append(token);
+      needsSpace = true;
+    }
+
+    @Override
+    public String toString() {
+      return result.toString();
+    }
   }
 }
