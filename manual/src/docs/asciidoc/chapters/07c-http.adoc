@@ -143,137 +143,21 @@ TIP: Call `resetReceivedRequests()` before exercising the code under test to ens
 === Wiring the `HttpStubServer` in Spring Boot
 
 In a **Spring Boot** test, the `HttpStubServer` needs to be wired into the application context so your services use it instead of the real API.
-The following steps show how to set this up.
+The following example from the Spring Boot example project shows a complete test class that approves the HTTP requests sent by a payment service:
 
-
-[id=http_approve_requests_stub_server_spring_boot_step1]
-==== Step 1: Create a test class with your service
-
-Start with a `@SpringBootTest` that injects the service whose HTTP requests you want to approve:
-
-[source,java,indent=0,role="primary"]
-.Java
+[source,java,indent=0]
 ----
-@SpringBootTest
-class PaymentGatewayTest {
-
-  @Autowired
-  PaymentGateway paymentGateway;
-}
+include::../../../../../examples/spring-boot/src/test/java/org/approvej/examples/shop/payment/PaymentApprovalTest.java[tags=spring_boot_http;!spring_boot_http_extra]
 ----
-[source,kotlin,indent=0,role="secondary"]
-.Kotlin
-----
-@SpringBootTest
-class PaymentGatewayTest(@Autowired val paymentGateway: PaymentGateway)
-----
-
-icon:check-circle[] _Checkpoint: the test class compiles and Spring can inject the bean._
-
-
-[id=http_approve_requests_stub_server_spring_boot_step2]
-==== Step 2: Add an `HttpStubServer` with `@DynamicPropertySource`
-
-Create a static `HttpStubServer` and use `@DynamicPropertySource` to point your service at it instead of the real API:
-
-[source,java,indent=0,role="primary"]
-.Java
-----
-@SpringBootTest
-class PaymentGatewayTest {
-
-  @AutoClose
-  static final HttpStubServer paymentServer = new HttpStubServer();
-
-  @DynamicPropertySource
-  static void configurePayment(DynamicPropertyRegistry registry) {
-    registry.add("payment.gateway.url", paymentServer::address);
-  }
-
-  @Autowired
-  PaymentGateway paymentGateway;
-}
-----
-[source,kotlin,indent=0,role="secondary"]
-.Kotlin
-----
-@SpringBootTest
-class PaymentGatewayTest(@Autowired val paymentGateway: PaymentGateway) {
-
-  companion object {
-    @AutoClose @JvmStatic
-    val paymentServer = HttpStubServer()
-
-    @DynamicPropertySource @JvmStatic
-    fun configurePayment(registry: DynamicPropertyRegistry) {
-      registry.add("payment.gateway.url", paymentServer::address)
-    }
-  }
-}
-----
-
-`@DynamicPropertySource` injects the stub server's address into the Spring property that your component reads (e.g., `payment.gateway.url`).
-`@AutoClose` ensures the server is shut down after all tests in the class.
-
-icon:check-circle[] _Checkpoint: the context starts and your service connects to the stub server instead of the real API._
-
-
-[id=http_approve_requests_stub_server_spring_boot_step3]
-==== Step 3: Write the approval test
-
-Add a `@BeforeEach` method to reset captured requests and configure the stubbed response, then write the test:
-
-[source,java,indent=0,role="primary"]
-.Java
-----
-@BeforeEach
-void setUp() {
-  paymentServer.resetReceivedRequests();
-  paymentServer.nextResponse(
-      response()
-          .header("Content-Type", "application/json")
-          .body("{\"status\":\"ok\"}")
-          .statusCode(200));
-}
-
-@Test
-void charge() {
-  paymentGateway.charge(new PaymentRequest("order-1", 9.99));
-
-  approve(paymentServer.lastReceivedRequest())
-      .scrubbedOf(hostHeaderValue())
-      .printedAs(httpRequest())
-      .byFile();
-}
-----
-[source,kotlin,indent=0,role="secondary"]
-.Kotlin
-----
-@BeforeEach
-fun setUp() {
-  paymentServer.resetReceivedRequests()
-  paymentServer.nextResponse(
-    response()
-      .header("Content-Type", "application/json")
-      .body("""{"status":"ok"}""")
-      .statusCode(200))
-}
-
-@Test
-fun charge() {
-  paymentGateway.charge(PaymentRequest("order-1", 9.99))
-
-  approve(paymentServer.lastReceivedRequest())
-    .scrubbedOf(hostHeaderValue())
-    .printedAs(httpRequest())
-    .byFile()
-}
-----
+<1> Create a static `HttpStubServer`.
+`@AutoClose` shuts it down after all tests in the class.
+<2> `@DynamicPropertySource` injects the stub server's address into the Spring property that your component reads (e.g., `payment.gateway.url`).
+<3> Call your service, then approve the captured HTTP request.
 
 NOTE: Set the `Content-Type` header on stubbed responses if your code parses them — Spring's `RestClient` and `WebClient` reject responses without a recognized content type.
 
-icon:check-circle[] _Checkpoint: the first run creates a `-received.http` file next to the test.
-Review it, rename it to `-approved.http`, and re-run — the test passes._
+TIP: The first run creates a `-received.http` file next to the test.
+Review it, rename it to `-approved.http`, and re-run — the test passes.
 
 
 [id=http_approve_requests_wiremock]
