@@ -37,15 +37,15 @@ class DatabaseDocTest {
   @Test
   void recording() throws Exception {
     // tag::recording[]
-    RecordingDataSource recordingDs = new RecordingDataSource(dataSource);
+    RecordingDataSource recordingDataSource = new RecordingDataSource(dataSource);
 
-    // ... pass recordingDs to your code instead of the real DataSource ...
-    try (Connection conn = recordingDs.getConnection();
-        Statement stmt = conn.createStatement()) {
-      stmt.executeQuery("SELECT id, name, email FROM users WHERE id = 1");
+    // ... pass recordingDataSource to your code instead of the real DataSource ...
+    try (Connection connection = recordingDataSource.getConnection();
+        Statement statement = connection.createStatement()) {
+      statement.executeQuery("SELECT id, name, email FROM users WHERE id = 1");
     }
 
-    approve(recordingDs.lastRecordedQuery()).printedAs(sql()).byFile();
+    approve(recordingDataSource.lastRecordedQuery()).printedAs(sql()).byFile();
     // end::recording[]
   }
 
