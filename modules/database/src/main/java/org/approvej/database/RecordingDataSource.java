@@ -88,15 +88,15 @@ public class RecordingDataSource implements DataSource {
         Connection.class,
         (proxy, method, args) -> {
           Object result = method.invoke(real, args);
-          if ("createStatement".equals(method.getName()) && result instanceof Statement stmt) {
-            return recordingStatement(stmt, null);
+          if ("createStatement".equals(method.getName()) && result instanceof Statement statement) {
+            return recordingStatement(statement, null);
           }
           if ("prepareStatement".equals(method.getName())
-              && result instanceof PreparedStatement pstmt
+              && result instanceof PreparedStatement statement
               && args != null
               && args.length > 0
               && args[0] instanceof String sql) {
-            return recordingStatement(pstmt, sql);
+            return recordingStatement(statement, sql);
           }
           return result;
         });

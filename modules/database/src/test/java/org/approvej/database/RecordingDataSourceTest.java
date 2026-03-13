@@ -16,23 +16,24 @@ class RecordingDataSourceTest {
 
   @BeforeEach
   void setUp() throws Exception {
-    JdbcDataSource ds = new JdbcDataSource();
-    ds.setURL("jdbc:h2:mem:recording_%s;DB_CLOSE_DELAY=-1".formatted(System.nanoTime()));
-    recordingDataSource = new RecordingDataSource(ds);
-    try (Connection conn = recordingDataSource.getConnection();
-        Statement stmt = conn.createStatement()) {
-      stmt.execute("CREATE TABLE users (id INT PRIMARY KEY, name VARCHAR(100))");
+    JdbcDataSource jdbcDataSource = new JdbcDataSource();
+    jdbcDataSource.setURL(
+        "jdbc:h2:mem:recording_%s;DB_CLOSE_DELAY=-1".formatted(System.nanoTime()));
+    recordingDataSource = new RecordingDataSource(jdbcDataSource);
+    try (Connection connection = recordingDataSource.getConnection();
+        Statement statement = connection.createStatement()) {
+      statement.execute("CREATE TABLE users (id INT PRIMARY KEY, name VARCHAR(100))");
     }
   }
 
   @Test
   void recordedQueries_statement() throws Exception {
-    try (Connection conn = recordingDataSource.getConnection();
-        Statement stmt = conn.createStatement()) {
+    try (Connection connection = recordingDataSource.getConnection();
+        Statement statement = connection.createStatement()) {
       recordingDataSource.resetRecordedQueries();
-      stmt.execute("INSERT INTO users VALUES (1, 'Alice')");
-      stmt.executeUpdate("INSERT INTO users VALUES (2, 'Bob')");
-      stmt.executeQuery("SELECT * FROM users");
+      statement.execute("INSERT INTO users VALUES (1, 'Alice')");
+      statement.executeUpdate("INSERT INTO users VALUES (2, 'Bob')");
+      statement.executeQuery("SELECT * FROM users");
     }
 
     assertThat(recordingDataSource.recordedQueries())
@@ -44,15 +45,16 @@ class RecordingDataSourceTest {
 
   @Test
   void recordedQueries_prepared_statement() throws Exception {
-    try (Connection conn = recordingDataSource.getConnection();
-        PreparedStatement pstmt = conn.prepareStatement("INSERT INTO users VALUES (?, ?)")) {
+    try (Connection connection = recordingDataSource.getConnection();
+        PreparedStatement statement =
+            connection.prepareStatement("INSERT INTO users VALUES (?, ?)")) {
       recordingDataSource.resetRecordedQueries();
-      pstmt.setInt(1, 1);
-      pstmt.setString(2, "Alice");
-      pstmt.execute();
-      pstmt.setInt(1, 2);
-      pstmt.setString(2, "Bob");
-      pstmt.execute();
+      statement.setInt(1, 1);
+      statement.setString(2, "Alice");
+      statement.execute();
+      statement.setInt(1, 2);
+      statement.setString(2, "Bob");
+      statement.execute();
     }
 
     assertThat(recordingDataSource.recordedQueries())
@@ -61,11 +63,11 @@ class RecordingDataSourceTest {
 
   @Test
   void lastRecordedQuery() throws Exception {
-    try (Connection conn = recordingDataSource.getConnection();
-        Statement stmt = conn.createStatement()) {
+    try (Connection connection = recordingDataSource.getConnection();
+        Statement statement = connection.createStatement()) {
       recordingDataSource.resetRecordedQueries();
-      stmt.execute("INSERT INTO users VALUES (1, 'Alice')");
-      stmt.execute("SELECT * FROM users");
+      statement.execute("INSERT INTO users VALUES (1, 'Alice')");
+      statement.execute("SELECT * FROM users");
     }
 
     assertThat(recordingDataSource.lastRecordedQuery()).isEqualTo("SELECT * FROM users");
@@ -73,9 +75,9 @@ class RecordingDataSourceTest {
 
   @Test
   void resetRecordedQueries() throws Exception {
-    try (Connection conn = recordingDataSource.getConnection();
-        Statement stmt = conn.createStatement()) {
-      stmt.execute("INSERT INTO users VALUES (1, 'Alice')");
+    try (Connection connection = recordingDataSource.getConnection();
+        Statement statement = connection.createStatement()) {
+      statement.execute("INSERT INTO users VALUES (1, 'Alice')");
     }
 
     assertThat(recordingDataSource.recordedQueries()).isNotEmpty();
@@ -87,12 +89,12 @@ class RecordingDataSourceTest {
 
   @Test
   void getConnection_username_password() throws Exception {
-    JdbcDataSource ds = new JdbcDataSource();
-    ds.setURL("jdbc:h2:mem:auth_%s;DB_CLOSE_DELAY=-1".formatted(System.nanoTime()));
-    DataSource recording = new RecordingDataSource(ds);
+    JdbcDataSource dataSource = new JdbcDataSource();
+    dataSource.setURL("jdbc:h2:mem:auth_%s;DB_CLOSE_DELAY=-1".formatted(System.nanoTime()));
+    DataSource recording = new RecordingDataSource(dataSource);
 
-    try (Connection conn = recording.getConnection("sa", "")) {
-      assertThat(conn).isNotNull();
+    try (Connection connection = recording.getConnection("sa", "")) {
+      assertThat(connection).isNotNull();
     }
   }
 }
