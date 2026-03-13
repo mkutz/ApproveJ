@@ -100,147 +100,23 @@ Since `RecordingDataSource` implements `DataSource`, it can be passed anywhere a
 With **plain JDBC**, simply wrap your `DataSource` before passing it to the code under test, as shown in the <<database_approve_sql,basic example>> above.
 
 In a **Spring Boot** test, the `DataSource` is managed by the container and injected into your services automatically.
-The following steps show how to set this up.
+The following example from the Spring Boot example project shows a complete test class that wraps the `DataSource` with a `RecordingDataSource` and approves the recorded SQL:
 
-
-[id=database_approve_sql_wiring_step1]
-==== Step 1: Create a test class with your service
-
-Start with a `@SpringBootTest` that injects the service you want to test and the `DataSource`:
-
-[source,java,indent=0,role="primary"]
-.Java
+[source,java,indent=0]
 ----
-@SpringBootTest
-class OrderServiceTest {
-
-  @Autowired
-  DataSource dataSource;
-
-  @Autowired
-  OrderService orderService;
-}
+include::../../../../../examples/spring-boot/src/test/java/org/approvej/examples/shop/order/OrderSqlApprovalTest.java[tag=spring_boot_database]
 ----
-[source,kotlin,indent=0,role="secondary"]
-.Kotlin
-----
-@SpringBootTest
-class OrderServiceTest(
-  @Autowired val dataSource: DataSource,
-  @Autowired val orderService: OrderService,
-)
-----
-
-icon:check-circle[] _Checkpoint: the test class compiles and Spring can inject both beans._
-
-
-[id=database_approve_sql_wiring_step2]
-==== Step 2: Wrap the DataSource with RecordingDataSource
-
-Add a `@TestConfiguration` with a `BeanPostProcessor` that replaces the `DataSource` bean with a `RecordingDataSource` wrapper.
+<1> `@Import` activates the `@TestConfiguration`.
+Without it, the inner class is ignored.
+<2> The injected `DataSource` is now the `RecordingDataSource` wrapper.
+<3> A `BeanPostProcessor` intercepts the `DataSource` bean and wraps it with `RecordingDataSource`.
 This ensures all beans — including your services and JPA — use the recording wrapper transparently.
-
-[source,java,indent=0,role="primary"]
-.Java
-----
-@SpringBootTest
-@Import(OrderServiceTest.RecordingConfig.class) // <1>
-class OrderServiceTest {
-
-  @TestConfiguration
-  static class RecordingConfig {
-    @Bean
-    static BeanPostProcessor recordingDataSourceWrapper() {
-      return new BeanPostProcessor() {
-        @Override
-        public Object postProcessAfterInitialization(Object bean, String beanName) {
-          if (bean instanceof DataSource ds && !(bean instanceof RecordingDataSource)) {
-            return new RecordingDataSource(ds);
-          }
-          return bean;
-        }
-      };
-    }
-  }
-
-  @Autowired
-  DataSource dataSource; // <2>
-
-  @Autowired
-  OrderService orderService;
-}
-----
-<1> `@Import` activates the configuration. Without it, the inner class is ignored.
-<2> The injected `DataSource` is now the `RecordingDataSource` wrapper.
-
-[source,kotlin,indent=0,role="secondary"]
-.Kotlin
-----
-@SpringBootTest
-@Import(OrderServiceTest.RecordingConfig::class) // <1>
-class OrderServiceTest(
-  @Autowired val dataSource: DataSource, // <2>
-  @Autowired val orderService: OrderService,
-) {
-
-  @TestConfiguration
-  class RecordingConfig {
-    companion object {
-      @Bean @JvmStatic
-      fun recordingDataSourceWrapper() = BeanPostProcessor { bean, _ ->
-        if (bean is DataSource && bean !is RecordingDataSource)
-          RecordingDataSource(bean) else bean
-      }
-    }
-  }
-}
-----
-<1> `@Import` activates the configuration. Without it, the inner class is ignored.
-<2> The injected `DataSource` is now the `RecordingDataSource` wrapper.
-
-icon:check-circle[] _Checkpoint: the context starts and `dataSource instanceof RecordingDataSource` is `true`._
-
-
-[id=database_approve_sql_wiring_step3]
-==== Step 3: Write the approval test
-
-Cast the `DataSource` to `RecordingDataSource`, reset it, exercise your code, and approve the last recorded query using the <<database_sql_print_format,SQL print format>>:
-
-[source,java,indent=0,role="primary"]
-.Java
-----
-@Test
-void place_order() {
-  RecordingDataSource recordingDataSource = (RecordingDataSource) dataSource;
-  recordingDataSource.resetRecordedQueries();
-
-  orderService.placeOrder(new Order("Widget", 3));
-
-  approve(recordingDataSource.lastRecordedQuery())
-      .printedAs(sql())
-      .byFile();
-}
-----
-[source,kotlin,indent=0,role="secondary"]
-.Kotlin
-----
-@Test
-fun place_order() {
-  val recordingDataSource = dataSource as RecordingDataSource
-  recordingDataSource.resetRecordedQueries()
-
-  orderService.placeOrder(Order("Widget", 3))
-
-  approve(recordingDataSource.lastRecordedQuery())
-    .printedAs(sql())
-    .byFile()
-}
-----
-
-icon:check-circle[] _Checkpoint: the first run creates a `-received.sql` file next to the test.
-Review it, rename it to `-approved.sql`, and re-run — the test passes._
+<4> Approve the last recorded SQL query using the <<database_sql_print_format,SQL print format>>.
 
 TIP: Call `resetRecordedQueries()` before exercising the code under test to ensure you only capture the SQL you care about.
+
+TIP: The first run creates a `-received.sql` file next to the test.
+Review it, rename it to `-approved.sql`, and re-run — the test passes.
 
 
 [id=database_sql_print_format]

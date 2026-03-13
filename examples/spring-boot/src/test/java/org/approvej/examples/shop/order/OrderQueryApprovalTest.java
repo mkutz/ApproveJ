@@ -4,7 +4,6 @@ import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.database.DatabaseScrubbers.columnValue;
 import static org.approvej.database.DatabaseSnapshot.query;
 import static org.approvej.database.QueryResultPrintFormat.queryResult;
-import static org.approvej.database.SqlPrintFormat.sql;
 import static org.approvej.http.StubbedHttpResponse.response;
 import static org.approvej.json.jackson3.JsonPrintFormat.json;
 import static org.approvej.scrub.Scrubbers.isoInstants;
@@ -13,7 +12,6 @@ import static org.approvej.scrub.Scrubbers.uuids;
 import java.math.BigDecimal;
 import java.util.List;
 import javax.sql.DataSource;
-import org.approvej.database.RecordingDataSource;
 import org.approvej.examples.shop.product.Product;
 import org.approvej.examples.shop.product.ProductRepository;
 import org.approvej.http.HttpStubServer;
@@ -21,12 +19,8 @@ import org.junit.jupiter.api.AutoClose;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.junit.jupiter.Container;
@@ -35,8 +29,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 
 @SpringBootTest
 @Testcontainers
-@Import(OrderApprovalTest.RecordingDataSourceConfiguration.class)
-class OrderApprovalTest {
+class OrderQueryApprovalTest {
 
   @Container @ServiceConnection
   static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17");
@@ -53,25 +46,8 @@ class OrderApprovalTest {
   @Autowired private ProductRepository productRepository;
   @Autowired private DataSource dataSource;
 
-  @TestConfiguration
-  static class RecordingDataSourceConfiguration {
-
-    @Bean
-    static BeanPostProcessor recordingDataSourceWrapper() {
-      return new BeanPostProcessor() {
-        @Override
-        public Object postProcessAfterInitialization(Object bean, String beanName) {
-          if (bean instanceof DataSource ds && !(bean instanceof RecordingDataSource)) {
-            return new RecordingDataSource(ds);
-          }
-          return bean;
-        }
-      };
-    }
-  }
-
   @BeforeEach
-  void setUp() {
+  void resetPaymentStub() {
     paymentServer.resetReceivedRequests();
     paymentServer.nextResponse(
         response()
@@ -133,19 +109,5 @@ class OrderApprovalTest {
         .scrubbedOf(columnValue("id"))
         .printedAs(queryResult())
         .byFile();
-  }
-
-  @Test
-  void place_order_sql() {
-    Product product =
-        productRepository.save(
-            new Product("Tamper", "Precision tamper", new BigDecimal("34.99"), "TMP-100"));
-
-    RecordingDataSource recordingDataSource = (RecordingDataSource) dataSource;
-    recordingDataSource.resetRecordedQueries();
-
-    orderService.placeOrder("Dave", "dave@example.com", List.of(product.getId()));
-
-    approve(recordingDataSource.lastRecordedQuery()).printedAs(sql()).scrubbedOf(uuids()).byFile();
   }
 }
