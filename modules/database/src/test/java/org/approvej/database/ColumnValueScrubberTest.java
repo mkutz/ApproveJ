@@ -30,7 +30,7 @@ class ColumnValueScrubberTest {
 
     QueryResult scrubbed = DatabaseScrubbers.columnValue("nonexistent").apply(result);
 
-    assertThat(scrubbed.rows().get(0)).containsExactly("1", "Alice");
+    assertThat(scrubbed.rows().getFirst()).containsExactly("1", "Alice");
   }
 
   @Test
@@ -42,7 +42,7 @@ class ColumnValueScrubberTest {
     QueryResult scrubbed =
         DatabaseScrubbers.columnValue("id").replacement(numbered("id")).apply(result);
 
-    assertThat(scrubbed.rows().get(0)).containsExactly("[id 1]", "Alice");
+    assertThat(scrubbed.rows().getFirst()).containsExactly("[id 1]", "Alice");
   }
 
   @Test
@@ -53,6 +53,6 @@ class ColumnValueScrubberTest {
 
     QueryResult scrubbed = DatabaseScrubbers.columnValue("id").replacement("***").apply(result);
 
-    assertThat(scrubbed.rows().get(0)).containsExactly("***", "Alice");
+    assertThat(scrubbed.rows().getFirst()).containsExactly("***", "Alice");
   }
 }

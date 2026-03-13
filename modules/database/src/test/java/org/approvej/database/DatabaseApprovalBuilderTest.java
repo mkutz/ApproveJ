@@ -18,15 +18,15 @@ class DatabaseApprovalBuilderTest {
 
   @BeforeEach
   void setUp() throws Exception {
-    JdbcDataSource ds = new JdbcDataSource();
-    ds.setURL("jdbc:h2:mem:approval_%s;DB_CLOSE_DELAY=-1".formatted(System.nanoTime()));
-    dataSource = ds;
-    try (Connection conn = dataSource.getConnection();
-        Statement stmt = conn.createStatement()) {
-      stmt.execute(
+    JdbcDataSource datasource = new JdbcDataSource();
+    datasource.setURL("jdbc:h2:mem:approval_%s;DB_CLOSE_DELAY=-1".formatted(System.nanoTime()));
+    dataSource = datasource;
+    try (Connection connection = dataSource.getConnection();
+        Statement statement = connection.createStatement()) {
+      statement.execute(
           "CREATE TABLE users (id INT PRIMARY KEY, name VARCHAR(100), email VARCHAR(200))");
-      stmt.execute("INSERT INTO users VALUES (1, 'Alice', 'alice@test.com')");
-      stmt.execute("INSERT INTO users VALUES (2, 'Bob', 'bob@test.com')");
+      statement.execute("INSERT INTO users VALUES (1, 'Alice', 'alice@test.com')");
+      statement.execute("INSERT INTO users VALUES (2, 'Bob', 'bob@test.com')");
     }
   }
 

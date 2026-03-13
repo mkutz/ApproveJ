@@ -30,8 +30,8 @@ public class QueryResultPrintFormat implements PrintFormat<QueryResult> {
   @Override
   public Printer<QueryResult> printer() {
     return (QueryResult result) -> {
-      StringBuilder sb = new StringBuilder();
-      sb.append("query: %s".formatted(result.query()));
+      StringBuilder stringBuilder = new StringBuilder();
+      stringBuilder.append("query: %s".formatted(result.query()));
 
       int columnCount = result.columnNames().size();
       int[] widths = new int[columnCount];
@@ -44,31 +44,33 @@ public class QueryResultPrintFormat implements PrintFormat<QueryResult> {
         }
       }
 
-      sb.append("\n\n");
-      appendRow(sb, result.columnNames(), widths);
-      sb.append("\n");
-      appendSeparator(sb, widths);
+      stringBuilder.append("\n\n");
+      appendRow(stringBuilder, result.columnNames(), widths);
+      stringBuilder.append("\n");
+      appendSeparator(stringBuilder, widths);
       for (var row : result.rows()) {
-        sb.append("\n");
-        appendRow(sb, row, widths);
+        stringBuilder.append("\n");
+        appendRow(stringBuilder, row, widths);
       }
 
-      return sb.toString();
+      return stringBuilder.toString();
     };
   }
 
-  private static void appendRow(StringBuilder sb, java.util.List<String> values, int[] widths) {
-    sb.append("|");
+  private static void appendRow(
+      StringBuilder stringBuilder, java.util.List<String> values, int[] widths) {
+    stringBuilder.append("|");
     for (int i = 0; i < values.size(); i++) {
-      sb.append(" %-*s |".replace("*", String.valueOf(widths[i])).formatted(values.get(i)));
+      stringBuilder.append(
+          " %-*s |".replace("*", String.valueOf(widths[i])).formatted(values.get(i)));
     }
   }
 
-  private static void appendSeparator(StringBuilder sb, int[] widths) {
-    sb.append("|");
+  private static void appendSeparator(StringBuilder stringBuilder, int[] widths) {
+    stringBuilder.append("|");
     for (int width : widths) {
-      sb.append("-".repeat(width + 2));
-      sb.append("|");
+      stringBuilder.append("-".repeat(width + 2));
+      stringBuilder.append("|");
     }
   }
 
