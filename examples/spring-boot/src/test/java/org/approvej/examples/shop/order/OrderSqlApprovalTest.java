@@ -4,6 +4,7 @@ import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.database.SqlPrintFormat.sql;
 import static org.approvej.http.StubbedHttpResponse.response;
 import static org.approvej.scrub.Scrubbers.uuids;
+import static org.testcontainers.containers.wait.strategy.Wait.forListeningPort;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -24,18 +25,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 // tag::spring_boot_database[]
 @SpringBootTest
-@Testcontainers
 @Import(OrderSqlApprovalTest.RecordingDataSourceConfiguration.class) // <1>
 class OrderSqlApprovalTest {
 
-  @Container @ServiceConnection
-  static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17");
+  @ServiceConnection
+  static final PostgreSQLContainer postgres =
+      new PostgreSQLContainer("postgres:17").waitingFor(forListeningPort());
 
   @AutoClose static final HttpStubServer paymentServer = new HttpStubServer();
 
