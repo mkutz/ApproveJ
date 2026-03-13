@@ -42,10 +42,11 @@ public class ReceivedHttpRequestPrintFormat implements PrintFormat<ReceivedHttpR
       request
           .headers()
           .forEach(
-              (key, value) -> stringBuilder.append("\n%s: %s".formatted(key, join(", ", value))));
+              (key, value) ->
+                  stringBuilder.append("\n").append("%s: %s".formatted(key, join(", ", value))));
 
       if (!request.body().isBlank()) {
-        stringBuilder.append("\n\n%s".formatted(request.body()));
+        stringBuilder.append("\n\n").append(request.body());
       }
       return stringBuilder.toString();
     };
