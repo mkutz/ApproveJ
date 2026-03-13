@@ -80,9 +80,14 @@ public final class ApproveCallLineMarkerProvider extends LineMarkerProviderDescr
 
     List<VirtualFile> approvedFiles =
         InventoryUtil.findApprovedFiles(className, methodName, project).stream()
-                .filter(f -> f.getNameWithoutExtension().endsWith(suffix))
-                .toList();
-
+            .filter(
+                f -> {
+                  String name = f.getNameWithoutExtension();
+                  int prefixLen = name.length() - suffix.length();
+                  return name.endsWith(suffix)
+                      && (prefixLen == 0 || name.charAt(prefixLen - 1) == '-');
+                })
+            .toList();
     if (approvedFiles.isEmpty()) return;
 
     PsiManager psiManager = PsiManager.getInstance(project);
