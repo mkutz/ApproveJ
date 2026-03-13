@@ -25,7 +25,7 @@ dependencies {
   testImplementation(project(":modules:json-jackson3"))
   testImplementation(project(":modules:yaml-jackson3"))
   testImplementation(project(":modules:http"))
-  testImplementation(project(":modules:database"))
+  testImplementation(project(":modules:database-jdbc"))
   testImplementation(platform(libs.jackson3.bom))
   testImplementation(libs.jackson3.dataformat.yaml)
 }

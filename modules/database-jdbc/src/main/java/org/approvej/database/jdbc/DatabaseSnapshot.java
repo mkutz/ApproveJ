@@ -1,13 +1,9 @@
-package org.approvej.database;
+package org.approvej.database.jdbc;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import javax.sql.DataSource;
 import org.jspecify.annotations.NullMarked;
 
@@ -30,25 +26,7 @@ public final class DatabaseSnapshot {
     try (Connection connection = dataSource.getConnection();
         Statement statement = connection.createStatement();
         ResultSet resultSet = statement.executeQuery(sql)) {
-
-      ResultSetMetaData metaData = resultSet.getMetaData();
-      int columnCount = metaData.getColumnCount();
-
-      List<String> columnNames = new ArrayList<>(columnCount);
-      for (int i = 1; i <= columnCount; i++) {
-        columnNames.add(metaData.getColumnLabel(i));
-      }
-
-      List<List<String>> rows = new ArrayList<>();
-      while (resultSet.next()) {
-        List<String> row = new ArrayList<>(columnCount);
-        for (int i = 1; i <= columnCount; i++) {
-          row.add(Objects.toString(resultSet.getObject(i), "NULL"));
-        }
-        rows.add(row);
-      }
-
-      return new QueryResult(sql, columnNames, rows);
+      return QueryResult.of(resultSet);
     } catch (SQLException e) {
       throw new DatabaseSnapshotException(e);
     }

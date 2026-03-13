@@ -90,11 +90,11 @@ endif::[]
 |`ReceivedHttpRequestPrintFormat.httpRequest()`
 |Print as HTTP request format (requires `http`)
 
-|`QueryResultPrintFormat.queryResult()`
-|Print as Markdown table (requires `database`)
+|`MarkdownTablePrintFormat.markdownTable()`
+|Print as Markdown table (requires `database-jdbc`)
 
 |`SqlPrintFormat.sql()`
-|Pretty-print SQL with line breaks (requires `database`)
+|Pretty-print SQL with line breaks (requires `database-jdbc`)
 |===
 
 

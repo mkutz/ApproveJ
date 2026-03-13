@@ -1,4 +1,4 @@
-package org.approvej.database;
+package org.approvej.database.jdbc;
 
 import static org.approvej.scrub.Replacements.numbered;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,10 +11,7 @@ class ColumnValueScrubberTest {
   @Test
   void apply() {
     QueryResult result =
-        new QueryResult(
-            "SELECT * FROM users",
-            List.of("id", "name"),
-            List.of(List.of("1", "Alice"), List.of("2", "Bob")));
+        new QueryResult(List.of("id", "name"), List.of(List.of("1", "Alice"), List.of("2", "Bob")));
 
     QueryResult scrubbed = DatabaseScrubbers.columnValue("id").apply(result);
 
@@ -24,9 +21,7 @@ class ColumnValueScrubberTest {
 
   @Test
   void apply_nonexistent_column() {
-    QueryResult result =
-        new QueryResult(
-            "SELECT * FROM users", List.of("id", "name"), List.of(List.of("1", "Alice")));
+    QueryResult result = new QueryResult(List.of("id", "name"), List.of(List.of("1", "Alice")));
 
     QueryResult scrubbed = DatabaseScrubbers.columnValue("nonexistent").apply(result);
 
@@ -35,9 +30,7 @@ class ColumnValueScrubberTest {
 
   @Test
   void replacement() {
-    QueryResult result =
-        new QueryResult(
-            "SELECT * FROM users", List.of("id", "name"), List.of(List.of("1", "Alice")));
+    QueryResult result = new QueryResult(List.of("id", "name"), List.of(List.of("1", "Alice")));
 
     QueryResult scrubbed =
         DatabaseScrubbers.columnValue("id").replacement(numbered("id")).apply(result);
@@ -47,9 +40,7 @@ class ColumnValueScrubberTest {
 
   @Test
   void replacement_static() {
-    QueryResult result =
-        new QueryResult(
-            "SELECT * FROM users", List.of("id", "name"), List.of(List.of("1", "Alice")));
+    QueryResult result = new QueryResult(List.of("id", "name"), List.of(List.of("1", "Alice")));
 
     QueryResult scrubbed = DatabaseScrubbers.columnValue("id").replacement("***").apply(result);
 

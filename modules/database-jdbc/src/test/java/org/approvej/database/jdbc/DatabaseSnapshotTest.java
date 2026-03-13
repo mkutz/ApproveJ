@@ -1,4 +1,4 @@
-package org.approvej.database;
+package org.approvej.database.jdbc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -33,7 +33,6 @@ class DatabaseSnapshotTest {
   void query() {
     QueryResult result = DatabaseSnapshot.query(dataSource, "SELECT * FROM users WHERE id <= 2");
 
-    assertThat(result.query()).isEqualTo("SELECT * FROM users WHERE id <= 2");
     assertThat(result.columnNames()).containsExactly("ID", "NAME", "EMAIL");
     assertThat(result.rows()).hasSize(2);
     assertThat(result.rows().get(0)).containsExactly("1", "Alice", "alice@test.com");
@@ -45,7 +44,7 @@ class DatabaseSnapshotTest {
     QueryResult result = DatabaseSnapshot.query(dataSource, "SELECT * FROM users WHERE id = 3");
 
     assertThat(result.rows()).hasSize(1);
-    assertThat(result.rows().getFirst()).containsExactly("3", "NULL", "charlie@test.com");
+    assertThat(result.rows().getFirst()).containsExactly("3", "<null>", "charlie@test.com");
   }
 
   @Test

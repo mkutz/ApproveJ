@@ -1,7 +1,7 @@
 package org.approvej.examples.shop.order;
 
 import static org.approvej.ApprovalBuilder.approve;
-import static org.approvej.database.SqlPrintFormat.sql;
+import static org.approvej.database.jdbc.SqlPrintFormat.sql;
 import static org.approvej.http.StubbedHttpResponse.response;
 import static org.approvej.scrub.Scrubbers.uuids;
 import static org.testcontainers.containers.wait.strategy.Wait.forListeningPort;
@@ -9,7 +9,7 @@ import static org.testcontainers.containers.wait.strategy.Wait.forListeningPort;
 import java.math.BigDecimal;
 import java.util.List;
 import javax.sql.DataSource;
-import org.approvej.database.RecordingDataSource;
+import org.approvej.database.jdbc.RecordingDataSource;
 import org.approvej.examples.shop.product.Product;
 import org.approvej.examples.shop.product.ProductRepository;
 import org.approvej.http.HttpStubServer;

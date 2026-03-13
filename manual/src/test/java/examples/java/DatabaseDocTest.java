@@ -1,17 +1,17 @@
 package examples.java;
 
 import static org.approvej.ApprovalBuilder.approve;
-import static org.approvej.database.DatabaseScrubbers.columnValue;
-import static org.approvej.database.DatabaseSnapshot.query;
-import static org.approvej.database.QueryResultPrintFormat.queryResult;
-import static org.approvej.database.SqlPrintFormat.sql;
+import static org.approvej.database.jdbc.DatabaseScrubbers.columnValue;
+import static org.approvej.database.jdbc.DatabaseSnapshot.query;
+import static org.approvej.database.jdbc.MarkdownTablePrintFormat.markdownTable;
+import static org.approvej.database.jdbc.SqlPrintFormat.sql;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.sql.Connection;
 import java.sql.Statement;
 import javax.sql.DataSource;
-import org.approvej.database.QueryResult;
-import org.approvej.database.RecordingDataSource;
+import org.approvej.database.jdbc.QueryResult;
+import org.approvej.database.jdbc.RecordingDataSource;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,7 +63,7 @@ class DatabaseDocTest {
     // tag::approve[]
     approve(query(dataSource, "SELECT * FROM users"))
         .scrubbedOf(columnValue("id"))
-        .printedAs(queryResult())
+        .printedAs(markdownTable())
         .byFile();
     // end::approve[]
   }
@@ -73,7 +73,7 @@ class DatabaseDocTest {
     // tag::scrub[]
     approve(query(dataSource, "SELECT * FROM users"))
         .scrubbedOf(columnValue("id"))
-        .printedAs(queryResult())
+        .printedAs(markdownTable())
         .byFile();
     // end::scrub[]
   }
@@ -83,7 +83,7 @@ class DatabaseDocTest {
     // tag::scrub_custom[]
     approve(query(dataSource, "SELECT * FROM users"))
         .scrubbedOf(columnValue("id").replacement("***"))
-        .printedAs(queryResult())
+        .printedAs(markdownTable())
         .byFile();
     // end::scrub_custom[]
   }

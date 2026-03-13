@@ -1,9 +1,9 @@
 package org.approvej.examples.shop.order;
 
 import static org.approvej.ApprovalBuilder.approve;
-import static org.approvej.database.DatabaseScrubbers.columnValue;
-import static org.approvej.database.DatabaseSnapshot.query;
-import static org.approvej.database.QueryResultPrintFormat.queryResult;
+import static org.approvej.database.jdbc.DatabaseScrubbers.columnValue;
+import static org.approvej.database.jdbc.DatabaseSnapshot.query;
+import static org.approvej.database.jdbc.MarkdownTablePrintFormat.markdownTable;
 import static org.approvej.http.StubbedHttpResponse.response;
 import static org.approvej.json.jackson3.JsonPrintFormat.json;
 import static org.approvej.scrub.Scrubbers.isoInstants;
@@ -52,8 +52,10 @@ class OrderQueryApprovalTest {
         response()
             .header("Content-Type", "application/json")
             .body(
-                "{\"paymentId\":\"pay-abc-123\",\"status\":\"succeeded\","
-                    + "\"processedAt\":\"2026-03-11T10:00:00Z\"}")
+                """
+                {"paymentId":"pay-abc-123","status":"succeeded",\
+                "processedAt":"2026-03-11T10:00:00Z"}\
+                """)
             .statusCode(200));
   }
 
@@ -86,7 +88,7 @@ class OrderQueryApprovalTest {
                 dataSource,
                 "SELECT customer_name, customer_email, status FROM orders"
                     + " WHERE customer_name = 'Bob'"))
-        .printedAs(queryResult())
+        .printedAs(markdownTable())
         .byFile();
   }
 
@@ -106,7 +108,7 @@ class OrderQueryApprovalTest {
                     + " JOIN orders o ON oi.order_id = o.id"
                     + " WHERE o.customer_name = 'Carol'"))
         .scrubbedOf(columnValue("id"))
-        .printedAs(queryResult())
+        .printedAs(markdownTable())
         .byFile();
   }
 }

@@ -1,6 +1,6 @@
-package org.approvej.database;
+package org.approvej.database.jdbc;
 
-import static org.approvej.database.SqlPrintFormat.sql;
+import static org.approvej.database.jdbc.SqlPrintFormat.sql;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;

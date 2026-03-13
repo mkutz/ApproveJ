@@ -1,4 +1,4 @@
-package org.approvej.database;
+package org.approvej.database.jdbc;
 
 import org.approvej.print.PrintFormat;
 import org.approvej.print.Printer;
@@ -8,11 +8,9 @@ import org.jspecify.annotations.NullMarked;
  * {@link PrintFormat} implementation for {@link QueryResult} that prints the result as a
  * Markdown-compatible ASCII table.
  *
- * <p>For example, a query {@code SELECT * FROM users} with two rows would be printed like this:
+ * <p>For example, a result with two rows would be printed like this:
  *
  * <pre>
- * query: SELECT * FROM users
- *
  * | id | name  | email          |
  * |----|-------|----------------|
  * | 1  | Alice | alice@test.com |
@@ -20,19 +18,16 @@ import org.jspecify.annotations.NullMarked;
  * </pre>
  */
 @NullMarked
-public class QueryResultPrintFormat implements PrintFormat<QueryResult> {
+public class MarkdownTablePrintFormat implements PrintFormat<QueryResult> {
 
   /** Default constructor. */
-  public QueryResultPrintFormat() {
+  public MarkdownTablePrintFormat() {
     // No initialization needed
   }
 
   @Override
   public Printer<QueryResult> printer() {
     return (QueryResult result) -> {
-      StringBuilder stringBuilder = new StringBuilder();
-      stringBuilder.append("query: %s".formatted(result.query()));
-
       int columnCount = result.columnNames().size();
       int[] widths = new int[columnCount];
       for (int i = 0; i < columnCount; i++) {
@@ -44,7 +39,7 @@ public class QueryResultPrintFormat implements PrintFormat<QueryResult> {
         }
       }
 
-      stringBuilder.append("\n\n");
+      StringBuilder stringBuilder = new StringBuilder();
       appendRow(stringBuilder, result.columnNames(), widths);
       stringBuilder.append("\n");
       appendSeparator(stringBuilder, widths);
@@ -80,11 +75,11 @@ public class QueryResultPrintFormat implements PrintFormat<QueryResult> {
   }
 
   /**
-   * Creates and returns a new {@link QueryResultPrintFormat} instance.
+   * Creates and returns a new {@link MarkdownTablePrintFormat} instance.
    *
    * @return the new instance
    */
-  public static QueryResultPrintFormat queryResult() {
-    return new QueryResultPrintFormat();
+  public static MarkdownTablePrintFormat markdownTable() {
+    return new MarkdownTablePrintFormat();
   }
 }
