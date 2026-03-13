@@ -19,6 +19,7 @@ dependencies {
   api(project(":modules:core"))
   api(libs.jspecify)
 
+  compileOnly(platform(libs.jackson2.bom))
   compileOnly(libs.jackson2.databind)
   compileOnly(libs.jackson2.dataformat.yaml)
   compileOnly(libs.jackson2.jsr310)
@@ -32,6 +33,7 @@ testing {
         dependencies {
           implementation(testFixtures(project(":modules:core")))
 
+          implementation(platform(libs.jackson2.bom))
           implementation(libs.jackson2.databind)
           implementation(libs.jackson2.dataformat.yaml)
           implementation(libs.jackson2.jsr310)

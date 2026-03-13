@@ -26,28 +26,8 @@ dependencies {
   testImplementation(project(":modules:yaml-jackson3"))
   testImplementation(project(":modules:http"))
   testImplementation(project(":modules:database"))
+  testImplementation(platform(libs.jackson3.bom))
   testImplementation(libs.jackson3.dataformat.yaml)
 }
 
-tasks.withType<Test> {
-  useJUnitPlatform()
-
-  // Rancher Desktop runs Docker inside a Lima VM.
-  // Ryuk needs the VM-internal socket path, not the host-side path.
-  environment("TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE", "/var/run/docker.sock")
-  // Mapped ports are reachable via the VM IP, not localhost.
-  val hostIp =
-    providers
-      .exec {
-        commandLine(
-          "sh",
-          "-c",
-          "rdctl shell ip a show rd0 2>/dev/null | awk '/inet / {sub(\"/.*\",\"\"); print \$2}'",
-        )
-      }
-      .standardOutput
-      .asText
-      .map { it.trim() }
-      .orElse("localhost")
-  environment("TESTCONTAINERS_HOST_OVERRIDE", hostIp)
-}
+tasks.withType<Test> { useJUnitPlatform() }

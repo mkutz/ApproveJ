@@ -3,9 +3,14 @@ plugins {
   `maven-publish`
 }
 
+javaPlatform { allowDependencies() }
+
 repositories { mavenCentral() }
 
 dependencies {
+  api(platform(libs.jackson2.bom))
+  api(platform(libs.jackson3.bom))
+
   constraints {
     rootProject.subprojects
       .filter {
@@ -15,12 +20,5 @@ dependencies {
       }
       .sortedBy { it.name }
       .forEach { api(it) }
-
-    api(libs.jackson2.databind)
-    api(libs.jackson2.jsr310)
-    api(libs.jackson2.dataformat.yaml)
-
-    api(libs.jackson3.databind)
-    api(libs.jackson3.dataformat.yaml)
   }
 }
