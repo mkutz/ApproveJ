@@ -6,6 +6,7 @@ import static org.approvej.http.HttpScrubbers.hostHeaderValue;
 import static org.approvej.http.ReceivedHttpRequestPrintFormat.httpRequest;
 import static org.approvej.http.StubbedHttpResponse.response;
 import static org.approvej.scrub.Scrubbers.uuids;
+import static org.testcontainers.containers.wait.strategy.Wait.forListeningPort;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,17 +22,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 // tag::spring_boot_http[]
 @SpringBootTest
-@Testcontainers
 class PaymentApprovalTest {
 
-  @Container @ServiceConnection
-  static final PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17");
+  @ServiceConnection
+  static final PostgreSQLContainer postgres =
+      new PostgreSQLContainer("postgres:17").waitingFor(forListeningPort());
 
   @AutoClose static final HttpStubServer paymentServer = new HttpStubServer(); // <1>
 
