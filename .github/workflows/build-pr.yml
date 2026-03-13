@@ -39,6 +39,7 @@ jobs:
       - run: ./gradlew check
 
       - run: ./gradlew jreleaserConfig -Pversion=0.0.1-SNAPSHOT --git-root-search
+        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
 
       - name: cache SonarCloud packages
         uses: actions/cache@v5
