@@ -71,8 +71,8 @@ public class SqlPrintFormat implements PrintFormat<String> {
 
   private static final Pattern TOKEN_PATTERN =
       Pattern.compile(
-          "('(?:[^']|'')*')" // single-quoted string (SQL escapes via '')
-              + "|(\"(?:[^\"]|\"\")*\")" // double-quoted identifier
+          "('[^']*+(?:''[^']*+)*+')" // single-quoted string (SQL escapes via '')
+              + "|(\"[^\"]*+(?:\"\"[^\"]*+)*+\")" // double-quoted identifier
               + "|(\\()" // open paren
               + "|(\\))" // close paren
               + "|(,)" // comma
