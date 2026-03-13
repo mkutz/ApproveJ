@@ -39,7 +39,7 @@ jobs:
       - run: ./gradlew check
 
       - run: ./gradlew jreleaserConfig -Pversion=0.0.1-SNAPSHOT --git-root-search
-        if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+        if: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY != '' }}
 
       - name: cache SonarCloud packages
         uses: actions/cache@v5
@@ -49,7 +49,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - run: ./gradlew build jacocoTestReport sonar
-        if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.user.login != 'dependabot[bot]' }}
+        if: ${{ secrets.SONAR_TOKEN != '' && github.event.pull_request.user.login != 'dependabot[bot]' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
