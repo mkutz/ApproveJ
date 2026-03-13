@@ -1,5 +1,5 @@
 [id=database]
-= Database -- Catch Changes to Queries and Data
+= Database JDBC -- Catch Changes to Queries and Data
 
 The database extension provides two complementary approaches to approval testing with databases:
 
@@ -18,32 +18,32 @@ No test database setup required.
 |Requires a database with predictable state
 
 |Uses `RecordingDataSource` + `SqlPrintFormat`
-|Uses `DatabaseSnapshot` + `QueryResultPrintFormat`
+|Uses `DatabaseSnapshot` + `MarkdownTablePrintFormat`
 |===
 
 
 [id=database_dependencies]
 == Dependencies
 
-The `database` module has no external dependencies beyond the JDK's `javax.sql` API.
+The `database-jdbc` module has no external dependencies beyond the JDK's `javax.sql` API.
 You need to provide a JDBC driver for your database (e.g., H2 for in-memory testing, or the driver for your production database).
 
 .Gradle
 [source,groovy,subs=attributes+,role="primary"]
 ----
-implementation 'org.approvej:database:{revnumber}'
+implementation 'org.approvej:database-jdbc:{revnumber}'
 ----
 .Gradle.kts
 [source,kotlin,subs=attributes+,role="secondary"]
 ----
-implementation("org.approvej:database:{revnumber}")
+implementation("org.approvej:database-jdbc:{revnumber}")
 ----
 .Maven
 [source,xml,subs=attributes+,role="secondary"]
 ----
 <dependency>
   <groupId>org.approvej</groupId>
-  <artifactId>database</artifactId>
+  <artifactId>database-jdbc</artifactId>
   <version>{revnumber}</version>
 </dependency>
 ----
@@ -76,7 +76,7 @@ test -> approvej : approve(sql)
 approvej -> approvej : print, compare
 ....
 
-Wrap your application's `DataSource` with a link:{javadoc-url}/database/org/approvej/database/RecordingDataSource.html[`RecordingDataSource`], then pass it to your code.
+Wrap your application's `DataSource` with a link:{javadoc-url}/database-jdbc/org/approvej/database/jdbc/RecordingDataSource.html[`RecordingDataSource`], then pass it to your code.
 After execution, approve the recorded queries:
 
 [source,java,indent=0,role="primary"]
@@ -122,7 +122,7 @@ Review it, rename it to `-approved.sql`, and re-run — the test passes.
 [id=database_sql_print_format]
 === Pretty-Print SQL
 
-The link:{javadoc-url}/database/org/approvej/database/SqlPrintFormat.html[`SqlPrintFormat`] formats SQL with line breaks and indentation, making it easy to review in approved files.
+The link:{javadoc-url}/database-jdbc/org/approvej/database/jdbc/SqlPrintFormat.html[`SqlPrintFormat`] formats SQL with line breaks and indentation, making it easy to review in approved files.
 Files are saved with the `.sql` extension.
 
 A query like `SELECT u.id, u.name FROM users u WHERE u.active = 1 ORDER BY u.name` becomes:
@@ -185,7 +185,7 @@ Regardless of which strategy you use, scrub any non-deterministic column values 
 [id=database_approve_state_snapshot]
 === Snapshot a Query
 
-Use link:{javadoc-url}/database/org/approvej/database/DatabaseSnapshot.html[`DatabaseSnapshot.query()`] to execute a SQL query and capture the result as a link:{javadoc-url}/database/org/approvej/database/QueryResult.html[`QueryResult`].
+Use link:{javadoc-url}/database-jdbc/org/approvej/database/jdbc/DatabaseSnapshot.html[`DatabaseSnapshot.query()`] to execute a SQL query and capture the result as a link:{javadoc-url}/database-jdbc/org/approvej/database/jdbc/QueryResult.html[`QueryResult`].
 It takes a standard `javax.sql.DataSource` — in a **Spring Boot** test, inject the one Spring already manages; with **plain JDBC**, create one directly (e.g., H2's `JdbcDataSource`).
 
 [source,java,indent=0,role="primary"]
@@ -200,13 +200,15 @@ include::../../../test/kotlin/examples/kotlin/DatabaseDocTest.kt[tag=snapshot]
 ----
 
 All cell values are converted to strings.
-`NULL` database values are rendered as the string `NULL`.
+`NULL` database values are rendered as the string `<null>`.
+
+If you already have a JDBC `ResultSet` (e.g., from your own `JdbcClient` or `JdbcTemplate` query), you can use `QueryResult.of(resultSet)` directly instead of going through `DatabaseSnapshot`.
 
 
 [id=database_approve_state_print_format]
 === Print as Markdown Table
 
-The link:{javadoc-url}/database/org/approvej/database/QueryResultPrintFormat.html[`QueryResultPrintFormat`] prints query results as a Markdown-compatible ASCII table.
+The link:{javadoc-url}/database-jdbc/org/approvej/database/jdbc/MarkdownTablePrintFormat.html[`MarkdownTablePrintFormat`] prints query results as a Markdown-compatible ASCII table.
 Files are saved with the `.md` extension.
 
 [source,java,indent=0,role="primary"]
@@ -233,7 +235,7 @@ include::../../../test/java/examples/java/DatabaseDocTest-approve_query-approved
 == Database Scrubbers
 
 Some columns contain values that change between test runs — auto-incremented IDs, timestamps, or generated tokens.
-The link:{javadoc-url}/database/org/approvej/database/DatabaseScrubbers.html[`DatabaseScrubbers`] utility provides a scrubber for these cases:
+The link:{javadoc-url}/database-jdbc/org/approvej/database/jdbc/DatabaseScrubbers.html[`DatabaseScrubbers`] utility provides a scrubber for these cases:
 
 * `columnValue(name)` -- Scrubs all values in the named column (case-insensitive)
 

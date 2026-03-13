@@ -1,4 +1,4 @@
-package org.approvej.database;
+package org.approvej.database.jdbc;
 
 import java.util.ArrayList;
 import java.util.List;

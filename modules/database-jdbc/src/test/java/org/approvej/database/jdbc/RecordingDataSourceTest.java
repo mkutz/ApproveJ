@@ -1,4 +1,4 @@
-package org.approvej.database;
+package org.approvej.database.jdbc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

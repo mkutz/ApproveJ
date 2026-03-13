@@ -2,11 +2,11 @@ package examples.kotlin
 
 import java.sql.Connection
 import org.approvej.ApprovalBuilder.approve
-import org.approvej.database.DatabaseScrubbers.columnValue
-import org.approvej.database.DatabaseSnapshot.query
-import org.approvej.database.QueryResultPrintFormat.queryResult
-import org.approvej.database.RecordingDataSource
-import org.approvej.database.SqlPrintFormat.sql
+import org.approvej.database.jdbc.DatabaseScrubbers.columnValue
+import org.approvej.database.jdbc.DatabaseSnapshot.query
+import org.approvej.database.jdbc.MarkdownTablePrintFormat.markdownTable
+import org.approvej.database.jdbc.RecordingDataSource
+import org.approvej.database.jdbc.SqlPrintFormat.sql
 import org.assertj.core.api.Assertions.assertThat
 import org.h2.jdbcx.JdbcDataSource
 import org.junit.jupiter.api.BeforeEach
@@ -61,7 +61,7 @@ class DatabaseDocTest {
     // tag::approve[]
     approve(query(dataSource, "SELECT * FROM users"))
       .scrubbedOf(columnValue("id"))
-      .printedAs(queryResult())
+      .printedAs(markdownTable())
       .byFile()
     // end::approve[]
   }
@@ -71,7 +71,7 @@ class DatabaseDocTest {
     // tag::scrub[]
     approve(query(dataSource, "SELECT * FROM users"))
       .scrubbedOf(columnValue("id"))
-      .printedAs(queryResult())
+      .printedAs(markdownTable())
       .byFile()
     // end::scrub[]
   }
@@ -81,7 +81,7 @@ class DatabaseDocTest {
     // tag::scrub_custom[]
     approve(query(dataSource, "SELECT * FROM users"))
       .scrubbedOf(columnValue("id").replacement("***"))
-      .printedAs(queryResult())
+      .printedAs(markdownTable())
       .byFile()
     // end::scrub_custom[]
   }

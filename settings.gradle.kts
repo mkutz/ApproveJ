@@ -24,7 +24,7 @@ include("modules:http")
 
 include("modules:http-wiremock")
 
-include("modules:database")
+include("modules:database-jdbc")
 
 include("manual")
 

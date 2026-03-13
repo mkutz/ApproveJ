@@ -1,4 +1,4 @@
-package org.approvej.database;
+package org.approvej.database.jdbc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public record ColumnValueScrubber(String columnName, Replacement<String> replace
       newRows.add(newRow);
     }
 
-    return new QueryResult(result.query(), result.columnNames(), newRows);
+    return new QueryResult(result.columnNames(), newRows);
   }
 
   @Override

@@ -1,9 +1,9 @@
-package org.approvej.database;
+package org.approvej.database.jdbc;
 
 import static org.approvej.ApprovalBuilder.approve;
-import static org.approvej.database.DatabaseScrubbers.columnValue;
-import static org.approvej.database.DatabaseSnapshot.query;
-import static org.approvej.database.QueryResultPrintFormat.queryResult;
+import static org.approvej.database.jdbc.DatabaseScrubbers.columnValue;
+import static org.approvej.database.jdbc.DatabaseSnapshot.query;
+import static org.approvej.database.jdbc.MarkdownTablePrintFormat.markdownTable;
 
 import java.sql.Connection;
 import java.sql.Statement;
@@ -34,7 +34,7 @@ class DatabaseApprovalBuilderTest {
   void approve_query() {
     approve(query(dataSource, "SELECT * FROM users"))
         .scrubbedOf(columnValue("id"))
-        .printedAs(queryResult())
+        .printedAs(markdownTable())
         .byFile();
   }
 }
