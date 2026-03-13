@@ -20,6 +20,7 @@ dependencies {
   api(libs.jspecify)
 
   // Jackson 3 as provided dependency
+  compileOnly(platform(libs.jackson3.bom))
   compileOnly(libs.jackson3.databind)
   compileOnly(libs.jackson3.dataformat.yaml)
 }
@@ -33,6 +34,7 @@ testing {
           implementation(testFixtures(project(":modules:core")))
 
           // Tests need Jackson
+          implementation(platform(libs.jackson3.bom))
           implementation(libs.jackson3.databind)
           implementation(libs.jackson3.dataformat.yaml)
 

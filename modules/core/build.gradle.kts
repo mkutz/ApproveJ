@@ -20,6 +20,7 @@ repositories { mavenCentral() }
 
 dependencies {
   api(libs.jspecify)
+  compileOnlyApi(platform(libs.junit.bom))
   compileOnlyApi(libs.junit.jupiter.api)
 }
 

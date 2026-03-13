@@ -20,17 +20,19 @@ commonmark = { module = "org.commonmark:commonmark", version.ref = "commonmark" 
 awaitility = { module = "org.awaitility:awaitility", version = "4.3.0" }
 groovy = { module = "org.apache.groovy:groovy" , version = "5.0.4" }
 h2 = { module = "com.h2database:h2", version = "2.3.232" }
-jackson2-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson2" }
-jackson2-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson2" }
-jackson2-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson2" }
-jackson3-databind = { module = "tools.jackson.core:jackson-databind", version.ref = "jackson3" }
-jackson3-dataformat-yaml = { module = "tools.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson3" }
+jackson2-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson2" }
+jackson2-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
+jackson2-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml" }
+jackson2-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
+jackson3-bom = { module = "tools.jackson:jackson-bom", version.ref = "jackson3" }
+jackson3-databind = { module = "tools.jackson.core:jackson-databind" }
+jackson3-dataformat-yaml = { module = "tools.jackson.dataformat:jackson-dataformat-yaml" }
 jspecify = { module = "org.jspecify:jspecify", version = "1.0.0" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
-junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
-junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
-junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
-junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
+junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
 junit4 = { module = "junit:junit", version = "4.13.2" }
 junit5-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit5" }
 junit5-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit5" }

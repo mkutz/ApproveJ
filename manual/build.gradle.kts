@@ -32,6 +32,7 @@ testing {
           implementation(project(":modules:http"))
           implementation(project(":modules:database"))
 
+          implementation(platform(libs.jackson2.bom))
           implementation(libs.jackson2.databind)
           implementation(libs.h2)
           implementation(libs.jackson2.dataformat.yaml)

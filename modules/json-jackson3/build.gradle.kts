@@ -19,6 +19,7 @@ dependencies {
   api(project(":modules:core"))
   api(libs.jspecify)
 
+  compileOnly(platform(libs.jackson3.bom))
   compileOnly(libs.jackson3.databind)
 }
 
@@ -30,6 +31,7 @@ testing {
         dependencies {
           implementation(testFixtures(project(":modules:core")))
 
+          implementation(platform(libs.jackson3.bom))
           implementation(libs.jackson3.databind)
 
           implementation(platform(libs.junit.bom))
