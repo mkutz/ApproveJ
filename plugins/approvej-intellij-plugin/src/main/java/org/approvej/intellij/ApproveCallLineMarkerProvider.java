@@ -76,18 +76,16 @@ public final class ApproveCallLineMarkerProvider extends LineMarkerProviderDescr
     Project project = element.getProject();
 
     String namedArg = ApproveCallUtil.findNamedArgument(callExpression);
+    String suffix = namedArg != null ? namedArg + "-approved" : methodName + "-approved";
 
     List<VirtualFile> approvedFiles =
-        InventoryUtil.findApprovedFiles(className, methodName, project);
-    String suffix = namedArg != null ? namedArg + "-approved" : methodName + "-approved";
-    approvedFiles =
-        approvedFiles.stream()
+        InventoryUtil.findApprovedFiles(className, methodName, project).stream()
             .filter(
                 approvedFile -> {
                   String name = approvedFile.getNameWithoutExtension();
-                  if (!name.endsWith(suffix)) return false;
                   int prefixLen = name.length() - suffix.length();
-                  return prefixLen == 0 || name.charAt(prefixLen - 1) == '-';
+                  return name.endsWith(suffix)
+                      && (prefixLen == 0 || name.charAt(prefixLen - 1) == '-');
                 })
             .toList();
     if (approvedFiles.isEmpty()) return;
