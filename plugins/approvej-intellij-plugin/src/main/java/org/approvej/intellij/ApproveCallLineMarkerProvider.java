@@ -4,18 +4,13 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
-import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.ui.popup.PopupStep;
-import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiMethod;
-import com.intellij.ui.awt.RelativePoint;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.List;
@@ -29,8 +24,8 @@ import org.jetbrains.uast.UastUtils;
 
 /**
  * Provides a gutter icon on {@code approve()...byFile()} chains that navigates to the approved
- * file. When a received file also exists, clicking the icon shows a popup with actions to compare,
- * navigate to received, or navigate to approved.
+ * file. When a received file also exists, clicking the icon opens the diff viewer comparing the
+ * received file with the approved file.
  */
 public final class ApproveCallLineMarkerProvider extends LineMarkerProviderDescriptor {
 
@@ -123,43 +118,12 @@ public final class ApproveCallLineMarkerProvider extends LineMarkerProviderDescr
               element,
               element.getTextRange(),
               ApproveJIcons.APPROVAL_PENDING,
-              psi -> "Received and approved files",
+              psi -> "Compare received with approved",
               (MouseEvent e, PsiElement elt) ->
-                  showPopup(e, elt.getProject(), receivedFile, approvedFile),
+                  ReceivedFileUtil.openDiff(elt.getProject(), receivedFile, approvedFile),
               GutterIconRenderer.Alignment.LEFT,
-              () -> "Received and approved files");
+              () -> "Compare received with approved");
       result.add(markerInfo);
     }
-  }
-
-  private static void showPopup(
-      @NotNull MouseEvent e,
-      @NotNull Project project,
-      @NotNull VirtualFile receivedFile,
-      @NotNull VirtualFile approvedFile) {
-    List<String> actions =
-        List.of(
-            "Compare Received and Approved",
-            "Navigate to Received File",
-            "Navigate to Approved File");
-    var step =
-        new BaseListPopupStep<>("ApproveJ", actions) {
-          @Override
-          public @Nullable PopupStep<?> onChosen(String selectedValue, boolean finalChoice) {
-            return doFinalStep(
-                () -> {
-                  switch (selectedValue) {
-                    case "Compare Received and Approved" ->
-                        ReceivedFileUtil.openDiff(project, receivedFile, approvedFile);
-                    case "Navigate to Received File" ->
-                        new OpenFileDescriptor(project, receivedFile).navigate(true);
-                    case "Navigate to Approved File" ->
-                        new OpenFileDescriptor(project, approvedFile).navigate(true);
-                    default -> {}
-                  }
-                });
-          }
-        };
-    JBPopupFactory.getInstance().createListPopup(step).show(new RelativePoint(e));
   }
 }

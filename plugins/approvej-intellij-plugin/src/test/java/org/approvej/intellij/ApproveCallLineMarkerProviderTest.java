@@ -187,7 +187,7 @@ public class ApproveCallLineMarkerProviderTest extends LightJavaCodeInsightFixtu
 
     List<GutterMark> gutters = findApprovalGutters();
     assertEquals(2, gutters.size());
-    assertEquals("Received and approved files", gutters.getFirst().getTooltipText());
+    assertEquals("Compare received with approved", gutters.getFirst().getTooltipText());
     assertEquals("Navigate to Test-myTest-b-approved.txt", gutters.get(1).getTooltipText());
   }
 
@@ -210,7 +210,7 @@ public class ApproveCallLineMarkerProviderTest extends LightJavaCodeInsightFixtu
 
     List<GutterMark> gutters = findApprovalGutters();
     assertEquals(1, gutters.size());
-    assertEquals("Received and approved files", gutters.getFirst().getTooltipText());
+    assertEquals("Compare received with approved", gutters.getFirst().getTooltipText());
   }
 
   private List<GutterMark> findApprovalGutters() {
@@ -219,7 +219,7 @@ public class ApproveCallLineMarkerProviderTest extends LightJavaCodeInsightFixtu
             g -> {
               String tooltip = g.getTooltipText();
               return tooltip != null
-                  && (tooltip.contains("approved") || tooltip.contains("Received"));
+                  && (tooltip.contains("approved") || tooltip.contains("received"));
             })
         .toList();
   }

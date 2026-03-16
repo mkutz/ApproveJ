@@ -33,6 +33,7 @@ public final class ReceivedFileEditorNotificationProvider
             "Compare with Approved", () -> ReceivedFileUtil.openDiff(project, file, approvedFile));
         panel.createActionLabel(
             "Approve", () -> ReceivedFileUtil.approve(project, file, approvedFile));
+        panel.createActionLabel("Reject", () -> ReceivedFileUtil.reject(project, file));
       } else {
         panel.setText(
             "This is an ApproveJ received file. No matching approved file was found nearby.");
