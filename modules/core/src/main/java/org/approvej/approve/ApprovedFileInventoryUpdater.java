@@ -28,8 +28,6 @@ public final class ApprovedFileInventoryUpdater {
 
   private static final ConcurrentHashMap<Path, InventoryEntry> collected =
       new ConcurrentHashMap<>();
-  private static final ConcurrentHashMap<String, Boolean> executedMethods =
-      new ConcurrentHashMap<>();
   private static final AtomicReference<@Nullable Thread> shutdownHook = new AtomicReference<>();
 
   private static final AtomicReference<Path> inventoryFile =
@@ -75,7 +73,6 @@ public final class ApprovedFileInventoryUpdater {
         Stream.concat(
                 collected.values().stream(),
                 loaded.entries().stream()
-                    .filter(entry -> !executedMethods.containsKey(entry.testReference()))
                     .filter(entry -> !collected.containsKey(entry.relativePath())))
             .sorted(Comparator.comparing(InventoryEntry::relativePath))
             .toList();
@@ -86,13 +83,11 @@ public final class ApprovedFileInventoryUpdater {
   /** Adds an entry directly. For testing only. */
   static void addEntry(InventoryEntry entry) {
     collected.put(entry.relativePath(), entry);
-    executedMethods.put(entry.testReference(), Boolean.TRUE);
   }
 
   /** Resets static state and sets the inventory file path. For testing only. */
   static void reset(Path testInventoryFile) {
     collected.clear();
-    executedMethods.clear();
     Thread hook = shutdownHook.getAndSet(null);
     if (hook != null) {
       try {
