@@ -1,6 +1,13 @@
 # Changelog
 
 
+## Unreleased
+
+* 🧹 **Simplify approved file filtering in line marker provider**
+  Inline the stream chain and consolidate the filter condition into a single return statement.
+  Thanks to [@DeepsanBhandari](https://github.com/DeepsanBhandari) for the contribution!
+
+
 ## v1.4.4
 
 * ✨ **Duplicate unnamed approval inspection**
