@@ -1,7 +1,7 @@
 # Changelog
 
 
-## Unreleased
+## v1.4.6
 
 * 🧹 **Simplify approved file filtering in line marker provider**
   Inline the stream chain and consolidate the filter condition into a single return statement.

@@ -1,6 +1,20 @@
 # Changelog
 
 
+## v1.4.6
+
+### core
+
+* 🐛 **Preserve inventory entries for unexecuted approvals**
+  When a test with multiple `approve().byFile()` calls failed before reaching all approvals,
+  the inventory entries for unexecuted approvals were dropped.
+  This caused IntelliJ plugin gutter icons to disappear for those approvals.
+  ([#230](https://github.com/mkutz/ApproveJ/issues/230))
+  Thanks to [@DeepsanBhandari](https://github.com/DeepsanBhandari) for the contribution!
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.4.5...v1.4.6
+
+
 ## v1.4.5
 
 ### core
