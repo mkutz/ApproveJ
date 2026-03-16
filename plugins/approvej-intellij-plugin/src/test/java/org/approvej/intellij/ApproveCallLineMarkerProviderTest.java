@@ -164,6 +164,33 @@ public class ApproveCallLineMarkerProviderTest extends LightJavaCodeInsightFixtu
         gutters.get(0).getTooltipText().equals(gutters.get(1).getTooltipText()));
   }
 
+  public void testMarker_named_approval_shown_when_sibling_unapproved() {
+    addInventory(
+        "src/com/example/Test-myTest-a-approved.txt", "com.example.Test#myTest",
+        "src/com/example/Test-myTest-b-approved.txt", "com.example.Test#myTest");
+    myFixture.addFileToProject("src/com/example/Test-myTest-a-approved.txt", "a content");
+    myFixture.addFileToProject("src/com/example/Test-myTest-a-received.txt", "a different content");
+    myFixture.addFileToProject("src/com/example/Test-myTest-b-approved.txt", "b content");
+
+    myFixture.configureByText(
+        "Test.java",
+        """
+        package com.example;
+        import static org.approvej.ApprovalBuilder.approve;
+        class Test {
+            void myTest() {
+                approve("x").named("a").byFile();
+                approve("y").named("b").byFile();
+            }
+        }
+        """);
+
+    List<GutterMark> gutters = findApprovalGutters();
+    assertEquals(2, gutters.size());
+    assertEquals("Received and approved files", gutters.getFirst().getTooltipText());
+    assertEquals("Navigate to Test-myTest-b-approved.txt", gutters.get(1).getTooltipText());
+  }
+
   public void testMarker_received_file_changes_icon() {
     addInventory("src/com/example/Test-myTest-approved.txt", "com.example.Test#myTest");
     myFixture.addFileToProject("src/com/example/Test-myTest-approved.txt", "approved content");
