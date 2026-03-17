@@ -1,6 +1,26 @@
 # Changelog
 
 
+## v1.4.7
+
+### IntelliJ plugin
+
+* ✨ **Diff view navigation and actions**
+  The diff viewer now shows a notification panel with "Navigate to Test", "Approve", and "Reject"
+  actions. Content titles clearly label which side is "Received" and which is "Approved".
+  ([#250](https://github.com/mkutz/ApproveJ/issues/250))
+
+* ✨ **One-click reject**
+  A new "Reject" action deletes the received file without copying its content to the approved file.
+  Available in the diff viewer and in the received file editor banner.
+
+* 🎨 **Simplified gutter icon for pending approvals**
+  When a received file exists, clicking the gutter icon now directly opens the diff view instead
+  of showing a popup menu.
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.4.6...v1.4.7
+
+
 ## v1.4.6
 
 ### core
