@@ -51,7 +51,8 @@ public class StackTraceTestFinderUtil {
    * Finds the source path of the test method, making the following assumptions:
    *
    * <ul>
-   *   <li>the test class' name is also the name of the source file,
+   *   <li>the top-level enclosing class' name is also the name of the source file (for nested or
+   *       inner classes, the enclosing class hierarchy is walked up to find the top-level class),
    *   <li>the base package is at most 10 levels deep,
    *   <li>the filename extension of the file is <code>java</code>, <code>kt</code>, <code>groovy
    *       </code>, or <code>scala</code>
@@ -70,10 +71,14 @@ public class StackTraceTestFinderUtil {
     } catch (URISyntaxException e) {
       throw new FileApproverError("Could not parse code source location", e);
     }
+    Class<?> topLevelClass = declaringClass;
+    while (topLevelClass.getEnclosingClass() != null) {
+      topLevelClass = topLevelClass.getEnclosingClass();
+    }
     String packagePath = declaringClass.getPackageName().replace(".", "/");
     String pathRegex =
         "(?!(?:build|target|bin|out)/).*%s.*/%s/%s\\.(java|kt|groovy|scala)$"
-            .formatted(sourceSetName, packagePath, declaringClass.getSimpleName());
+            .formatted(sourceSetName, packagePath, topLevelClass.getSimpleName());
     try (Stream<Path> pathStream =
         Files.find(
             Path.of(""),

@@ -15,6 +15,16 @@ public final class PathProviders {
 
   private PathProviders() {}
 
+  private static String nestedSimpleName(Class<?> clazz) {
+    StringBuilder name = new StringBuilder(clazz.getSimpleName());
+    Class<?> enclosing = clazz.getEnclosingClass();
+    while (enclosing != null) {
+      name.insert(0, enclosing.getSimpleName() + ".");
+      enclosing = enclosing.getEnclosingClass();
+    }
+    return name.toString();
+  }
+
   /**
    * Creates a new {@link PathProvider} that uses the given approved {@link Path}.
    *
@@ -57,14 +67,16 @@ public final class PathProviders {
 
     Path directory = findTestSourcePath(testMethod.method()).getParent();
     String baseFilename =
-        "%s-%s".formatted(testMethod.testClass().getSimpleName(), testMethod.testCaseName());
+        "%s-%s".formatted(nestedSimpleName(testMethod.testClass()), testMethod.testCaseName());
 
     return new PathProvider(directory, baseFilename, "", APPROVED, DEFAULT_FILENAME_EXTENSION);
   }
 
   /**
    * Creates a {@link PathProvider} that uses a stack trace to determine the paths of the approved
-   * and received files in a subdirectory named after the current test class simple name.
+   * and received files in a subdirectory named after the current test class. For nested or inner
+   * classes, the subdirectory name includes enclosing class names separated by dots (e.g. {@code
+   * OuterTest.InnerTest}).
    *
    * @return a new {@link PathProvider}
    */
@@ -74,7 +86,7 @@ public final class PathProviders {
     Path directory =
         findTestSourcePath(testMethod.method())
             .getParent()
-            .resolve(testMethod.testClass().getSimpleName());
+            .resolve(nestedSimpleName(testMethod.testClass()));
     String baseFilename = testMethod.method().getName();
 
     return new PathProvider(directory, baseFilename, "", APPROVED, DEFAULT_FILENAME_EXTENSION);

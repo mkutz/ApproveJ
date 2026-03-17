@@ -51,6 +51,7 @@ You can use a diff tool of your choice to compare the two files and merge values
 === Next to Test
 
 By default, the `FileApprover` will put the received and approved files next to the test class and name them like the test case method.
+For nested or inner test classes (e.g. JUnit 5 `@Nested`), the class name includes enclosing class names separated by dots (e.g. `OuterTest.InnerTest`).
 
 You can make this explicit by using the link:{javadoc-url}/core/org/approvej/approve/PathProviderBuilder.html#nextToTest()[`PathProviderBuilder.nextToTest()`] method.
 
