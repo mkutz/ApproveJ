@@ -3,6 +3,7 @@ package org.approvej.approve;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class PathProvidersTest {
@@ -95,6 +96,71 @@ class PathProvidersTest {
             directory
                 .resolve("PathProvidersTest" + "-nextToTest_directory" + "-received.txt")
                 .normalize());
+  }
+
+  @Nested
+  class NestedTest {
+
+    @Test
+    void nextToTest() {
+      PathProvider pathProvider = PathProviders.nextToTest();
+
+      assertThat(pathProvider.approvedPath())
+          .isEqualTo(
+              Path.of(
+                      "./src/test/java/org/approvej/approve/"
+                          + "PathProvidersTest.NestedTest"
+                          + "-nextToTest"
+                          + "-approved.txt")
+                  .normalize());
+      assertThat(pathProvider.receivedPath())
+          .isEqualTo(
+              Path.of(
+                      "./src/test/java/org/approvej/approve/"
+                          + "PathProvidersTest.NestedTest"
+                          + "-nextToTest"
+                          + "-received.txt")
+                  .normalize());
+    }
+
+    @Test
+    void nextToTestInSubdirectory() {
+      PathProvider pathProvider = PathProviders.nextToTestInSubdirectory();
+      assertThat(pathProvider.approvedPath())
+          .isEqualTo(
+              Path.of(
+                      "./src/test/java/org/approvej/approve/"
+                          + "PathProvidersTest.NestedTest/"
+                          + "nextToTestInSubdirectory"
+                          + "-approved.txt")
+                  .normalize());
+      assertThat(pathProvider.receivedPath())
+          .isEqualTo(
+              Path.of(
+                      "./src/test/java/org/approvej/approve/"
+                          + "PathProvidersTest.NestedTest/"
+                          + "nextToTestInSubdirectory"
+                          + "-received.txt")
+                  .normalize());
+    }
+
+    @Nested
+    class DoublyNestedTest {
+
+      @Test
+      void nextToTest() {
+        PathProvider pathProvider = PathProviders.nextToTest();
+
+        assertThat(pathProvider.approvedPath())
+            .isEqualTo(
+                Path.of(
+                        "./src/test/java/org/approvej/approve/"
+                            + "PathProvidersTest.NestedTest.DoublyNestedTest"
+                            + "-nextToTest"
+                            + "-approved.txt")
+                    .normalize());
+      }
+    }
   }
 
   @Test

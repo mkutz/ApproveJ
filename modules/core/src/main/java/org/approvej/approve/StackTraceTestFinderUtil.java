@@ -70,10 +70,14 @@ public class StackTraceTestFinderUtil {
     } catch (URISyntaxException e) {
       throw new FileApproverError("Could not parse code source location", e);
     }
+    Class<?> topLevelClass = declaringClass;
+    while (topLevelClass.getEnclosingClass() != null) {
+      topLevelClass = topLevelClass.getEnclosingClass();
+    }
     String packagePath = declaringClass.getPackageName().replace(".", "/");
     String pathRegex =
         "(?!(?:build|target|bin|out)/).*%s.*/%s/%s\\.(java|kt|groovy|scala)$"
-            .formatted(sourceSetName, packagePath, declaringClass.getSimpleName());
+            .formatted(sourceSetName, packagePath, topLevelClass.getSimpleName());
     try (Stream<Path> pathStream =
         Files.find(
             Path.of(""),
