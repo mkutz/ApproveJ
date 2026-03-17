@@ -110,7 +110,13 @@ configurations.testCompileClasspath {
   }
 }
 
-tasks.test { useJUnitPlatform() }
+tasks.test {
+  useJUnitPlatform()
+  configure<JacocoTaskExtension> {
+    includes = listOf("org.approvej.*")
+    isIncludeNoLocationClasses = true
+  }
+}
 
 testing {
   suites {
