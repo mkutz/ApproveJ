@@ -3,6 +3,15 @@
 
 ## v1.4.7
 
+### core
+
+* 🐛 **Fix `byFile()` for inner and nested test classes**
+  `approve().byFile()` failed when called from a JUnit 5 `@Nested` inner class (Java or Kotlin)
+  because the source file lookup used the inner class name instead of the top-level class name.
+  The approved file name now includes enclosing class names separated by dots
+  (e.g. `OuterTest.InnerTest-methodName-approved.txt`).
+  ([#253](https://github.com/mkutz/ApproveJ/issues/253))
+
 ### IntelliJ plugin
 
 * ✨ **Diff view navigation and actions**
