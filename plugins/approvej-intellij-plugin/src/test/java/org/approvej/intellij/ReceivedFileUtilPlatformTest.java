@@ -166,6 +166,18 @@ public class ReceivedFileUtilPlatformTest extends BasePlatformTestCase {
     assertEquals("new content", new String(approved.contentsToByteArray()));
   }
 
+  public void testReject_deletes_received_without_changing_approved() throws Exception {
+    myFixture.addFileToProject("MyTest.byValue-received.txt", "new content");
+    myFixture.addFileToProject("MyTest.byValue-approved.txt", "old content");
+    VirtualFile received = myFixture.findFileInTempDir("MyTest.byValue-received.txt");
+    VirtualFile approved = myFixture.findFileInTempDir("MyTest.byValue-approved.txt");
+
+    ReceivedFileUtil.reject(getProject(), received);
+
+    assertFalse(received.isValid());
+    assertEquals("old content", new String(approved.contentsToByteArray()));
+  }
+
   private AnActionEvent createEvent(VirtualFile file) {
     var dataContext =
         SimpleDataContext.builder()

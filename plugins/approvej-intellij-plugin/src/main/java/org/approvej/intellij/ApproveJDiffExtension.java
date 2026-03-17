@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
  * Adds a notification panel with "Navigate to Test", "Approve", and "Reject" actions to the diff
  * viewer when comparing an ApproveJ received file with its approved counterpart.
  */
-final class ApproveJDiffExtension extends DiffExtension {
+public final class ApproveJDiffExtension extends DiffExtension {
 
   @Override
   public void onViewerCreated(
