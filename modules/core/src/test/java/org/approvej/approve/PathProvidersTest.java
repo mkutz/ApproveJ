@@ -159,6 +159,14 @@ class PathProvidersTest {
                             + "-nextToTest"
                             + "-approved.txt")
                     .normalize());
+        assertThat(pathProvider.receivedPath())
+            .isEqualTo(
+                Path.of(
+                        "./src/test/java/org/approvej/approve/"
+                            + "PathProvidersTest.NestedTest.DoublyNestedTest"
+                            + "-nextToTest"
+                            + "-received.txt")
+                    .normalize());
       }
     }
   }

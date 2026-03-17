@@ -51,7 +51,8 @@ public class StackTraceTestFinderUtil {
    * Finds the source path of the test method, making the following assumptions:
    *
    * <ul>
-   *   <li>the test class' name is also the name of the source file,
+   *   <li>the top-level enclosing class' name is also the name of the source file (for nested or
+   *       inner classes, the enclosing class hierarchy is walked up to find the top-level class),
    *   <li>the base package is at most 10 levels deep,
    *   <li>the filename extension of the file is <code>java</code>, <code>kt</code>, <code>groovy
    *       </code>, or <code>scala</code>
