@@ -2,6 +2,7 @@ package org.approvej.intellij
 
 import com.intellij.psi.PsiElement
 import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
+import org.assertj.core.api.Assertions.assertThat
 import org.jetbrains.uast.UCallExpression
 import org.jetbrains.uast.getUParentForIdentifier
 
@@ -38,7 +39,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
           .trimIndent()
       )
 
-    assertNotNull(ApproveCallUtil.asApproveCall(element))
+    assertThat(ApproveCallUtil.asApproveCall(element)).isNotNull()
   }
 
   fun testAsApproveCall_unrelated_method() {
@@ -52,7 +53,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
           .trimIndent()
       )
 
-    assertNull(ApproveCallUtil.asApproveCall(element))
+    assertThat(ApproveCallUtil.asApproveCall(element)).isNull()
   }
 
   fun testIsApproveCall() {
@@ -69,7 +70,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
           .trimIndent()
       )
 
-    assertTrue(ApproveCallUtil.isApproveCall(call))
+    assertThat(ApproveCallUtil.isApproveCall(call)).isTrue()
   }
 
   fun testFindTerminalCall_byFile() {
@@ -86,7 +87,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
           .trimIndent()
       )
 
-    assertEquals("byFile", ApproveCallUtil.findTerminalCall(call).lastMethodName)
+    assertThat(ApproveCallUtil.findTerminalCall(call).lastMethodName).isEqualTo("byFile")
   }
 
   fun testFindTerminalCall_byValue() {
@@ -103,7 +104,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
           .trimIndent()
       )
 
-    assertEquals("byValue", ApproveCallUtil.findTerminalCall(call).lastMethodName)
+    assertThat(ApproveCallUtil.findTerminalCall(call).lastMethodName).isEqualTo("byValue")
   }
 
   fun testFindTerminalCall_with_intermediate() {
@@ -120,7 +121,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
           .trimIndent()
       )
 
-    assertEquals("byFile", ApproveCallUtil.findTerminalCall(call).lastMethodName)
+    assertThat(ApproveCallUtil.findTerminalCall(call).lastMethodName).isEqualTo("byFile")
   }
 
   fun testFindTerminalCall_no_terminal() {
@@ -137,7 +138,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
           .trimIndent()
       )
 
-    assertEquals("approve", ApproveCallUtil.findTerminalCall(call).lastMethodName)
+    assertThat(ApproveCallUtil.findTerminalCall(call).lastMethodName).isEqualTo("approve")
   }
 
   fun testFindTerminalCall_dangling_with_intermediate() {
@@ -154,7 +155,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
           .trimIndent()
       )
 
-    assertEquals("printedAs", ApproveCallUtil.findTerminalCall(call).lastMethodName)
+    assertThat(ApproveCallUtil.findTerminalCall(call).lastMethodName).isEqualTo("printedAs")
   }
 
   fun testFindNamedArgument() {
@@ -171,7 +172,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
           .trimIndent()
       )
 
-    assertEquals("first", ApproveCallUtil.findNamedArgument(call))
+    assertThat(ApproveCallUtil.findNamedArgument(call)).isEqualTo("first")
   }
 
   fun testFindNamedArgument_with_intermediate() {
@@ -188,7 +189,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
           .trimIndent()
       )
 
-    assertEquals("second", ApproveCallUtil.findNamedArgument(call))
+    assertThat(ApproveCallUtil.findNamedArgument(call)).isEqualTo("second")
   }
 
   fun testHasNamedCall() {
@@ -205,7 +206,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
           .trimIndent()
       )
 
-    assertTrue(ApproveCallUtil.hasNamedCall(call))
+    assertThat(ApproveCallUtil.hasNamedCall(call)).isTrue()
   }
 
   fun testHasNamedCall_absent() {
@@ -222,7 +223,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
           .trimIndent()
       )
 
-    assertFalse(ApproveCallUtil.hasNamedCall(call))
+    assertThat(ApproveCallUtil.hasNamedCall(call)).isFalse()
   }
 
   fun testFindNamedArgument_absent() {
@@ -239,7 +240,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
           .trimIndent()
       )
 
-    assertNull(ApproveCallUtil.findNamedArgument(call))
+    assertThat(ApproveCallUtil.findNamedArgument(call)).isNull()
   }
 
   private fun configureAndFindApproveIdentifier(code: String): PsiElement {
@@ -250,7 +251,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
   private fun configureAndFindApproveCallExpression(code: String): UCallExpression {
     val element = configureAndFindApproveIdentifier(code)
     val uElement = getUParentForIdentifier(element)
-    assertInstanceOf(uElement, UCallExpression::class.java)
+    assertThat(uElement).isInstanceOf(UCallExpression::class.java)
     return uElement as UCallExpression
   }
 }

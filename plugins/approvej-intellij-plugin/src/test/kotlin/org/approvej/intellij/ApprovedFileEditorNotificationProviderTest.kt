@@ -3,6 +3,7 @@ package org.approvej.intellij
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.intellij.ui.EditorNotificationPanel
+import org.assertj.core.api.Assertions.assertThat
 
 class ApprovedFileEditorNotificationProviderTest : BasePlatformTestCase() {
 
@@ -14,7 +15,7 @@ class ApprovedFileEditorNotificationProviderTest : BasePlatformTestCase() {
 
     val factory = provider.collectNotificationData(project, file)
 
-    assertNotNull(factory)
+    assertThat(factory).isNotNull()
   }
 
   fun testBanner_text_for_approved_file() {
@@ -25,7 +26,8 @@ class ApprovedFileEditorNotificationProviderTest : BasePlatformTestCase() {
 
     val panel = provider.collectNotificationData(project, file)!!.apply(editor)
 
-    assertEquals("This is an ApproveJ approved file.", (panel as EditorNotificationPanel).text)
+    assertThat((panel as EditorNotificationPanel).text)
+      .isEqualTo("This is an ApproveJ approved file.")
   }
 
   fun testBanner_absent_for_non_approved_file() {
@@ -34,7 +36,7 @@ class ApprovedFileEditorNotificationProviderTest : BasePlatformTestCase() {
 
     val factory = provider.collectNotificationData(project, file)
 
-    assertNull(factory)
+    assertThat(factory).isNull()
   }
 
   fun testBanner_absent_for_received_file() {
@@ -43,6 +45,6 @@ class ApprovedFileEditorNotificationProviderTest : BasePlatformTestCase() {
 
     val factory = provider.collectNotificationData(project, file)
 
-    assertNull(factory)
+    assertThat(factory).isNull()
   }
 }

@@ -1,6 +1,7 @@
 package org.approvej.intellij
 
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import org.assertj.core.api.Assertions.assertThat
 
 class ApprovedFileUtilPlatformTest : BasePlatformTestCase() {
 
@@ -11,8 +12,8 @@ class ApprovedFileUtilPlatformTest : BasePlatformTestCase() {
 
     val result = ApprovedFileUtil.findReceivedFile(approved)
 
-    assertNotNull(result)
-    assertEquals("MyTest.byValue-received.txt", result!!.name)
+    assertThat(result).isNotNull()
+    assertThat(result!!.name).isEqualTo("MyTest.byValue-received.txt")
   }
 
   fun testFindReceivedFile_no_extension() {
@@ -22,8 +23,8 @@ class ApprovedFileUtilPlatformTest : BasePlatformTestCase() {
 
     val result = ApprovedFileUtil.findReceivedFile(approved)
 
-    assertNotNull(result)
-    assertEquals("MyTest.byValue-received", result!!.name)
+    assertThat(result).isNotNull()
+    assertThat(result!!.name).isEqualTo("MyTest.byValue-received")
   }
 
   fun testFindReceivedFile_with_affix() {
@@ -33,8 +34,8 @@ class ApprovedFileUtilPlatformTest : BasePlatformTestCase() {
 
     val result = ApprovedFileUtil.findReceivedFile(approved)
 
-    assertNotNull(result)
-    assertEquals("MyTest.byValue-body-received.json", result!!.name)
+    assertThat(result).isNotNull()
+    assertThat(result!!.name).isEqualTo("MyTest.byValue-body-received.json")
   }
 
   fun testFindReceivedFile_no_received_file() {
@@ -43,7 +44,7 @@ class ApprovedFileUtilPlatformTest : BasePlatformTestCase() {
 
     val result = ApprovedFileUtil.findReceivedFile(approved)
 
-    assertNull(result)
+    assertThat(result).isNull()
   }
 
   fun testFindReceivedFile_non_approved_file() {
@@ -52,6 +53,6 @@ class ApprovedFileUtilPlatformTest : BasePlatformTestCase() {
 
     val result = ApprovedFileUtil.findReceivedFile(file)
 
-    assertNull(result)
+    assertThat(result).isNull()
   }
 }

@@ -10,6 +10,7 @@ import com.intellij.openapi.actionSystem.impl.SimpleDataContext
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import java.util.concurrent.atomic.AtomicReference
+import org.assertj.core.api.Assertions.assertThat
 
 class ReceivedFileUtilPlatformTest : BasePlatformTestCase() {
 
@@ -20,8 +21,8 @@ class ReceivedFileUtilPlatformTest : BasePlatformTestCase() {
 
     val result = ReceivedFileUtil.findApprovedFile(received)
 
-    assertNotNull(result)
-    assertEquals("MyTest.byValue-approved.txt", result!!.name)
+    assertThat(result).isNotNull()
+    assertThat(result!!.name).isEqualTo("MyTest.byValue-approved.txt")
   }
 
   fun testFindApprovedFile_custom_base_name() {
@@ -31,8 +32,8 @@ class ReceivedFileUtilPlatformTest : BasePlatformTestCase() {
 
     val result = ReceivedFileUtil.findApprovedFile(received)
 
-    assertNotNull(result)
-    assertEquals("MyTest.byValue.txt", result!!.name)
+    assertThat(result).isNotNull()
+    assertThat(result!!.name).isEqualTo("MyTest.byValue.txt")
   }
 
   fun testFindApprovedFile_prefers_approved_infix() {
@@ -43,8 +44,8 @@ class ReceivedFileUtilPlatformTest : BasePlatformTestCase() {
 
     val result = ReceivedFileUtil.findApprovedFile(received)
 
-    assertNotNull(result)
-    assertEquals("MyTest.byValue-approved.txt", result!!.name)
+    assertThat(result).isNotNull()
+    assertThat(result!!.name).isEqualTo("MyTest.byValue-approved.txt")
   }
 
   fun testFindApprovedFile_no_match() {
@@ -53,7 +54,7 @@ class ReceivedFileUtilPlatformTest : BasePlatformTestCase() {
 
     val result = ReceivedFileUtil.findApprovedFile(received)
 
-    assertNull(result)
+    assertThat(result).isNull()
   }
 
   fun testApproveAction_visible_with_approved_file() {
@@ -63,7 +64,7 @@ class ReceivedFileUtilPlatformTest : BasePlatformTestCase() {
 
     val presentation = updateAction(ApproveReceivedAction(), received)
 
-    assertTrue(presentation.isEnabledAndVisible)
+    assertThat(presentation.isEnabledAndVisible).isTrue()
   }
 
   fun testApproveAction_hidden_without_approved_file() {
@@ -72,7 +73,7 @@ class ReceivedFileUtilPlatformTest : BasePlatformTestCase() {
 
     val presentation = updateAction(ApproveReceivedAction(), received)
 
-    assertFalse(presentation.isEnabledAndVisible)
+    assertThat(presentation.isEnabledAndVisible).isFalse()
   }
 
   fun testCompareAction_visible_with_approved_file() {
@@ -82,7 +83,7 @@ class ReceivedFileUtilPlatformTest : BasePlatformTestCase() {
 
     val presentation = updateAction(CompareReceivedWithApprovedAction(), received)
 
-    assertTrue(presentation.isEnabledAndVisible)
+    assertThat(presentation.isEnabledAndVisible).isTrue()
   }
 
   fun testCompareAction_hidden_without_approved_file() {
@@ -91,7 +92,7 @@ class ReceivedFileUtilPlatformTest : BasePlatformTestCase() {
 
     val presentation = updateAction(CompareReceivedWithApprovedAction(), received)
 
-    assertFalse(presentation.isEnabledAndVisible)
+    assertThat(presentation.isEnabledAndVisible).isFalse()
   }
 
   fun testCompareAction_hidden_for_non_received_file() {
@@ -100,7 +101,7 @@ class ReceivedFileUtilPlatformTest : BasePlatformTestCase() {
 
     val presentation = updateAction(CompareReceivedWithApprovedAction(), file)
 
-    assertFalse(presentation.isEnabledAndVisible)
+    assertThat(presentation.isEnabledAndVisible).isFalse()
   }
 
   fun testIsActionAvailable_received_with_approved() {
@@ -108,21 +109,21 @@ class ReceivedFileUtilPlatformTest : BasePlatformTestCase() {
     myFixture.addFileToProject("MyTest.byValue-approved.txt", "approved")
     val received = myFixture.findFileInTempDir("MyTest.byValue-received.txt")
 
-    assertTrue(ReceivedFileUtil.isActionAvailable(createEvent(received)))
+    assertThat(ReceivedFileUtil.isActionAvailable(createEvent(received))).isTrue()
   }
 
   fun testIsActionAvailable_received_without_approved() {
     myFixture.addFileToProject("MyTest.byValue-received.txt", "received")
     val received = myFixture.findFileInTempDir("MyTest.byValue-received.txt")
 
-    assertFalse(ReceivedFileUtil.isActionAvailable(createEvent(received)))
+    assertThat(ReceivedFileUtil.isActionAvailable(createEvent(received))).isFalse()
   }
 
   fun testIsActionAvailable_non_received_file() {
     myFixture.addFileToProject("MyTest.java", "class MyTest {}")
     val file = myFixture.findFileInTempDir("MyTest.java")
 
-    assertFalse(ReceivedFileUtil.isActionAvailable(createEvent(file)))
+    assertThat(ReceivedFileUtil.isActionAvailable(createEvent(file))).isFalse()
   }
 
   fun testWithReceivedAndApproved_invokes_action() {
@@ -137,8 +138,8 @@ class ReceivedFileUtilPlatformTest : BasePlatformTestCase() {
       capturedApproved.set(a)
     }
 
-    assertEquals("MyTest.byValue-received.txt", capturedReceived.get().name)
-    assertEquals("MyTest.byValue-approved.txt", capturedApproved.get().name)
+    assertThat(capturedReceived.get().name).isEqualTo("MyTest.byValue-received.txt")
+    assertThat(capturedApproved.get().name).isEqualTo("MyTest.byValue-approved.txt")
   }
 
   fun testWithReceivedAndApproved_does_nothing_without_approved() {
@@ -150,7 +151,7 @@ class ReceivedFileUtilPlatformTest : BasePlatformTestCase() {
       capturedReceived.set(r)
     }
 
-    assertNull(capturedReceived.get())
+    assertThat(capturedReceived.get()).isNull()
   }
 
   fun testApprove_copies_content_and_deletes_received() {
@@ -161,8 +162,8 @@ class ReceivedFileUtilPlatformTest : BasePlatformTestCase() {
 
     ReceivedFileUtil.approve(project, received, approved)
 
-    assertFalse(received.isValid)
-    assertEquals("new content", String(approved.contentsToByteArray()))
+    assertThat(received.isValid).isFalse()
+    assertThat(String(approved.contentsToByteArray())).isEqualTo("new content")
   }
 
   fun testReject_deletes_received_without_changing_approved() {
@@ -173,8 +174,8 @@ class ReceivedFileUtilPlatformTest : BasePlatformTestCase() {
 
     ReceivedFileUtil.reject(project, received)
 
-    assertFalse(received.isValid)
-    assertEquals("old content", String(approved.contentsToByteArray()))
+    assertThat(received.isValid).isFalse()
+    assertThat(String(approved.contentsToByteArray())).isEqualTo("old content")
   }
 
   private fun createEvent(file: VirtualFile): AnActionEvent {

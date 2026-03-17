@@ -2,6 +2,7 @@ package org.approvej.intellij
 
 import com.intellij.codeInsight.daemon.GutterMark
 import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
+import org.assertj.core.api.Assertions.assertThat
 
 class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() {
 
@@ -42,8 +43,7 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
         .trimIndent(),
     )
 
-    val gutters = findApprovalGutters()
-    assertTrue("No gutter icons expected for byValue() chain", gutters.isEmpty())
+    assertThat(findApprovalGutters()).isEmpty()
   }
 
   fun testMarker_absent_for_unrelated_approve() {
@@ -60,11 +60,9 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
         .trimIndent(),
     )
 
-    val gutters = myFixture.findAllGutters()
-    assertTrue(
-      "No gutter icons expected for unrelated approve() method",
-      gutters.none { it.tooltipText?.contains("approved") == true },
-    )
+    assertThat(myFixture.findAllGutters()).noneMatch {
+      it.tooltipText?.contains("approved") == true
+    }
   }
 
   fun testMarker_present_for_byFile() {
@@ -86,8 +84,8 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
     )
 
     val gutters = findApprovalGutters()
-    assertEquals(1, gutters.size)
-    assertEquals("Navigate to Test-myTest-approved.txt", gutters.first().tooltipText)
+    assertThat(gutters).hasSize(1)
+    assertThat(gutters.first().tooltipText).isEqualTo("Navigate to Test-myTest-approved.txt")
   }
 
   fun testMarker_named_filters_to_matching_file() {
@@ -115,9 +113,8 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
     )
 
     val gutters = findApprovalGutters()
-    assertEquals(1, gutters.size)
-    assertTrue(gutters.first().tooltipText!!.contains("jane"))
-    assertFalse(gutters.first().tooltipText!!.contains("john"))
+    assertThat(gutters).hasSize(1)
+    assertThat(gutters.first().tooltipText).contains("jane").doesNotContain("john")
   }
 
   fun testMarker_unnamed_excludes_named_files() {
@@ -145,8 +142,8 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
     )
 
     val gutters = findApprovalGutters()
-    assertEquals(1, gutters.size)
-    assertEquals("Navigate to Test-myTest-approved.txt", gutters.first().tooltipText)
+    assertThat(gutters).hasSize(1)
+    assertThat(gutters.first().tooltipText).isEqualTo("Navigate to Test-myTest-approved.txt")
   }
 
   fun testMarker_multiple_named_approvals() {
@@ -175,8 +172,8 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
     )
 
     val gutters = findApprovalGutters()
-    assertEquals(2, gutters.size)
-    assertFalse("Expected distinct tooltips", gutters[0].tooltipText == gutters[1].tooltipText)
+    assertThat(gutters).hasSize(2)
+    assertThat(gutters[0].tooltipText).isNotEqualTo(gutters[1].tooltipText)
   }
 
   fun testMarker_named_approval_shown_when_sibling_unapproved() {
@@ -206,9 +203,9 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
     )
 
     val gutters = findApprovalGutters()
-    assertEquals(2, gutters.size)
-    assertEquals("Compare received with approved", gutters.first().tooltipText)
-    assertEquals("Navigate to Test-myTest-b-approved.txt", gutters[1].tooltipText)
+    assertThat(gutters).hasSize(2)
+    assertThat(gutters[0].tooltipText).isEqualTo("Compare received with approved")
+    assertThat(gutters[1].tooltipText).isEqualTo("Navigate to Test-myTest-b-approved.txt")
   }
 
   fun testMarker_received_file_changes_icon() {
@@ -231,8 +228,8 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
     )
 
     val gutters = findApprovalGutters()
-    assertEquals(1, gutters.size)
-    assertEquals("Compare received with approved", gutters.first().tooltipText)
+    assertThat(gutters).hasSize(1)
+    assertThat(gutters.first().tooltipText).isEqualTo("Compare received with approved")
   }
 
   private fun findApprovalGutters(): List<GutterMark> =

@@ -2,6 +2,7 @@ package org.approvej.intellij
 
 import com.intellij.psi.PsiClass
 import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
+import org.assertj.core.api.Assertions.assertThat
 
 class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtureTestCase() {
 
@@ -26,8 +27,9 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
 
     renameMethod(testClass, "byValue", "byContent")
 
-    assertNotNull(myFixture.findFileInTempDir("src/com/example/MyTest-byContent-approved.txt"))
-    assertNull(myFixture.findFileInTempDir("src/com/example/MyTest-byValue-approved.txt"))
+    assertThat(myFixture.findFileInTempDir("src/com/example/MyTest-byContent-approved.txt"))
+      .isNotNull()
+    assertThat(myFixture.findFileInTempDir("src/com/example/MyTest-byValue-approved.txt")).isNull()
   }
 
   fun testRenameMethod_with_received_file() {
@@ -38,10 +40,12 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
 
     renameMethod(testClass, "byValue", "byContent")
 
-    assertNotNull(myFixture.findFileInTempDir("src/com/example/MyTest-byContent-approved.txt"))
-    assertNotNull(myFixture.findFileInTempDir("src/com/example/MyTest-byContent-received.txt"))
-    assertNull(myFixture.findFileInTempDir("src/com/example/MyTest-byValue-approved.txt"))
-    assertNull(myFixture.findFileInTempDir("src/com/example/MyTest-byValue-received.txt"))
+    assertThat(myFixture.findFileInTempDir("src/com/example/MyTest-byContent-approved.txt"))
+      .isNotNull()
+    assertThat(myFixture.findFileInTempDir("src/com/example/MyTest-byContent-received.txt"))
+      .isNotNull()
+    assertThat(myFixture.findFileInTempDir("src/com/example/MyTest-byValue-approved.txt")).isNull()
+    assertThat(myFixture.findFileInTempDir("src/com/example/MyTest-byValue-received.txt")).isNull()
   }
 
   fun testRenameMethod_with_affix() {
@@ -54,12 +58,14 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
 
     renameMethod(testClass, "approve_named", "approve_person")
 
-    assertNotNull(
-      myFixture.findFileInTempDir("src/com/example/MyTest-approve_person-jane-approved.txt")
-    )
-    assertNull(
-      myFixture.findFileInTempDir("src/com/example/MyTest-approve_named-jane-approved.txt")
-    )
+    assertThat(
+        myFixture.findFileInTempDir("src/com/example/MyTest-approve_person-jane-approved.txt")
+      )
+      .isNotNull()
+    assertThat(
+        myFixture.findFileInTempDir("src/com/example/MyTest-approve_named-jane-approved.txt")
+      )
+      .isNull()
   }
 
   fun testRenameMethod_multiple_files() {
@@ -75,12 +81,14 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
 
     renameMethod(testClass, "approve_named", "approve_person")
 
-    assertNotNull(
-      myFixture.findFileInTempDir("src/com/example/MyTest-approve_person-jane-approved.txt")
-    )
-    assertNotNull(
-      myFixture.findFileInTempDir("src/com/example/MyTest-approve_person-john-approved.txt")
-    )
+    assertThat(
+        myFixture.findFileInTempDir("src/com/example/MyTest-approve_person-jane-approved.txt")
+      )
+      .isNotNull()
+    assertThat(
+        myFixture.findFileInTempDir("src/com/example/MyTest-approve_person-john-approved.txt")
+      )
+      .isNotNull()
   }
 
   fun testRenameMethod_subdirectory_pattern() {
@@ -93,8 +101,10 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
 
     renameMethod(testClass, "subdir_test", "renamed_test")
 
-    assertNotNull(myFixture.findFileInTempDir("src/com/example/MyTest/renamed_test-approved.txt"))
-    assertNull(myFixture.findFileInTempDir("src/com/example/MyTest/subdir_test-approved.txt"))
+    assertThat(myFixture.findFileInTempDir("src/com/example/MyTest/renamed_test-approved.txt"))
+      .isNotNull()
+    assertThat(myFixture.findFileInTempDir("src/com/example/MyTest/subdir_test-approved.txt"))
+      .isNull()
   }
 
   fun testRenameClass() {
@@ -104,8 +114,10 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
 
     myFixture.renameElement(testClass, "NewTest")
 
-    assertNotNull(myFixture.findFileInTempDir("src/com/example/NewTest-myMethod-approved.txt"))
-    assertNull(myFixture.findFileInTempDir("src/com/example/OldTest-myMethod-approved.txt"))
+    assertThat(myFixture.findFileInTempDir("src/com/example/NewTest-myMethod-approved.txt"))
+      .isNotNull()
+    assertThat(myFixture.findFileInTempDir("src/com/example/OldTest-myMethod-approved.txt"))
+      .isNull()
   }
 
   fun testRenameClass_subdirectory() {
@@ -115,8 +127,10 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
 
     myFixture.renameElement(testClass, "NewTest")
 
-    assertNotNull(myFixture.findFileInTempDir("src/com/example/NewTest/myMethod-approved.txt"))
-    assertNull(myFixture.findFileInTempDir("src/com/example/OldTest/myMethod-approved.txt"))
+    assertThat(myFixture.findFileInTempDir("src/com/example/NewTest/myMethod-approved.txt"))
+      .isNotNull()
+    assertThat(myFixture.findFileInTempDir("src/com/example/OldTest/myMethod-approved.txt"))
+      .isNull()
   }
 
   fun testRenameMethod_no_inventory() {
@@ -124,8 +138,7 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
 
     renameMethod(testClass, "byValue", "byContent")
 
-    val methods = testClass.findMethodsByName("byContent", false)
-    assertEquals(1, methods.size)
+    assertThat(testClass.findMethodsByName("byContent", false)).hasSize(1)
   }
 
   fun testRenameMethod_no_approved_files() {
@@ -134,8 +147,7 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
 
     renameMethod(testClass, "byValue", "byContent")
 
-    val methods = testClass.findMethodsByName("byContent", false)
-    assertEquals(1, methods.size)
+    assertThat(testClass.findMethodsByName("byContent", false)).hasSize(1)
   }
 
   private fun addTestClassWithMethod(
@@ -173,7 +185,7 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
 
   private fun renameMethod(psiClass: PsiClass, oldName: String, newName: String) {
     val methods = psiClass.findMethodsByName(oldName, false)
-    assertEquals("Expected exactly one method named $oldName", 1, methods.size)
+    assertThat(methods).describedAs("Expected exactly one method named $oldName").hasSize(1)
     myFixture.renameElement(methods[0], newName)
   }
 }
