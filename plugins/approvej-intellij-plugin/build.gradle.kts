@@ -141,7 +141,13 @@ tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileUnitTestKot
   libraries.from(configurations.getByName("intellijPlatformClasspath"))
 }
 
-tasks.named<Test>("unitTest") { classpath += configurations.getByName("intellijPlatformClasspath") }
+tasks.named<Test>("unitTest") {
+  classpath += configurations.getByName("intellijPlatformClasspath")
+  configure<JacocoTaskExtension> {
+    includes = listOf("org.approvej.*")
+    isIncludeNoLocationClasses = true
+  }
+}
 
 tasks.named("check") { dependsOn(testing.suites.named("unitTest")) }
 

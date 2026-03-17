@@ -45,14 +45,11 @@ class DanglingApprovalInspection : AbstractBaseUastLocalInspectionTool() {
   }
 
   override fun getStaticDescription(): String =
-    """
-    Reports <code>approve()</code> calls on <code>ApprovalBuilder</code> that are not \
-    concluded with a terminal method (<code>by()</code>, <code>byFile()</code>, or \
-    <code>byValue()</code>). A missing terminal call means the approval is never actually \
-    checked. When the test method is annotated with <code>@ApprovalTest</code>, this causes \
-    a <code>DanglingApprovalError</code> at runtime.\
-    """
-      .trimIndent()
+    "Reports <code>approve()</code> calls on <code>ApprovalBuilder</code> that are not " +
+      "concluded with a terminal method (<code>by()</code>, <code>byFile()</code>, or " +
+      "<code>byValue()</code>). A missing terminal call means the approval is never actually " +
+      "checked. When the test method is annotated with <code>@ApprovalTest</code>, this causes " +
+      "a <code>DanglingApprovalError</code> at runtime."
 
   private class AppendTerminalMethodFix(private val methodCall: String) : LocalQuickFix {
 

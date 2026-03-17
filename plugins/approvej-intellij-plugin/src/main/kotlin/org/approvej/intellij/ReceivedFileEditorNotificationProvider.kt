@@ -9,7 +9,7 @@ import com.intellij.ui.EditorNotificationProvider
 import java.util.function.Function
 import javax.swing.JComponent
 
-/** Shows an info banner when a `.received` file is opened, with actions to compare or approve. */
+/** Shows an info banner when a `-received` file is opened, with actions to compare or approve. */
 class ReceivedFileEditorNotificationProvider : EditorNotificationProvider, DumbAware {
 
   override fun collectNotificationData(

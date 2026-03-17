@@ -56,13 +56,10 @@ class DuplicateUnnamedApprovalInspection : AbstractBaseUastLocalInspectionTool()
   }
 
   override fun getStaticDescription(): String =
-    """
-    Reports multiple <code>approve().byFile()</code> calls within the same test method \
-    that resolve to the same approved file. Without <code>.named()</code>, each no-arg \
-    <code>byFile()</code> uses the test method name, so the second call silently overwrites \
-    the first. Use <code>.named()</code> to give each approval a distinct name.\
-    """
-      .trimIndent()
+    "Reports multiple <code>approve().byFile()</code> calls within the same test method " +
+      "that resolve to the same approved file. Without <code>.named()</code>, each no-arg " +
+      "<code>byFile()</code> uses the test method name, so the second call silently overwrites " +
+      "the first. Use <code>.named()</code> to give each approval a distinct name."
 
   private data class NoArgByFileCall(
     val approveElement: PsiElement,
