@@ -4,8 +4,6 @@ import com.intellij.openapi.util.IconLoader
 
 internal object ApproveJIcons {
 
-  @JvmField val APPROVED = IconLoader.getIcon("/icons/approved.svg", ApproveJIcons::class.java)
-
-  @JvmField
+  val APPROVED = IconLoader.getIcon("/icons/approved.svg", ApproveJIcons::class.java)
   val APPROVAL_PENDING = IconLoader.getIcon("/icons/approvalPending.svg", ApproveJIcons::class.java)
 }
