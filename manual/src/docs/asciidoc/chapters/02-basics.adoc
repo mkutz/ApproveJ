@@ -24,6 +24,7 @@ include::../../../test/kotlin/examples/kotlin/BasicsDocTest.kt[tag=approve_strin
 <2> compares result to a previously approved value stored in a file next to the test and fails the test if the result differs
 
 Executing such a test will create two files next to the test code file named like `<TestClass>-<testMethod>-received.txt` and `<TestClass>-<testMethod>-approved.txt`.
+For nested or inner test classes, `<TestClass>` includes enclosing class names separated by dots (e.g. `OuterTest.InnerTest`).
 
 The received file will always contain a string representation of the object you want to approve at the last execution.
 
