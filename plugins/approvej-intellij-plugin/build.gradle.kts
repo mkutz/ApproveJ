@@ -10,15 +10,15 @@ buildscript {
 }
 
 plugins {
-  java
+  alias(libs.plugins.kotlin.jvm)
   jacoco
   `jvm-test-suite`
   alias(libs.plugins.intellij.platform)
 }
 
-java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+kotlin { jvmToolchain(21) }
 
-sonar { properties { property("sonar.coverage.exclusions", "src/main/java/**") } }
+sonar { properties { property("sonar.coverage.exclusions", "src/main/kotlin/**") } }
 
 repositories {
   mavenCentral()
@@ -133,8 +133,8 @@ testing {
 }
 
 // Add IntelliJ platform JARs to unitTest so production classes can be compiled against and loaded
-tasks.named<JavaCompile>("compileUnitTestJava") {
-  classpath += configurations.getByName("intellijPlatformClasspath")
+tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileUnitTestKotlin") {
+  libraries.from(configurations.getByName("intellijPlatformClasspath"))
 }
 
 tasks.named<Test>("unitTest") { classpath += configurations.getByName("intellijPlatformClasspath") }
@@ -142,7 +142,7 @@ tasks.named<Test>("unitTest") { classpath += configurations.getByName("intellijP
 tasks.named("check") { dependsOn(testing.suites.named("unitTest")) }
 
 tasks.jacocoTestReport {
-  mustRunAfter(tasks.check, tasks.javadoc)
+  mustRunAfter(tasks.check)
   executionData(fileTree(project.layout.buildDirectory) { include("**/jacoco/*.exec") })
   reports { xml.required = true }
 }

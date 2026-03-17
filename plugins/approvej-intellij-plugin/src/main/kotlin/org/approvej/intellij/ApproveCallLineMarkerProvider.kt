@@ -1,0 +1,100 @@
+package org.approvej.intellij
+
+import com.intellij.codeInsight.daemon.LineMarkerInfo
+import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor
+import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
+import com.intellij.openapi.editor.markup.GutterIconRenderer
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiManager
+import javax.swing.Icon
+import org.jetbrains.uast.UMethod
+import org.jetbrains.uast.getParentOfType
+
+/**
+ * Provides a gutter icon on `approve()...byFile()` chains that navigates to the approved file. When
+ * a received file also exists, clicking the icon opens the diff viewer comparing the received file
+ * with the approved file.
+ */
+class ApproveCallLineMarkerProvider : LineMarkerProviderDescriptor() {
+
+  override fun getName(): String = "ApproveJ approved file"
+
+  override fun getIcon(): Icon = ApproveJIcons.APPROVED
+
+  override fun getLineMarkerInfo(element: PsiElement): LineMarkerInfo<*>? = null
+
+  override fun collectSlowLineMarkers(
+    elements: List<PsiElement>,
+    result: MutableCollection<in LineMarkerInfo<*>>,
+  ) {
+    for (element in elements) {
+      collectMarker(element, result)
+    }
+  }
+
+  private fun collectMarker(element: PsiElement, result: MutableCollection<in LineMarkerInfo<*>>) {
+    val callExpression = ApproveCallUtil.asApproveCall(element) ?: return
+
+    if (ApproveCallUtil.findTerminalCall(callExpression).lastMethodName != "byFile") return
+
+    val uMethod = callExpression.getParentOfType<UMethod>() ?: return
+    val psiMethod = uMethod.javaPsi
+    val psiClass = psiMethod.containingClass ?: return
+    val className = psiClass.qualifiedName ?: return
+
+    val methodName = psiMethod.name
+    val project = element.project
+
+    val namedArg = ApproveCallUtil.findNamedArgument(callExpression)
+    val suffix = if (namedArg != null) "$namedArg-approved" else "$methodName-approved"
+
+    val approvedFiles =
+      InventoryUtil.findApprovedFiles(className, methodName, project).filter { approvedFile ->
+        val name = approvedFile.nameWithoutExtension
+        val prefixLen = name.length - suffix.length
+        name.endsWith(suffix) && (prefixLen == 0 || name[prefixLen - 1] == '-')
+      }
+    if (approvedFiles.isEmpty()) return
+
+    val psiManager = PsiManager.getInstance(project)
+    val targets = approvedFiles.mapNotNull { psiManager.findFile(it) }
+    if (targets.isEmpty()) return
+
+    var firstApprovedWithReceived: com.intellij.openapi.vfs.VirtualFile? = null
+    var matchingReceived: com.intellij.openapi.vfs.VirtualFile? = null
+    for (approved in approvedFiles) {
+      val received = ApprovedFileUtil.findReceivedFile(approved)
+      if (received != null) {
+        firstApprovedWithReceived = approved
+        matchingReceived = received
+        break
+      }
+    }
+
+    if (firstApprovedWithReceived == null) {
+      val builder =
+        NavigationGutterIconBuilder.create(ApproveJIcons.APPROVED)
+          .setTargets(targets)
+          .setTooltipText(
+            if (targets.size == 1) "Navigate to ${approvedFiles.first().name}"
+            else "Navigate to approved file"
+          )
+      result.add(builder.createLineMarkerInfo(element))
+    } else {
+      val approvedFile = firstApprovedWithReceived
+      val receivedFile = matchingReceived!!
+      val markerInfo =
+        LineMarkerInfo(
+          element,
+          element.textRange,
+          ApproveJIcons.APPROVAL_PENDING,
+          { "Compare received with approved" },
+          { _, elt -> ReceivedFileUtil.openDiff(elt.project, receivedFile, approvedFile) },
+          GutterIconRenderer.Alignment.LEFT,
+        ) {
+          "Compare received with approved"
+        }
+      result.add(markerInfo)
+    }
+  }
+}
