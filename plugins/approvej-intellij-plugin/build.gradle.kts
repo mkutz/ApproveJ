@@ -18,8 +18,6 @@ plugins {
 
 kotlin { jvmToolchain(21) }
 
-sonar { properties { property("sonar.coverage.exclusions", "src/main/kotlin/**") } }
-
 repositories {
   mavenCentral()
   intellijPlatform { defaultRepositories() }
