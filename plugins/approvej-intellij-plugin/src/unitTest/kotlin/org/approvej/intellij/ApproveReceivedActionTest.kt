@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class ApproveReceivedActionTest {
 
   @Test
-  fun getActionUpdateThread() {
+  fun `getActionUpdateThread`() {
     assertThat(ApproveReceivedAction().actionUpdateThread).isEqualTo(ActionUpdateThread.BGT)
   }
 }

@@ -6,27 +6,32 @@ import org.junit.jupiter.api.Test
 class ApprovedFileUtilTest {
 
   @Test
-  fun isApprovedFileName() {
+  fun `isApprovedFileName`() {
     assertThat(ApprovedFileUtil.isApprovedFileName("MyTest.byValue-approved.txt")).isTrue()
   }
 
   @Test
-  fun isApprovedFileName_no_extension() {
+  fun `isApprovedFileName no extension`() {
     assertThat(ApprovedFileUtil.isApprovedFileName("MyTest.byValue-approved")).isTrue()
   }
 
   @Test
-  fun isApprovedFileName_with_affix() {
+  fun `isApprovedFileName with affix`() {
     assertThat(ApprovedFileUtil.isApprovedFileName("MyTest.byValue-body-approved.json")).isTrue()
   }
 
   @Test
-  fun isApprovedFileName_not_approved() {
+  fun `isApprovedFileName non-approved file`() {
     assertThat(ApprovedFileUtil.isApprovedFileName("MyTest.java")).isFalse()
   }
 
   @Test
-  fun isApprovedFileName_received_file() {
+  fun `isApprovedFileName received file`() {
     assertThat(ApprovedFileUtil.isApprovedFileName("MyTest.byValue-received.txt")).isFalse()
+  }
+
+  @Test
+  fun `isApprovedFileName approved infix at start`() {
+    assertThat(ApprovedFileUtil.isApprovedFileName("-approved.txt")).isFalse()
   }
 }

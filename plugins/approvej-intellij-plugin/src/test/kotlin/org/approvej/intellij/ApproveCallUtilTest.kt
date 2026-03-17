@@ -191,6 +191,40 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     assertEquals("second", ApproveCallUtil.findNamedArgument(call))
   }
 
+  fun testHasNamedCall() {
+    val call =
+      configureAndFindApproveCallExpression(
+        """
+      import static org.approvej.ApprovalBuilder.approve;
+      class Test {
+          void test() {
+              appr<caret>ove("hello").named("first").byFile();
+          }
+      }
+      """
+          .trimIndent()
+      )
+
+    assertTrue(ApproveCallUtil.hasNamedCall(call))
+  }
+
+  fun testHasNamedCall_absent() {
+    val call =
+      configureAndFindApproveCallExpression(
+        """
+      import static org.approvej.ApprovalBuilder.approve;
+      class Test {
+          void test() {
+              appr<caret>ove("hello").byFile();
+          }
+      }
+      """
+          .trimIndent()
+      )
+
+    assertFalse(ApproveCallUtil.hasNamedCall(call))
+  }
+
   fun testFindNamedArgument_absent() {
     val call =
       configureAndFindApproveCallExpression(

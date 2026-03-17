@@ -42,8 +42,9 @@ internal object ApproveCallUtil {
     var lastMethodName = "approve"
     val chainEnd =
       walkChain(approveCall) { selector ->
-        if (selector.methodName != null) {
-          lastMethodName = selector.methodName!!
+        val name = selector.methodName
+        if (name != null) {
+          lastMethodName = name
           true
         } else {
           false

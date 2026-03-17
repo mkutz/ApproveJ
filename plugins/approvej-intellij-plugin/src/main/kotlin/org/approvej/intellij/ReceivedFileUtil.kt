@@ -89,8 +89,8 @@ object ReceivedFileUtil {
    * counterpart.
    */
   fun isActionAvailable(event: AnActionEvent): Boolean {
-    val file = event.getData(CommonDataKeys.VIRTUAL_FILE)
-    return isReceivedFile(file) && findApprovedFile(file!!) != null
+    val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return false
+    return isReceivedFile(file) && findApprovedFile(file) != null
   }
 
   /**

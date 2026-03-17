@@ -10,23 +10,23 @@ class ApproveJRenamePsiElementProcessorTest {
   inner class StripBackticks {
 
     @Test
-    fun plain_name() {
+    fun `stripBackticks`() {
       assertThat(ApproveJRenamePsiElementProcessor.stripBackticks("myMethod")).isEqualTo("myMethod")
     }
 
     @Test
-    fun backticked_name() {
+    fun `stripBackticks backticked name`() {
       assertThat(ApproveJRenamePsiElementProcessor.stripBackticks("`my test case`"))
         .isEqualTo("my test case")
     }
 
     @Test
-    fun single_backtick() {
+    fun `stripBackticks single backtick`() {
       assertThat(ApproveJRenamePsiElementProcessor.stripBackticks("`")).isEqualTo("`")
     }
 
     @Test
-    fun empty_backticks() {
+    fun `stripBackticks empty backticks`() {
       assertThat(ApproveJRenamePsiElementProcessor.stripBackticks("``")).isEqualTo("``")
     }
   }
@@ -35,7 +35,7 @@ class ApproveJRenamePsiElementProcessorTest {
   inner class ComputeNewFileName {
 
     @Test
-    fun next_to_test() {
+    fun `computeNewFileName`() {
       assertThat(
           ApproveJRenamePsiElementProcessor.computeNewFileName(
             "MyTest-oldMethod-approved.txt",
@@ -48,7 +48,7 @@ class ApproveJRenamePsiElementProcessorTest {
     }
 
     @Test
-    fun next_to_test_with_affix() {
+    fun `computeNewFileName with affix`() {
       assertThat(
           ApproveJRenamePsiElementProcessor.computeNewFileName(
             "MyTest-oldMethod-jane-approved.txt",
@@ -61,7 +61,7 @@ class ApproveJRenamePsiElementProcessorTest {
     }
 
     @Test
-    fun subdirectory() {
+    fun `computeNewFileName subdirectory`() {
       assertThat(
           ApproveJRenamePsiElementProcessor.computeNewFileName(
             "oldMethod-approved.txt",
@@ -74,7 +74,7 @@ class ApproveJRenamePsiElementProcessorTest {
     }
 
     @Test
-    fun no_match() {
+    fun `computeNewFileName no match`() {
       assertThat(
           ApproveJRenamePsiElementProcessor.computeNewFileName(
             "unrelated-file.txt",
