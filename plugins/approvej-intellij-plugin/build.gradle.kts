@@ -12,7 +12,6 @@ buildscript {
 plugins {
   alias(libs.plugins.kotlin.jvm)
   jacoco
-  `jvm-test-suite`
   alias(libs.plugins.intellij.platform)
 }
 
@@ -117,39 +116,6 @@ tasks.test {
     isIncludeNoLocationClasses = true
   }
 }
-
-testing {
-  suites {
-    val unitTest by
-      registering(JvmTestSuite::class) {
-        useJUnitJupiter()
-        dependencies {
-          implementation(platform(libs.junit.bom))
-          implementation(libs.junit.jupiter.api)
-          implementation(libs.assertj.core)
-          implementation(project())
-
-          runtimeOnly(libs.junit.platform.launcher)
-          runtimeOnly(libs.junit.jupiter.engine)
-        }
-      }
-  }
-}
-
-// Add IntelliJ platform JARs to unitTest so production classes can be compiled against and loaded
-tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileUnitTestKotlin") {
-  libraries.from(configurations.getByName("intellijPlatformClasspath"))
-}
-
-tasks.named<Test>("unitTest") {
-  classpath += configurations.getByName("intellijPlatformClasspath")
-  configure<JacocoTaskExtension> {
-    includes = listOf("org.approvej.*")
-    isIncludeNoLocationClasses = true
-  }
-}
-
-tasks.named("check") { dependsOn(testing.suites.named("unitTest")) }
 
 tasks.jacocoTestReport {
   mustRunAfter(tasks.check)
