@@ -10,15 +10,12 @@ buildscript {
 }
 
 plugins {
-  java
+  alias(libs.plugins.kotlin.jvm)
   jacoco
-  `jvm-test-suite`
   alias(libs.plugins.intellij.platform)
 }
 
-java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
-
-sonar { properties { property("sonar.coverage.exclusions", "src/main/java/**") } }
+kotlin { jvmToolchain(21) }
 
 repositories {
   mavenCentral()
@@ -112,37 +109,12 @@ configurations.testCompileClasspath {
   }
 }
 
-tasks.test { useJUnitPlatform() }
-
-testing {
-  suites {
-    val unitTest by
-      registering(JvmTestSuite::class) {
-        useJUnitJupiter()
-        dependencies {
-          implementation(platform(libs.junit.bom))
-          implementation(libs.junit.jupiter.api)
-          implementation(libs.assertj.core)
-          implementation(project())
-
-          runtimeOnly(libs.junit.platform.launcher)
-          runtimeOnly(libs.junit.jupiter.engine)
-        }
-      }
+tasks.test {
+  useJUnitPlatform()
+  configure<JacocoTaskExtension> {
+    includes = listOf("org.approvej.*")
+    isIncludeNoLocationClasses = true
   }
 }
 
-// Add IntelliJ platform JARs to unitTest so production classes can be compiled against and loaded
-tasks.named<JavaCompile>("compileUnitTestJava") {
-  classpath += configurations.getByName("intellijPlatformClasspath")
-}
-
-tasks.named<Test>("unitTest") { classpath += configurations.getByName("intellijPlatformClasspath") }
-
-tasks.named("check") { dependsOn(testing.suites.named("unitTest")) }
-
-tasks.jacocoTestReport {
-  mustRunAfter(tasks.check, tasks.javadoc)
-  executionData(fileTree(project.layout.buildDirectory) { include("**/jacoco/*.exec") })
-  reports { xml.required = true }
-}
+tasks.jacocoTestReport { reports { xml.required = true } }
