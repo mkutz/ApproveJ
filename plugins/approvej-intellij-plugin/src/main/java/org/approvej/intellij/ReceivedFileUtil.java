@@ -8,6 +8,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.io.IOException;
 import java.util.List;
@@ -21,6 +22,9 @@ final class ReceivedFileUtil {
   private static final Logger LOG = Logger.getInstance(ReceivedFileUtil.class);
 
   private ReceivedFileUtil() {}
+
+  static final Key<VirtualFile> RECEIVED_FILE_KEY = Key.create("ApproveJ.receivedFile");
+  static final Key<VirtualFile> APPROVED_FILE_KEY = Key.create("ApproveJ.approvedFile");
 
   private static final String RECEIVED_INFIX = "-received";
 
@@ -132,8 +136,10 @@ final class ReceivedFileUtil {
             "ApproveJ: " + receivedFile.getName(),
             contentFactory.create(project, receivedFile),
             contentFactory.create(project, approvedFile),
-            receivedFile.getName(),
-            approvedFile.getName());
+            "Received: " + receivedFile.getName(),
+            "Approved: " + approvedFile.getName());
+    request.putUserData(RECEIVED_FILE_KEY, receivedFile);
+    request.putUserData(APPROVED_FILE_KEY, approvedFile);
     DiffManager.getInstance().showDiff(project, request);
   }
 
@@ -155,6 +161,24 @@ final class ReceivedFileUtil {
             receivedFile.delete(ReceivedFileUtil.class);
           } catch (IOException e) {
             LOG.error("Failed to approve received file", e);
+          }
+        });
+  }
+
+  /**
+   * Deletes the received file without copying its content to the approved file. The operation is
+   * wrapped in a {@link WriteCommandAction} to support undo.
+   */
+  static void reject(@NotNull Project project, @NotNull VirtualFile receivedFile) {
+    WriteCommandAction.runWriteCommandAction(
+        project,
+        "Reject Received",
+        null,
+        () -> {
+          try {
+            receivedFile.delete(ReceivedFileUtil.class);
+          } catch (IOException e) {
+            LOG.error("Failed to reject received file", e);
           }
         });
   }
