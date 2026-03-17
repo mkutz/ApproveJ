@@ -117,8 +117,4 @@ tasks.test {
   }
 }
 
-tasks.jacocoTestReport {
-  mustRunAfter(tasks.check)
-  executionData(fileTree(project.layout.buildDirectory) { include("**/jacoco/*.exec") })
-  reports { xml.required = true }
-}
+tasks.jacocoTestReport { reports { xml.required = true } }
