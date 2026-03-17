@@ -26,7 +26,7 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
   }
 
   fun testMarker_absent_for_byValue() {
-    addInventory("src/com/example/Test-test-approved.txt", "com.example.Test#test")
+    addInventory("src/com/example/Test-test-approved.txt" to "com.example.Test#test")
     myFixture.addFileToProject("src/com/example/Test-test-approved.txt", "approved content")
 
     myFixture.configureByText(
@@ -66,7 +66,7 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
   }
 
   fun testMarker_present_for_byFile() {
-    addInventory("src/com/example/Test-myTest-approved.txt", "com.example.Test#myTest")
+    addInventory("src/com/example/Test-myTest-approved.txt" to "com.example.Test#myTest")
     myFixture.addFileToProject("src/com/example/Test-myTest-approved.txt", "approved content")
 
     myFixture.configureByText(
@@ -90,10 +90,8 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
 
   fun testMarker_named_filters_to_matching_file() {
     addInventory(
-      "src/com/example/Test-myTest-jane-approved.txt",
-      "com.example.Test#myTest",
-      "src/com/example/Test-myTest-john-approved.txt",
-      "com.example.Test#myTest",
+      "src/com/example/Test-myTest-jane-approved.txt" to "com.example.Test#myTest",
+      "src/com/example/Test-myTest-john-approved.txt" to "com.example.Test#myTest",
     )
     myFixture.addFileToProject("src/com/example/Test-myTest-jane-approved.txt", "jane content")
     myFixture.addFileToProject("src/com/example/Test-myTest-john-approved.txt", "john content")
@@ -119,10 +117,8 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
 
   fun testMarker_unnamed_excludes_named_files() {
     addInventory(
-      "src/com/example/Test-myTest-approved.txt",
-      "com.example.Test#myTest",
-      "src/com/example/Test-myTest-jane-approved.txt",
-      "com.example.Test#myTest",
+      "src/com/example/Test-myTest-approved.txt" to "com.example.Test#myTest",
+      "src/com/example/Test-myTest-jane-approved.txt" to "com.example.Test#myTest",
     )
     myFixture.addFileToProject("src/com/example/Test-myTest-approved.txt", "unnamed content")
     myFixture.addFileToProject("src/com/example/Test-myTest-jane-approved.txt", "jane content")
@@ -148,10 +144,8 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
 
   fun testMarker_multiple_named_approvals() {
     addInventory(
-      "src/com/example/Test-myTest-jane-approved.txt",
-      "com.example.Test#myTest",
-      "src/com/example/Test-myTest-john-approved.txt",
-      "com.example.Test#myTest",
+      "src/com/example/Test-myTest-jane-approved.txt" to "com.example.Test#myTest",
+      "src/com/example/Test-myTest-john-approved.txt" to "com.example.Test#myTest",
     )
     myFixture.addFileToProject("src/com/example/Test-myTest-jane-approved.txt", "jane content")
     myFixture.addFileToProject("src/com/example/Test-myTest-john-approved.txt", "john content")
@@ -178,10 +172,8 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
 
   fun testMarker_named_approval_shown_when_sibling_unapproved() {
     addInventory(
-      "src/com/example/Test-myTest-a-approved.txt",
-      "com.example.Test#myTest",
-      "src/com/example/Test-myTest-b-approved.txt",
-      "com.example.Test#myTest",
+      "src/com/example/Test-myTest-a-approved.txt" to "com.example.Test#myTest",
+      "src/com/example/Test-myTest-b-approved.txt" to "com.example.Test#myTest",
     )
     myFixture.addFileToProject("src/com/example/Test-myTest-a-approved.txt", "a content")
     myFixture.addFileToProject("src/com/example/Test-myTest-a-received.txt", "a different content")
@@ -209,7 +201,7 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
   }
 
   fun testMarker_received_file_changes_icon() {
-    addInventory("src/com/example/Test-myTest-approved.txt", "com.example.Test#myTest")
+    addInventory("src/com/example/Test-myTest-approved.txt" to "com.example.Test#myTest")
     myFixture.addFileToProject("src/com/example/Test-myTest-approved.txt", "approved content")
     myFixture.addFileToProject("src/com/example/Test-myTest-received.txt", "received content")
 
@@ -238,17 +230,11 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
       tooltip != null && (tooltip.contains("approved") || tooltip.contains("received"))
     }
 
-  private fun addInventory(vararg keysAndValues: String) {
-    val sb = StringBuilder("# ApproveJ Approved File Inventory\n")
-    var i = 0
-    while (i < keysAndValues.size) {
-      sb
-        .append(keysAndValues[i].replace(" ", "\\ "))
-        .append(" = ")
-        .append(keysAndValues[i + 1])
-        .append("\n")
-      i += 2
+  private fun addInventory(vararg entries: Pair<String, String>) {
+    val content = buildString {
+      appendLine("# ApproveJ Approved File Inventory")
+      entries.forEach { (path, testRef) -> appendLine("${path.replace(" ", "\\ ")} = $testRef") }
     }
-    myFixture.addFileToProject(".approvej/inventory.properties", sb.toString())
+    myFixture.addFileToProject(".approvej/inventory.properties", content)
   }
 }

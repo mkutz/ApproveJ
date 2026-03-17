@@ -22,7 +22,7 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
 
   fun testRenameMethod() {
     val testClass = addTestClassWithMethod("com.example", "MyTest", "byValue")
-    addInventory("src/com/example/MyTest-byValue-approved.txt", "com.example.MyTest#byValue")
+    addInventory("src/com/example/MyTest-byValue-approved.txt" to "com.example.MyTest#byValue")
     myFixture.addFileToProject("src/com/example/MyTest-byValue-approved.txt", "approved content")
 
     renameMethod(testClass, "byValue", "byContent")
@@ -34,7 +34,7 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
 
   fun testRenameMethod_with_received_file() {
     val testClass = addTestClassWithMethod("com.example", "MyTest", "byValue")
-    addInventory("src/com/example/MyTest-byValue-approved.txt", "com.example.MyTest#byValue")
+    addInventory("src/com/example/MyTest-byValue-approved.txt" to "com.example.MyTest#byValue")
     myFixture.addFileToProject("src/com/example/MyTest-byValue-approved.txt", "approved")
     myFixture.addFileToProject("src/com/example/MyTest-byValue-received.txt", "received")
 
@@ -51,8 +51,7 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
   fun testRenameMethod_with_affix() {
     val testClass = addTestClassWithMethod("com.example", "MyTest", "approve_named")
     addInventory(
-      "src/com/example/MyTest-approve_named-jane-approved.txt",
-      "com.example.MyTest#approve_named",
+      "src/com/example/MyTest-approve_named-jane-approved.txt" to "com.example.MyTest#approve_named"
     )
     myFixture.addFileToProject("src/com/example/MyTest-approve_named-jane-approved.txt", "approved")
 
@@ -71,10 +70,9 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
   fun testRenameMethod_multiple_files() {
     val testClass = addTestClassWithMethod("com.example", "MyTest", "approve_named")
     addInventory(
-      "src/com/example/MyTest-approve_named-jane-approved.txt",
-      "com.example.MyTest#approve_named",
-      "src/com/example/MyTest-approve_named-john-approved.txt",
-      "com.example.MyTest#approve_named",
+      "src/com/example/MyTest-approve_named-jane-approved.txt" to
+        "com.example.MyTest#approve_named",
+      "src/com/example/MyTest-approve_named-john-approved.txt" to "com.example.MyTest#approve_named",
     )
     myFixture.addFileToProject("src/com/example/MyTest-approve_named-jane-approved.txt", "jane")
     myFixture.addFileToProject("src/com/example/MyTest-approve_named-john-approved.txt", "john")
@@ -94,8 +92,7 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
   fun testRenameMethod_subdirectory_pattern() {
     val testClass = addTestClassWithMethod("com.example", "MyTest", "subdir_test")
     addInventory(
-      "src/com/example/MyTest/subdir_test-approved.txt",
-      "com.example.MyTest#subdir_test",
+      "src/com/example/MyTest/subdir_test-approved.txt" to "com.example.MyTest#subdir_test"
     )
     myFixture.addFileToProject("src/com/example/MyTest/subdir_test-approved.txt", "approved")
 
@@ -109,7 +106,7 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
 
   fun testRenameClass() {
     val testClass = addTestClassWithMethod("com.example", "OldTest", "myMethod")
-    addInventory("src/com/example/OldTest-myMethod-approved.txt", "com.example.OldTest#myMethod")
+    addInventory("src/com/example/OldTest-myMethod-approved.txt" to "com.example.OldTest#myMethod")
     myFixture.addFileToProject("src/com/example/OldTest-myMethod-approved.txt", "approved")
 
     myFixture.renameElement(testClass, "NewTest")
@@ -122,7 +119,7 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
 
   fun testRenameClass_subdirectory() {
     val testClass = addTestClassWithMethod("com.example", "OldTest", "myMethod")
-    addInventory("src/com/example/OldTest/myMethod-approved.txt", "com.example.OldTest#myMethod")
+    addInventory("src/com/example/OldTest/myMethod-approved.txt" to "com.example.OldTest#myMethod")
     myFixture.addFileToProject("src/com/example/OldTest/myMethod-approved.txt", "approved")
 
     myFixture.renameElement(testClass, "NewTest")
@@ -143,7 +140,9 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
 
   fun testRenameMethod_no_approved_files() {
     val testClass = addTestClassWithMethod("com.example", "MyTest", "byValue")
-    addInventory("src/com/example/Other-otherMethod-approved.txt", "com.example.Other#otherMethod")
+    addInventory(
+      "src/com/example/Other-otherMethod-approved.txt" to "com.example.Other#otherMethod"
+    )
 
     renameMethod(testClass, "byValue", "byContent")
 
@@ -169,18 +168,12 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
     )
   }
 
-  private fun addInventory(vararg keysAndValues: String) {
-    val sb = StringBuilder("# ApproveJ Approved File Inventory\n")
-    var i = 0
-    while (i < keysAndValues.size) {
-      sb
-        .append(keysAndValues[i].replace(" ", "\\ "))
-        .append(" = ")
-        .append(keysAndValues[i + 1])
-        .append("\n")
-      i += 2
+  private fun addInventory(vararg entries: Pair<String, String>) {
+    val content = buildString {
+      appendLine("# ApproveJ Approved File Inventory")
+      entries.forEach { (path, testRef) -> appendLine("${path.replace(" ", "\\ ")} = $testRef") }
     }
-    myFixture.addFileToProject(".approvej/inventory.properties", sb.toString())
+    myFixture.addFileToProject(".approvej/inventory.properties", content)
   }
 
   private fun renameMethod(psiClass: PsiClass, oldName: String, newName: String) {
