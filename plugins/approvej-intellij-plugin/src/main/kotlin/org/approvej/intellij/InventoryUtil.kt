@@ -47,6 +47,7 @@ internal object InventoryUtil {
     return inventory
       .stringPropertyNames()
       .filter { testReference == inventory.getProperty(it) }
+      .sorted()
       .mapNotNull { projectDir.findFileByRelativePath(it) }
   }
 
