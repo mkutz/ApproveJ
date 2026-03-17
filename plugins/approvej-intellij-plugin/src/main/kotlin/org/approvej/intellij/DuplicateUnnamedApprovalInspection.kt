@@ -64,7 +64,7 @@ class DuplicateUnnamedApprovalInspection : AbstractBaseUastLocalInspectionTool()
     """
       .trimIndent()
 
-  private class NoArgByFileCall(
+  private data class NoArgByFileCall(
     val approveElement: PsiElement,
     val chainEndElement: PsiElement,
     val effectiveName: String?,

@@ -133,14 +133,14 @@ class ApproveJRefactoringListenerProvider : RefactoringElementListenerProvider {
       projectDir: VirtualFile?,
     ): Map<String, String> {
       if (projectDir == null) return emptyMap()
-      val paths = mutableMapOf<String, String>()
-      for (file in files) {
-        val relativePath = VfsUtil.getRelativePath(file, projectDir)
-        if (relativePath != null) {
-          paths[relativePath] = file.name
+      return buildMap {
+        for (file in files) {
+          val relativePath = VfsUtil.getRelativePath(file, projectDir)
+          if (relativePath != null) {
+            put(relativePath, file.name)
+          }
         }
       }
-      return paths
     }
   }
 }

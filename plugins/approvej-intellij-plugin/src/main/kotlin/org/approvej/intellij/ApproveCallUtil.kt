@@ -2,6 +2,7 @@ package org.approvej.intellij
 
 import com.intellij.psi.PsiElement
 import org.jetbrains.uast.UCallExpression
+import org.jetbrains.uast.UElement
 import org.jetbrains.uast.UExpression
 import org.jetbrains.uast.UQualifiedReferenceExpression
 import org.jetbrains.uast.getUParentForIdentifier
@@ -38,21 +39,17 @@ internal object ApproveCallUtil {
    * the chain (e.g. `"byFile"`, `"printedAs"`, or `"approve"` if there is no chained call).
    */
   fun findTerminalCall(approveCall: UCallExpression): ChainWalkResult {
-    var current: org.jetbrains.uast.UElement = approveCall
     var lastMethodName = "approve"
-    while (true) {
-      val parent = current.uastParent
-      if (parent is UQualifiedReferenceExpression) {
-        val selector = parent.selector
-        if (selector is UCallExpression && selector.methodName != null) {
+    val chainEnd =
+      walkChain(approveCall) { selector ->
+        if (selector.methodName != null) {
           lastMethodName = selector.methodName!!
-          current = parent
-          continue
+          true
+        } else {
+          false
         }
       }
-      break
-    }
-    return ChainWalkResult(lastMethodName, current)
+    return ChainWalkResult(lastMethodName, chainEnd)
   }
 
   /**
@@ -60,22 +57,15 @@ internal object ApproveCallUtil {
    * a `.named()` call in the chain, or `null` if no such call exists.
    */
   fun findNamedArgument(approveCall: UCallExpression): String? {
-    var current: org.jetbrains.uast.UElement = approveCall
-    while (true) {
-      val parent = current.uastParent
-      if (parent is UQualifiedReferenceExpression) {
-        val selector = parent.selector
-        if (selector is UCallExpression && selector.methodName == "named") {
-          val args: List<UExpression> = selector.valueArguments
-          if (args.size == 1) {
-            val evaluated = args.first().evaluate()
-            if (evaluated is String) return evaluated
-          }
+    walkChain(approveCall) { selector ->
+      if (selector.methodName == "named") {
+        val args: List<UExpression> = selector.valueArguments
+        if (args.size == 1) {
+          val evaluated = args.first().evaluate()
+          if (evaluated is String) return evaluated
         }
-        current = parent
-        continue
       }
-      break
+      true
     }
     return null
   }
@@ -85,19 +75,37 @@ internal object ApproveCallUtil {
    * regardless of whether the argument is a constant.
    */
   fun hasNamedCall(approveCall: UCallExpression): Boolean {
-    var current: org.jetbrains.uast.UElement = approveCall
-    while (true) {
-      val parent = current.uastParent
-      if (parent is UQualifiedReferenceExpression) {
-        val selector = parent.selector
-        if (selector is UCallExpression && selector.methodName == "named") return true
-        current = parent
-        continue
-      }
-      break
+    walkChain(approveCall) { selector ->
+      if (selector.methodName == "named") return true
+      true
     }
     return false
   }
 
-  data class ChainWalkResult(val lastMethodName: String, val chainEnd: org.jetbrains.uast.UElement)
+  /**
+   * Walks the qualified-reference parent chain from [start], calling [visitSelector] for each
+   * chained [UCallExpression]. The visitor returns `true` to continue walking or `false` to stop.
+   * Returns the outermost [UElement] reached.
+   */
+  private inline fun walkChain(
+    start: UCallExpression,
+    visitSelector: (UCallExpression) -> Boolean,
+  ): UElement {
+    var current: UElement = start
+    while (true) {
+      val parent = current.uastParent
+      if (parent is UQualifiedReferenceExpression) {
+        val selector = parent.selector
+        if (selector is UCallExpression) {
+          if (!visitSelector(selector)) break
+          current = parent
+          continue
+        }
+      }
+      break
+    }
+    return current
+  }
+
+  data class ChainWalkResult(val lastMethodName: String, val chainEnd: UElement)
 }

@@ -1,5 +1,6 @@
 package org.approvej.intellij
 
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
@@ -8,6 +9,7 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.refactoring.rename.RenamePsiElementProcessor
 import org.jetbrains.uast.UClass
+import org.jetbrains.uast.UElement
 import org.jetbrains.uast.UMethod
 import org.jetbrains.uast.getUParentForIdentifier
 
@@ -45,12 +47,8 @@ class ApproveJRenamePsiElementProcessor : RenamePsiElementProcessor() {
 
   companion object {
     /** Strips Kotlin backtick quoting from method names (e.g. `` `my test` `` → `my test`). */
-    fun stripBackticks(name: String): String {
-      if (name.startsWith("`") && name.endsWith("`") && name.length > 2) {
-        return name.substring(1, name.length - 1)
-      }
-      return name
-    }
+    fun stripBackticks(name: String): String =
+      if (name.length > 2) name.removeSurrounding("`") else name
 
     fun resolveMethod(element: PsiElement): PsiMethod? {
       if (element is PsiMethod) return element
@@ -64,7 +62,7 @@ class ApproveJRenamePsiElementProcessor : RenamePsiElementProcessor() {
       return (uElement as? UClass)?.javaPsi
     }
 
-    private fun toUElement(element: PsiElement): org.jetbrains.uast.UElement? {
+    private fun toUElement(element: PsiElement): UElement? {
       if (element !is PsiNameIdentifierOwner) return null
       val nameIdentifier = element.nameIdentifier ?: return null
       return getUParentForIdentifier(nameIdentifier)
@@ -110,7 +108,7 @@ class ApproveJRenamePsiElementProcessor : RenamePsiElementProcessor() {
     }
 
     private fun addMethodFileRename(
-      file: com.intellij.openapi.vfs.VirtualFile,
+      file: VirtualFile,
       simpleClassName: String,
       oldMethodName: String,
       newMethodName: String,
@@ -132,7 +130,7 @@ class ApproveJRenamePsiElementProcessor : RenamePsiElementProcessor() {
       val project = clazz.project
       val psiManager = PsiManager.getInstance(project)
       val renames = mutableMapOf<PsiElement, String>()
-      val renamedDirectories = mutableSetOf<com.intellij.openapi.vfs.VirtualFile>()
+      val renamedDirectories = mutableSetOf<VirtualFile>()
 
       for (method in clazz.methods) {
         val methodName = method.name
@@ -158,7 +156,7 @@ class ApproveJRenamePsiElementProcessor : RenamePsiElementProcessor() {
     }
 
     private fun addClassFileRename(
-      file: com.intellij.openapi.vfs.VirtualFile,
+      file: VirtualFile,
       oldClassName: String,
       newClassName: String,
       psiManager: PsiManager,
@@ -172,11 +170,11 @@ class ApproveJRenamePsiElementProcessor : RenamePsiElementProcessor() {
     }
 
     private fun addClassDirRename(
-      file: com.intellij.openapi.vfs.VirtualFile,
+      file: VirtualFile,
       oldClassName: String,
       newClassName: String,
       psiManager: PsiManager,
-      renamedDirectories: MutableSet<com.intellij.openapi.vfs.VirtualFile>,
+      renamedDirectories: MutableSet<VirtualFile>,
       renames: MutableMap<PsiElement, String>,
     ) {
       val parentDir = file.parent ?: return

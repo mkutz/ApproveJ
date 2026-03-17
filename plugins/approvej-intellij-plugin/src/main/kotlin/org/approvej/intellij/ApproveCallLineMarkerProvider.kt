@@ -4,6 +4,7 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProviderDescriptor
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
 import com.intellij.openapi.editor.markup.GutterIconRenderer
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import javax.swing.Icon
@@ -45,8 +46,8 @@ class ApproveCallLineMarkerProvider : LineMarkerProviderDescriptor() {
     val methodName = psiMethod.name
     val project = element.project
 
-    val namedArg = ApproveCallUtil.findNamedArgument(callExpression)
-    val suffix = if (namedArg != null) "$namedArg-approved" else "$methodName-approved"
+    val affix = ApproveCallUtil.findNamedArgument(callExpression)
+    val suffix = if (affix != null) "$affix-approved" else "$methodName-approved"
 
     val approvedFiles =
       InventoryUtil.findApprovedFiles(className, methodName, project).filter { approvedFile ->
@@ -60,18 +61,14 @@ class ApproveCallLineMarkerProvider : LineMarkerProviderDescriptor() {
     val targets = approvedFiles.mapNotNull { psiManager.findFile(it) }
     if (targets.isEmpty()) return
 
-    var firstApprovedWithReceived: com.intellij.openapi.vfs.VirtualFile? = null
-    var matchingReceived: com.intellij.openapi.vfs.VirtualFile? = null
-    for (approved in approvedFiles) {
-      val received = ApprovedFileUtil.findReceivedFile(approved)
-      if (received != null) {
-        firstApprovedWithReceived = approved
-        matchingReceived = received
-        break
-      }
-    }
+    data class ReceivedApprovedPair(val received: VirtualFile, val approved: VirtualFile)
 
-    if (firstApprovedWithReceived == null) {
+    val receivedApprovedPair =
+      approvedFiles.firstNotNullOfOrNull { approved ->
+        ApprovedFileUtil.findReceivedFile(approved)?.let { ReceivedApprovedPair(it, approved) }
+      }
+
+    if (receivedApprovedPair == null) {
       val builder =
         NavigationGutterIconBuilder.create(ApproveJIcons.APPROVED)
           .setTargets(targets)
@@ -81,8 +78,7 @@ class ApproveCallLineMarkerProvider : LineMarkerProviderDescriptor() {
           )
       result.add(builder.createLineMarkerInfo(element))
     } else {
-      val approvedFile = firstApprovedWithReceived
-      val receivedFile = matchingReceived!!
+      val (receivedFile, approvedFile) = receivedApprovedPair
       val markerInfo =
         LineMarkerInfo(
           element,

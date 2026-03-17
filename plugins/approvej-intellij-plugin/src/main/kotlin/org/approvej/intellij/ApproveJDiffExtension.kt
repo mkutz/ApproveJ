@@ -4,6 +4,7 @@ import com.intellij.diff.DiffContext
 import com.intellij.diff.DiffExtension
 import com.intellij.diff.FrameDiffTool
 import com.intellij.diff.requests.DiffRequest
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiMethod
 import com.intellij.ui.EditorNotificationPanel
@@ -33,7 +34,7 @@ class ApproveJDiffExtension : DiffExtension() {
 
   companion object {
     private fun createNotificationPanel(
-      project: com.intellij.openapi.project.Project,
+      project: Project,
       receivedFile: VirtualFile,
       approvedFile: VirtualFile,
       testMethod: PsiMethod?,
