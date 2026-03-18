@@ -115,12 +115,13 @@ It is structured in four main directories:
 - The [modules](modules) directory contains all the published library modules:
   - [core](modules/core) contains the code for the core framework and should not have any dependencies to other modules and only very few (if any) to external libraries,
   - [database-jdbc](modules/database-jdbc) contains the JDBC adapter for database testing,
+  - [http](modules/http) contains code to create an HTTP server for approving requests,
+  - [http-wiremock](modules/http-wiremock) contains the WireMock adapter for HTTP testing,
+  - [image](modules/image) contains the image approval and comparison utilities,
   - [json-jackson](modules/json-jackson) contains JSON-related code using Jackson 2.x,
   - [json-jackson3](modules/json-jackson3) contains JSON-related code using Jackson 3.x,
   - [yaml-jackson](modules/yaml-jackson) contains YAML-related code using Jackson 2.x,
   - [yaml-jackson3](modules/yaml-jackson3) contains YAML-related code using Jackson 3.x,
-  - [http](modules/http) contains code to create an HTTP server for approving requests,
-  - [http-wiremock](modules/http-wiremock) contains the WireMock adapter for HTTP testing
 - The [plugins](plugins) directory contains build tool plugins:
   - [approvej-gradle-plugin](plugins/approvej-gradle-plugin) contains the Gradle plugin for managing approved files
   - [approvej-maven-plugin](plugins/approvej-maven-plugin) contains the Maven plugin for managing approved files

@@ -11,7 +11,16 @@
   - **Approve database state** by snapshotting query results with `DatabaseSnapshot` and printing them as Markdown tables.
   ([#207](https://github.com/mkutz/ApproveJ/issues/207))
 
-**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.4.5...v1.5.0
+### image
+
+* ✨ **New module for visual regression testing**
+  Add `image` module providing a fluent API (`ImageApprovalBuilder.approveImage()`) for image approval testing:
+  - Supports testing screenshots from browser automation tools (Playwright, Selenium) via `byte[]` or `BufferedImage`.
+  - Includes multiple comparators: **Perceptual hashing (pHash)** (robust to font rendering and minor changes) and **Pixel-wise comparison**.
+  - Provides region-based image scrubbing to mask dynamic content like timestamps or dynamic ads.
+  ([#152](https://github.com/mkutz/ApproveJ/issues/152))
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.4.7...v1.5.0
 
 
 ## v1.4.7
