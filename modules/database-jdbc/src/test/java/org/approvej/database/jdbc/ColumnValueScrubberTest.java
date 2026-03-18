@@ -30,12 +30,20 @@ class ColumnValueScrubberTest {
 
   @Test
   void replacement() {
-    QueryResult result = new QueryResult(List.of("id", "name"), List.of(List.of("1", "Alice")));
+    QueryResult result =
+        new QueryResult(
+            List.of("id", "name"),
+            List.of(
+                List.of("uuid-1", "Alice"),
+                List.of("uuid-2", "Bob"),
+                List.of("uuid-1", "Alice Again")));
 
     QueryResult scrubbed =
         DatabaseScrubbers.columnValue("id").replacement(numbered("id")).apply(result);
 
-    assertThat(scrubbed.rows().getFirst()).containsExactly("[id 1]", "Alice");
+    assertThat(scrubbed.rows().get(0)).containsExactly("[id 1]", "Alice");
+    assertThat(scrubbed.rows().get(1)).containsExactly("[id 2]", "Bob");
+    assertThat(scrubbed.rows().get(2)).containsExactly("[id 1]", "Alice Again");
   }
 
   @Test

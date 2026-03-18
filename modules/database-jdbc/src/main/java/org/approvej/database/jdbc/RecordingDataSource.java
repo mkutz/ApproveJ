@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -52,7 +51,7 @@ public class RecordingDataSource implements DataSource {
    * @return the recorded SQL queries
    */
   public List<String> recordedQueries() {
-    return Collections.unmodifiableList(recordedQueries);
+    return List.copyOf(recordedQueries);
   }
 
   /**

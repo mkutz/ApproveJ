@@ -1,7 +1,10 @@
 package org.approvej.database.jdbc;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
 import org.approvej.scrub.Replacement;
 import org.approvej.scrub.Scrubber;
 import org.jspecify.annotations.NullMarked;
@@ -30,23 +33,29 @@ public record ColumnValueScrubber(String columnName, Replacement<String> replace
 
   @Override
   public QueryResult apply(QueryResult result) {
-    int columnIndex = -1;
-    for (int i = 0; i < result.columnNames().size(); i++) {
-      if (result.columnNames().get(i).equalsIgnoreCase(columnName)) {
-        columnIndex = i;
-        break;
-      }
-    }
+    int columnIndex =
+        IntStream.range(0, result.columnNames().size())
+            .filter(i -> result.columnNames().get(i).equalsIgnoreCase(columnName))
+            .findFirst()
+            .orElse(-1);
+
     if (columnIndex < 0) {
       return result;
     }
 
-    List<List<String>> newRows = new ArrayList<>(result.rows().size());
-    for (var row : result.rows()) {
-      List<String> newRow = new ArrayList<>(row);
-      newRow.set(columnIndex, replacement.apply(row.get(columnIndex), 1));
-      newRows.add(newRow);
-    }
+    Map<String, Integer> findings = new HashMap<>();
+
+    List<List<String>> newRows =
+        result.rows().stream()
+            .map(
+                row -> {
+                  List<String> newRow = new ArrayList<>(row);
+                  String value = row.get(columnIndex);
+                  findings.putIfAbsent(value, findings.size() + 1);
+                  newRow.set(columnIndex, replacement.apply(value, findings.get(value)));
+                  return newRow;
+                })
+            .toList();
 
     return new QueryResult(result.columnNames(), newRows);
   }
