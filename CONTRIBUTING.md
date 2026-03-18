@@ -114,6 +114,7 @@ It is structured in four main directories:
 
 - The [modules](modules) directory contains all the published library modules:
   - [core](modules/core) contains the code for the core framework and should not have any dependencies to other modules and only very few (if any) to external libraries,
+  - [database-jdbc](modules/database-jdbc) contains the JDBC adapter for database testing,
   - [json-jackson](modules/json-jackson) contains JSON-related code using Jackson 2.x,
   - [json-jackson3](modules/json-jackson3) contains JSON-related code using Jackson 3.x,
   - [yaml-jackson](modules/yaml-jackson) contains YAML-related code using Jackson 2.x,

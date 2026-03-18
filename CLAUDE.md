@@ -35,6 +35,7 @@ It provides a fluent API to compare actual values against previously approved "g
 ## Module Structure
 
 - **modules/core** - Core framework with no external dependencies. Contains `ApprovalBuilder`, `Approver`, `Scrubber`, `PrintFormat`, and `FileReviewer` interfaces.
+- **modules/database-jdbc** - JDBC adapter for database state snapshotting and SQL recording
 - **modules/json-jackson** - JSON support using Jackson 2.x
 - **modules/json-jackson3** - JSON support using Jackson 3.x
 - **modules/yaml-jackson** - YAML support using Jackson 2.x
