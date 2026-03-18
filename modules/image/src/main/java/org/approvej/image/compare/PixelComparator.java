@@ -24,8 +24,8 @@ public final class PixelComparator implements ImageComparator {
   /**
    * Returns a new comparator with the specified threshold.
    *
-   * @param threshold the maximum allowed difference (0.0 to 1.0), where 0.01 means 1% difference is
-   *     acceptable
+   * @param threshold the minimum similarity required for a match (0.0 to 1.0), where 0.99 means 99%
+   *     similarity required
    * @return a new comparator with the specified threshold
    */
   public PixelComparator withThreshold(double threshold) {

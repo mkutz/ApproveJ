@@ -69,7 +69,7 @@ class PixelComparatorTest {
 
     ImageComparisonResult result = comparator.compare(RED, GREEN);
 
-    // With 50% threshold, images that are less than 50% different should still match
+    assertThat(result.isMatch()).isFalse();
     assertThat(result.similarity()).isLessThan(0.5);
   }
 

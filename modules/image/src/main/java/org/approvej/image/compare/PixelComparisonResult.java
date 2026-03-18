@@ -14,12 +14,12 @@ public record PixelComparisonResult(double similarity, double threshold)
 
   @Override
   public boolean isMatch() {
-    return similarity >= (1.0 - threshold);
+    return similarity >= threshold;
   }
 
   @Override
   public String description() {
     return "Pixel comparison: %.2f%% similar (threshold: %.2f%%)%s"
-        .formatted(similarity * 100, (1.0 - threshold) * 100, isMatch() ? "" : " - MISMATCH");
+        .formatted(similarity * 100, threshold * 100, isMatch() ? "" : " - MISMATCH");
   }
 }

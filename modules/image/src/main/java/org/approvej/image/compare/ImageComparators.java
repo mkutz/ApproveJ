@@ -31,7 +31,7 @@ public final class ImageComparators {
   }
 
   /**
-   * Creates a pixel-by-pixel comparator with 1% difference threshold.
+   * Creates a pixel-by-pixel comparator with 99% similarity threshold.
    *
    * <p>Pixel comparison compares each pixel individually and is suitable for exact-match use cases
    * where precision is critical.
@@ -39,6 +39,6 @@ public final class ImageComparators {
    * @return a new {@link PixelComparator} with default threshold
    */
   public static PixelComparator pixel() {
-    return new PixelComparator(0.01);
+    return new PixelComparator(0.99);
   }
 }
