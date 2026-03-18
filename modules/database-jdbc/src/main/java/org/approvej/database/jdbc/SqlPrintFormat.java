@@ -123,7 +123,8 @@ public class SqlPrintFormat implements PrintFormat<String> {
 
   private static List<String> mergeKeywords(List<String> tokens) {
     List<String> merged = new ArrayList<>();
-    for (int index = 0; index < tokens.size(); index++) {
+    int index = 0;
+    while (index < tokens.size()) {
       String token = tokens.get(index);
 
       if (!token.isBlank()) {
@@ -138,6 +139,7 @@ public class SqlPrintFormat implements PrintFormat<String> {
           merged.add(token);
         }
       }
+      index++;
     }
     return merged;
   }
