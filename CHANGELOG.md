@@ -1,7 +1,6 @@
 # Changelog
 
 
-<<<<<<< HEAD
 ## v1.5.0
 
 ### database-jdbc
@@ -13,7 +12,8 @@
   ([#207](https://github.com/mkutz/ApproveJ/issues/207))
 
 **Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.4.5...v1.5.0
-=======
+
+
 ## v1.4.7
 
 ### core
