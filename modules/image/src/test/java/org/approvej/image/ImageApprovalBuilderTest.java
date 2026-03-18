@@ -27,4 +27,12 @@ class ImageApprovalBuilderTest {
 
     approveImage(image).scrubbedOf(region(10, 10, 50, 20)).byFile();
   }
+
+  @Test
+  void named() throws IOException {
+    BufferedImage image =
+        ImageIO.read(requireNonNull(getClass().getResourceAsStream("/screenshot.png")));
+
+    approveImage(image).named("custom_name").byFile();
+  }
 }

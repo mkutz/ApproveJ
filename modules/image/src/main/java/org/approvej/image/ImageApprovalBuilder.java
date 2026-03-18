@@ -79,6 +79,18 @@ public class ImageApprovalBuilder {
   }
 
   /**
+   * Sets a name for the current approval. Generally this should be used when there are multiple
+   * image approvals in one test case, as the second approval would otherwise overwrite the first
+   * one.
+   *
+   * @param name the name for the current approval
+   * @return a new builder with the given name
+   */
+  public ImageApprovalBuilder named(String name) {
+    return new ImageApprovalBuilder(value, name, filenameExtension, fileReviewer, comparator);
+  }
+
+  /**
    * Specifies the image comparator to use for comparing images.
    *
    * @param comparator the {@link ImageComparator} to use
