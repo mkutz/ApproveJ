@@ -23,6 +23,34 @@ class DuplicateUnnamedApprovalInspectionTest : LightJavaCodeInsightFixtureTestCa
       """
         .trimIndent()
     )
+    myFixture.addClass(
+      """
+      package org.approvej.image;
+      import java.awt.image.BufferedImage;
+      public class ImageApprovalBuilder {
+          public static ImageApprovalBuilder approveImage(BufferedImage value) { return null; }
+          public ImageApprovalBuilder named(String name) { return this; }
+          public void byFile() {}
+
+      }
+      """
+        .trimIndent()
+    )
+  }
+
+  fun testTwo_unnamed_approveImage_calls() {
+    doHighlightTest(
+      """
+      import static org.approvej.image.ImageApprovalBuilder.approveImage;
+      class Test {
+          void test() {
+              <warning descr="$UNNAMED_WARNING">approveImage(null).byFile()</warning>;
+              <warning descr="$UNNAMED_WARNING">approveImage(null).byFile()</warning>;
+          }
+      }
+      """
+        .trimIndent()
+    )
   }
 
   fun testTwo_unnamed_byFile_calls() {

@@ -23,6 +23,18 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
       """
         .trimIndent()
     )
+    myFixture.addClass(
+      """
+      package org.approvej.image;
+      import java.awt.image.BufferedImage;
+      public class ImageApprovalBuilder {
+          public static ImageApprovalBuilder approveImage(BufferedImage value) { return null; }
+          public ImageApprovalBuilder named(String name) { return this; }
+          public void byFile() {}
+      }
+      """
+        .trimIndent()
+    )
   }
 
   fun testAsApproveCall() {
@@ -33,6 +45,23 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
       class Test {
           void test() {
               appr<caret>ove("hello").byFile();
+          }
+      }
+      """
+          .trimIndent()
+      )
+
+    assertThat(ApproveCallUtil.asApproveCall(element)).isNotNull()
+  }
+
+  fun testAsApproveCall_image() {
+    val element =
+      configureAndFindApproveIdentifier(
+        """
+      import static org.approvej.image.ImageApprovalBuilder.approveImage;
+      class Test {
+          void test() {
+              appr<caret>oveImage(null).byFile();
           }
       }
       """
@@ -64,6 +93,23 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
       class Test {
           void test() {
               appr<caret>ove("hello").byFile();
+          }
+      }
+      """
+          .trimIndent()
+      )
+
+    assertThat(ApproveCallUtil.isApproveCall(call)).isTrue()
+  }
+
+  fun testIsApproveCall_image() {
+    val call =
+      configureAndFindApproveCallExpression(
+        """
+      import static org.approvej.image.ImageApprovalBuilder.approveImage;
+      class Test {
+          void test() {
+              appr<caret>oveImage(null).byFile();
           }
       }
       """
@@ -139,6 +185,23 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
       )
 
     assertThat(ApproveCallUtil.findTerminalCall(call).lastMethodName).isEqualTo("approve")
+  }
+
+  fun testFindTerminalCall_no_terminal_image() {
+    val call =
+      configureAndFindApproveCallExpression(
+        """
+      import static org.approvej.image.ImageApprovalBuilder.approveImage;
+      class Test {
+          void test() {
+              appr<caret>oveImage(null);
+          }
+      }
+      """
+          .trimIndent()
+      )
+
+    assertThat(ApproveCallUtil.findTerminalCall(call).lastMethodName).isEqualTo("approveImage")
   }
 
   fun testFindTerminalCall_dangling_with_intermediate() {
