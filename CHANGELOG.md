@@ -1,6 +1,7 @@
 # Changelog
 
 
+<<<<<<< HEAD
 ## v1.5.0
 
 ### database-jdbc
@@ -12,6 +13,49 @@
   ([#207](https://github.com/mkutz/ApproveJ/issues/207))
 
 **Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.4.5...v1.5.0
+=======
+## v1.4.7
+
+### core
+
+* 🐛 **Fix `byFile()` for inner and nested test classes**
+  `approve().byFile()` failed when called from a JUnit 5 `@Nested` inner class (Java or Kotlin)
+  because the source file lookup used the inner class name instead of the top-level class name.
+  The approved file name now includes enclosing class names separated by dots
+  (e.g. `OuterTest.InnerTest-methodName-approved.txt`).
+  ([#253](https://github.com/mkutz/ApproveJ/issues/253))
+
+### IntelliJ plugin
+
+* ✨ **Diff view navigation and actions**
+  The diff viewer now shows a notification panel with "Navigate to Test", "Approve", and "Reject"
+  actions. Content titles clearly label which side is "Received" and which is "Approved".
+  ([#250](https://github.com/mkutz/ApproveJ/issues/250))
+
+* ✨ **One-click reject**
+  A new "Reject" action deletes the received file without copying its content to the approved file.
+  Available in the diff viewer and in the received file editor banner.
+
+* 🎨 **Simplified gutter icon for pending approvals**
+  When a received file exists, clicking the gutter icon now directly opens the diff view instead
+  of showing a popup menu.
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.4.6...v1.4.7
+
+
+## v1.4.6
+
+### core
+
+* 🐛 **Preserve inventory entries for unexecuted approvals**
+  When a test with multiple `approve().byFile()` calls failed before reaching all approvals,
+  the inventory entries for unexecuted approvals were dropped.
+  This caused IntelliJ plugin gutter icons to disappear for those approvals.
+  ([#230](https://github.com/mkutz/ApproveJ/issues/230))
+  Thanks to [@DeepsanBhandari](https://github.com/DeepsanBhandari) for the contribution!
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.4.5...v1.4.6
+>>>>>>> origin/main
 
 
 ## v1.4.5

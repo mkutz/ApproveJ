@@ -74,7 +74,7 @@ class ApprovedFileInventoryUpdaterTest {
   }
 
   @Test
-  void writeInventory_replaces_entries_for_executed_methods() throws IOException {
+  void writeInventory_preserves_old_entries_for_same_method() throws IOException {
     writeString(
         inventoryFile,
         """
@@ -95,8 +95,38 @@ class ApprovedFileInventoryUpdaterTest {
 
     ApprovedFileInventoryUpdater.writeInventory();
 
+    var alpha =
+        new InventoryEntry(
+            Path.of("src/test/MyTest-myTest-alpha-approved.txt"), "com.example.MyTest#myTest");
     var inventory = ApprovedFileInventory.loadInventory(inventoryFile);
-    assertThat(inventory.entries()).containsExactly(beta, gamma);
+    assertThat(inventory.entries()).containsExactly(alpha, beta, gamma);
+  }
+
+  @Test
+  void writeInventory_preserves_entries_for_unexecuted_approvals_in_same_method()
+      throws IOException {
+    writeString(
+        inventoryFile,
+        """
+        # ApproveJ Approved File Inventory (auto-generated, do not edit)
+        src/test/MyTest-myTest-alpha-approved.txt = com.example.MyTest#myTest
+        src/test/MyTest-myTest-beta-approved.txt = com.example.MyTest#myTest
+        """,
+        StandardOpenOption.CREATE);
+
+    // Only alpha was reached during this run (e.g. the test failed before beta)
+    var alpha =
+        new InventoryEntry(
+            Path.of("src/test/MyTest-myTest-alpha-approved.txt"), "com.example.MyTest#myTest");
+    ApprovedFileInventoryUpdater.addEntry(alpha);
+
+    ApprovedFileInventoryUpdater.writeInventory();
+
+    var beta =
+        new InventoryEntry(
+            Path.of("src/test/MyTest-myTest-beta-approved.txt"), "com.example.MyTest#myTest");
+    var inventory = ApprovedFileInventory.loadInventory(inventoryFile);
+    assertThat(inventory.entries()).containsExactly(alpha, beta);
   }
 
   @Test

@@ -1,0 +1,184 @@
+package org.approvej.intellij
+
+import com.intellij.psi.PsiClass
+import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase
+import org.assertj.core.api.Assertions.assertThat
+
+class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtureTestCase() {
+
+  override fun setUp() {
+    super.setUp()
+    myFixture.addClass(
+      """
+      package org.approvej;
+      public class ApprovalBuilder<T> {
+          public static <T> ApprovalBuilder<T> approve(T value) { return null; }
+          public void byFile() {}
+      }
+      """
+        .trimIndent()
+    )
+  }
+
+  fun testRenameMethod() {
+    val testClass = addTestClassWithMethod("com.example", "MyTest", "byValue")
+    addInventory("src/com/example/MyTest-byValue-approved.txt" to "com.example.MyTest#byValue")
+    myFixture.addFileToProject("src/com/example/MyTest-byValue-approved.txt", "approved content")
+
+    renameMethod(testClass, "byValue", "byContent")
+
+    assertThat(myFixture.findFileInTempDir("src/com/example/MyTest-byContent-approved.txt"))
+      .isNotNull()
+    assertThat(myFixture.findFileInTempDir("src/com/example/MyTest-byValue-approved.txt")).isNull()
+  }
+
+  fun testRenameMethod_with_received_file() {
+    val testClass = addTestClassWithMethod("com.example", "MyTest", "byValue")
+    addInventory("src/com/example/MyTest-byValue-approved.txt" to "com.example.MyTest#byValue")
+    myFixture.addFileToProject("src/com/example/MyTest-byValue-approved.txt", "approved")
+    myFixture.addFileToProject("src/com/example/MyTest-byValue-received.txt", "received")
+
+    renameMethod(testClass, "byValue", "byContent")
+
+    assertThat(myFixture.findFileInTempDir("src/com/example/MyTest-byContent-approved.txt"))
+      .isNotNull()
+    assertThat(myFixture.findFileInTempDir("src/com/example/MyTest-byContent-received.txt"))
+      .isNotNull()
+    assertThat(myFixture.findFileInTempDir("src/com/example/MyTest-byValue-approved.txt")).isNull()
+    assertThat(myFixture.findFileInTempDir("src/com/example/MyTest-byValue-received.txt")).isNull()
+  }
+
+  fun testRenameMethod_with_affix() {
+    val testClass = addTestClassWithMethod("com.example", "MyTest", "approve_named")
+    addInventory(
+      "src/com/example/MyTest-approve_named-jane-approved.txt" to "com.example.MyTest#approve_named"
+    )
+    myFixture.addFileToProject("src/com/example/MyTest-approve_named-jane-approved.txt", "approved")
+
+    renameMethod(testClass, "approve_named", "approve_person")
+
+    assertThat(
+        myFixture.findFileInTempDir("src/com/example/MyTest-approve_person-jane-approved.txt")
+      )
+      .isNotNull()
+    assertThat(
+        myFixture.findFileInTempDir("src/com/example/MyTest-approve_named-jane-approved.txt")
+      )
+      .isNull()
+  }
+
+  fun testRenameMethod_multiple_files() {
+    val testClass = addTestClassWithMethod("com.example", "MyTest", "approve_named")
+    addInventory(
+      "src/com/example/MyTest-approve_named-jane-approved.txt" to
+        "com.example.MyTest#approve_named",
+      "src/com/example/MyTest-approve_named-john-approved.txt" to "com.example.MyTest#approve_named",
+    )
+    myFixture.addFileToProject("src/com/example/MyTest-approve_named-jane-approved.txt", "jane")
+    myFixture.addFileToProject("src/com/example/MyTest-approve_named-john-approved.txt", "john")
+
+    renameMethod(testClass, "approve_named", "approve_person")
+
+    assertThat(
+        myFixture.findFileInTempDir("src/com/example/MyTest-approve_person-jane-approved.txt")
+      )
+      .isNotNull()
+    assertThat(
+        myFixture.findFileInTempDir("src/com/example/MyTest-approve_person-john-approved.txt")
+      )
+      .isNotNull()
+  }
+
+  fun testRenameMethod_subdirectory_pattern() {
+    val testClass = addTestClassWithMethod("com.example", "MyTest", "subdir_test")
+    addInventory(
+      "src/com/example/MyTest/subdir_test-approved.txt" to "com.example.MyTest#subdir_test"
+    )
+    myFixture.addFileToProject("src/com/example/MyTest/subdir_test-approved.txt", "approved")
+
+    renameMethod(testClass, "subdir_test", "renamed_test")
+
+    assertThat(myFixture.findFileInTempDir("src/com/example/MyTest/renamed_test-approved.txt"))
+      .isNotNull()
+    assertThat(myFixture.findFileInTempDir("src/com/example/MyTest/subdir_test-approved.txt"))
+      .isNull()
+  }
+
+  fun testRenameClass() {
+    val testClass = addTestClassWithMethod("com.example", "OldTest", "myMethod")
+    addInventory("src/com/example/OldTest-myMethod-approved.txt" to "com.example.OldTest#myMethod")
+    myFixture.addFileToProject("src/com/example/OldTest-myMethod-approved.txt", "approved")
+
+    myFixture.renameElement(testClass, "NewTest")
+
+    assertThat(myFixture.findFileInTempDir("src/com/example/NewTest-myMethod-approved.txt"))
+      .isNotNull()
+    assertThat(myFixture.findFileInTempDir("src/com/example/OldTest-myMethod-approved.txt"))
+      .isNull()
+  }
+
+  fun testRenameClass_subdirectory() {
+    val testClass = addTestClassWithMethod("com.example", "OldTest", "myMethod")
+    addInventory("src/com/example/OldTest/myMethod-approved.txt" to "com.example.OldTest#myMethod")
+    myFixture.addFileToProject("src/com/example/OldTest/myMethod-approved.txt", "approved")
+
+    myFixture.renameElement(testClass, "NewTest")
+
+    assertThat(myFixture.findFileInTempDir("src/com/example/NewTest/myMethod-approved.txt"))
+      .isNotNull()
+    assertThat(myFixture.findFileInTempDir("src/com/example/OldTest/myMethod-approved.txt"))
+      .isNull()
+  }
+
+  fun testRenameMethod_no_inventory() {
+    val testClass = addTestClassWithMethod("com.example", "MyTest", "byValue")
+
+    renameMethod(testClass, "byValue", "byContent")
+
+    assertThat(testClass.findMethodsByName("byContent", false)).hasSize(1)
+  }
+
+  fun testRenameMethod_no_approved_files() {
+    val testClass = addTestClassWithMethod("com.example", "MyTest", "byValue")
+    addInventory(
+      "src/com/example/Other-otherMethod-approved.txt" to "com.example.Other#otherMethod"
+    )
+
+    renameMethod(testClass, "byValue", "byContent")
+
+    assertThat(testClass.findMethodsByName("byContent", false)).hasSize(1)
+  }
+
+  private fun addTestClassWithMethod(
+    packageName: String,
+    className: String,
+    methodName: String,
+  ): PsiClass {
+    return myFixture.addClass(
+      """
+      package $packageName;
+      import static org.approvej.ApprovalBuilder.approve;
+      public class $className {
+          void $methodName() {
+              approve("hello").byFile();
+          }
+      }
+      """
+        .trimIndent()
+    )
+  }
+
+  private fun addInventory(vararg entries: Pair<String, String>) {
+    val content = buildString {
+      appendLine("# ApproveJ Approved File Inventory")
+      entries.forEach { (path, testRef) -> appendLine("${path.replace(" ", "\\ ")} = $testRef") }
+    }
+    myFixture.addFileToProject(".approvej/inventory.properties", content)
+  }
+
+  private fun renameMethod(psiClass: PsiClass, oldName: String, newName: String) {
+    val methods = psiClass.findMethodsByName(oldName, false)
+    assertThat(methods).describedAs("Expected exactly one method named $oldName").hasSize(1)
+    myFixture.renameElement(methods[0], newName)
+  }
+}
