@@ -97,4 +97,29 @@ class RecordingDataSourceTest {
       assertThat(connection).isNotNull();
     }
   }
+
+  @Test
+  void getLogWriter_setLogWriter() throws Exception {
+    java.io.PrintWriter writer = new java.io.PrintWriter(System.out);
+    recordingDataSource.setLogWriter(writer);
+    assertThat(recordingDataSource.getLogWriter()).isSameAs(writer);
+  }
+
+  @Test
+  void getLoginTimeout_setLoginTimeout() throws Exception {
+    recordingDataSource.setLoginTimeout(42);
+    assertThat(recordingDataSource.getLoginTimeout()).isEqualTo(42);
+  }
+
+  @Test
+  void unwrap_isWrapperFor() throws Exception {
+    assertThat(recordingDataSource.isWrapperFor(JdbcDataSource.class)).isTrue();
+    assertThat(recordingDataSource.unwrap(JdbcDataSource.class)).isNotNull();
+  }
+
+  @Test
+  void getParentLogger() throws Exception {
+    assertThat(recordingDataSource.getParentLogger().getName())
+        .isEqualTo(RecordingDataSource.class.getName());
+  }
 }
