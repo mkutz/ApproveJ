@@ -1,12 +1,29 @@
 [id=http]
-= HTTP -- Catch Integration Risks
-
-Unlike the JSON and YAML extensions, which provide print formats for specific data formats, the HTTP extension addresses a different concern: **integration risk**.
+= HTTP -- Catch Changes to Outgoing Requests
 
 When your application calls an external HTTP API, a code change can silently alter the requests you send — a different path, a missing header, a changed body format.
 These issues often go unnoticed until they break in production.
-The HTTP extension lets you write simple contract tests that approve the exact HTTP requests your code sends.
+The HTTP extension lets you approve the exact HTTP requests your code sends.
 If a request changes, the approval test fails and shows you exactly what changed.
+
+[plantuml,http-test-setup,svg]
+....
+skinparam style strictuml
+skinparam defaultFontSize 13
+skinparam backgroundColor transparent
+
+participant "Test" as test
+participant "Your Code" as code
+participant "HttpStubServer" as stub
+participant "ApproveJ" as approvej
+
+test -> code : call your code
+code -> stub : HTTP request
+stub --> code : stubbed response
+test -> stub : get captured requests
+test -> approvej : approve(request)
+approvej -> approvej : scrub, print, compare
+....
 
 
 [id=http_dependencies]
@@ -80,20 +97,20 @@ implementation("org.wiremock:wiremock:3.10.0")
 ----
 
 
-[id=http_capture_requests]
-== Capture Outgoing Requests
+[id=http_approve_requests]
+== Approve Outgoing Requests
 
 To approve the HTTP requests your code sends, you need to intercept them.
 Point your component at a stub server instead of the real API, then retrieve and approve the captured requests.
 
 
-[id=http_capture_requests_stub_server]
+[id=http_approve_requests_stub_server]
 === Using `HttpStubServer`
 
 The link:{javadoc-url}/http/org/approvej/http/HttpStubServer.html[`HttpStubServer`] is a simple HTTP server based on the JVM's built-in link:https://docs.oracle.com/en/java/javase/21/docs/api/jdk.httpserver/com/sun/net/httpserver/package-summary.html[HttpServer].
 It automatically records all received requests and replies with a configurable response.
 
-Initialize the server and configure your component to use its address:
+With **plain JDBC or unit tests**, initialize the server and configure your component to use its address:
 
 [source,java,indent=0,role="primary"]
 .Java
@@ -119,8 +136,31 @@ include::../../../test/java/examples/java/HttpDocTest.java[tag=approve_http_requ
 include::../../../test/kotlin/examples/kotlin/HttpDocTest.kt[tag=approve_http_request]
 ----
 
+TIP: Call `resetReceivedRequests()` before exercising the code under test to ensure you only capture the requests you care about.
 
-[id=http_capture_requests_wiremock]
+
+[id=http_approve_requests_stub_server_spring_boot]
+=== Wiring the `HttpStubServer` in Spring Boot
+
+In a **Spring Boot** test, the `HttpStubServer` needs to be wired into the application context so your services use it instead of the real API.
+The following example from the Spring Boot example project shows a complete test class that approves the HTTP requests sent by a payment service:
+
+[source,java,indent=0]
+----
+include::../../../../../examples/spring-boot/src/test/java/org/approvej/examples/shop/payment/PaymentApprovalTest.java[tags=spring_boot_http;!spring_boot_http_extra]
+----
+<1> Create a static `HttpStubServer`.
+`@AutoClose` shuts it down after all tests in the class.
+<2> `@DynamicPropertySource` injects the stub server's address into the Spring property that your component reads (e.g., `payment.gateway.url`).
+<3> Call your service, then approve the captured HTTP request.
+
+NOTE: Set the `Content-Type` header on stubbed responses if your code parses them — Spring's `RestClient` and `WebClient` reject responses without a recognized content type.
+
+TIP: The first run creates a `-received.http` file next to the test.
+Review it, rename it to `-approved.http`, and re-run — the test passes.
+
+
+[id=http_approve_requests_wiremock]
 === Using WireMock
 
 Use link:{javadoc-url}/http-wiremock/org/approvej/http/wiremock/WireMockRequests.html[`WireMockRequests.toReceivedHttpRequest()`] to convert WireMock's `Request` objects to link:{javadoc-url}/http/org/approvej/http/ReceivedHttpRequest.html[`ReceivedHttpRequest`]:

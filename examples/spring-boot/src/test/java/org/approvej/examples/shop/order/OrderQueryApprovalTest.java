@@ -1,0 +1,114 @@
+package org.approvej.examples.shop.order;
+
+import static org.approvej.ApprovalBuilder.approve;
+import static org.approvej.database.jdbc.DatabaseScrubbers.columnValue;
+import static org.approvej.database.jdbc.DatabaseSnapshot.query;
+import static org.approvej.database.jdbc.MarkdownTablePrintFormat.markdownTable;
+import static org.approvej.http.StubbedHttpResponse.response;
+import static org.approvej.json.jackson3.JsonPrintFormat.json;
+import static org.approvej.scrub.Scrubbers.isoInstants;
+import static org.approvej.scrub.Scrubbers.uuids;
+import static org.testcontainers.containers.wait.strategy.Wait.forListeningPort;
+
+import java.math.BigDecimal;
+import java.util.List;
+import javax.sql.DataSource;
+import org.approvej.examples.shop.product.Product;
+import org.approvej.examples.shop.product.ProductRepository;
+import org.approvej.http.HttpStubServer;
+import org.junit.jupiter.api.AutoClose;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.postgresql.PostgreSQLContainer;
+
+@SpringBootTest
+class OrderQueryApprovalTest {
+
+  @ServiceConnection
+  static final PostgreSQLContainer postgres =
+      new PostgreSQLContainer("postgres:17").waitingFor(forListeningPort());
+
+  @AutoClose static final HttpStubServer paymentServer = new HttpStubServer();
+
+  @DynamicPropertySource
+  static void configurePayment(DynamicPropertyRegistry registry) {
+    registry.add("payment.gateway.url", paymentServer::address);
+    registry.add("payment.gateway.token", () -> "test-token-123");
+  }
+
+  @Autowired private OrderService orderService;
+  @Autowired private ProductRepository productRepository;
+  @Autowired private DataSource dataSource;
+
+  @BeforeEach
+  void resetPaymentStub() {
+    paymentServer.resetReceivedRequests();
+    paymentServer.nextResponse(
+        response()
+            .header("Content-Type", "application/json")
+            .body(
+                """
+                {"paymentId":"pay-abc-123","status":"succeeded",\
+                "processedAt":"2026-03-11T10:00:00Z"}\
+                """)
+            .statusCode(200));
+  }
+
+  @Test
+  void place_order() {
+    Product product =
+        productRepository.save(
+            new Product(
+                "Espresso Machine",
+                "Professional espresso machine",
+                new BigDecimal("299.99"),
+                "ESP-100"));
+
+    Order order = orderService.placeOrder("Alice", "alice@example.com", List.of(product.getId()));
+
+    approve(order).printedAs(json()).scrubbedOf(uuids()).scrubbedOf(isoInstants()).byFile();
+  }
+
+  @Test
+  void place_order_database_state() {
+    Product product =
+        productRepository.save(
+            new Product(
+                "Coffee Grinder", "Burr coffee grinder", new BigDecimal("89.99"), "GRD-100"));
+
+    orderService.placeOrder("Bob", "bob@example.com", List.of(product.getId()));
+
+    approve(
+            query(
+                dataSource,
+                "SELECT customer_name, customer_email, status FROM orders"
+                    + " WHERE customer_name = 'Bob'"))
+        .printedAs(markdownTable())
+        .byFile();
+  }
+
+  @Test
+  void place_order_order_items_state() {
+    Product product =
+        productRepository.save(
+            new Product(
+                "Milk Frother", "Automatic milk frother", new BigDecimal("49.99"), "FRT-100"));
+
+    orderService.placeOrder("Carol", "carol@example.com", List.of(product.getId()));
+
+    approve(
+            query(
+                dataSource,
+                "SELECT oi.id, oi.quantity, oi.unit_price FROM order_items oi"
+                    + " JOIN orders o ON oi.order_id = o.id"
+                    + " WHERE o.customer_name = 'Carol'"))
+        .scrubbedOf(columnValue("id"))
+        .printedAs(markdownTable())
+        .byFile();
+  }
+}

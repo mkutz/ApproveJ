@@ -10,3 +10,4 @@ Javadoc for each module is available here:
 - link:{javadoc-url}/json-jackson3/index.html[json-jackson3] -- JSON support (Jackson 3.x)
 - link:{javadoc-url}/yaml-jackson/index.html[yaml-jackson] -- YAML support (Jackson 2.x)
 - link:{javadoc-url}/yaml-jackson3/index.html[yaml-jackson3] -- YAML support (Jackson 3.x)
+- link:{javadoc-url}/database/index.html[database] -- database state snapshotting

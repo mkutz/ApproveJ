@@ -1,0 +1,90 @@
+package examples.java;
+
+import static org.approvej.ApprovalBuilder.approve;
+import static org.approvej.database.jdbc.DatabaseScrubbers.columnValue;
+import static org.approvej.database.jdbc.DatabaseSnapshot.query;
+import static org.approvej.database.jdbc.MarkdownTablePrintFormat.markdownTable;
+import static org.approvej.database.jdbc.SqlPrintFormat.sql;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.sql.Connection;
+import java.sql.Statement;
+import javax.sql.DataSource;
+import org.approvej.database.jdbc.QueryResult;
+import org.approvej.database.jdbc.RecordingDataSource;
+import org.h2.jdbcx.JdbcDataSource;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+class DatabaseDocTest {
+
+  private DataSource dataSource;
+
+  @BeforeEach
+  void setUp() throws Exception {
+    JdbcDataSource jdbcDataSource = new JdbcDataSource();
+    jdbcDataSource.setURL("jdbc:h2:mem:doc_%s;DB_CLOSE_DELAY=-1".formatted(System.nanoTime()));
+    dataSource = jdbcDataSource;
+    try (Connection connection = dataSource.getConnection();
+        Statement statement = connection.createStatement()) {
+      statement.execute(
+          "CREATE TABLE users (id INT PRIMARY KEY, name VARCHAR(100), email VARCHAR(200))");
+      statement.execute("INSERT INTO users VALUES (1, 'Alice', 'alice@test.com')");
+      statement.execute("INSERT INTO users VALUES (2, 'Bob', 'bob@test.com')");
+    }
+  }
+
+  @Test
+  void recording() throws Exception {
+    // tag::recording[]
+    RecordingDataSource recordingDataSource = new RecordingDataSource(dataSource);
+
+    // ... pass recordingDataSource to your code instead of the real DataSource ...
+    try (Connection connection = recordingDataSource.getConnection();
+        Statement statement = connection.createStatement()) {
+      statement.executeQuery("SELECT id, name, email FROM users WHERE id = 1");
+    }
+
+    approve(recordingDataSource.lastRecordedQuery()).printedAs(sql()).byFile();
+    // end::recording[]
+  }
+
+  @Test
+  void snapshot() {
+    // tag::snapshot[]
+    QueryResult result = query(dataSource, "SELECT * FROM users");
+    // end::snapshot[]
+
+    assertThat(result.rows()).hasSize(2);
+  }
+
+  @Test
+  void approve_query() {
+    // tag::approve[]
+    approve(query(dataSource, "SELECT * FROM users"))
+        .scrubbedOf(columnValue("id"))
+        .printedAs(markdownTable())
+        .byFile();
+    // end::approve[]
+  }
+
+  @Test
+  void scrub() {
+    // tag::scrub[]
+    approve(query(dataSource, "SELECT * FROM users"))
+        .scrubbedOf(columnValue("id"))
+        .printedAs(markdownTable())
+        .byFile();
+    // end::scrub[]
+  }
+
+  @Test
+  void scrub_custom() {
+    // tag::scrub_custom[]
+    approve(query(dataSource, "SELECT * FROM users"))
+        .scrubbedOf(columnValue("id").replacement("***"))
+        .printedAs(markdownTable())
+        .byFile();
+    // end::scrub_custom[]
+  }
+}

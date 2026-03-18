@@ -30,8 +30,11 @@ testing {
           implementation(project(":modules:json-jackson"))
           implementation(project(":modules:yaml-jackson"))
           implementation(project(":modules:http"))
+          implementation(project(":modules:database-jdbc"))
 
+          implementation(platform(libs.jackson2.bom))
           implementation(libs.jackson2.databind)
+          implementation(libs.h2)
           implementation(libs.jackson2.dataformat.yaml)
           implementation(libs.jackson2.jsr310)
 

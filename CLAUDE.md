@@ -35,6 +35,7 @@ It provides a fluent API to compare actual values against previously approved "g
 ## Module Structure
 
 - **modules/core** - Core framework with no external dependencies. Contains `ApprovalBuilder`, `Approver`, `Scrubber`, `PrintFormat`, and `FileReviewer` interfaces.
+- **modules/database-jdbc** - JDBC adapter for database state snapshotting and SQL recording
 - **modules/json-jackson** - JSON support using Jackson 2.x
 - **modules/json-jackson3** - JSON support using Jackson 3.x
 - **modules/yaml-jackson** - YAML support using Jackson 2.x
@@ -142,6 +143,7 @@ Package structure: `org.approvej` for core, `org.approvej.<format>.<library>` fo
 - All classes should be immutable where possible (final fields, initialized in constructor)
 - Only API elements required by users are `public`; internal classes are package-private
 - Built-in `Scrubber` implementations have package-private constructors (use `Scrubbers` factory)
+- Do not abbreviate variable names (e.g., use `statement` not `stmt`, `connection` not `conn`, `recordingDataSource` not `recordingDs`)
 
 
 ## Testing
