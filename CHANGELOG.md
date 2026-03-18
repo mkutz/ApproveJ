@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v1.5.0
+
+### database-jdbc
+
+* ✨ **New module for database testing**
+  Add `database-jdbc` module providing two complementary approaches to database approval testing:
+  - **Approve SQL** queries using `RecordingDataSource` and `SqlPrintFormat`.
+  - **Approve database state** by snapshotting query results with `DatabaseSnapshot` and printing them as Markdown tables.
+  ([#207](https://github.com/mkutz/ApproveJ/issues/207))
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.4.5...v1.5.0
+
+
 ## v1.4.5
 
 ### core
