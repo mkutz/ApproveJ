@@ -118,7 +118,7 @@ class RecordingDataSourceTest {
   }
 
   @Test
-  void getParentLogger() throws Exception {
+  void getParentLogger() {
     assertThat(recordingDataSource.getParentLogger().getName())
         .isEqualTo(RecordingDataSource.class.getName());
   }
