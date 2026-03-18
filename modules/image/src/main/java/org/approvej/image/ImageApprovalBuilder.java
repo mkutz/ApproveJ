@@ -18,6 +18,15 @@ import org.approvej.review.FileReviewer;
 import org.approvej.review.ReviewResult;
 import org.jspecify.annotations.NullMarked;
 
+/**
+ * Builder for configuring and executing image approval tests.
+ *
+ * <p>This builder provides a fluent API for comparing images (like screenshots) against previously
+ * approved baselines. It supports customizing the comparison strategy and scrubbing specific
+ * regions to ignore dynamic content.
+ *
+ * <p>Instances of this builder are created via the static {@link #approveImage} methods.
+ */
 @NullMarked
 public class ImageApprovalBuilder {
 

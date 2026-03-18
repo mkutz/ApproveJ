@@ -3,8 +3,9 @@ package org.approvej.image.approve;
 import java.awt.image.BufferedImage;
 import org.jspecify.annotations.NullMarked;
 
+/** Internal utility for analyzing and comparing individual image pixels. */
 @NullMarked
-public record AnalysedImage(BufferedImage image, int width, int height, int size) {
+record AnalysedImage(BufferedImage image, int width, int height, int size) {
 
   public static AnalysedImage analyse(BufferedImage image) {
     int width = image.getWidth();

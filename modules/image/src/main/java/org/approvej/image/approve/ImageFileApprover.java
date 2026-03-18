@@ -29,6 +29,13 @@ import org.approvej.image.compare.ImageComparator;
 import org.approvej.image.compare.ImageComparisonResult;
 import org.jspecify.annotations.NullMarked;
 
+/**
+ * Approves a received image by comparing it to an approved file on disk.
+ *
+ * <p>If the approved file does not exist, a transparent placeholder file is generated. If the
+ * received image differs from the approved image according to the configured {@link
+ * ImageComparator}, the received image is written to disk alongside the approved file.
+ */
 @NullMarked
 public class ImageFileApprover implements ImageApprover {
 
@@ -160,6 +167,13 @@ public class ImageFileApprover implements ImageApprover {
     return result;
   }
 
+  /**
+   * Creates a new ImageFileApprover.
+   *
+   * @param pathProvider the provider for approved and received file paths
+   * @param comparator the comparator to use
+   * @return a new ImageFileApprover
+   */
   public static ImageFileApprover imageFile(PathProvider pathProvider, ImageComparator comparator) {
     return new ImageFileApprover(pathProvider, comparator);
   }
