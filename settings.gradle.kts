@@ -6,11 +6,7 @@ include("bom")
 
 include("modules:core")
 
-include("plugins:approvej-gradle-plugin")
-
-include("plugins:approvej-maven-plugin")
-
-include("plugins:approvej-intellij-plugin")
+include("modules:image")
 
 include("modules:json-jackson")
 
@@ -25,6 +21,12 @@ include("modules:http")
 include("modules:http-wiremock")
 
 include("modules:database-jdbc")
+
+include("plugins:approvej-gradle-plugin")
+
+include("plugins:approvej-maven-plugin")
+
+include("plugins:approvej-intellij-plugin")
 
 include("manual")
 
