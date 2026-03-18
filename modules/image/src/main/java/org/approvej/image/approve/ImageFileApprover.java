@@ -52,7 +52,8 @@ public class ImageFileApprover implements ImageApprover {
     ensureDirectory();
     handleOldApprovedFiles();
     ensureApprovedFile(received.getWidth(), received.getHeight());
-    return check(readApprovedFile(), received);
+    BufferedImage approved = readApprovedFile();
+    return check(approved, received);
   }
 
   private void ensureDirectory() {
@@ -81,7 +82,7 @@ public class ImageFileApprover implements ImageApprover {
   }
 
   private void handleOldApprovedFiles() {
-    Path approvedPath = pathProvider.approvedPath();
+    Path approvedPath = pathProvider.approvedPath().toAbsolutePath();
     String filename = approvedPath.getFileName().toString();
     Pattern filenameExtensionPattern =
         Pattern.compile("(?<baseFilename>.+?)(?:\\.(?<extension>[^.]*))?");
