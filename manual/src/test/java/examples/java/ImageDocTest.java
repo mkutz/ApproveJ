@@ -86,7 +86,7 @@ class ImageDocTest {
       page.navigate("https://approvej.org");
 
       approveImage(page.screenshot())
-          .comparedBy(pixel().withThreshold(0.99)) // <1>
+          .comparedBy(pixel().withThreshold(1.0)) // <1>
           .byFile();
     }
     // end::approve_screenshot_pixel[]

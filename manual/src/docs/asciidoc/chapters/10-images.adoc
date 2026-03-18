@@ -93,7 +93,7 @@ Pixel-by-pixel comparison calculates the exact difference between each pixel.
 ----
 include::../../../test/java/examples/java/ImageDocTest.java[tag=approve_screenshot_pixel]
 ----
-<1> Use pixel comparison with 0.99 threshold (99% similarity required)
+<1> Use pixel comparison with 1.0 threshold (exact match required)
 
 *How it works:*
 
@@ -141,10 +141,10 @@ include::../../../test/java/examples/java/ImageDocTest.java[tag=approve_screensh
 
 *Pixel Comparison Threshold:*
 
-* Default: 0.99 (99% similarity)
+* Default: 1.0 (100% similarity / exact match)
 * Range: 0.0 to 1.0
 * Higher values = stricter matching
-* Recommended: 0.95-0.99 depending on stability needs
+* Recommended: 0.99-1.0 depending on stability needs
 
 
 [id="visual_testing_challenges"]
@@ -264,7 +264,7 @@ The cursor position or focused elements can vary between runs.
 
 | Pixel-perfect design
 | Pixel
-| 0.98-0.99
+| 1.0
 
 | Component screenshots
 | Perceptual Hash
