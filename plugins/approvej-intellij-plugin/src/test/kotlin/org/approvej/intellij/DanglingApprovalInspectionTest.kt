@@ -21,6 +21,33 @@ class DanglingApprovalInspectionTest : LightJavaCodeInsightFixtureTestCase() {
       """
         .trimIndent()
     )
+    myFixture.addClass(
+      """
+      package org.approvej.image;
+      import java.awt.image.BufferedImage;
+      public class ImageApprovalBuilder {
+          public static ImageApprovalBuilder approveImage(BufferedImage value) { return null; }
+          public ImageApprovalBuilder named(String name) { return this; }
+          public void byFile() {}
+
+      }
+      """
+        .trimIndent()
+    )
+  }
+
+  fun testApproveImage_alone() {
+    doHighlightTest(
+      """
+      import static org.approvej.image.ImageApprovalBuilder.approveImage;
+      class Test {
+          void test() {
+              <warning descr="$WARNING">approveImage(null)</warning>;
+          }
+      }
+      """
+        .trimIndent()
+    )
   }
 
   fun testApprove_alone() {

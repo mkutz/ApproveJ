@@ -11,6 +11,7 @@ import org.jetbrains.uast.getUParentForIdentifier
 internal object ApproveCallUtil {
 
   const val APPROVAL_BUILDER_CLASS = "org.approvej.ApprovalBuilder"
+  const val IMAGE_APPROVAL_BUILDER_CLASS = "org.approvej.image.ImageApprovalBuilder"
 
   /**
    * Returns the UAST call expression if the given PSI element is the identifier of an `approve()`
@@ -28,10 +29,12 @@ internal object ApproveCallUtil {
    * Unlike [asApproveCall], this takes a UAST node directly (no leaf-element check).
    */
   fun isApproveCall(node: UCallExpression): Boolean {
-    if (node.methodName != "approve") return false
+    val name = node.methodName
+    if (name != "approve" && name != "approveImage") return false
     val method = node.resolve() ?: return false
     val containingClass = method.containingClass ?: return false
-    return containingClass.qualifiedName == APPROVAL_BUILDER_CLASS
+    val qname = containingClass.qualifiedName
+    return qname == APPROVAL_BUILDER_CLASS || qname == IMAGE_APPROVAL_BUILDER_CLASS
   }
 
   /**
@@ -39,7 +42,7 @@ internal object ApproveCallUtil {
    * the chain (e.g. `"byFile"`, `"printedAs"`, or `"approve"` if there is no chained call).
    */
   fun findTerminalCall(approveCall: UCallExpression): ChainWalkResult {
-    var lastMethodName = "approve"
+    var lastMethodName = approveCall.methodName ?: "approve"
     val chainEnd =
       walkChain(approveCall) { selector ->
         val name = selector.methodName
