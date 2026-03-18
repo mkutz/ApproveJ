@@ -30,4 +30,11 @@ dependencies {
   testImplementation(libs.jackson3.dataformat.yaml)
 }
 
-tasks.withType<Test> { useJUnitPlatform() }
+tasks.withType<Test> {
+  useJUnitPlatform()
+
+  // Skip Spring Boot example tests on Windows because they require Docker/Testcontainers
+  if (System.getProperty("os.name").lowercase().contains("windows")) {
+    enabled = false
+  }
+}
