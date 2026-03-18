@@ -123,24 +123,21 @@ public class SqlPrintFormat implements PrintFormat<String> {
 
   private static List<String> mergeKeywords(List<String> tokens) {
     List<String> merged = new ArrayList<>();
-    int index = 0;
-    while (index < tokens.size()) {
+    for (int index = 0; index < tokens.size(); index++) {
       String token = tokens.get(index);
-      if (token.isBlank()) {
-        index++;
-        continue;
-      }
-      int secondWordIndex = findSecondWordIndex(tokens, index);
-      if (secondWordIndex > 0) {
-        String twoWordKeyword = (token + " " + tokens.get(secondWordIndex)).toUpperCase();
+
+      if (!token.isBlank()) {
+        int secondWordIndex = findSecondWordIndex(tokens, index);
+        String twoWordKeyword =
+            secondWordIndex > 0 ? (token + " " + tokens.get(secondWordIndex)).toUpperCase() : "";
+
         if (CLAUSE_KEYWORDS.contains(twoWordKeyword) || SUB_KEYWORDS.contains(twoWordKeyword)) {
           merged.add(twoWordKeyword);
-          index = secondWordIndex + 1;
-          continue;
+          index = secondWordIndex; // Skip ahead
+        } else {
+          merged.add(token);
         }
       }
-      merged.add(token);
-      index++;
     }
     return merged;
   }
