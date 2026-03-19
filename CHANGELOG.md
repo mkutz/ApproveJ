@@ -1,6 +1,20 @@
 # Changelog
 
 
+## v1.5.1
+
+### IntelliJ plugin
+
+* ✨ **Image diff viewer**
+  A custom three-panel diff tool (Received | Pixel Difference | Approved) highlights pixel-level
+  changes between image approvals. Matching pixels are shown as dimmed grayscale; differing pixels
+  are highlighted in magenta.
+
+* 🎨 **Navigate to approved file after approve/reject**
+  Clicking "Approve" or "Reject" in the diff viewer now opens the approved file in the editor
+  instead of leaving the stale diff view open.
+
+
 ## v1.5.0
 
 ### database-jdbc

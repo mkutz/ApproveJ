@@ -45,6 +45,7 @@
     <codeInsight.lineMarkerProvider
         language="UAST"
         implementationClass="org.approvej.intellij.ApproveCallLineMarkerProvider"/>
+    <diff.DiffTool implementation="org.approvej.intellij.ImageDiffTool"/>
     <diff.DiffExtension
         implementation="org.approvej.intellij.ApproveJDiffExtension"/>
     <renamePsiElementProcessor order="last"
