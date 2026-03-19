@@ -3,6 +3,16 @@
 
 ## v1.5.1
 
+### image
+
+* 🛠️ **Default image file extension to png**
+  `ImageFileApprover` now defaults to `.png` when the path provider uses the default `.txt` extension,
+  preventing image data from being written to text files.
+
+* 🐛 **Register image approvals in inventory**
+  `ImageApprovalBuilder.byFile()` now registers approved image files in the inventory,
+  matching the behavior of `ApprovalBuilder.byFile()`.
+
 ### IntelliJ plugin
 
 * ✨ **Image diff viewer**
