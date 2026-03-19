@@ -76,7 +76,7 @@ final class DanglingApprovalTracker {
       try {
         Runtime.getRuntime().removeShutdownHook(hook);
       } catch (IllegalStateException e) {
-        // JVM is already shutting down
+        LOGGER.fine("Could not remove shutdown hook: " + e.getMessage());
       }
     }
   }

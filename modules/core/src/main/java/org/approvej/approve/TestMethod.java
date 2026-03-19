@@ -144,7 +144,7 @@ public interface TestMethod {
                 } catch (IllegalAccessException
                     | InvocationTargetException
                     | NoSuchMethodException e) {
-                  return null;
+                  return method.getName();
                 }
               })
           .orElse(method.getName());

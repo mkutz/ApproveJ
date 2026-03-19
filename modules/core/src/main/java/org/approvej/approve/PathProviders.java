@@ -16,13 +16,14 @@ public final class PathProviders {
   private PathProviders() {}
 
   private static String nestedSimpleName(Class<?> clazz) {
-    StringBuilder name = new StringBuilder(clazz.getSimpleName());
+    java.util.ArrayDeque<String> parts = new java.util.ArrayDeque<>();
+    parts.addFirst(clazz.getSimpleName());
     Class<?> enclosing = clazz.getEnclosingClass();
     while (enclosing != null) {
-      name.insert(0, enclosing.getSimpleName() + ".");
+      parts.addFirst(enclosing.getSimpleName());
       enclosing = enclosing.getEnclosingClass();
     }
-    return name.toString();
+    return String.join(".", parts);
   }
 
   /**

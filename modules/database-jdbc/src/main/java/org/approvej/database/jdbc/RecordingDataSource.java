@@ -126,7 +126,7 @@ public class RecordingDataSource implements DataSource {
   private static <T> T proxy(Class<T> iface, InvocationHandler handler) {
     return (T)
         Proxy.newProxyInstance(
-            RecordingDataSource.class.getClassLoader(), new Class[] {iface}, handler);
+            RecordingDataSource.class.getClassLoader(), new Class<?>[] {iface}, handler);
   }
 
   @Override

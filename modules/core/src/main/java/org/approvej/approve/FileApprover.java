@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.approvej.ApprovalError;
@@ -35,6 +36,8 @@ import org.jspecify.annotations.NullMarked;
  */
 @NullMarked
 record FileApprover(PathProvider pathProvider) implements Approver {
+
+  private static final Logger LOGGER = Logger.getLogger(FileApprover.class.getName());
 
   @Override
   public ApprovalResult apply(String received) {
@@ -70,7 +73,10 @@ record FileApprover(PathProvider pathProvider) implements Approver {
     Pattern filenameExtensionPattern =
         Pattern.compile("(?<baseFilename>.+?)(?:\\.(?<extension>[^.]*))?");
     Matcher matcher = filenameExtensionPattern.matcher(filename);
-    String baseFilename = matcher.matches() ? matcher.group("baseFilename") : null;
+    if (!matcher.matches()) {
+      return;
+    }
+    String baseFilename = matcher.group("baseFilename");
     Pattern baseFilenamePattern = Pattern.compile(baseFilename + "(?:\\.(?<extension>[^.]*))?");
     try (var paths = list(pathProvider.directory())) {
       List<Path> oldApprovedFiles =
@@ -84,7 +90,8 @@ record FileApprover(PathProvider pathProvider) implements Approver {
                       path -> {
                         try {
                           return getLastModifiedTime(path);
-                        } catch (IOException ignored) {
+                        } catch (IOException e) {
+                          LOGGER.fine("Could not read modification time: " + e.getMessage());
                           return FileTime.from(Instant.ofEpochSecond(0));
                         }
                       }))
@@ -99,12 +106,12 @@ record FileApprover(PathProvider pathProvider) implements Approver {
           path -> {
             try {
               deleteIfExists(path);
-            } catch (IOException ignored) {
-              // this is an optional cleanup
+            } catch (IOException e) {
+              LOGGER.fine("Could not delete old approved file: " + e.getMessage());
             }
           });
-    } catch (IOException ignored) {
-      // this is an optional cleanup
+    } catch (IOException e) {
+      LOGGER.fine("Could not clean up old approved files: " + e.getMessage());
     }
   }
 

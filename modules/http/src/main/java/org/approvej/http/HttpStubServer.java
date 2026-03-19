@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -26,8 +26,8 @@ public class HttpStubServer implements AutoCloseable {
 
   private final HttpServer server;
   private final String address;
-  private final List<ReceivedHttpRequest> receivedRequests = new ArrayList<>();
-  private StubbedHttpResponse nextResponse = response().body("OK").statusCode(200);
+  private final List<ReceivedHttpRequest> receivedRequests = new CopyOnWriteArrayList<>();
+  private volatile StubbedHttpResponse nextResponse = response().body("OK").statusCode(200);
 
   /**
    * Creates and starts the server.

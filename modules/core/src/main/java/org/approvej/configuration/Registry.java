@@ -27,9 +27,10 @@ public final class Registry {
 
   private Registry() {}
 
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings("unchecked")
   private static void loadProviders() {
-    ServiceLoader<Provider> loader = ServiceLoader.load(Provider.class);
+    ServiceLoader<Provider<?>> loader =
+        (ServiceLoader<Provider<?>>) (ServiceLoader<?>) ServiceLoader.load(Provider.class);
     for (Provider<?> provider : loader) {
       registerProvider(providersByType, provider);
     }
@@ -45,8 +46,8 @@ public final class Registry {
     Map<String, Provider<?>> providers =
         registry.computeIfAbsent(provider.type(), k -> new HashMap<>());
     String alias = provider.alias();
-    if (providers.containsKey(alias)) {
-      Provider<?> existing = providers.get(alias);
+    Provider<?> existing = providers.get(alias);
+    if (existing != null) {
       throw new ConfigurationError(
           "Duplicate provider alias '%s' for type %s: %s and %s. "
                   .formatted(
@@ -89,8 +90,11 @@ public final class Registry {
   @SuppressWarnings("unchecked")
   public static <T> Optional<T> findByAlias(String alias, Class<T> type) {
     Map<String, Provider<?>> providers = providersByType.get(type);
-    if (providers != null && providers.containsKey(alias)) {
-      return Optional.of((T) providers.get(alias).create());
+    if (providers != null) {
+      Provider<?> provider = providers.get(alias);
+      if (provider != null) {
+        return Optional.of((T) provider.create());
+      }
     }
     return Optional.empty();
   }

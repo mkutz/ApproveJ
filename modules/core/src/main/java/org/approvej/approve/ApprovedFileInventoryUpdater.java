@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -29,6 +30,9 @@ public final class ApprovedFileInventoryUpdater {
   private static final ConcurrentHashMap<Path, InventoryEntry> collected =
       new ConcurrentHashMap<>();
   private static final AtomicReference<@Nullable Thread> shutdownHook = new AtomicReference<>();
+
+  private static final Logger LOGGER =
+      Logger.getLogger(ApprovedFileInventoryUpdater.class.getName());
 
   private static final AtomicReference<Path> inventoryFile =
       new AtomicReference<>(DEFAULT_INVENTORY_FILE);
@@ -93,7 +97,7 @@ public final class ApprovedFileInventoryUpdater {
       try {
         Runtime.getRuntime().removeShutdownHook(hook);
       } catch (IllegalStateException e) {
-        // JVM is already shutting down
+        LOGGER.fine("Could not remove shutdown hook: " + e.getMessage());
       }
     }
     inventoryFile.set(testInventoryFile);

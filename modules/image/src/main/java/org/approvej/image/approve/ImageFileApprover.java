@@ -12,7 +12,6 @@ import static java.nio.file.StandardOpenOption.CREATE;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.util.Comparator.comparing;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
@@ -38,6 +38,8 @@ import org.jspecify.annotations.NullMarked;
  */
 @NullMarked
 public class ImageFileApprover implements ImageApprover {
+
+  private static final Logger LOGGER = Logger.getLogger(ImageFileApprover.class.getName());
 
   private final PathProvider pathProvider;
   private final ImageComparator comparator;
@@ -75,12 +77,9 @@ public class ImageFileApprover implements ImageApprover {
   private void ensureApprovedFile(int width, int height) {
     Path approvedPath = pathProvider.approvedPath();
     if (notExists(approvedPath)) {
-      try {
+      try (var outputStream = Files.newOutputStream(approvedPath, CREATE)) {
         BufferedImage missingApprovedImage = new BufferedImage(width, height, TYPE_INT_ARGB);
-        ImageIO.write(
-            missingApprovedImage,
-            pathProvider.filenameExtension(),
-            Files.newOutputStream(approvedPath, CREATE));
+        ImageIO.write(missingApprovedImage, pathProvider.filenameExtension(), outputStream);
       } catch (IOException e) {
         throw new ImageFileApproverError(
             "Creating approved file %s failed".formatted(approvedPath), e);
@@ -94,7 +93,10 @@ public class ImageFileApprover implements ImageApprover {
     Pattern filenameExtensionPattern =
         Pattern.compile("(?<baseFilename>.+?)(?:\\.(?<extension>[^.]*))?");
     Matcher matcher = filenameExtensionPattern.matcher(filename);
-    String baseFilename = matcher.matches() ? matcher.group("baseFilename") : null;
+    if (!matcher.matches()) {
+      return;
+    }
+    String baseFilename = matcher.group("baseFilename");
     Pattern baseFilenamePattern = Pattern.compile(baseFilename + "(?:\\.(?<extension>[^.]*))?");
     try (var paths = list(pathProvider.directory())) {
       List<Path> oldApprovedFiles =
@@ -108,7 +110,8 @@ public class ImageFileApprover implements ImageApprover {
                       path -> {
                         try {
                           return getLastModifiedTime(path);
-                        } catch (IOException ignored) {
+                        } catch (IOException e) {
+                          LOGGER.fine("Could not read modification time: " + e.getMessage());
                           return FileTime.from(Instant.ofEpochSecond(0));
                         }
                       }))
@@ -123,12 +126,12 @@ public class ImageFileApprover implements ImageApprover {
           path -> {
             try {
               deleteIfExists(path);
-            } catch (IOException ignored) {
-              // this is an optional cleanup
+            } catch (IOException e) {
+              LOGGER.fine("Could not delete old approved file: " + e.getMessage());
             }
           });
-    } catch (IOException ignored) {
-      // this is an optional cleanup
+    } catch (IOException e) {
+      LOGGER.fine("Could not clean up old approved files: " + e.getMessage());
     }
   }
 
@@ -147,11 +150,8 @@ public class ImageFileApprover implements ImageApprover {
     ImageFileApprovalResult result = new ImageFileApprovalResult(comparisonResult, pathProvider);
     Path receivedPath = pathProvider.receivedPath();
     if (result.needsApproval()) {
-      try {
-        ImageIO.write(
-            received,
-            pathProvider.filenameExtension(),
-            Files.newOutputStream(receivedPath, CREATE, TRUNCATE_EXISTING));
+      try (var outputStream = Files.newOutputStream(receivedPath, CREATE, TRUNCATE_EXISTING)) {
+        ImageIO.write(received, pathProvider.filenameExtension(), outputStream);
       } catch (IOException e) {
         throw new ImageFileApproverError(
             "Writing received to %s failed".formatted(receivedPath), e);
