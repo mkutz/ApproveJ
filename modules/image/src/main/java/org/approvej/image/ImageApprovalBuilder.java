@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.function.UnaryOperator;
 import javax.imageio.ImageIO;
+import org.approvej.approve.ApprovedFileInventoryUpdater;
 import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviders;
 import org.approvej.image.approve.ImageFileApprover;
@@ -153,6 +154,9 @@ public class ImageApprovalBuilder {
   public void byFile(PathProvider pathProvider) {
     PathProvider updatedPathProvider =
         pathProvider.filenameAffix(name).filenameExtension(filenameExtension);
+    if (configuration.inventoryEnabled()) {
+      ApprovedFileInventoryUpdater.registerApprovedFile(updatedPathProvider);
+    }
     ImageFileApprover approver = imageFile(updatedPathProvider, comparator);
     ImageApprovalResult approvalResult = approver.apply(value);
     if (approvalResult.needsApproval()) {
