@@ -195,6 +195,7 @@ Entries in `gradle/libs.versions.toml` must be sorted alphabetically within each
 - Present tense, imperative mood ("Add feature" not "Added feature")
 - Subject line max 50 chars, no period at end
 - Explain _what_ and _why_ in body, not _how_
+- No semantic prefix like "fix:" or "feature:"
 
 
 ## Markdown Formatting
