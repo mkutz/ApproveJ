@@ -20,6 +20,25 @@
   - Provides region-based image scrubbing to mask dynamic content like timestamps or dynamic ads.
   ([#152](https://github.com/mkutz/ApproveJ/issues/152))
 
+### core
+
+* ⚠️ **Remove deprecated `ScriptFileReviewer.script()`**
+  The static factory method deprecated since 1.1 has been removed.
+  Use `Reviewers.script()` instead.
+
+* 🛠️ **Fix potential null dereference in `FileApprover`**
+  `handleOldApprovedFiles()` could pass a null filename to `Pattern.compile()` when the filename pattern didn't match.
+
+### http
+
+* 🛠️ **Improve thread safety of `HttpStubServer`**
+  `receivedRequests` now uses `CopyOnWriteArrayList` and `nextResponse` uses `AtomicReference` for safe cross-thread access between the HTTP handler and test threads.
+
+### manual
+
+* 📖 **Document SonarQube S2699 workaround**
+  Added a SonarQube/SonarCloud section to the configuration chapter explaining how to configure `customAssertionMethods` so that `byFile()` and `byValue()` are recognized as assertions.
+
 **Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.4.7...v1.5.0
 
 
@@ -64,7 +83,6 @@
   Thanks to [@DeepsanBhandari](https://github.com/DeepsanBhandari) for the contribution!
 
 **Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.4.5...v1.4.6
->>>>>>> origin/main
 
 
 ## v1.4.5
