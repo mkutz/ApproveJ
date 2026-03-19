@@ -38,15 +38,6 @@ public record YamlPrintFormat<T>(ObjectWriter objectWriter)
           .addModule(new SimpleModule().setSerializerModifier(new DeterministicPropertyOrder()))
           .build();
 
-  /**
-   * Creates a {@link YamlPrintFormat} using the given {@link ObjectWriter}.
-   *
-   * @param objectWriter the {@link ObjectWriter} that will be used for printing
-   */
-  public YamlPrintFormat {
-    // Note: Jackson 3 defaults to WRITE_DATES_AS_TIMESTAMPS=false, so no need to disable it
-  }
-
   /** Default constructor to be used in {@link Configuration}. */
   public YamlPrintFormat() {
     this(DEFAULT_YAML_MAPPER.writer());

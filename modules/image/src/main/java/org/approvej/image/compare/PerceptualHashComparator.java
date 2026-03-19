@@ -93,47 +93,41 @@ public final class PerceptualHashComparator implements ImageComparator {
 
   private double[][] applyDct(double[][] input) {
     int n = input.length;
+    double[][] cosValues = precomputeCosValues(n);
     double[][] dct = new double[n][n];
+    for (int u = 0; u < n; u++) {
+      for (int v = 0; v < n; v++) {
+        dct[u][v] = computeDctCoefficient(input, cosValues, u, v, n);
+      }
+    }
+    return dct;
+  }
 
-    // Precompute cosine values for efficiency
+  private double[][] precomputeCosValues(int n) {
     double[][] cosValues = new double[n][n];
     for (int i = 0; i < n; i++) {
       for (int j = 0; j < n; j++) {
         cosValues[i][j] = Math.cos((2 * j + 1) * i * Math.PI / (2 * n));
       }
     }
+    return cosValues;
+  }
 
-    for (int u = 0; u < n; u++) {
-      for (int v = 0; v < n; v++) {
-        double sum = 0.0;
-        for (int y = 0; y < n; y++) {
-          for (int x = 0; x < n; x++) {
-            sum += input[y][x] * cosValues[u][y] * cosValues[v][x];
-          }
-        }
-
-        double cu = (u == 0) ? 1.0 / Math.sqrt(2) : 1.0;
-        double cv = (v == 0) ? 1.0 / Math.sqrt(2) : 1.0;
-        dct[u][v] = 0.25 * cu * cv * sum;
+  private double computeDctCoefficient(
+      double[][] input, double[][] cosValues, int u, int v, int n) {
+    double sum = 0.0;
+    for (int y = 0; y < n; y++) {
+      for (int x = 0; x < n; x++) {
+        sum += input[y][x] * cosValues[u][y] * cosValues[v][x];
       }
     }
-
-    return dct;
+    double cu = (u == 0) ? 1.0 / Math.sqrt(2) : 1.0;
+    double cv = (v == 0) ? 1.0 / Math.sqrt(2) : 1.0;
+    return 0.25 * cu * cv * sum;
   }
 
   private long computeHashFromDct(double[][] dct) {
-    // Extract top-left 8x8 (excluding DC component at [0][0])
-    // Calculate mean of low-frequency components
-    double sum = 0.0;
-    for (int y = 0; y < HASH_SIZE; y++) {
-      for (int x = 0; x < HASH_SIZE; x++) {
-        if (y == 0 && x == 0) continue; // Skip DC component
-        sum += dct[y][x];
-      }
-    }
-    double mean = sum / (HASH_BITS - 1);
-
-    // Build hash: bit is 1 if value > mean
+    double mean = computeLowFrequencyMean(dct);
     long hash = 0;
     for (int y = 0; y < HASH_SIZE; y++) {
       for (int x = 0; x < HASH_SIZE; x++) {
@@ -144,7 +138,17 @@ public final class PerceptualHashComparator implements ImageComparator {
         }
       }
     }
-
     return hash;
+  }
+
+  private double computeLowFrequencyMean(double[][] dct) {
+    double sum = 0.0;
+    for (int y = 0; y < HASH_SIZE; y++) {
+      for (int x = 0; x < HASH_SIZE; x++) {
+        if (y == 0 && x == 0) continue;
+        sum += dct[y][x];
+      }
+    }
+    return sum / (HASH_BITS - 1);
   }
 }

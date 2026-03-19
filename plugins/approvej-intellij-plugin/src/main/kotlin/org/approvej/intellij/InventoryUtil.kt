@@ -67,7 +67,7 @@ internal object InventoryUtil {
   private fun forEachInventoryFile(projectDir: VirtualFile, action: (VirtualFile) -> Unit) {
     VfsUtil.visitChildrenRecursively(
       projectDir,
-      object : VirtualFileVisitor<Void>() {
+      object : VirtualFileVisitor<Unit>() {
         override fun visitFile(file: VirtualFile): Boolean {
           if (file.isDirectory) {
             val name = file.name
@@ -153,18 +153,8 @@ internal object InventoryUtil {
     var changed = false
     val updated = Properties()
     for (key in properties.stringPropertyNames()) {
-      val projectRelKey = if (prefix.isNullOrEmpty()) key else "$prefix/$key"
       val value = properties.getProperty(key)
-
-      val newProjectRelKey = pathRenames[projectRelKey]
-      val newKey =
-        if (newProjectRelKey != null) {
-          if (prefix.isNullOrEmpty()) newProjectRelKey
-          else newProjectRelKey.substring(prefix.length + 1)
-        } else {
-          key
-        }
-      val newValue = testReferenceRenames.getOrDefault(value, value)
+      val (newKey, newValue) = transformEntry(key, value, prefix, pathRenames, testReferenceRenames)
       updated.setProperty(newKey, newValue)
       if (newKey != key || newValue != value) {
         changed = true
@@ -172,21 +162,45 @@ internal object InventoryUtil {
     }
 
     if (changed) {
-      ApplicationManager.getApplication().runWriteAction {
-        try {
-          OutputStreamWriter(
-              inventoryFile.getOutputStream(InventoryUtil::class.java),
-              StandardCharsets.ISO_8859_1,
+      writeInventoryFile(inventoryFile, updated)
+    }
+  }
+
+  private fun transformEntry(
+    key: String,
+    value: String,
+    prefix: String?,
+    pathRenames: Map<String, String>,
+    testReferenceRenames: Map<String, String>,
+  ): Pair<String, String> {
+    val projectRelKey = if (prefix.isNullOrEmpty()) key else "$prefix/$key"
+    val newProjectRelKey = pathRenames[projectRelKey]
+    val newKey =
+      if (newProjectRelKey != null) {
+        if (prefix.isNullOrEmpty()) newProjectRelKey
+        else newProjectRelKey.substring(prefix.length + 1)
+      } else {
+        key
+      }
+    val newValue = testReferenceRenames.getOrDefault(value, value)
+    return newKey to newValue
+  }
+
+  private fun writeInventoryFile(inventoryFile: VirtualFile, properties: Properties) {
+    ApplicationManager.getApplication().runWriteAction {
+      try {
+        OutputStreamWriter(
+            inventoryFile.getOutputStream(InventoryUtil::class.java),
+            StandardCharsets.ISO_8859_1,
+          )
+          .use { writer ->
+            properties.store(
+              writer,
+              "ApproveJ Approved File Inventory (auto-generated, do not edit)",
             )
-            .use { writer ->
-              updated.store(
-                writer,
-                "ApproveJ Approved File Inventory (auto-generated, do not edit)",
-              )
-            }
-        } catch (e: java.io.IOException) {
-          LOG.warn("Failed to write inventory file: ${inventoryFile.path}", e)
-        }
+          }
+      } catch (e: java.io.IOException) {
+        LOG.warn("Failed to write inventory file: ${inventoryFile.path}", e)
       }
     }
   }

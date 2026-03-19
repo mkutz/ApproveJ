@@ -41,7 +41,9 @@ class ApproveJRefactoringListenerProvider : RefactoringElementListenerProvider {
       val oldTestReference = "$className#$oldMethodName"
 
       return object : RefactoringElementListener {
-        override fun elementMoved(newElement: PsiElement) {}
+        override fun elementMoved(newElement: PsiElement) {
+          // not applicable for method renames
+        }
 
         override fun elementRenamed(newElement: PsiElement) {
           val newMethodName =
@@ -49,21 +51,8 @@ class ApproveJRefactoringListenerProvider : RefactoringElementListenerProvider {
               (newElement as PsiNamedElement).name ?: return
             )
 
-          val pathRenames = mutableMapOf<String, String>()
-          for ((oldPath, oldFileName) in oldPaths) {
-            val newFileName =
-              ApproveJRenamePsiElementProcessor.computeNewFileName(
-                oldFileName,
-                simpleClassName,
-                oldMethodName,
-                newMethodName,
-              )
-            if (newFileName != null) {
-              pathRenames[oldPath] =
-                oldPath.substring(0, oldPath.length - oldFileName.length) + newFileName
-            }
-          }
-
+          val pathRenames =
+            computeMethodPathRenames(oldPaths, simpleClassName, oldMethodName, newMethodName)
           val newTestReference = "$className#$newMethodName"
           InventoryUtil.updateEntries(
             project,
@@ -95,35 +84,65 @@ class ApproveJRefactoringListenerProvider : RefactoringElementListenerProvider {
       if (allOldPaths.isEmpty()) return null
 
       return object : RefactoringElementListener {
-        override fun elementMoved(newElement: PsiElement) {}
+        override fun elementMoved(newElement: PsiElement) {
+          // not applicable for class renames
+        }
 
         override fun elementRenamed(newElement: PsiElement) {
           val newClassName = (newElement as PsiNamedElement).name ?: return
           val packageName = qualifiedName.substring(0, qualifiedName.length - oldClassName.length)
           val newQualifiedName = packageName + newClassName
 
-          val pathRenames = mutableMapOf<String, String>()
-          for ((oldPath, oldFileName) in allOldPaths) {
-            if (oldFileName.startsWith("$oldClassName-")) {
-              val newFileName = newClassName + oldFileName.substring(oldClassName.length)
-              pathRenames[oldPath] =
-                oldPath.substring(0, oldPath.length - oldFileName.length) + newFileName
-            } else {
-              val oldDirSegment = "/$oldClassName/"
-              val newDirSegment = "/$newClassName/"
-              val dirIndex = oldPath.indexOf(oldDirSegment)
-              if (dirIndex >= 0) {
-                pathRenames[oldPath] = oldPath.substring(0, dirIndex) + newDirSegment + oldFileName
-              }
+          val pathRenames = computeClassPathRenames(allOldPaths, oldClassName, newClassName)
+          val testReferenceRenames =
+            oldTestReferences.entries.associate { (oldRef, methodName) ->
+              oldRef to "$newQualifiedName#$methodName"
             }
-          }
-
-          val testReferenceRenames = mutableMapOf<String, String>()
-          for ((oldRef, methodName) in oldTestReferences) {
-            testReferenceRenames[oldRef] = "$newQualifiedName#$methodName"
-          }
 
           InventoryUtil.updateEntries(project, pathRenames, testReferenceRenames)
+        }
+      }
+    }
+
+    private fun computeMethodPathRenames(
+      oldPaths: Map<String, String>,
+      simpleClassName: String,
+      oldMethodName: String,
+      newMethodName: String,
+    ): Map<String, String> {
+      return buildMap {
+        for ((oldPath, oldFileName) in oldPaths) {
+          val newFileName =
+            ApproveJRenamePsiElementProcessor.computeNewFileName(
+              oldFileName,
+              simpleClassName,
+              oldMethodName,
+              newMethodName,
+            )
+          if (newFileName != null) {
+            put(oldPath, oldPath.substring(0, oldPath.length - oldFileName.length) + newFileName)
+          }
+        }
+      }
+    }
+
+    private fun computeClassPathRenames(
+      allOldPaths: Map<String, String>,
+      oldClassName: String,
+      newClassName: String,
+    ): Map<String, String> {
+      return buildMap {
+        for ((oldPath, oldFileName) in allOldPaths) {
+          if (oldFileName.startsWith("$oldClassName-")) {
+            val newFileName = newClassName + oldFileName.substring(oldClassName.length)
+            put(oldPath, oldPath.substring(0, oldPath.length - oldFileName.length) + newFileName)
+          } else {
+            val oldDirSegment = "/$oldClassName/"
+            val dirIndex = oldPath.indexOf(oldDirSegment)
+            if (dirIndex >= 0) {
+              put(oldPath, oldPath.substring(0, dirIndex) + "/$newClassName/" + oldFileName)
+            }
+          }
         }
       }
     }

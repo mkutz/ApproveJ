@@ -14,7 +14,7 @@ record AnalysedImage(BufferedImage image, int width, int height, int size) {
   }
 
   public Pixel pixel(int x, int y) {
-    if (x >= image.getWidth() || y >= image.getHeight()) return Pixel.missing();
+    if (x >= image.getWidth() || y >= image.getHeight()) return Pixel.ofMissing();
     return Pixel.of(image.getRGB(x, y));
   }
 
@@ -27,7 +27,7 @@ record AnalysedImage(BufferedImage image, int width, int height, int size) {
         difference += thisPixel.difference(otherPixel);
       }
     }
-    return difference / (double) (image.getWidth() * image.getHeight());
+    return difference / (image.getWidth() * image.getHeight());
   }
 
   public boolean isMoreDifferentThan(AnalysedImage other, double maxDifference) {
@@ -57,7 +57,7 @@ record AnalysedImage(BufferedImage image, int width, int height, int size) {
           argb & MAX_VALUE);
     }
 
-    static Pixel missing() {
+    static Pixel ofMissing() {
       return MISSING;
     }
 

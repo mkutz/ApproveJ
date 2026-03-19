@@ -44,7 +44,7 @@ class ApprovalBuilderTest {
   @Test
   void printedBy() {
     Function<Person, String> personPrinter =
-        person -> "id=%s\nname=%s\nbirthday=%s".formatted(person.id, person.name, person.birthday);
+        person -> "id=" + person.id + "\nname=" + person.name + "\nbirthday=" + person.birthday;
     approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
         .printedBy(personPrinter)
         .byValue("id=000000-0000-0000-00000001\nname=Micha\nbirthday=1982-02-19");

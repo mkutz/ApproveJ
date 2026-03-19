@@ -240,8 +240,7 @@ class ApprovedFileInventoryTest {
     inventory.saveInventory();
 
     var content = readString(inventoryPath());
-    assertThat(content).contains("src/test/MyTest-myTest-approved.txt");
-    assertThat(content).doesNotContain("\\");
+    assertThat(content).contains("src/test/MyTest-myTest-approved.txt").doesNotContain("\\");
   }
 
   @Test

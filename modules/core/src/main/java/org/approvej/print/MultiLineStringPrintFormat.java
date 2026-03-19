@@ -210,7 +210,7 @@ public record MultiLineStringPrintFormat(Printer<Object> printer)
               method ->
                   derivePropertyName(method)
                       .filter(name -> !allFieldNames.contains(name))
-                      .filter(name -> seen.add(name))
+                      .filter(seen::add)
                       .map(name -> new Property(name, object, method))
                       .stream());
     }

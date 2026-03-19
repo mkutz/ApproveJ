@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -27,7 +28,8 @@ public class HttpStubServer implements AutoCloseable {
   private final HttpServer server;
   private final String address;
   private final List<ReceivedHttpRequest> receivedRequests = new CopyOnWriteArrayList<>();
-  private volatile StubbedHttpResponse nextResponse = response().body("OK").statusCode(200);
+  private final AtomicReference<StubbedHttpResponse> nextResponse =
+      new AtomicReference<>(response().body("OK").statusCode(200));
 
   /**
    * Creates and starts the server.
@@ -52,10 +54,11 @@ public class HttpStubServer implements AutoCloseable {
                     new TreeMap<>(exchange.getRequestHeaders()),
                     new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8)));
 
-            exchange.getResponseHeaders().putAll(nextResponse.headers());
-            exchange.sendResponseHeaders(nextResponse.statusCode(), nextResponse.body().length());
+            StubbedHttpResponse response = nextResponse.get();
+            exchange.getResponseHeaders().putAll(response.headers());
+            exchange.sendResponseHeaders(response.statusCode(), response.body().length());
             try (OutputStream responseBodyOutputStream = exchange.getResponseBody()) {
-              responseBodyOutputStream.write(nextResponse.body().getBytes());
+              responseBodyOutputStream.write(response.body().getBytes());
             }
             exchange.close();
           });
@@ -99,7 +102,7 @@ public class HttpStubServer implements AutoCloseable {
    * @return this
    */
   public HttpStubServer nextResponse(StubbedHttpResponse nextResponse) {
-    this.nextResponse = nextResponse;
+    this.nextResponse.set(nextResponse);
     return this;
   }
 
