@@ -49,3 +49,27 @@ jobs:
           path: |
             modules/**/build/reports/tests/test/
             plugins/**/build/reports/tests/test/
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: temurin
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - run: ./gradlew check
+
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: windows-test-reports
+          path: |
+            modules/**/build/reports/tests/test/
+            plugins/**/build/reports/tests/test/
