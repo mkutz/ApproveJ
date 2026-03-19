@@ -22,3 +22,24 @@ This hierarchy allows you to:
 - Further override them via environment variables (useful for CI/CD pipelines)
 
 See the <<cheat_sheet_configuration,cheat sheet>> for a complete list of all supported properties.
+
+
+[id="configuration_sonarqube"]
+== SonarQube / SonarCloud
+
+SonarQube's rule https://rules.sonarsource.com/java/RSPEC-2699/[S2699 ("Tests should include assertions")] may report false positives on approval tests because it does not recognize `byFile()` or `byValue()` as assertion methods.
+
+To fix this, configure the `customAssertionMethods` parameter on rule S2699 in your quality profile.
+Add the following entries:
+
+[source,text]
+----
+org.approvej.ApprovalBuilder#byFile,org.approvej.ApprovalBuilder#byValue,org.approvej.ApprovalBuilder#by,org.approvej.image.ImageApprovalBuilder#byFile
+----
+
+In SonarCloud, go to **Quality Profiles** → your Java profile → find rule **S2699** → click **Change** → set the `customAssertionMethods` parameter.
+
+In SonarQube Server, go to **Quality Profiles** → your Java profile → **Activate More Rules** → search for **S2699** → configure the parameter.
+
+NOTE: We have https://community.sonarsource.com/t/s2699-support-custom-annotations-as-assertions/93498[requested] that SonarSource add `approve` to the built-in assertion method pattern.
+If that is accepted, this configuration will no longer be necessary.

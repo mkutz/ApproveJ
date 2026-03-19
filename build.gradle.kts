@@ -124,15 +124,6 @@ sonar {
     property("sonar.projectKey", "mkutz_ApproveJ")
     property("sonar.organization", "mkutz")
     property("sonar.host.url", "https://sonarcloud.io")
-    property(
-      "sonar.java.test.custom_assertions",
-      listOf(
-          "org.approvej.ApprovalBuilder#byFile",
-          "org.approvej.ApprovalBuilder#byValue",
-          "org.approvej.image.ImageApprovalBuilder#byFile",
-        )
-        .joinToString(","),
-    )
   }
 }
 
