@@ -27,6 +27,7 @@ import org.approvej.approve.PathProvider;
 import org.approvej.image.ImageApprovalResult;
 import org.approvej.image.compare.ImageComparator;
 import org.approvej.image.compare.ImageComparisonResult;
+import org.approvej.print.PrintFormat;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -51,8 +52,13 @@ public class ImageFileApprover implements ImageApprover {
    *     files
    * @param comparator the {@link ImageComparator} to use for comparing images
    */
+  private static final String DEFAULT_IMAGE_EXTENSION = "png";
+
   ImageFileApprover(PathProvider pathProvider, ImageComparator comparator) {
-    this.pathProvider = pathProvider;
+    this.pathProvider =
+        pathProvider.filenameExtension().equals(PrintFormat.DEFAULT_FILENAME_EXTENSION)
+            ? pathProvider.filenameExtension(DEFAULT_IMAGE_EXTENSION)
+            : pathProvider;
     this.comparator = comparator;
   }
 
