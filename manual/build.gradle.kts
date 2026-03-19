@@ -60,6 +60,8 @@ tasks.withType<org.asciidoctor.gradle.jvm.AsciidoctorTask> {
 }
 
 tasks.register<org.asciidoctor.gradle.jvm.pdf.AsciidoctorPdfTask>("cheatSheetPdf") {
+  group = "documentation"
+  description = "Generates the cheat sheet as PDF."
   baseDirFollowsSourceFile()
   sourceDir(file("src/docs/asciidoc"))
   setOutputDir(layout.buildDirectory.dir("docs/asciidocPdf"))
