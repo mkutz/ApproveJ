@@ -7,15 +7,16 @@ import org.jetbrains.uast.UExpression
 import org.jetbrains.uast.UQualifiedReferenceExpression
 import org.jetbrains.uast.getUParentForIdentifier
 
-/** Shared utilities for recognising and analysing `approve()` call chains. */
+/** Shared utilities for recognising and analysing `approve()` / `approveImage()` call chains. */
 internal object ApproveCallUtil {
 
   const val APPROVAL_BUILDER_CLASS = "org.approvej.ApprovalBuilder"
   const val IMAGE_APPROVAL_BUILDER_CLASS = "org.approvej.image.ImageApprovalBuilder"
 
   /**
-   * Returns the UAST call expression if the given PSI element is the identifier of an `approve()`
-   * call on `ApprovalBuilder`, or `null` otherwise.
+   * Returns the [UCallExpression] if the given [PsiElement] is the identifier of an `approve()` or
+   * `approveImage()` call on [APPROVAL_BUILDER_CLASS] or [IMAGE_APPROVAL_BUILDER_CLASS], or `null`
+   * otherwise.
    */
   fun asApproveCall(element: PsiElement): UCallExpression? {
     if (element.firstChild != null) return null
@@ -24,7 +25,8 @@ internal object ApproveCallUtil {
   }
 
   /**
-   * Returns `true` if the given `approve()` call is on `ApprovalBuilder`.
+   * Returns `true` if the given [UCallExpression] is an `approve()` on [APPROVAL_BUILDER_CLASS] or
+   * an `approveImage()` on [IMAGE_APPROVAL_BUILDER_CLASS].
    *
    * Unlike [asApproveCall], this takes a UAST node directly (no leaf-element check).
    */
@@ -38,8 +40,9 @@ internal object ApproveCallUtil {
   }
 
   /**
-   * Walks the UAST parent chain from an `approve()` call and returns the name of the last method in
-   * the chain (e.g. `"byFile"`, `"printedAs"`, or `"approve"` if there is no chained call).
+   * Walks the UAST parent chain from an `approve()` or `approveImage()` call and returns a
+   * [ChainWalkResult] with the name of the last method in the chain (e.g. `"byFile"`,
+   * `"printedAs"`, or the initial method name if there is no chained call).
    */
   fun findTerminalCall(approveCall: UCallExpression): ChainWalkResult {
     var lastMethodName = approveCall.methodName ?: "approve"
@@ -57,8 +60,8 @@ internal object ApproveCallUtil {
   }
 
   /**
-   * Walks the UAST parent chain from an `approve()` call and returns the string literal argument of
-   * a `.named()` call in the chain, or `null` if no such call exists.
+   * Walks the UAST parent chain from an `approve()` or `approveImage()` call and returns the string
+   * literal argument of a `.named()` call in the chain, or `null` if no such call exists.
    */
   fun findNamedArgument(approveCall: UCallExpression): String? {
     walkChain(approveCall) { selector ->
@@ -75,8 +78,8 @@ internal object ApproveCallUtil {
   }
 
   /**
-   * Returns `true` if the UAST parent chain from an `approve()` call contains a `.named()` call,
-   * regardless of whether the argument is a constant.
+   * Returns `true` if the UAST parent chain from an `approve()` or `approveImage()` call contains a
+   * `.named()` call, regardless of whether the argument is a constant.
    */
   fun hasNamedCall(approveCall: UCallExpression): Boolean {
     walkChain(approveCall) { selector ->

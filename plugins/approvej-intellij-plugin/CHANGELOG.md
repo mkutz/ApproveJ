@@ -1,6 +1,14 @@
 # Changelog
 
 
+## v1.5.0
+
+* ✨ **Image approval support**
+  The plugin now recognizes `approveImage()` calls from the `image` module.
+  Gutter icons, dangling approval inspection, and duplicate unnamed approval inspection
+  all work with `ImageApprovalBuilder` chains.
+
+
 ## v1.4.7
 
 * ✨ **Diff view navigation and actions**
