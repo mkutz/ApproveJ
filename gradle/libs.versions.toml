@@ -9,7 +9,7 @@ junit = "6.0.3"
 junit5 = "5.11.3"
 junitPlatform5 = "1.11.3"
 maven = "3.9.14"
-spring-boot = "4.0.3"
+spring-boot = "4.0.4"
 testcontainers = "2.0.3"
 wiremock = "3.13.2"
 
