@@ -3,6 +3,7 @@ package org.approvej.approve;
 import static java.nio.file.Files.readString;
 import static java.nio.file.Files.writeString;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -10,6 +11,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import org.approvej.review.FileReviewResult;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -96,6 +98,94 @@ class ApprovedFileInventoryTest {
     var leftovers = inventory.findLeftovers();
 
     assertThat(leftovers).isEmpty();
+  }
+
+  @Test
+  void findLeftovers_existing_method_nested_class_canonical_name() {
+    var inventory =
+        new ApprovedFileInventory(
+            List.of(
+                new InventoryEntry(
+                    Path.of("src/test/PathProvidersTest.NestedTest-nextToTest-approved.txt"),
+                    "org.approvej.approve.PathProvidersTest.NestedTest#nextToTest")),
+            inventoryPath());
+
+    var leftovers = inventory.findLeftovers();
+
+    assertThat(leftovers).isEmpty();
+  }
+
+  @Test
+  void findLeftovers_existing_method_nested_class_binary_name() {
+    var inventory =
+        new ApprovedFileInventory(
+            List.of(
+                new InventoryEntry(
+                    Path.of("src/test/PathProvidersTest.NestedTest-nextToTest-approved.txt"),
+                    "org.approvej.approve.PathProvidersTest$NestedTest#nextToTest")),
+            inventoryPath());
+
+    var leftovers = inventory.findLeftovers();
+
+    assertThat(leftovers).isEmpty();
+  }
+
+  @Test
+  void findLeftovers_existing_method_doubly_nested_class_canonical_name() {
+    var inventory =
+        new ApprovedFileInventory(
+            List.of(
+                new InventoryEntry(
+                    Path.of(
+                        "src/test/PathProvidersTest.NestedTest.DoublyNestedTest"
+                            + "-nextToTest-approved.txt"),
+                    "org.approvej.approve.PathProvidersTest.NestedTest"
+                        + ".DoublyNestedTest#nextToTest")),
+            inventoryPath());
+
+    var leftovers = inventory.findLeftovers();
+
+    assertThat(leftovers).isEmpty();
+  }
+
+  @Nested
+  class ResolveClass {
+
+    @Test
+    void top_level_class() throws ClassNotFoundException {
+      assertThat(ApprovedFileInventory.resolveClass("org.approvej.approve.ApprovedFileInventory"))
+          .isEqualTo(ApprovedFileInventory.class);
+    }
+
+    @Test
+    void nested_class_canonical_name() throws ClassNotFoundException {
+      assertThat(
+              ApprovedFileInventory.resolveClass(
+                  "org.approvej.approve.PathProvidersTest.NestedTest"))
+          .isEqualTo(PathProvidersTest.NestedTest.class);
+    }
+
+    @Test
+    void nested_class_binary_name() throws ClassNotFoundException {
+      assertThat(
+              ApprovedFileInventory.resolveClass(
+                  "org.approvej.approve.PathProvidersTest$NestedTest"))
+          .isEqualTo(PathProvidersTest.NestedTest.class);
+    }
+
+    @Test
+    void doubly_nested_class_canonical_name() throws ClassNotFoundException {
+      assertThat(
+              ApprovedFileInventory.resolveClass(
+                  "org.approvej.approve.PathProvidersTest.NestedTest.DoublyNestedTest"))
+          .isEqualTo(PathProvidersTest.NestedTest.DoublyNestedTest.class);
+    }
+
+    @Test
+    void non_existent_class() {
+      assertThatThrownBy(() -> ApprovedFileInventory.resolveClass("com.nonexistent.NoSuchClass"))
+          .isInstanceOf(ClassNotFoundException.class);
+    }
   }
 
   @Test

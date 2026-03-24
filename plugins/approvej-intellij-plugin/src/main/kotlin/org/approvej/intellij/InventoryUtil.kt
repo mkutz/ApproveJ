@@ -46,7 +46,10 @@ internal object InventoryUtil {
     val testReference = "$className#$methodName"
     return inventory
       .stringPropertyNames()
-      .filter { testReference == inventory.getProperty(it) }
+      .filter {
+        val value = inventory.getProperty(it)
+        testReference == value || testReference == normalizeClassName(value)
+      }
       .sorted()
       .mapNotNull { projectDir.findFileByRelativePath(it) }
   }
@@ -182,7 +185,8 @@ internal object InventoryUtil {
       } else {
         key
       }
-    val newValue = testReferenceRenames.getOrDefault(value, value)
+    val newValue =
+      testReferenceRenames[value] ?: testReferenceRenames[normalizeClassName(value)] ?: value
     return newKey to newValue
   }
 
@@ -205,11 +209,18 @@ internal object InventoryUtil {
     }
   }
 
+  /**
+   * Converts a JVM binary class name to a canonical (dot-separated) name by replacing `$` inner
+   * class separators with `.`. This allows matching inventory entries (which may use `$`) against
+   * IntelliJ PSI names (which always use `.`).
+   */
+  internal fun normalizeClassName(className: String): String = className.replace('$', '.')
+
   private fun parseTestReference(testReference: String): TestReference? {
     val hashIndex = testReference.indexOf('#')
     if (hashIndex < 0) return null
     return TestReference(
-      testReference.substring(0, hashIndex),
+      normalizeClassName(testReference.substring(0, hashIndex)),
       testReference.substring(hashIndex + 1),
     )
   }

@@ -53,7 +53,7 @@ public final class ApprovedFileInventoryUpdater {
     }
 
     String testReference =
-        "%s#%s".formatted(testMethod.testClass().getName(), testMethod.testCaseName());
+        "%s#%s".formatted(testMethod.testClass().getCanonicalName(), testMethod.testCaseName());
 
     addEntry(new InventoryEntry(pathProvider.approvedPath(), testReference));
 

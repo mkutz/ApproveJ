@@ -80,13 +80,34 @@ public class ApprovedFileInventory {
         .filter(
             entry -> {
               try {
-                return stream(Class.forName(entry.className()).getDeclaredMethods())
+                return stream(resolveClass(entry.className()).getDeclaredMethods())
                     .noneMatch(method -> method.getName().equals(entry.methodName()));
               } catch (ClassNotFoundException e) {
                 return true;
               }
             })
         .toList();
+  }
+
+  /**
+   * Resolves a class name that may use either canonical (dot) or binary (dollar) notation for
+   * nested classes. Tries {@link Class#forName(String)} first, then progressively replaces dots
+   * with dollar signs from right to left to find nested classes.
+   */
+  static Class<?> resolveClass(String className) throws ClassNotFoundException {
+    String[] parts = className.split("\\.");
+    for (int classStart = parts.length; classStart > 0; classStart--) {
+      var candidate = new StringBuilder(parts[0]);
+      for (int i = 1; i < parts.length; i++) {
+        candidate.append(i < classStart ? '.' : '$').append(parts[i]);
+      }
+      try {
+        return Class.forName(candidate.toString());
+      } catch (ClassNotFoundException ignored) {
+        // try next split point
+      }
+    }
+    throw new ClassNotFoundException(className);
   }
 
   /** Result of a {@link #removeLeftovers()} operation. */
