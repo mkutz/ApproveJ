@@ -83,42 +83,22 @@ class ApproveJRenamePsiElementProcessor : RenamePsiElementProcessor() {
 
       val renames = mutableMapOf<PsiElement, String>()
       val psiManager = PsiManager.getInstance(project)
+
+      fun addRename(file: VirtualFile) {
+        val newFileName =
+          computeNewFileName(file.name, simpleClassName, oldMethodName, newMethodName) ?: return
+        val psiFile: PsiFile = psiManager.findFile(file) ?: return
+        renames[psiFile] = newFileName
+      }
+
       for (approvedFile in approvedFiles) {
-        addMethodFileRename(
-          approvedFile,
-          simpleClassName,
-          oldMethodName,
-          newMethodName,
-          psiManager,
-          renames,
-        )
+        addRename(approvedFile)
         val receivedFile = ApprovedFileUtil.findReceivedFile(approvedFile)
         if (receivedFile != null) {
-          addMethodFileRename(
-            receivedFile,
-            simpleClassName,
-            oldMethodName,
-            newMethodName,
-            psiManager,
-            renames,
-          )
+          addRename(receivedFile)
         }
       }
       return renames
-    }
-
-    private fun addMethodFileRename(
-      file: VirtualFile,
-      simpleClassName: String,
-      oldMethodName: String,
-      newMethodName: String,
-      psiManager: PsiManager,
-      renames: MutableMap<PsiElement, String>,
-    ) {
-      val newFileName =
-        computeNewFileName(file.name, simpleClassName, oldMethodName, newMethodName) ?: return
-      val psiFile: PsiFile = psiManager.findFile(file) ?: return
-      renames[psiFile] = newFileName
     }
 
     private fun prepareClassRenaming(
@@ -142,14 +122,13 @@ class ApproveJRenamePsiElementProcessor : RenamePsiElementProcessor() {
           if (receivedFile != null) {
             addClassFileRename(receivedFile, oldClassName, newClassName, psiManager, renames)
           }
-          addClassDirRename(
-            approvedFile,
-            oldClassName,
-            newClassName,
-            psiManager,
-            renamedDirectories,
-            renames,
-          )
+          val parentDir = approvedFile.parent
+          if (
+            parentDir != null && parentDir.name == oldClassName && renamedDirectories.add(parentDir)
+          ) {
+            val psiDir = psiManager.findDirectory(parentDir)
+            if (psiDir != null) renames[psiDir] = newClassName
+          }
         }
       }
       return renames
@@ -167,20 +146,6 @@ class ApproveJRenamePsiElementProcessor : RenamePsiElementProcessor() {
       val newFileName = newClassName + filename.substring(oldClassName.length)
       val psiFile: PsiFile = psiManager.findFile(file) ?: return
       renames[psiFile] = newFileName
-    }
-
-    private fun addClassDirRename(
-      file: VirtualFile,
-      oldClassName: String,
-      newClassName: String,
-      psiManager: PsiManager,
-      renamedDirectories: MutableSet<VirtualFile>,
-      renames: MutableMap<PsiElement, String>,
-    ) {
-      val parentDir = file.parent ?: return
-      if (parentDir.name != oldClassName || !renamedDirectories.add(parentDir)) return
-      val psiDir = psiManager.findDirectory(parentDir) ?: return
-      renames[psiDir] = newClassName
     }
 
     /**

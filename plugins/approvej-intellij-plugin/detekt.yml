@@ -1,0 +1,15 @@
+complexity:
+  CyclomaticComplexMethod:
+    threshold: 15
+  NestedBlockDepth:
+    threshold: 5
+  TooManyFunctions:
+    thresholdInObjects: 15
+
+style:
+  ReturnCount:
+    max: 5
+
+naming:
+  MemberNameEqualsClassName:
+    active: false

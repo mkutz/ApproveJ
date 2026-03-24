@@ -1,6 +1,7 @@
 [versions]
 assertj = "3.27.7"
 commonmark = "0.27.1"
+detekt = "1.23.8"
 intellij-ide = "2025.1"
 intellij-platform = "2.13.1"
 jackson2 = "2.21.1"
@@ -60,6 +61,7 @@ wiremock = { module = "org.wiremock:wiremock", version.ref = "wiremock" }
 [plugins]
 asciidoctor = { id = "org.asciidoctor.jvm.convert", version = "4.0.5" }
 asciidoctor-pdf = { id = "org.asciidoctor.jvm.pdf", version = "4.0.5" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-platform" }
 jreleaser = { id = "org.jreleaser", version = "1.23.0" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.3.20" }

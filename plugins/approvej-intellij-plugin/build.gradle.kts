@@ -13,9 +13,13 @@ plugins {
   alias(libs.plugins.kotlin.jvm)
   jacoco
   alias(libs.plugins.intellij.platform)
+  alias(libs.plugins.detekt)
 }
 
-kotlin { jvmToolchain(21) }
+kotlin {
+  jvmToolchain(21)
+  compilerOptions { allWarningsAsErrors.set(true) }
+}
 
 repositories {
   mavenCentral()
@@ -118,3 +122,5 @@ tasks.test {
 }
 
 tasks.jacocoTestReport { reports { xml.required = true } }
+
+detekt { config.setFrom(files("detekt.yml")) }

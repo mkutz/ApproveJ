@@ -40,16 +40,24 @@ class DuplicateUnnamedApprovalInspection : AbstractBaseUastLocalInspectionTool()
           val key = call.effectiveName ?: ""
           val unnamed = key.isEmpty()
           val message = if (unnamed) UNNAMED_WARNING else NAMED_WARNING_TEMPLATE.format(key)
-          val fixes =
-            if (unnamed) arrayOf<LocalQuickFix>(AddNamedCallFix()) else LocalQuickFix.EMPTY_ARRAY
-          manager.createProblemDescriptor(
-            call.approveElement,
-            call.chainEndElement,
-            message,
-            ProblemHighlightType.WARNING,
-            isOnTheFly,
-            *fixes,
-          )
+          if (unnamed) {
+            manager.createProblemDescriptor(
+              call.approveElement,
+              call.chainEndElement,
+              message,
+              ProblemHighlightType.WARNING,
+              isOnTheFly,
+              AddNamedCallFix(),
+            )
+          } else {
+            manager.createProblemDescriptor(
+              call.approveElement,
+              call.chainEndElement,
+              message,
+              ProblemHighlightType.WARNING,
+              isOnTheFly,
+            )
+          }
         }
 
     return if (problems.isEmpty()) null else problems.toTypedArray()
