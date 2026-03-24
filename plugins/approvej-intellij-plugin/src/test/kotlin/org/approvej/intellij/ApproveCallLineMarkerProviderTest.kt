@@ -88,6 +88,33 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
     assertThat(gutters.first().tooltipText).isEqualTo("Navigate to Test-myTest-approved.txt")
   }
 
+  fun testMarker_present_for_byFile_nested_class() {
+    addInventory(
+      "src/com/example/OuterTest-myTest-approved.txt" to "com.example.OuterTest\$InnerTest#myTest"
+    )
+    myFixture.addFileToProject("src/com/example/OuterTest-myTest-approved.txt", "approved content")
+
+    myFixture.configureByText(
+      "OuterTest.java",
+      """
+      package com.example;
+      import static org.approvej.ApprovalBuilder.approve;
+      class OuterTest {
+          class InnerTest {
+              void myTest() {
+                  approve("x").byFile();
+              }
+          }
+      }
+      """
+        .trimIndent(),
+    )
+
+    val gutters = findApprovalGutters()
+    assertThat(gutters).hasSize(1)
+    assertThat(gutters.first().tooltipText).isEqualTo("Navigate to OuterTest-myTest-approved.txt")
+  }
+
   fun testMarker_named_filters_to_matching_file() {
     addInventory(
       "src/com/example/Test-myTest-jane-approved.txt" to "com.example.Test#myTest",
