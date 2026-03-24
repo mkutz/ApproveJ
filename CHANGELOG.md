@@ -1,6 +1,16 @@
 # Changelog
 
 
+## v1.5.2
+
+### core
+
+* 🐛 **Use canonical class names for nested classes in inventory**
+  `ApprovedFileInventory` now uses canonical names (dots) instead of JVM binary names (`$`) for nested
+  classes, making inventory entries easier to resolve in tools like the IntelliJ plugin.
+  ([#257](https://github.com/mkutz/ApproveJ/issues/257))
+
+
 ## v1.5.1
 
 ### image

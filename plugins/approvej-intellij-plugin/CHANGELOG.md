@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v1.5.2
+
+* 🐛 **Fix nested test class resolution in Kotlin/JUnit 5**
+  The plugin now normalizes `$` separators in class names when reading inventory entries, correctly
+  resolving nested test classes.
+  ([#257](https://github.com/mkutz/ApproveJ/issues/257))
+
+* 🐛 **Fix image diff tool not appearing**
+  `ImageDiffTool` now suppresses IntelliJ's built-in `SimpleDiffTool` and `BinaryDiffTool`, ensuring
+  the three-panel image diff viewer is used for image approvals.
+  ([#273](https://github.com/mkutz/ApproveJ/issues/273))
+
+
 ## v1.5.1
 
 * ✨ **Image diff viewer**
