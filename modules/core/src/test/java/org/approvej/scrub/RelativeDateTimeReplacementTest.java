@@ -7,12 +7,13 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 import static org.approvej.scrub.Replacements.relativeDateTime;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import org.junit.jupiter.api.Test;
 
 class RelativeDateTimeReplacementTest {
 
-  public static final ZonedDateTime NOW = ZonedDateTime.now();
+  public static final ZonedDateTime NOW = ZonedDateTime.now(ZoneOffset.UTC);
 
   @Test
   void apply_now() {
