@@ -27,6 +27,19 @@ class ReviewingDocTest {
   }
 
   @Test
+  fun `approve reviewedBy ai`() {
+    assumeThat(ProcessBuilder("which", "claude").start().waitFor()).isEqualTo(0)
+    // tag::approve_reviewedBy_ai[]
+    val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
+
+    approve(person)
+      .printedAs(PersonYamlPrinter())
+      .reviewedBy(Reviewers.ai("claude -p --allowedTools Read")) // <1>
+      .byFile() // <2>
+    // end::approve_reviewedBy_ai[]
+  }
+
+  @Test
   fun `approve reviewedBy automatic`() {
     // tag::approve_reviewedBy_automatic[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))

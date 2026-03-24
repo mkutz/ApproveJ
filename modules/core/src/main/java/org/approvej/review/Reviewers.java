@@ -33,6 +33,21 @@ public class Reviewers {
   }
 
   /**
+   * A {@link FileReviewer} that calls an AI CLI tool to review the difference between the received
+   * and approved files.
+   *
+   * <p>For text files, a unified diff is included in the prompt. For image files, the file paths
+   * are passed so the AI CLI can read them directly. If the AI responds with "YES", the received
+   * file is automatically approved.
+   *
+   * @param command the AI CLI command to execute (e.g., "claude", "gemini")
+   * @return the new {@link AiFileReviewer}
+   */
+  public static FileReviewer ai(String command) {
+    return new AiFileReviewer(command);
+  }
+
+  /**
    * A {@link FileReviewer} that accepts any given received value, ignoring the previously approved
    * value.
    *

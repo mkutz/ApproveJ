@@ -163,6 +163,7 @@ public class ApprovedFileInventory {
               try {
                 Files.move(
                     pathProvider.receivedPath(), pathProvider.approvedPath(), REPLACE_EXISTING);
+                Files.deleteIfExists(pathProvider.diffPath());
                 approved.add(pathProvider.approvedPath());
               } catch (IOException e) {
                 failed.add(pathProvider.receivedPath());

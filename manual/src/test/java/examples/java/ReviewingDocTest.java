@@ -28,6 +28,19 @@ class ReviewingDocTest {
   }
 
   @Test
+  void approve_reviewedBy_ai() throws IOException, InterruptedException {
+    assumeThat(new ProcessBuilder("which", "claude").start().waitFor()).isEqualTo(0);
+    // tag::approve_reviewedBy_ai[]
+    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+
+    approve(person)
+        .printedAs(new PersonYamlPrintFormat())
+        .reviewedBy(Reviewers.ai("claude -p --allowedTools Read")) // <1>
+        .byFile(); // <2>
+    // end::approve_reviewedBy_ai[]
+  }
+
+  @Test
   void approve_reviewedBy_automatic() {
     // tag::approve_reviewedBy_automatic[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));

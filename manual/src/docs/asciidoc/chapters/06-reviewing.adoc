@@ -124,3 +124,70 @@ You can also set this globally via configuration:
 ----
 defaultFileReviewer = automatic
 ----
+
+
+[id=ai_review]
+== AI-Assisted Review
+
+You can configure an AI CLI tool to review approval test diffs automatically.
+The AI evaluates whether changes look intentional and auto-approves if confident — otherwise the test fails for human review.
+
+This is especially useful for image approvals, where multimodal AI can visually compare screenshots.
+
+NOTE: AI-assisted review targets local development.
+It requires an AI CLI tool (e.g., `claude`, `gemini`, `codex`) installed locally.
+
+To enable AI-assisted review, configure the `aiReviewerCommand` property in your `approvej.properties`:
+
+.`~/.config/approvej/approvej.properties`
+[source,properties]
+----
+aiReviewerCommand = claude -p --allowedTools Read
+----
+
+This property takes priority over `defaultFileReviewer` and `defaultFileReviewerScript`.
+
+The command can contain `\{receivedFile}` and `\{approvedFile}` placeholders, which will be replaced with the actual file paths.
+
+Here are configuration examples for common AI CLI tools:
+
+[source,properties]
+.Claude (with image support via Read tool)
+----
+aiReviewerCommand = claude -p --allowedTools Read
+----
+
+[source,properties]
+.Gemini
+----
+aiReviewerCommand = gemini
+----
+
+[source,properties]
+.Codex
+----
+aiReviewerCommand = codex
+----
+
+For **text files**, ApproveJ generates a unified diff and sends it to the AI as part of the prompt.
+For **image files** (e.g., `.png`, `.jpg`), the AI is instructed to read the image files from disk.
+The AI CLI needs permission to read files for image review to work (e.g., `--allowedTools Read` for Claude).
+
+The AI is asked to respond with YES or NO on the first line.
+If the AI responds with YES, the received file is automatically approved (<<blocking_review,blocking>>).
+If it responds with NO or encounters an error, the test fails and a human developer needs to review the difference.
+
+You can also override the AI reviewer for a single test:
+
+[source,java,indent=0,role="primary"]
+.Java
+----
+include::../../../test/java/examples/java/ReviewingDocTest.java[tag=approve_reviewedBy_ai]
+----
+[source,kotlin,indent=0,role="secondary"]
+.Kotlin
+----
+include::../../../test/kotlin/examples/kotlin/ReviewingDocTest.kt[tag=approve_reviewedBy_ai]
+----
+<1> sets the AI CLI command to be used for review
+<2> triggers the AI review if the received value differs from the approved value

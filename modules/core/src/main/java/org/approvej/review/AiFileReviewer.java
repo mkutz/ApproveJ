@@ -1,0 +1,191 @@
+package org.approvej.review;
+
+import static java.nio.file.Files.move;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Set;
+import java.util.logging.Logger;
+import org.approvej.approve.PathProvider;
+import org.jspecify.annotations.NullMarked;
+
+/**
+ * A {@link FileReviewer} that calls an AI CLI tool to review the difference between the received
+ * and approved files.
+ *
+ * <p>For text files, a unified diff is generated and included in the prompt. For image files, the
+ * AI is instructed to read the files from disk.
+ *
+ * <p>The command can contain <code>{@value RECEIVED_PLACEHOLDER}</code> and <code>
+ * {@value APPROVED_PLACEHOLDER}</code> placeholders, which will be replaced with the actual file
+ * paths.
+ *
+ * <p>If the AI responds with "YES" on the first line, the received file is automatically approved.
+ * Otherwise, the test fails and a human developer needs to review.
+ *
+ * @param command the AI CLI command to execute (e.g., "claude -p --allowedTools Read")
+ */
+@NullMarked
+record AiFileReviewer(String command) implements FileReviewer {
+
+  static final String RECEIVED_PLACEHOLDER = "{receivedFile}";
+  static final String APPROVED_PLACEHOLDER = "{approvedFile}";
+
+  private static final Logger LOGGER = Logger.getLogger(AiFileReviewer.class.getName());
+
+  private static final Set<String> IMAGE_EXTENSIONS =
+      Set.of("png", "jpg", "jpeg", "gif", "bmp", "webp");
+
+  private static final String TEXT_PROMPT_TEMPLATE =
+      """
+      You are reviewing a change in an approval test.
+      Approval tests compare a "received" value (current test output) \
+      against a previously "approved" value (golden master).
+
+      Files:
+      - Approved: %s
+      - Received: %s
+
+      Unified diff (--- is the approved file, +++ is the received file):
+      %s
+
+      Is this change clearly intentional and safe to approve?
+      When in doubt, answer NO — it is better to ask a human than to approve an unintended change.
+      Answer with exactly YES or NO on the first line, \
+      followed by a summary of all differences you found.\
+      """;
+
+  private static final String IMAGE_DIFF_PROMPT_TEMPLATE =
+      """
+      You are reviewing a change in an image approval test.
+      Approval tests compare a "received" image (current test output) \
+      against a previously "approved" image (golden master).
+
+      A pixel-difference overlay image has been generated for you:
+      - Diff image: %s
+
+      In this diff image, matching pixels are shown as dimmed grayscale, \
+      and differing pixels are highlighted in magenta.
+
+      Read the diff image file. \
+      If the magenta-highlighted areas indicate clearly intentional changes \
+      (e.g., expected UI updates), answer YES. \
+      If they suggest potentially unintentional changes \
+      (e.g., layout breaks, missing elements, changed text or numbers), answer NO.
+
+      When in doubt, answer NO — it is better to ask a human than to approve an unintended change.
+      Answer with exactly YES or NO on the first line, \
+      followed by a summary of all visual differences you found.\
+      """;
+
+  private static final String IMAGE_PROMPT_TEMPLATE =
+      """
+      You are reviewing a change in an image approval test.
+      Approval tests compare a "received" image (current test output) \
+      against a previously "approved" image (golden master).
+
+      Read and compare these two image files:
+      - Approved: %s
+      - Received: %s
+
+      You MUST read both image files before answering. \
+      Look at both images and determine if the visual differences are clearly intentional \
+      (e.g., expected UI changes, content updates) or potentially unintentional \
+      (e.g., layout breaks, missing elements, visual regressions, changed text or numbers).
+
+      When in doubt, answer NO — it is better to ask a human than to approve an unintended change.
+      Answer with exactly YES or NO on the first line, \
+      followed by a summary of all visual differences you found.\
+      """;
+
+  @Override
+  public ReviewResult apply(PathProvider pathProvider) {
+    try {
+      Path approvedPath = pathProvider.approvedPath();
+      Path receivedPath = pathProvider.receivedPath();
+
+      String prompt = buildPrompt(pathProvider, approvedPath, receivedPath);
+      String resolvedCommand = resolveCommand(approvedPath, receivedPath);
+      String response = executeAiCommand(resolvedCommand, prompt);
+
+      LOGGER.info("AI review result:\n%s".formatted(response));
+
+      if (isApproved(response)) {
+        move(receivedPath, approvedPath, REPLACE_EXISTING);
+        Files.deleteIfExists(pathProvider.diffPath());
+        return new FileReviewResult(true);
+      }
+    } catch (IOException e) {
+      LOGGER.info("Review by %s failed with exception %s".formatted(getClass().getSimpleName(), e));
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      LOGGER.info(
+          "Review by %s was interrupted with exception %s"
+              .formatted(getClass().getSimpleName(), e));
+    }
+    return new FileReviewResult(false);
+  }
+
+  private String buildPrompt(PathProvider pathProvider, Path approvedPath, Path receivedPath)
+      throws IOException, InterruptedException {
+    if (isImageFile(pathProvider.filenameExtension())) {
+      Path diffPath = pathProvider.diffPath();
+      if (Files.exists(diffPath)) {
+        return IMAGE_DIFF_PROMPT_TEMPLATE.formatted(diffPath);
+      }
+      return IMAGE_PROMPT_TEMPLATE.formatted(approvedPath, receivedPath);
+    }
+    String diff = generateDiff(approvedPath, receivedPath);
+    return TEXT_PROMPT_TEMPLATE.formatted(approvedPath, receivedPath, diff);
+  }
+
+  private String generateDiff(Path approvedPath, Path receivedPath)
+      throws IOException, InterruptedException {
+    ProcessBuilder processBuilder =
+        new ProcessBuilder("diff", "-u", approvedPath.toString(), receivedPath.toString());
+    Process process = processBuilder.start();
+    String diff = new String(process.getInputStream().readAllBytes());
+    process.waitFor();
+    return diff;
+  }
+
+  private String resolveCommand(Path approvedPath, Path receivedPath) {
+    return command
+        .replace(RECEIVED_PLACEHOLDER, "%s".formatted(receivedPath))
+        .replace(APPROVED_PLACEHOLDER, "%s".formatted(approvedPath));
+  }
+
+  private String executeAiCommand(String resolvedCommand, String prompt)
+      throws IOException, InterruptedException {
+    ProcessBuilder processBuilder = new ProcessBuilder();
+    if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+      processBuilder.command("cmd.exe", "/c", resolvedCommand); // NOSONAR
+    } else {
+      processBuilder.command("sh", "-c", resolvedCommand); // NOSONAR
+    }
+    Process process = processBuilder.start();
+    process.getOutputStream().write(prompt.getBytes());
+    process.getOutputStream().close();
+    String response = new String(process.getInputStream().readAllBytes());
+    process.waitFor();
+    return response;
+  }
+
+  private static boolean isImageFile(String filenameExtension) {
+    return IMAGE_EXTENSIONS.contains(filenameExtension.toLowerCase());
+  }
+
+  private static boolean isApproved(String response) {
+    return firstLine(response).trim().toUpperCase().startsWith("YES");
+  }
+
+  private static String firstLine(String response) {
+    int newlineIndex = response.indexOf('\n');
+    if (newlineIndex >= 0) {
+      return response.substring(0, newlineIndex);
+    }
+    return response;
+  }
+}

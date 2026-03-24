@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import org.approvej.approve.PathProvider;
 import org.approvej.image.ImageApprovalResult;
+import org.approvej.image.compare.DiffImageRenderer;
 import org.approvej.image.compare.ImageComparator;
 import org.approvej.image.compare.ImageComparisonResult;
 import org.approvej.print.PrintFormat;
@@ -155,6 +156,7 @@ public class ImageFileApprover implements ImageApprover {
     ImageComparisonResult comparisonResult = comparator.compare(previouslyApproved, received);
     ImageFileApprovalResult result = new ImageFileApprovalResult(comparisonResult, pathProvider);
     Path receivedPath = pathProvider.receivedPath();
+    Path diffPath = pathProvider.diffPath();
     if (result.needsApproval()) {
       try (var outputStream = Files.newOutputStream(receivedPath, CREATE, TRUNCATE_EXISTING)) {
         ImageIO.write(received, pathProvider.filenameExtension(), outputStream);
@@ -162,15 +164,27 @@ public class ImageFileApprover implements ImageApprover {
         throw new ImageFileApproverError(
             "Writing received to %s failed".formatted(receivedPath), e);
       }
+      writeDiffImage(previouslyApproved, received, diffPath);
     } else {
       try {
         deleteIfExists(receivedPath);
+        deleteIfExists(diffPath);
       } catch (IOException e) {
         throw new ImageFileApproverError(
             "Deleting received file %s failed".formatted(receivedPath), e);
       }
     }
     return result;
+  }
+
+  private void writeDiffImage(
+      BufferedImage previouslyApproved, BufferedImage received, Path diffPath) {
+    try (var outputStream = Files.newOutputStream(diffPath, CREATE, TRUNCATE_EXISTING)) {
+      BufferedImage diffImage = DiffImageRenderer.computeDiffImage(received, previouslyApproved);
+      ImageIO.write(diffImage, pathProvider.filenameExtension(), outputStream);
+    } catch (IOException e) {
+      LOGGER.fine("Writing diff image to %s failed: %s".formatted(diffPath, e.getMessage()));
+    }
   }
 
   /**
