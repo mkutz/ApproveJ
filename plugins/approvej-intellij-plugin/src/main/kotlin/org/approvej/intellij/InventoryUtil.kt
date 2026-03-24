@@ -211,10 +211,18 @@ internal object InventoryUtil {
 
   /**
    * Converts a JVM binary class name to a canonical (dot-separated) name by replacing `$` inner
-   * class separators with `.`. This allows matching inventory entries (which may use `$`) against
-   * IntelliJ PSI names (which always use `.`).
+   * class separators with `.`. When given a full test reference of the form `Class#method`, only
+   * the class portion before `#` is normalized. This allows matching inventory entries (which may
+   * use `$`) against IntelliJ PSI names (which always use `.`).
    */
-  internal fun normalizeClassName(className: String): String = className.replace('$', '.')
+  internal fun normalizeClassName(className: String): String {
+    val hashIndex = className.indexOf('#')
+    if (hashIndex < 0) {
+      return className.replace('$', '.')
+    }
+    val normalizedClassPart = className.substring(0, hashIndex).replace('$', '.')
+    return normalizedClassPart + className.substring(hashIndex)
+  }
 
   private fun parseTestReference(testReference: String): TestReference? {
     val hashIndex = testReference.indexOf('#')

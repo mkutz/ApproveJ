@@ -52,8 +52,11 @@ public final class ApprovedFileInventoryUpdater {
       return;
     }
 
-    String testReference =
-        "%s#%s".formatted(testMethod.testClass().getCanonicalName(), testMethod.testCaseName());
+    String className = testMethod.testClass().getCanonicalName();
+    if (className == null) {
+      className = testMethod.testClass().getName();
+    }
+    String testReference = "%s#%s".formatted(className, testMethod.testCaseName());
 
     addEntry(new InventoryEntry(pathProvider.approvedPath(), testReference));
 
