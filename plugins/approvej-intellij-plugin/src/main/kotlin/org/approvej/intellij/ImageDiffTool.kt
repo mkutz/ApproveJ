@@ -23,7 +23,7 @@ import javax.swing.SwingConstants
 private val IMAGE_EXTENSIONS = setOf("png", "jpg", "jpeg", "gif", "bmp", "webp")
 private const val IMAGE_COLUMNS = 3
 
-private fun isImageFile(filename: String): Boolean {
+internal fun isImageFile(filename: String): Boolean {
   val extension = filename.substringAfterLast('.', "").lowercase()
   return extension in IMAGE_EXTENSIONS
 }
