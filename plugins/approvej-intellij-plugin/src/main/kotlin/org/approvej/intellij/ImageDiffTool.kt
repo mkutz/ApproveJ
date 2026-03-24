@@ -1,24 +1,40 @@
 package org.approvej.intellij
 
 import com.intellij.diff.DiffContext
+import com.intellij.diff.DiffTool
 import com.intellij.diff.FrameDiffTool
+import com.intellij.diff.SuppressiveDiffTool
 import com.intellij.diff.requests.DiffRequest
+import com.intellij.diff.tools.binary.BinaryDiffTool
+import com.intellij.diff.tools.simple.SimpleDiffTool
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.ui.components.JBScrollPane
 import java.awt.BorderLayout
 import java.awt.GridLayout
+import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
 import javax.swing.BorderFactory
 import javax.swing.ImageIcon
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.JScrollPane
 import javax.swing.SwingConstants
 
+private val IMAGE_EXTENSIONS = setOf("png", "jpg", "jpeg", "gif", "bmp", "webp")
+private const val IMAGE_COLUMNS = 3
+
+internal fun isImageFile(filename: String): Boolean {
+  val extension = filename.substringAfterLast('.', "").lowercase()
+  return extension in IMAGE_EXTENSIONS
+}
+
 /** A three-panel diff tool that shows Received, Pixel Difference, and Approved images. */
-class ImageDiffTool : FrameDiffTool {
+class ImageDiffTool : FrameDiffTool, SuppressiveDiffTool {
 
   override fun getName(): String = "ApproveJ Image Diff"
+
+  override fun getSuppressedTools(): List<Class<out DiffTool>> =
+    listOf(SimpleDiffTool::class.java, BinaryDiffTool::class.java)
 
   override fun canShow(context: DiffContext, request: DiffRequest): Boolean {
     val receivedFile = request.getUserData(ReceivedFileUtil.RECEIVED_FILE_KEY) ?: return false
@@ -57,7 +73,7 @@ class ImageDiffTool : FrameDiffTool {
       val receivedImage = ImageIO.read(File(receivedFile.path))
       val approvedImage = ImageIO.read(File(approvedFile.path))
 
-      val imagesPanel = JPanel(GridLayout(1, 3))
+      val imagesPanel = JPanel(GridLayout(1, IMAGE_COLUMNS))
 
       if (receivedImage != null && approvedImage != null) {
         val diffImage = ImageDiffUtil.computeDiffImage(receivedImage, approvedImage)
@@ -78,22 +94,15 @@ class ImageDiffTool : FrameDiffTool {
 
     override fun init(): FrameDiffTool.ToolbarComponents = FrameDiffTool.ToolbarComponents()
 
-    override fun dispose() {}
+    override fun dispose() {
+      // nothing to dispose
+    }
 
-    private fun createImagePanel(title: String, image: java.awt.image.BufferedImage): JScrollPane {
+    private fun createImagePanel(title: String, image: BufferedImage): JBScrollPane {
       val label = JLabel(ImageIcon(image))
-      val scrollPane = JScrollPane(label)
+      val scrollPane = JBScrollPane(label)
       scrollPane.border = BorderFactory.createTitledBorder(title)
       return scrollPane
-    }
-  }
-
-  companion object {
-    private val IMAGE_EXTENSIONS = setOf("png", "jpg", "jpeg", "gif", "bmp", "webp")
-
-    private fun isImageFile(filename: String): Boolean {
-      val extension = filename.substringAfterLast('.', "").lowercase()
-      return extension in IMAGE_EXTENSIONS
     }
   }
 }
