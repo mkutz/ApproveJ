@@ -1,7 +1,6 @@
 package org.approvej.intellij
 
 import com.intellij.openapi.fileEditor.FileEditor
-import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.EditorNotificationPanel
@@ -10,7 +9,7 @@ import java.util.function.Function
 import javax.swing.JComponent
 
 /** Shows an info banner when a `-received` file is opened, with actions to compare or approve. */
-class ReceivedFileEditorNotificationProvider : EditorNotificationProvider, DumbAware {
+class ReceivedFileEditorNotificationProvider : EditorNotificationProvider {
 
   override fun collectNotificationData(
     project: Project,
