@@ -3,6 +3,7 @@ package org.approvej.review;
 import static java.nio.file.Files.readString;
 import static java.nio.file.Files.writeString;
 import static org.approvej.approve.PathProviders.approvedPath;
+import static org.approvej.review.AiFileReviewer.unifiedDiff;
 import static org.approvej.review.Reviewers.ai;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 import org.approvej.approve.PathProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -148,5 +150,60 @@ class AiFileReviewerTest {
     ReviewResult result = reviewer.apply(pathProvider);
 
     assertThat(result.needsReapproval()).isTrue();
+  }
+
+  @Test
+  void unifiedDiff_identical() {
+    List<String> lines = List.of("line1", "line2");
+
+    String diff = unifiedDiff("a.txt", "b.txt", lines, lines);
+
+    assertThat(diff).isEmpty();
+  }
+
+  @Test
+  void unifiedDiff_added_line() {
+    List<String> approved = List.of("line1", "line3");
+    List<String> received = List.of("line1", "line2", "line3");
+
+    String diff = unifiedDiff("a.txt", "b.txt", approved, received);
+
+    assertThat(diff)
+        .startsWith("--- a.txt\n+++ b.txt\n")
+        .contains("+line2\n")
+        .contains(" line1\n")
+        .contains(" line3\n");
+  }
+
+  @Test
+  void unifiedDiff_removed_line() {
+    List<String> approved = List.of("line1", "line2", "line3");
+    List<String> received = List.of("line1", "line3");
+
+    String diff = unifiedDiff("a.txt", "b.txt", approved, received);
+
+    assertThat(diff).contains("-line2\n");
+  }
+
+  @Test
+  void unifiedDiff_changed_line() {
+    List<String> approved = List.of("hello world");
+    List<String> received = List.of("hello earth");
+
+    String diff = unifiedDiff("a.txt", "b.txt", approved, received);
+
+    assertThat(diff).contains("-hello world\n").contains("+hello earth\n");
+  }
+
+  @Test
+  void generateDiff_from_files() throws IOException {
+    Path approved = tempDir.resolve("approved.txt");
+    Path received = tempDir.resolve("received.txt");
+    writeString(approved, "line1\nline2\n", StandardOpenOption.CREATE);
+    writeString(received, "line1\nchanged\n", StandardOpenOption.CREATE);
+
+    String diff = AiFileReviewer.generateDiff(approved, received);
+
+    assertThat(diff).contains("-line2").contains("+changed");
   }
 }

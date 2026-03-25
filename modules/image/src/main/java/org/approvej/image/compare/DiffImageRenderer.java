@@ -63,13 +63,16 @@ public final class DiffImageRenderer {
   }
 
   private static boolean pixelsMatch(int rgb1, int rgb2) {
+    int alpha1 = (rgb1 >> ALPHA_SHIFT) & CHANNEL_MASK;
     int red1 = (rgb1 >> RED_SHIFT) & CHANNEL_MASK;
     int green1 = (rgb1 >> GREEN_SHIFT) & CHANNEL_MASK;
     int blue1 = rgb1 & CHANNEL_MASK;
+    int alpha2 = (rgb2 >> ALPHA_SHIFT) & CHANNEL_MASK;
     int red2 = (rgb2 >> RED_SHIFT) & CHANNEL_MASK;
     int green2 = (rgb2 >> GREEN_SHIFT) & CHANNEL_MASK;
     int blue2 = rgb2 & CHANNEL_MASK;
-    return Math.abs(red1 - red2) <= CHANNEL_TOLERANCE
+    return Math.abs(alpha1 - alpha2) <= CHANNEL_TOLERANCE
+        && Math.abs(red1 - red2) <= CHANNEL_TOLERANCE
         && Math.abs(green1 - green2) <= CHANNEL_TOLERANCE
         && Math.abs(blue1 - blue2) <= CHANNEL_TOLERANCE;
   }

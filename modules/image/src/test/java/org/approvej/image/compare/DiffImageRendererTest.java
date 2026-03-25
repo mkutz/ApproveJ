@@ -76,6 +76,26 @@ class DiffImageRendererTest {
     assertThat(red).isLessThan(255);
   }
 
+  @Test
+  void computeDiffImage_different_alpha() {
+    BufferedImage received = createSolidImage(5, 5, new Color(100, 100, 100, 255));
+    BufferedImage approved = createSolidImage(5, 5, new Color(100, 100, 100, 200));
+
+    BufferedImage diff = DiffImageRenderer.computeDiffImage(received, approved);
+
+    assertThat(diff.getRGB(0, 0)).isEqualTo(Color.MAGENTA.getRGB());
+  }
+
+  @Test
+  void computeDiffImage_alpha_within_tolerance() {
+    BufferedImage received = createSolidImage(5, 5, new Color(100, 100, 100, 255));
+    BufferedImage approved = createSolidImage(5, 5, new Color(100, 100, 100, 254));
+
+    BufferedImage diff = DiffImageRenderer.computeDiffImage(received, approved);
+
+    assertThat(diff.getRGB(0, 0)).isNotEqualTo(Color.MAGENTA.getRGB());
+  }
+
   private static BufferedImage createSolidImage(int width, int height, Color color) {
     BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
     for (int y = 0; y < height; y++) {

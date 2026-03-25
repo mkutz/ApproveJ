@@ -2,11 +2,14 @@ package org.approvej.review;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.move;
+import static java.nio.file.Files.readAllLines;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.approvej.approve.PathProvider;
@@ -130,7 +133,7 @@ record AiFileReviewer(String command) implements FileReviewer {
   }
 
   private String buildPrompt(PathProvider pathProvider, Path approvedPath, Path receivedPath)
-      throws IOException, InterruptedException {
+      throws IOException {
     if (isImageFile(pathProvider.filenameExtension())) {
       Path diffPath = pathProvider.diffPath();
       if (Files.exists(diffPath)) {
@@ -142,14 +145,89 @@ record AiFileReviewer(String command) implements FileReviewer {
     return TEXT_PROMPT_TEMPLATE.formatted(approvedPath, receivedPath, diff);
   }
 
-  private String generateDiff(Path approvedPath, Path receivedPath)
-      throws IOException, InterruptedException {
-    ProcessBuilder processBuilder =
-        new ProcessBuilder("diff", "-u", approvedPath.toString(), receivedPath.toString());
-    Process process = processBuilder.start();
-    String diff = new String(process.getInputStream().readAllBytes(), UTF_8);
-    process.waitFor();
-    return diff;
+  static String generateDiff(Path approvedPath, Path receivedPath) throws IOException {
+    List<String> approvedLines = readAllLines(approvedPath, UTF_8);
+    List<String> receivedLines = readAllLines(receivedPath, UTF_8);
+    return unifiedDiff(
+        approvedPath.toString(), receivedPath.toString(), approvedLines, receivedLines);
+  }
+
+  static String unifiedDiff(
+      String approvedLabel,
+      String receivedLabel,
+      List<String> approvedLines,
+      List<String> receivedLines) {
+    int[][] lengths = longestCommonSubsequenceLengths(approvedLines, receivedLines);
+    List<DiffLine> diffLines = backtrack(lengths, approvedLines, receivedLines);
+    if (diffLines.stream().allMatch(line -> line.type == DiffLine.Type.CONTEXT)) {
+      return "";
+    }
+    StringBuilder result = new StringBuilder();
+    result.append("--- %s\n".formatted(approvedLabel));
+    result.append("+++ %s\n".formatted(receivedLabel));
+    for (DiffLine line : diffLines) {
+      result.append(
+          switch (line.type) {
+            case CONTEXT -> " %s\n".formatted(line.content);
+            case REMOVED -> "-%s\n".formatted(line.content);
+            case ADDED -> "+%s\n".formatted(line.content);
+          });
+    }
+    return result.toString();
+  }
+
+  private static int[][] longestCommonSubsequenceLengths(
+      List<String> approvedLines, List<String> receivedLines) {
+    int approvedSize = approvedLines.size();
+    int receivedSize = receivedLines.size();
+    int[][] lengths = new int[approvedSize + 1][receivedSize + 1];
+    for (int i = approvedSize - 1; i >= 0; i--) {
+      for (int j = receivedSize - 1; j >= 0; j--) {
+        if (approvedLines.get(i).equals(receivedLines.get(j))) {
+          lengths[i][j] = lengths[i + 1][j + 1] + 1;
+        } else {
+          lengths[i][j] = Math.max(lengths[i + 1][j], lengths[i][j + 1]);
+        }
+      }
+    }
+    return lengths;
+  }
+
+  private static List<DiffLine> backtrack(
+      int[][] lengths, List<String> approvedLines, List<String> receivedLines) {
+    List<DiffLine> result = new ArrayList<>();
+    int i = 0;
+    int j = 0;
+    while (i < approvedLines.size() && j < receivedLines.size()) {
+      if (approvedLines.get(i).equals(receivedLines.get(j))) {
+        result.add(new DiffLine(DiffLine.Type.CONTEXT, approvedLines.get(i)));
+        i++;
+        j++;
+      } else if (lengths[i + 1][j] >= lengths[i][j + 1]) {
+        result.add(new DiffLine(DiffLine.Type.REMOVED, approvedLines.get(i)));
+        i++;
+      } else {
+        result.add(new DiffLine(DiffLine.Type.ADDED, receivedLines.get(j)));
+        j++;
+      }
+    }
+    while (i < approvedLines.size()) {
+      result.add(new DiffLine(DiffLine.Type.REMOVED, approvedLines.get(i)));
+      i++;
+    }
+    while (j < receivedLines.size()) {
+      result.add(new DiffLine(DiffLine.Type.ADDED, receivedLines.get(j)));
+      j++;
+    }
+    return result;
+  }
+
+  private record DiffLine(Type type, String content) {
+    enum Type {
+      CONTEXT,
+      REMOVED,
+      ADDED
+    }
   }
 
   private String resolveCommand(Path approvedPath, Path receivedPath) {
