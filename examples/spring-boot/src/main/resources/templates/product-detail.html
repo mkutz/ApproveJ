@@ -175,7 +175,7 @@
       <h1 th:text="${product.name}">Espresso Machine</h1>
       <p class="description" th:text="${product.description}">Professional espresso machine</p>
       <div class="price">
-        <span class="currency">USD</span><span th:text="${#numbers.formatDecimal(product.price, 1, 2)}">299.99</span>
+        <span class="currency">USD</span><span th:text="${#numbers.formatDecimal(product.price, 1, 'NONE', 2, 'POINT')}">299.99</span>
       </div>
       <button class="add-to-cart">Add to Cart</button>
       <span class="badge">In Stock</span>
