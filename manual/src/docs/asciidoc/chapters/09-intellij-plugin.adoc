@@ -16,26 +16,6 @@ Install the plugin from the https://plugins.jetbrains.com/plugin/30468-approvej[
 . Click _Install_ and restart the IDE.
 
 
-[id=intellij_plugin_diff_viewer]
-== Diff Viewer and One-Click Approval
-
-When a test produces a `.received` file, the plugin shows a banner at the top of the file with actions:
-
-- **Compare with Approved** — opens a side-by-side diff between the received and approved file.
-- **Approve** — copies the received file over the approved file in one click.
-- **Navigate to Test** — navigates to the test method that produced the file.
-
-Similarly, when an approved file has a pending received file, its banner offers a **Compare with Received** action.
-
-.Banner on a received file offering to compare or approve
-image::received-file-banner.png[Banner on a received file with "Compare with Approved" and "Approve" actions,width=100%]
-
-.Side-by-side diff between received and approved file
-image::diff-viewer.png[Side-by-side diff between received and approved file,width=100%]
-
-These actions are also available from the context menu on `.received` files in the project tree.
-
-
 [id=intellij_plugin_navigation]
 == Navigation
 
@@ -45,15 +25,57 @@ The plugin provides bidirectional navigation between test code and approved file
 Click it to navigate directly to the corresponding approved file.
 - **Approved/Received file → Test**: Banners on approved and received files offer a "Navigate to Test" action that navigates back to the `approve()` call.
 
-.Gutter icon on an `approve()` call chain linking to the approved file
-image::gutter-icon.png[Gutter icon on an approve call chain linking to the approved file,width=100%]
+When all approvals are up to date, the gutter icon is green:
 
-.Banner on an approved file offering to navigate to the test
-image::approved-file-banner.png[Banner on an approved file with "Navigate to Test" action,width=100%]
+.Gutter icons on `approve()` call chains linking to approved files
+image::guttericon-text-approved.png[Gutter icons on approve call chains linking to approved files,width=100%]
+
+
+[id=intellij_plugin_diff_viewer]
+== Diff Viewer and One-Click Approval
+
+When a test produces a received file that differs from the approved file, the gutter icon turns orange.
+Clicking it opens a side-by-side diff between the received and approved file, with a notification banner offering:
+
+- **Navigate to Test** — navigates to the test method that produced the file.
+- **Approve** — copies the received file over the approved file in one click.
+- **Reject** — deletes the received file.
+
+.Pending approval gutter icon and failed test result
+image::guttericon-text-pending.png[Pending approval gutter icon on a failed test,width=100%]
+
+.Side-by-side diff between received and approved file
+image::diffview-text.png[Side-by-side diff between received and approved file with approve action,width=100%]
+
+These actions are also available from the context menu on received files in the project tree, and from banners shown when opening received or approved files:
+
+.Banner on a received file offering to compare, approve, or reject
+image::receivedfile-text.png[Banner on a received file with Compare with Approved and Approve and Reject actions,width=100%]
+
+.Banner on an approved file offering to compare with received and navigate to the test
+image::approvefile-text.png[Banner on an approved file with Compare with Received and Navigate to Test actions,width=100%]
+
+
+[id=intellij_plugin_image_diff]
+=== Image Diff Viewer
+
+For image approvals, the plugin provides a specialized three-panel diff viewer showing the received image, the pixel-level difference, and the approved image side by side.
+
+.Image diff viewer showing Received, Pixel Difference, and Approved panels
+image::diffview-image.png[Image diff viewer with three panels showing Received and Pixel Difference and Approved,width=100%]
+
+.Pending approval gutter icon on an image approval test
+image::guttericon-image-pending.png[Pending approval gutter icon on an image approval test,width=100%]
 
 
 [id=intellij_plugin_inspection]
-== Dangling Approval Inspection
+== Inspections
+
+The plugin provides two inspections that catch common mistakes at edit time.
+
+
+[id=intellij_plugin_dangling_approval]
+=== Dangling Approval
 
 The plugin warns you when an `approve()` call is missing its terminal method (like `byFile()` or `byValue()`).
 Without a terminal method, the approval is never actually executed — the test silently passes without checking anything.
@@ -63,10 +85,11 @@ The inspection offers quick fixes to add a terminal method:
 - `.byFile()` — file-based approval (most common)
 - `.byValue("")` — inline approval with an empty expected value
 
-[cols="1a,1a",frame=none,grid=none]
-|===
-|.Inspection warning on a dangling approve() call
-image::dangling-inspection.png[Warning on an approve call missing a terminal method]
-|.Quick fixes to conclude a dangling approval
-image::dangling-inspection-quick-fixes.png[Quick fixes to conclude a dangling approval]
-|===
+
+[id=intellij_plugin_duplicate_unnamed_approval]
+=== Duplicate Unnamed Approval
+
+The plugin warns you when multiple `approve().byFile()` calls in the same test method resolve to the same approved file.
+Without `.named()`, each `byFile()` uses the test method name, so the second call silently overwrites the first.
+
+The inspection offers a quick fix to add `.named("TODO")` before the `byFile()` call.
