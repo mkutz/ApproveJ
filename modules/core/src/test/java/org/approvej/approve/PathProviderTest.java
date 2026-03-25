@@ -135,4 +135,23 @@ class PathProviderTest {
             Path.of("./src/test/resources/" + "base" + "-affix" + "-received" + ".xml")
                 .normalize());
   }
+
+  @Test
+  void diffPath() {
+    assertThat(pathProvider.diffPath())
+        .isEqualTo(
+            Path.of("./src/test/resources/" + "base" + "-affix" + "-diff" + ".xml").normalize());
+  }
+
+  @Test
+  void diffPath_blank_affix() {
+    assertThat(pathProvider.filenameAffix(" ").diffPath())
+        .isEqualTo(Path.of("./src/test/resources/" + "base" + "-diff" + ".xml").normalize());
+  }
+
+  @Test
+  void diffPath_blank_extension() {
+    assertThat(pathProvider.filenameExtension(" ").diffPath())
+        .isEqualTo(Path.of("./src/test/resources/" + "base" + "-affix" + "-diff").normalize());
+  }
 }

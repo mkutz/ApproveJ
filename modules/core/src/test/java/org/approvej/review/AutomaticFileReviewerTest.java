@@ -37,4 +37,42 @@ class AutomaticFileReviewerTest {
         .isEqualTo("Some received text that will be accepted automatically\n");
     assertThat(pathProvider.receivedPath()).doesNotExist();
   }
+
+  @Test
+  void apply_cleans_up_diff_file() throws IOException {
+    FileReviewer reviewer = automatic();
+    PathProvider pathProvider = approvedPath(tempDir.resolve("apply_cleanup-approved.txt"));
+    writeString(pathProvider.approvedPath(), "approved\n", StandardOpenOption.CREATE);
+    writeString(pathProvider.receivedPath(), "received\n", StandardOpenOption.CREATE);
+    writeString(pathProvider.diffPath(), "diff content\n", StandardOpenOption.CREATE);
+
+    ReviewResult result = reviewer.apply(pathProvider);
+
+    assertThat(result.needsReapproval()).isTrue();
+    assertThat(pathProvider.diffPath()).doesNotExist();
+  }
+
+  @Test
+  void apply_no_received_file() {
+    FileReviewer reviewer = automatic();
+    PathProvider pathProvider = approvedPath(tempDir.resolve("apply_missing-approved.txt"));
+
+    ReviewResult result = reviewer.apply(pathProvider);
+
+    assertThat(result.needsReapproval()).isFalse();
+  }
+
+  @Test
+  void alias() {
+    AutomaticFileReviewer reviewer = new AutomaticFileReviewer();
+
+    assertThat(reviewer.alias()).isEqualTo("automatic");
+  }
+
+  @Test
+  void create() {
+    AutomaticFileReviewer reviewer = new AutomaticFileReviewer();
+
+    assertThat(reviewer.create()).isInstanceOf(AutomaticFileReviewer.class);
+  }
 }

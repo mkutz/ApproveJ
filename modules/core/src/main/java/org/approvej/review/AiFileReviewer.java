@@ -159,12 +159,7 @@ record AiFileReviewer(String command) implements FileReviewer {
 
   private String executeAiCommand(String resolvedCommand, String prompt)
       throws IOException, InterruptedException {
-    ProcessBuilder processBuilder = new ProcessBuilder();
-    if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
-      processBuilder.command("cmd.exe", "/c", resolvedCommand); // NOSONAR
-    } else {
-      processBuilder.command("sh", "-c", resolvedCommand); // NOSONAR
-    }
+    ProcessBuilder processBuilder = new ProcessBuilder(resolvedCommand.split("\\s+"));
     Process process = processBuilder.start();
     process.getOutputStream().write(prompt.getBytes());
     process.getOutputStream().close();

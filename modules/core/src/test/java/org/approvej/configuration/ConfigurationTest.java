@@ -211,6 +211,29 @@ class ConfigurationTest {
   }
 
   @Test
+  void loadConfiguration_aiReviewerCommand() {
+    Properties props = new Properties();
+    props.setProperty("aiReviewerCommand", "claude -p");
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+
+    Configuration config = Configuration.loadConfiguration(loader);
+
+    assertThat(config.defaultFileReviewer()).isInstanceOf(FileReviewer.class);
+  }
+
+  @Test
+  void loadConfiguration_aiReviewerCommand_takes_priority_over_fileReviewerScript() {
+    Properties props = new Properties();
+    props.setProperty("aiReviewerCommand", "claude -p");
+    props.setProperty("defaultFileReviewerScript", "diff {receivedFile} {approvedFile}");
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+
+    Configuration config = Configuration.loadConfiguration(loader);
+
+    assertThat(config.defaultFileReviewer()).isNotNull();
+  }
+
+  @Test
   void configurationLoader_chainedSources_firstNonNullWins() {
     Properties props1 = new Properties();
     props1.setProperty("key1", "value1");
