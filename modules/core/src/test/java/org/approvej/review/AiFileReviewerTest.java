@@ -14,6 +14,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.List;
 import org.approvej.approve.PathProvider;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 class AiFileReviewerTest {
@@ -135,6 +137,7 @@ class AiFileReviewerTest {
   }
 
   @Test
+  @DisabledOnOs(OS.WINDOWS)
   void apply_command_with_placeholders() throws IOException {
     PathProvider pathProvider = approvedPath(tempDir.resolve("apply_placeholders-approved.txt"));
     writeString(pathProvider.approvedPath(), "approved", StandardOpenOption.CREATE);

@@ -240,8 +240,12 @@ record AiFileReviewer(String command) implements FileReviewer {
       throws IOException, InterruptedException {
     ProcessBuilder processBuilder = new ProcessBuilder(resolvedCommand.split("\\s+"));
     Process process = processBuilder.start();
-    process.getOutputStream().write(prompt.getBytes(UTF_8));
-    process.getOutputStream().close();
+    try {
+      process.getOutputStream().write(prompt.getBytes(UTF_8));
+      process.getOutputStream().close();
+    } catch (IOException e) {
+      LOGGER.fine("Writing prompt to process stdin failed: %s".formatted(e.getMessage()));
+    }
     String response = new String(process.getInputStream().readAllBytes(), UTF_8);
     process.waitFor();
     return response;
