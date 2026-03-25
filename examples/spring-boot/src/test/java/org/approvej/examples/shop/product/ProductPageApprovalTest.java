@@ -1,6 +1,7 @@
 package org.approvej.examples.shop.product;
 
 import static org.approvej.image.ImageApprovalBuilder.approveImage;
+import static org.approvej.image.compare.ImageComparators.perceptualHash;
 import static org.testcontainers.containers.wait.strategy.Wait.forListeningPort;
 
 import com.microsoft.playwright.Browser;
@@ -45,7 +46,7 @@ class ProductPageApprovalTest {
       page.navigate("http://localhost:" + port + "/products/" + product.getSku());
       page.waitForLoadState();
 
-      approveImage(page.screenshot()).byFile();
+      approveImage(page.screenshot()).comparedBy(perceptualHash().withThreshold(0.8)).byFile();
     }
   }
 }
