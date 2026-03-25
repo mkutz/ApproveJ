@@ -164,7 +164,7 @@ public class ImageFileApprover implements ImageApprover {
         throw new ImageFileApproverError(
             "Writing received to %s failed".formatted(receivedPath), e);
       }
-      writeDiffImage(previouslyApproved, received, diffPath);
+      writeDiffImage(received, previouslyApproved, diffPath);
     } else {
       try {
         deleteIfExists(receivedPath);
@@ -178,7 +178,7 @@ public class ImageFileApprover implements ImageApprover {
   }
 
   private void writeDiffImage(
-      BufferedImage previouslyApproved, BufferedImage received, Path diffPath) {
+      BufferedImage received, BufferedImage previouslyApproved, Path diffPath) {
     try (var outputStream = Files.newOutputStream(diffPath, CREATE, TRUNCATE_EXISTING)) {
       BufferedImage diffImage = DiffImageRenderer.computeDiffImage(received, previouslyApproved);
       ImageIO.write(diffImage, pathProvider.filenameExtension(), outputStream);

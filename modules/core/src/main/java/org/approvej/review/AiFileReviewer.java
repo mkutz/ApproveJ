@@ -1,5 +1,6 @@
 package org.approvej.review;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.move;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -146,7 +147,7 @@ record AiFileReviewer(String command) implements FileReviewer {
     ProcessBuilder processBuilder =
         new ProcessBuilder("diff", "-u", approvedPath.toString(), receivedPath.toString());
     Process process = processBuilder.start();
-    String diff = new String(process.getInputStream().readAllBytes());
+    String diff = new String(process.getInputStream().readAllBytes(), UTF_8);
     process.waitFor();
     return diff;
   }
@@ -161,9 +162,9 @@ record AiFileReviewer(String command) implements FileReviewer {
       throws IOException, InterruptedException {
     ProcessBuilder processBuilder = new ProcessBuilder(resolvedCommand.split("\\s+"));
     Process process = processBuilder.start();
-    process.getOutputStream().write(prompt.getBytes());
+    process.getOutputStream().write(prompt.getBytes(UTF_8));
     process.getOutputStream().close();
-    String response = new String(process.getInputStream().readAllBytes());
+    String response = new String(process.getInputStream().readAllBytes(), UTF_8);
     process.waitFor();
     return response;
   }
