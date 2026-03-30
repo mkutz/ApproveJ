@@ -1,5 +1,6 @@
 package org.approvej.review;
 
+import static java.nio.file.Files.deleteIfExists;
 import static java.nio.file.Files.move;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -28,6 +29,7 @@ public record AutomaticFileReviewer() implements FileReviewer, FileReviewerProvi
     Path approvedPath = pathProvider.approvedPath();
     try {
       move(receivedPath, approvedPath, REPLACE_EXISTING);
+      deleteIfExists(pathProvider.diffPath());
       return new FileReviewResult(true);
     } catch (IOException e) {
       LOGGER.info(

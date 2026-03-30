@@ -39,6 +39,9 @@ public record PathProvider(
   /** The infix of the file containing a previously approved value. */
   public static final String APPROVED = "approved";
 
+  /** The infix of the file containing a visual diff between received and approved. */
+  public static final String DIFF = "diff";
+
   /**
    * Set the {@link #directory} where the approved and received files are stored.
    *
@@ -111,6 +114,25 @@ public record PathProvider(
                     baseFilename,
                     filenameAffix.isBlank() ? "" : "-%s".formatted(filenameAffix),
                     "-%s".formatted(RECEIVED),
+                    filenameExtension.isBlank() ? "" : ".%s".formatted(filenameExtension)))
+        .normalize();
+  }
+
+  /**
+   * Resolves and returns the {@link Path} to the diff file in the {@link #directory}, using the
+   * {@link #baseFilename}, followed by {@value DIFF}, followed by the {@link #filenameExtension}
+   * (if any).
+   *
+   * @return the normalized {@link Path} to the diff file
+   */
+  public Path diffPath() {
+    return directory
+        .resolve(
+            "%s%s%s%s"
+                .formatted(
+                    baseFilename,
+                    filenameAffix.isBlank() ? "" : "-%s".formatted(filenameAffix),
+                    "-%s".formatted(DIFF),
                     filenameExtension.isBlank() ? "" : ".%s".formatted(filenameExtension)))
         .normalize();
   }

@@ -19,6 +19,7 @@ object ReceivedFileUtil {
   val APPROVED_FILE_KEY: Key<VirtualFile> = Key.create("ApproveJ.approvedFile")
 
   private const val RECEIVED_INFIX = "-received"
+  private const val DIFF_INFIX = "-diff"
 
   /**
    * Finds the last occurrence of `-received` in the filename and returns the index, or `-1` if the
@@ -58,6 +59,25 @@ object ReceivedFileUtil {
     val index = findReceivedIndex(filename)
     if (index < 0) return null
     return filename.substring(0, index) + filename.substring(index + RECEIVED_INFIX.length)
+  }
+
+  /**
+   * Returns the diff filename for the given received filename, or `null` if the filename is not a
+   * received filename.
+   */
+  fun toDiffFileName(filename: String): String? {
+    val index = findReceivedIndex(filename)
+    if (index < 0) return null
+    return filename.substring(0, index) +
+      DIFF_INFIX +
+      filename.substring(index + RECEIVED_INFIX.length)
+  }
+
+  /** Finds and returns the sibling diff file for the given received file, or `null`. */
+  fun findDiffFile(receivedFile: VirtualFile): VirtualFile? {
+    val parent = receivedFile.parent ?: return null
+    val diffName = toDiffFileName(receivedFile.name) ?: return null
+    return parent.findChild(diffName)
   }
 
   /**
@@ -134,8 +154,10 @@ object ReceivedFileUtil {
       null,
       {
         try {
+          val diffFile = findDiffFile(receivedFile)
           approvedFile.setBinaryContent(receivedFile.contentsToByteArray())
           receivedFile.delete(ReceivedFileUtil::class.java)
+          diffFile?.delete(ReceivedFileUtil::class.java)
         } catch (e: java.io.IOException) {
           LOG.error("Failed to approve received file", e)
         }
@@ -154,7 +176,9 @@ object ReceivedFileUtil {
       null,
       {
         try {
+          val diffFile = findDiffFile(receivedFile)
           receivedFile.delete(ReceivedFileUtil::class.java)
+          diffFile?.delete(ReceivedFileUtil::class.java)
         } catch (e: java.io.IOException) {
           LOG.error("Failed to reject received file", e)
         }

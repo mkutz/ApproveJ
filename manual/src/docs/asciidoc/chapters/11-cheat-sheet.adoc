@@ -303,6 +303,9 @@ endif::[]
 
 |`Reviewers.script(String script)`
 |Run a script with `\{receivedFile}` and `\{approvedFile}` placeholders
+
+|`Reviewers.ai(String command)`
+|Use an AI CLI tool to review and auto-approve changes
 |===
 
 
@@ -356,6 +359,10 @@ endif::[]
 
 |`defaultFileReviewerScript`
 |`APPROVEJ_DEFAULT_FILE_REVIEWER_SCRIPT`
+|_(none)_
+
+|`aiReviewerCommand`
+|`APPROVEJ_AI_REVIEWER_COMMAND`
 |_(none)_
 
 |`inventoryEnabled`

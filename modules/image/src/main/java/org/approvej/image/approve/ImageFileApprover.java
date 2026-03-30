@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import org.approvej.approve.PathProvider;
 import org.approvej.image.ImageApprovalResult;
+import org.approvej.image.compare.DiffImageRenderer;
 import org.approvej.image.compare.ImageComparator;
 import org.approvej.image.compare.ImageComparisonResult;
 import org.approvej.print.PrintFormat;
@@ -144,7 +145,12 @@ public class ImageFileApprover implements ImageApprover {
   private BufferedImage readApprovedFile() {
     Path approvedPath = pathProvider.approvedPath();
     try {
-      return ImageIO.read(approvedPath.toFile());
+      BufferedImage image = ImageIO.read(approvedPath.toFile());
+      if (image == null) {
+        throw new ImageFileApproverError(
+            "Cannot decode approved file %s (unsupported image format)".formatted(approvedPath));
+      }
+      return image;
     } catch (IOException e) {
       throw new ImageFileApproverError(
           "Reading approved file %s failed".formatted(approvedPath), e);
@@ -155,6 +161,7 @@ public class ImageFileApprover implements ImageApprover {
     ImageComparisonResult comparisonResult = comparator.compare(previouslyApproved, received);
     ImageFileApprovalResult result = new ImageFileApprovalResult(comparisonResult, pathProvider);
     Path receivedPath = pathProvider.receivedPath();
+    Path diffPath = pathProvider.diffPath();
     if (result.needsApproval()) {
       try (var outputStream = Files.newOutputStream(receivedPath, CREATE, TRUNCATE_EXISTING)) {
         ImageIO.write(received, pathProvider.filenameExtension(), outputStream);
@@ -162,15 +169,42 @@ public class ImageFileApprover implements ImageApprover {
         throw new ImageFileApproverError(
             "Writing received to %s failed".formatted(receivedPath), e);
       }
+      writeDiffImage(received, previouslyApproved, diffPath);
     } else {
       try {
         deleteIfExists(receivedPath);
+        deleteIfExists(diffPath);
       } catch (IOException e) {
         throw new ImageFileApproverError(
             "Deleting received file %s failed".formatted(receivedPath), e);
       }
     }
     return result;
+  }
+
+  private void writeDiffImage(
+      BufferedImage received, BufferedImage previouslyApproved, Path diffPath) {
+    String format = pathProvider.filenameExtension();
+    boolean writeSucceeded = false;
+    try (var outputStream = Files.newOutputStream(diffPath, CREATE, TRUNCATE_EXISTING)) {
+      BufferedImage diffImage = DiffImageRenderer.computeDiffImage(received, previouslyApproved);
+      writeSucceeded = ImageIO.write(diffImage, format, outputStream);
+      if (!writeSucceeded) {
+        LOGGER.fine(
+            "No ImageIO writer found for format \"%s\" when writing diff image to %s"
+                .formatted(format, diffPath));
+      }
+    } catch (IOException e) {
+      LOGGER.fine("Writing diff image to %s failed: %s".formatted(diffPath, e.getMessage()));
+    }
+    if (!writeSucceeded) {
+      try {
+        deleteIfExists(diffPath);
+      } catch (IOException e) {
+        LOGGER.fine(
+            "Deleting partial diff image %s failed: %s".formatted(diffPath, e.getMessage()));
+      }
+    }
   }
 
   /**

@@ -24,12 +24,29 @@ public class Reviewers {
    * A {@link FileReviewer} that executes the given script.
    *
    * @param script the script to be executed with placeholders <code>
-   *     {@value ScriptFileReviewer#RECEIVED_PLACEHOLDER}
-   *     </code> and <code>{@value ScriptFileReviewer#APPROVED_PLACEHOLDER}</code>
+   *     {@value FileReviewer#RECEIVED_PLACEHOLDER}
+   *     </code> and <code>{@value FileReviewer#APPROVED_PLACEHOLDER}</code>
    * @return the new {@link ScriptFileReviewer}
    */
   public static FileReviewer script(String script) {
     return new ScriptFileReviewer(script);
+  }
+
+  /**
+   * A {@link FileReviewer} that calls an AI CLI tool to review the difference between the received
+   * and approved files.
+   *
+   * <p>The AI CLI receives a prompt on stdin. For text files, this prompt includes a unified diff.
+   * For image files, the prompt mentions the relevant file paths (for example, a diff image path
+   * when available). File paths are only passed as CLI arguments if the command string includes
+   * placeholders that are expanded by the reviewer. If the AI responds with "YES", the received
+   * file is automatically approved.
+   *
+   * @param command the AI CLI command to execute (e.g., "claude", "gemini")
+   * @return the new {@link AiFileReviewer}
+   */
+  public static FileReviewer ai(String command) {
+    return new AiFileReviewer(command);
   }
 
   /**

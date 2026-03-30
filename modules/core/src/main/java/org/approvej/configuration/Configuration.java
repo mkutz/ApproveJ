@@ -42,6 +42,7 @@ public record Configuration(
   private static final String DEFAULT_PRINT_FORMAT_PROPERTY = "defaultPrintFormat";
   private static final String DEFAULT_FILE_REVIEWER_PROPERTY = "defaultFileReviewer";
   private static final String DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY = "defaultFileReviewerScript";
+  private static final String AI_REVIEWER_COMMAND_PROPERTY = "aiReviewerCommand";
   private static final String INVENTORY_ENABLED_PROPERTY = "inventoryEnabled";
 
   /** The loaded {@link Configuration} object. */
@@ -68,6 +69,11 @@ public record Configuration(
   }
 
   private static FileReviewer resolveFileReviewer(ConfigurationLoader loader) {
+    String aiCommand = loader.get(AI_REVIEWER_COMMAND_PROPERTY);
+    if (aiCommand != null) {
+      return Reviewers.ai(aiCommand);
+    }
+
     String fileReviewerScript = loader.get(DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY);
     if (fileReviewerScript != null) {
       return Reviewers.script(fileReviewerScript);
