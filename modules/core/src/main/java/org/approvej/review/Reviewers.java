@@ -24,8 +24,8 @@ public class Reviewers {
    * A {@link FileReviewer} that executes the given script.
    *
    * @param script the script to be executed with placeholders <code>
-   *     {@value ScriptFileReviewer#RECEIVED_PLACEHOLDER}
-   *     </code> and <code>{@value ScriptFileReviewer#APPROVED_PLACEHOLDER}</code>
+   *     {@value FileReviewer#RECEIVED_PLACEHOLDER}
+   *     </code> and <code>{@value FileReviewer#APPROVED_PLACEHOLDER}</code>
    * @return the new {@link ScriptFileReviewer}
    */
   public static FileReviewer script(String script) {

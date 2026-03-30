@@ -145,7 +145,12 @@ public class ImageFileApprover implements ImageApprover {
   private BufferedImage readApprovedFile() {
     Path approvedPath = pathProvider.approvedPath();
     try {
-      return ImageIO.read(approvedPath.toFile());
+      BufferedImage image = ImageIO.read(approvedPath.toFile());
+      if (image == null) {
+        throw new ImageFileApproverError(
+            "Cannot decode approved file %s (unsupported image format)".formatted(approvedPath));
+      }
+      return image;
     } catch (IOException e) {
       throw new ImageFileApproverError(
           "Reading approved file %s failed".formatted(approvedPath), e);

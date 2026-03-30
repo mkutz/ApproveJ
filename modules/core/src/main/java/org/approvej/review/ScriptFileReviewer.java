@@ -8,23 +8,19 @@ import org.jspecify.annotations.NullMarked;
 /**
  * A {@link FileReviewer} implementation that executes the given script.
  *
- * @param script the script to be executed with placeholders <code>{@value RECEIVED_PLACEHOLDER}
- *     </code> and <code>{@value APPROVED_PLACEHOLDER}</code>
+ * @param script the script to be executed with placeholders <code>
+ *     {@value FileReviewer#RECEIVED_PLACEHOLDER}</code> and <code>
+ *     {@value FileReviewer#APPROVED_PLACEHOLDER}</code>
  */
 @NullMarked
 record ScriptFileReviewer(String script) implements FileReviewer {
 
-  static final String RECEIVED_PLACEHOLDER = "{receivedFile}";
-  static final String APPROVED_PLACEHOLDER = "{approvedFile}";
   private static final Logger LOGGER = Logger.getLogger(ScriptFileReviewer.class.getName());
 
   @Override
   public ReviewResult apply(PathProvider pathProvider) {
     try {
-      String command =
-          script
-              .replace(RECEIVED_PLACEHOLDER, "%s".formatted(pathProvider.receivedPath()))
-              .replace(APPROVED_PLACEHOLDER, "%s".formatted(pathProvider.approvedPath()));
+      String command = FileReviewer.resolveCommand(script, pathProvider);
 
       ProcessBuilder processBuilder = new ProcessBuilder();
       if (System.getProperty("os.name").toLowerCase().startsWith("win")) {

@@ -3,6 +3,7 @@ package org.approvej.review;
 import static java.nio.file.Files.readString;
 import static java.nio.file.Files.writeString;
 import static org.approvej.approve.PathProviders.approvedPath;
+import static org.approvej.review.AiFileReviewer.tokenizeCommand;
 import static org.approvej.review.AiFileReviewer.unifiedDiff;
 import static org.approvej.review.Reviewers.ai;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -153,6 +154,38 @@ class AiFileReviewerTest {
     ReviewResult result = reviewer.apply(pathProvider);
 
     assertThat(result.needsReapproval()).isTrue();
+  }
+
+  @Test
+  void tokenizeCommand_simple() {
+    assertThat(tokenizeCommand("claude -p --allowedTools Read"))
+        .containsExactly("claude", "-p", "--allowedTools", "Read");
+  }
+
+  @Test
+  void tokenizeCommand_single_quoted_path() {
+    assertThat(tokenizeCommand("claude -p '/path/with spaces/file.txt'"))
+        .containsExactly("claude", "-p", "/path/with spaces/file.txt");
+  }
+
+  @Test
+  void tokenizeCommand_double_quoted_path() {
+    assertThat(tokenizeCommand("claude -p \"/path/with spaces/file.txt\""))
+        .containsExactly("claude", "-p", "/path/with spaces/file.txt");
+  }
+
+  @Test
+  void tokenizeCommand_user_quoted_placeholders_are_not_double_quoted() {
+    // Users are responsible for quoting placeholders in their command configuration.
+    // The tokenizer must not add its own quotes — doing so would break user-provided quoting
+    // (e.g., ''/path/with spaces'' instead of '/path/with spaces').
+    String command = "claude -p '/tmp/my project/received.txt' '/tmp/my project/approved.txt'";
+
+    List<String> tokens = tokenizeCommand(command);
+
+    assertThat(tokens)
+        .containsExactly(
+            "claude", "-p", "/tmp/my project/received.txt", "/tmp/my project/approved.txt");
   }
 
   @Test

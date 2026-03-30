@@ -22,9 +22,9 @@ import org.jspecify.annotations.NullMarked;
  * <p>For text files, a unified diff is generated and included in the prompt. For image files, the
  * AI is instructed to read the files from disk.
  *
- * <p>The command can contain <code>{@value RECEIVED_PLACEHOLDER}</code> and <code>
- * {@value APPROVED_PLACEHOLDER}</code> placeholders, which will be replaced with the actual file
- * paths.
+ * <p>The command can contain <code>{@value FileReviewer#RECEIVED_PLACEHOLDER}</code> and <code>
+ * {@value FileReviewer#APPROVED_PLACEHOLDER}</code> placeholders, which will be replaced with the
+ * actual file paths.
  *
  * <p>If the AI responds with "YES" on the first line, the received file is automatically approved.
  * Otherwise, the test fails and a human developer needs to review.
@@ -33,9 +33,6 @@ import org.jspecify.annotations.NullMarked;
  */
 @NullMarked
 record AiFileReviewer(String command) implements FileReviewer {
-
-  static final String RECEIVED_PLACEHOLDER = "{receivedFile}";
-  static final String APPROVED_PLACEHOLDER = "{approvedFile}";
 
   private static final Logger LOGGER = Logger.getLogger(AiFileReviewer.class.getName());
 
@@ -111,7 +108,7 @@ record AiFileReviewer(String command) implements FileReviewer {
       Path receivedPath = pathProvider.receivedPath();
 
       String prompt = buildPrompt(pathProvider, approvedPath, receivedPath);
-      String resolvedCommand = resolveCommand(approvedPath, receivedPath);
+      String resolvedCommand = FileReviewer.resolveCommand(command, approvedPath, receivedPath);
       String response = executeAiCommand(resolvedCommand, prompt);
 
       LOGGER.info("AI review result:\n%s".formatted(response));
@@ -230,15 +227,10 @@ record AiFileReviewer(String command) implements FileReviewer {
     }
   }
 
-  private String resolveCommand(Path approvedPath, Path receivedPath) {
-    return command
-        .replace(RECEIVED_PLACEHOLDER, "%s".formatted(receivedPath))
-        .replace(APPROVED_PLACEHOLDER, "%s".formatted(approvedPath));
-  }
-
   private String executeAiCommand(String resolvedCommand, String prompt)
       throws IOException, InterruptedException {
-    ProcessBuilder processBuilder = new ProcessBuilder(resolvedCommand.split("\\s+"));
+    ProcessBuilder processBuilder = new ProcessBuilder(tokenizeCommand(resolvedCommand));
+    processBuilder.redirectErrorStream(true);
     Process process = processBuilder.start();
     try {
       process.getOutputStream().write(prompt.getBytes(UTF_8));
@@ -256,7 +248,37 @@ record AiFileReviewer(String command) implements FileReviewer {
   }
 
   private static boolean isApproved(String response) {
-    return firstLine(response).trim().toUpperCase().startsWith("YES");
+    return firstLine(response).trim().toUpperCase().equals("YES");
+  }
+
+  /**
+   * Tokenizes a command string into a list of arguments, respecting single and double quotes. Paths
+   * substituted via placeholders may contain spaces, so naive whitespace splitting is insufficient.
+   */
+  static List<String> tokenizeCommand(String command) {
+    List<String> tokens = new ArrayList<>();
+    StringBuilder current = new StringBuilder();
+    boolean inSingleQuote = false;
+    boolean inDoubleQuote = false;
+    for (int i = 0; i < command.length(); i++) {
+      char character = command.charAt(i);
+      if (character == '\'' && !inDoubleQuote) {
+        inSingleQuote = !inSingleQuote;
+      } else if (character == '"' && !inSingleQuote) {
+        inDoubleQuote = !inDoubleQuote;
+      } else if (Character.isWhitespace(character) && !inSingleQuote && !inDoubleQuote) {
+        if (!current.isEmpty()) {
+          tokens.add(current.toString());
+          current.setLength(0);
+        }
+      } else {
+        current.append(character);
+      }
+    }
+    if (!current.isEmpty()) {
+      tokens.add(current.toString());
+    }
+    return tokens;
   }
 
   private static String firstLine(String response) {
