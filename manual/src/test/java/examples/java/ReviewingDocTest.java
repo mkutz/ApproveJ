@@ -10,11 +10,14 @@ import java.io.IOException;
 import java.time.LocalDate;
 import org.approvej.review.Reviewers;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 @org.approvej.ApprovalTest
 class ReviewingDocTest {
 
   @Test
+  @DisabledOnOs(OS.WINDOWS)
   void approve_reviewedBy_fileReviewer() throws IOException, InterruptedException {
     assumeThat(new ProcessBuilder("which", "idea").start().waitFor()).isEqualTo(0);
     // tag::approve_reviewedBy_fileReviewer[]
@@ -28,6 +31,7 @@ class ReviewingDocTest {
   }
 
   @Test
+  @DisabledOnOs(OS.WINDOWS)
   void approve_reviewedBy_ai() throws IOException, InterruptedException {
     assumeThat(new ProcessBuilder("which", "claude").start().waitFor()).isEqualTo(0);
     // tag::approve_reviewedBy_ai[]

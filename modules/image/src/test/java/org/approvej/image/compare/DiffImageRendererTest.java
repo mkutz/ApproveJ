@@ -87,6 +87,17 @@ class DiffImageRendererTest {
   }
 
   @Test
+  void computeDiffImage_matching_transparent_pixels_preserve_alpha() {
+    BufferedImage image = createSolidImage(5, 5, new Color(100, 100, 100, 50));
+
+    BufferedImage diff = DiffImageRenderer.computeDiffImage(image, image);
+
+    int pixel = diff.getRGB(0, 0);
+    int alpha = (pixel >> 24) & 0xFF;
+    assertThat(alpha).isEqualTo(50);
+  }
+
+  @Test
   void computeDiffImage_alpha_within_tolerance() {
     BufferedImage received = createSolidImage(5, 5, new Color(100, 100, 100, 255));
     BufferedImage approved = createSolidImage(5, 5, new Color(100, 100, 100, 254));

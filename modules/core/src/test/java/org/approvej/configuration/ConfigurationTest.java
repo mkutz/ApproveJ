@@ -218,7 +218,7 @@ class ConfigurationTest {
 
     Configuration config = Configuration.loadConfiguration(loader);
 
-    assertThat(config.defaultFileReviewer()).isInstanceOf(FileReviewer.class);
+    assertThat(config.defaultFileReviewer().getClass().getSimpleName()).isEqualTo("AiFileReviewer");
   }
 
   @Test
@@ -230,7 +230,7 @@ class ConfigurationTest {
 
     Configuration config = Configuration.loadConfiguration(loader);
 
-    assertThat(config.defaultFileReviewer()).isNotNull();
+    assertThat(config.defaultFileReviewer().getClass().getSimpleName()).isEqualTo("AiFileReviewer");
   }
 
   @Test

@@ -10,7 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import org.approvej.approve.PathProvider;
 import org.jspecify.annotations.NullMarked;
@@ -35,6 +37,9 @@ import org.jspecify.annotations.NullMarked;
 record AiFileReviewer(String command) implements FileReviewer {
 
   private static final Logger LOGGER = Logger.getLogger(AiFileReviewer.class.getName());
+
+  private static final int TIMEOUT_MINUTES = 5;
+  private static final int MAX_DIFF_LINES = 10_000;
 
   private static final Set<String> IMAGE_EXTENSIONS =
       Set.of("png", "jpg", "jpeg", "gif", "bmp", "webp");
@@ -145,6 +150,10 @@ record AiFileReviewer(String command) implements FileReviewer {
   static String generateDiff(Path approvedPath, Path receivedPath) throws IOException {
     List<String> approvedLines = readAllLines(approvedPath, UTF_8);
     List<String> receivedLines = readAllLines(receivedPath, UTF_8);
+    if (approvedLines.size() > MAX_DIFF_LINES || receivedLines.size() > MAX_DIFF_LINES) {
+      return "[Diff omitted: files exceed %d lines. Approved: %d lines, Received: %d lines]"
+          .formatted(MAX_DIFF_LINES, approvedLines.size(), receivedLines.size());
+    }
     return unifiedDiff(
         approvedPath.toString(), receivedPath.toString(), approvedLines, receivedLines);
   }
@@ -237,9 +246,22 @@ record AiFileReviewer(String command) implements FileReviewer {
       process.getOutputStream().close();
     } catch (IOException e) {
       LOGGER.fine("Writing prompt to process stdin failed: %s".formatted(e.getMessage()));
+      process.destroyForcibly();
+      return "";
     }
     String response = new String(process.getInputStream().readAllBytes(), UTF_8);
-    process.waitFor();
+    boolean finished = process.waitFor(TIMEOUT_MINUTES, TimeUnit.MINUTES);
+    if (!finished) {
+      LOGGER.info(
+          "AI command timed out after %d minutes, destroying process".formatted(TIMEOUT_MINUTES));
+      process.destroyForcibly();
+      return "";
+    }
+    int exitCode = process.exitValue();
+    if (exitCode != 0) {
+      LOGGER.info("AI command exited with code %d, response: %s".formatted(exitCode, response));
+      return "";
+    }
     return response;
   }
 
@@ -248,7 +270,7 @@ record AiFileReviewer(String command) implements FileReviewer {
   }
 
   private static boolean isApproved(String response) {
-    return firstLine(response).trim().toUpperCase().equals("YES");
+    return firstLine(response).trim().toUpperCase(Locale.ROOT).equals("YES");
   }
 
   /**

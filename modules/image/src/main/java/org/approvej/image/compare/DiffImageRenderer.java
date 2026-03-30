@@ -78,10 +78,11 @@ public final class DiffImageRenderer {
   }
 
   private static int dimmedGrayscale(int rgb) {
+    int alpha = (rgb >> ALPHA_SHIFT) & CHANNEL_MASK;
     int red = (rgb >> RED_SHIFT) & CHANNEL_MASK;
     int green = (rgb >> GREEN_SHIFT) & CHANNEL_MASK;
     int blue = rgb & CHANNEL_MASK;
     int gray = (int) ((LUMA_RED * red + LUMA_GREEN * green + LUMA_BLUE * blue) * DIM_FACTOR);
-    return (CHANNEL_MASK << ALPHA_SHIFT) | (gray << RED_SHIFT) | (gray << GREEN_SHIFT) | gray;
+    return (alpha << ALPHA_SHIFT) | (gray << RED_SHIFT) | (gray << GREEN_SHIFT) | gray;
   }
 }

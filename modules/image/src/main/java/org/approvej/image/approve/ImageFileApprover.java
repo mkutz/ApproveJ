@@ -184,11 +184,26 @@ public class ImageFileApprover implements ImageApprover {
 
   private void writeDiffImage(
       BufferedImage received, BufferedImage previouslyApproved, Path diffPath) {
+    String format = pathProvider.filenameExtension();
+    boolean writeSucceeded = false;
     try (var outputStream = Files.newOutputStream(diffPath, CREATE, TRUNCATE_EXISTING)) {
       BufferedImage diffImage = DiffImageRenderer.computeDiffImage(received, previouslyApproved);
-      ImageIO.write(diffImage, pathProvider.filenameExtension(), outputStream);
+      writeSucceeded = ImageIO.write(diffImage, format, outputStream);
+      if (!writeSucceeded) {
+        LOGGER.fine(
+            "No ImageIO writer found for format \"%s\" when writing diff image to %s"
+                .formatted(format, diffPath));
+      }
     } catch (IOException e) {
       LOGGER.fine("Writing diff image to %s failed: %s".formatted(diffPath, e.getMessage()));
+    }
+    if (!writeSucceeded) {
+      try {
+        deleteIfExists(diffPath);
+      } catch (IOException e) {
+        LOGGER.fine(
+            "Deleting partial diff image %s failed: %s".formatted(diffPath, e.getMessage()));
+      }
     }
   }
 

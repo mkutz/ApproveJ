@@ -36,8 +36,10 @@ public class Reviewers {
    * A {@link FileReviewer} that calls an AI CLI tool to review the difference between the received
    * and approved files.
    *
-   * <p>For text files, a unified diff is included in the prompt. For image files, the file paths
-   * are passed so the AI CLI can read them directly. If the AI responds with "YES", the received
+   * <p>The AI CLI receives a prompt on stdin. For text files, this prompt includes a unified diff.
+   * For image files, the prompt mentions the relevant file paths (for example, a diff image path
+   * when available). File paths are only passed as CLI arguments if the command string includes
+   * placeholders that are expanded by the reviewer. If the AI responds with "YES", the received
    * file is automatically approved.
    *
    * @param command the AI CLI command to execute (e.g., "claude", "gemini")

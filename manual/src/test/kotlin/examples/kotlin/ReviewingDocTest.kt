@@ -9,11 +9,14 @@ import org.approvej.print.Printer
 import org.approvej.review.Reviewers
 import org.assertj.core.api.Assumptions.assumeThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.DisabledOnOs
+import org.junit.jupiter.api.condition.OS
 
 @org.approvej.ApprovalTest
 class ReviewingDocTest {
 
   @Test
+  @DisabledOnOs(OS.WINDOWS)
   fun `approve reviewedBy fileReviewer`() {
     assumeThat(ProcessBuilder("which", "meld").start().waitFor()).isEqualTo(0)
     // tag::approve_reviewedBy_fileReviewer[]
@@ -27,6 +30,7 @@ class ReviewingDocTest {
   }
 
   @Test
+  @DisabledOnOs(OS.WINDOWS)
   fun `approve reviewedBy ai`() {
     assumeThat(ProcessBuilder("which", "claude").start().waitFor()).isEqualTo(0)
     // tag::approve_reviewedBy_ai[]
