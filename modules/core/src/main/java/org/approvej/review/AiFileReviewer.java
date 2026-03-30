@@ -246,8 +246,6 @@ record AiFileReviewer(String command) implements FileReviewer {
       process.getOutputStream().close();
     } catch (IOException e) {
       LOGGER.fine("Writing prompt to process stdin failed: %s".formatted(e.getMessage()));
-      process.destroyForcibly();
-      return "";
     }
     String response = new String(process.getInputStream().readAllBytes(), UTF_8);
     boolean finished = process.waitFor(TIMEOUT_MINUTES, TimeUnit.MINUTES);
