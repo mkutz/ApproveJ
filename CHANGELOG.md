@@ -56,7 +56,7 @@
 
 ### core
 
-* ⚠️ **Remove deprecated `ScriptFileReviewer.script()`**
+* ⚠️ **Remove deprecated `ScriptReviewer.script()`**
   The static factory method deprecated since 1.1 has been removed.
   Use `Reviewers.script()` instead.
 
@@ -213,7 +213,7 @@ Note that the Gradle plugin is still pending release on the Gradle Plugin portal
 
 * 👀 review all unapproved files
   The new task/goal allows to trigger a review on all remaining unapproved received files via `gradle approvejReviewUnapproved` or `mvn approvej:review-unapproved` without needing to re-run all other tests.
-  This uses the currently configured `defaultFileReviewerScript` or `defaultFileReviewer`.
+  This uses the currently configured `defaultReviewerScript` or `defaultReviewer`.
   See [manual](https://approvej.org/#cleanup_review_unapproved)
 
 * 🙈 auto-approve all received files

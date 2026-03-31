@@ -11,7 +11,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-import org.approvej.review.FileReviewResult;
+import org.approvej.review.ReviewResultRecord;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -268,7 +268,7 @@ class ApprovedFileInventoryTest {
         inventory.reviewUnapproved(
             pathProvider -> {
               reviewedProviders.add(pathProvider);
-              return new FileReviewResult(false);
+              return new ReviewResultRecord(false);
             });
 
     assertThat(reviewed).hasSize(1);
@@ -281,7 +281,7 @@ class ApprovedFileInventoryTest {
   void reviewUnapproved_no_received_files() {
     var inventory = new ApprovedFileInventory(List.of(), inventoryPath());
 
-    var reviewed = inventory.reviewUnapproved(pathProvider -> new FileReviewResult(false));
+    var reviewed = inventory.reviewUnapproved(pathProvider -> new ReviewResultRecord(false));
 
     assertThat(reviewed).isEmpty();
   }

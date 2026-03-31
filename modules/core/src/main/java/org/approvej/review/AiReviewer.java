@@ -18,14 +18,14 @@ import org.approvej.approve.PathProvider;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * A {@link FileReviewer} that calls an AI CLI tool to review the difference between the received
- * and approved files.
+ * A {@link Reviewer} that calls an AI CLI tool to review the difference between the received and
+ * approved files.
  *
  * <p>For text files, a unified diff is generated and included in the prompt. For image files, the
  * AI is instructed to read the files from disk.
  *
- * <p>The command can contain <code>{@value FileReviewer#RECEIVED_PLACEHOLDER}</code> and <code>
- * {@value FileReviewer#APPROVED_PLACEHOLDER}</code> placeholders, which will be replaced with the
+ * <p>The command can contain <code>{@value Reviewer#RECEIVED_PLACEHOLDER}</code> and <code>
+ * {@value Reviewer#APPROVED_PLACEHOLDER}</code> placeholders, which will be replaced with the
  * actual file paths.
  *
  * <p>If the AI responds with "YES" on the first line, the received file is automatically approved.
@@ -34,9 +34,9 @@ import org.jspecify.annotations.NullMarked;
  * @param command the AI CLI command to execute (e.g., "claude -p --allowedTools Read")
  */
 @NullMarked
-record AiFileReviewer(String command) implements FileReviewer {
+record AiReviewer(String command) implements Reviewer {
 
-  private static final Logger LOGGER = Logger.getLogger(AiFileReviewer.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(AiReviewer.class.getName());
 
   private static final int TIMEOUT_MINUTES = 5;
   private static final int MAX_DIFF_LINES = 10_000;
@@ -113,7 +113,7 @@ record AiFileReviewer(String command) implements FileReviewer {
       Path receivedPath = pathProvider.receivedPath();
 
       String prompt = buildPrompt(pathProvider, approvedPath, receivedPath);
-      String resolvedCommand = FileReviewer.resolveCommand(command, approvedPath, receivedPath);
+      String resolvedCommand = Reviewer.resolveCommand(command, approvedPath, receivedPath);
       String response = executeAiCommand(resolvedCommand, prompt);
 
       LOGGER.info("AI review result:\n%s".formatted(response));
@@ -121,7 +121,7 @@ record AiFileReviewer(String command) implements FileReviewer {
       if (isApproved(response)) {
         move(receivedPath, approvedPath, REPLACE_EXISTING);
         Files.deleteIfExists(pathProvider.diffPath());
-        return new FileReviewResult(true);
+        return new ReviewResultRecord(true);
       }
     } catch (IOException e) {
       LOGGER.info("Review by %s failed with exception %s".formatted(getClass().getSimpleName(), e));
@@ -131,7 +131,7 @@ record AiFileReviewer(String command) implements FileReviewer {
           "Review by %s was interrupted with exception %s"
               .formatted(getClass().getSimpleName(), e));
     }
-    return new FileReviewResult(false);
+    return new ReviewResultRecord(false);
   }
 
   private String buildPrompt(PathProvider pathProvider, Path approvedPath, Path receivedPath)

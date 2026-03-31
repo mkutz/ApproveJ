@@ -2,7 +2,7 @@ package org.approvej.configuration;
 
 import org.approvej.print.PrintFormat;
 import org.approvej.print.SingleLineStringPrintFormat;
-import org.approvej.review.FileReviewer;
+import org.approvej.review.Reviewer;
 import org.approvej.review.Reviewers;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -30,24 +30,25 @@ import org.jspecify.annotations.Nullable;
  *
  * @param defaultPrintFormat the {@link PrintFormat} that will be used if none is specified
  *     otherwise
- * @param defaultFileReviewer the {@link FileReviewer} that will be used if none is specified
+ * @param defaultFileReviewer the {@link Reviewer} that will be used for file-based approvals if
+ *     none is specified
  * @param inventoryEnabled whether the approved file inventory is enabled
- * @param autoUpdateInlineValues whether inline values in {@code byValue()} calls should be
- *     automatically updated in the test source file on mismatch
+ * @param defaultInlineValueReviewer the {@link Reviewer} that will be used for inline value
+ *     approvals if none is specified
  */
 @NullMarked
 public record Configuration(
     PrintFormat<Object> defaultPrintFormat,
-    FileReviewer defaultFileReviewer,
+    Reviewer defaultFileReviewer,
     boolean inventoryEnabled,
-    boolean autoUpdateInlineValues) {
+    Reviewer defaultInlineValueReviewer) {
 
   private static final String DEFAULT_PRINT_FORMAT_PROPERTY = "defaultPrintFormat";
   private static final String DEFAULT_FILE_REVIEWER_PROPERTY = "defaultFileReviewer";
   private static final String DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY = "defaultFileReviewerScript";
   private static final String AI_REVIEWER_COMMAND_PROPERTY = "aiReviewerCommand";
   private static final String INVENTORY_ENABLED_PROPERTY = "inventoryEnabled";
-  private static final String AUTO_UPDATE_INLINE_VALUES_PROPERTY = "autoUpdateInlineValues";
+  private static final String DEFAULT_INLINE_VALUE_REVIEWER_PROPERTY = "defaultInlineValueReviewer";
 
   /** The loaded {@link Configuration} object. */
   public static final Configuration configuration =
@@ -57,14 +58,15 @@ public record Configuration(
     String printFormatConfig = loader.get(DEFAULT_PRINT_FORMAT_PROPERTY, "singleLineString");
     PrintFormat<Object> printFormat = resolvePrintFormat(printFormatConfig);
 
-    FileReviewer fileReviewer = resolveFileReviewer(loader);
+    Reviewer fileReviewer = resolveFileReviewer(loader);
 
     boolean inventoryEnabled = resolveInventoryEnabled(loader);
 
-    boolean autoUpdateInlineValues =
-        Boolean.parseBoolean(loader.get(AUTO_UPDATE_INLINE_VALUES_PROPERTY, "false"));
+    Reviewer inlineValueReviewer =
+        Registry.resolve(
+            loader.get(DEFAULT_INLINE_VALUE_REVIEWER_PROPERTY, "none"), Reviewer.class);
 
-    return new Configuration(printFormat, fileReviewer, inventoryEnabled, autoUpdateInlineValues);
+    return new Configuration(printFormat, fileReviewer, inventoryEnabled, inlineValueReviewer);
   }
 
   @SuppressWarnings("unchecked")
@@ -75,7 +77,7 @@ public record Configuration(
     return Registry.resolve(aliasOrClassName, PrintFormat.class);
   }
 
-  private static FileReviewer resolveFileReviewer(ConfigurationLoader loader) {
+  private static Reviewer resolveFileReviewer(ConfigurationLoader loader) {
     String aiCommand = loader.get(AI_REVIEWER_COMMAND_PROPERTY);
     if (aiCommand != null) {
       return Reviewers.ai(aiCommand);
@@ -86,7 +88,7 @@ public record Configuration(
       return Reviewers.script(fileReviewerScript);
     }
 
-    return Registry.resolve(loader.get(DEFAULT_FILE_REVIEWER_PROPERTY, "none"), FileReviewer.class);
+    return Registry.resolve(loader.get(DEFAULT_FILE_REVIEWER_PROPERTY, "none"), Reviewer.class);
   }
 
   private static boolean resolveInventoryEnabled(ConfigurationLoader loader) {

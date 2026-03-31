@@ -19,17 +19,6 @@ public class Approvers {
   }
 
   /**
-   * Creates an {@link Approver} that checks the given previouslyApproved value and automatically
-   * rewrites the test source file on mismatch.
-   *
-   * @param previouslyApproved the approved value
-   * @return a new {@link AutoUpdatingInplaceApprover} for the given previouslyApproved value.
-   */
-  public static Approver autoUpdatingValue(String previouslyApproved) {
-    return new AutoUpdatingInplaceApprover(previouslyApproved);
-  }
-
-  /**
    * Creates a new {@link Approver} that uses the given {@link PathProvider} to determine the paths
    * of approved and received files.
    *

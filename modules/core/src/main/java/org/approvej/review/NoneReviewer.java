@@ -3,13 +3,13 @@ package org.approvej.review;
 import org.approvej.approve.PathProvider;
 import org.jspecify.annotations.NullMarked;
 
-/** A {@link FileReviewer} that does nothing and never triggers a reapproval. */
+/** A {@link Reviewer} that does nothing and never triggers a reapproval. */
 @NullMarked
-public record NoneFileReviewer() implements FileReviewer, FileReviewerProvider {
+public record NoneReviewer() implements Reviewer, ReviewerProvider {
 
   @Override
   public ReviewResult apply(PathProvider pathProvider) {
-    return new FileReviewResult(false);
+    return new ReviewResultRecord(false);
   }
 
   @Override
@@ -18,7 +18,7 @@ public record NoneFileReviewer() implements FileReviewer, FileReviewerProvider {
   }
 
   @Override
-  public FileReviewer create() {
-    return new NoneFileReviewer();
+  public Reviewer create() {
+    return new NoneReviewer();
   }
 }

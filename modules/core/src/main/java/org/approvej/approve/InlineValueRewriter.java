@@ -12,10 +12,10 @@ import org.jspecify.annotations.Nullable;
 /**
  * Rewrites {@code byValue()} string arguments in test source files.
  *
- * <p>When {@link org.approvej.configuration.Configuration#autoUpdateInlineValues()} is enabled,
- * this class replaces the string argument of a {@code byValue()} call with a text block containing
- * the new received value. Only the argument itself is replaced — the rest of the file is left
- * untouched.
+ * <p>When the {@link org.approvej.configuration.Configuration#defaultInlineValueReviewer()} is
+ * configured (e.g. as {@code automatic}), this class replaces the string argument of a {@code
+ * byValue()} call with a text block containing the new received value. Only the argument itself is
+ * replaced — the rest of the file is left untouched.
  *
  * <p>Supports Java ({@code .java}), Kotlin ({@code .kt}), Groovy ({@code .groovy}), and Scala
  * ({@code .scala}) source files.
@@ -56,6 +56,21 @@ public class InlineValueRewriter {
       FILE_LOCKS.remove(absolutePath, lock);
       lock.unlock();
     }
+  }
+
+  /**
+   * Rewrites the content of a source file, replacing the {@code byValue()} argument in the given
+   * method with a text block containing the new value.
+   *
+   * @param content the source file content
+   * @param methodName the test method name
+   * @param newValue the new value
+   * @param sourcePath the source file path (used to detect the language)
+   * @return the rewritten content
+   */
+  public static String rewriteContent(
+      String content, String methodName, String newValue, Path sourcePath) {
+    return rewriteContent(content, methodName, newValue, Language.fromPath(sourcePath));
   }
 
   static String rewriteContent(String content, String methodName, String newValue) {

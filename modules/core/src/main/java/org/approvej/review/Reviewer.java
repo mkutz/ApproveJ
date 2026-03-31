@@ -10,7 +10,7 @@ import org.approvej.approve.PathProvider;
  * <p>This usually means that a diff/merge tool is opened, which presents the difference between the
  * received and the previously approved value to users in case they differ.
  */
-public interface FileReviewer extends Function<PathProvider, ReviewResult> {
+public interface Reviewer extends Function<PathProvider, ReviewResult> {
 
   /** Placeholder in commands that is replaced with the received file path. */
   String RECEIVED_PLACEHOLDER = "{receivedFile}";

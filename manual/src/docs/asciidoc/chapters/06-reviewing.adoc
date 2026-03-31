@@ -101,7 +101,7 @@ include::../../../test/kotlin/examples/kotlin/ReviewingDocTest.kt[tag=approve_re
 == Automatic Review
 
 If you have a lot of approvals that need to be updated, you might want to just accept all the updates automatically.
-In that case, you can use the link:{javadoc-url}/core/org/approvej/review/Reviewers.html#automatic()[`automatic`] link:{javadoc-url}/core/org/approvej/review/FileReviewer.html[`FileReviewer`].
+In that case, you can use the link:{javadoc-url}/core/org/approvej/review/Reviewers.html#automatic()[`automatic`] link:{javadoc-url}/core/org/approvej/review/Reviewer.html[`Reviewer`].
 It simply writes the received value into the approved file without checking them at all.
 
 WARNING: This will overwrite your approved file(s).

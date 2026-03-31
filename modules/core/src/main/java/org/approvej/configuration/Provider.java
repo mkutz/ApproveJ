@@ -11,7 +11,7 @@ import org.jspecify.annotations.NullMarked;
  *
  * <p>This interface is typically implemented directly by the component class itself, allowing the
  * component to serve as its own provider. Use specialized sub-interfaces like {@code
- * PrintFormatProvider} or {@code FileReviewerProvider} which provide a default implementation for
+ * PrintFormatProvider} or {@code ReviewerProvider} which provide a default implementation for
  * {@link #type()}.
  *
  * @param <T> the type of component this provider creates
@@ -41,7 +41,7 @@ public interface Provider<T> {
   /**
    * Returns the type of component this provider creates.
    *
-   * <p>Specialized sub-interfaces like {@code PrintFormatProvider} and {@code FileReviewerProvider}
+   * <p>Specialized sub-interfaces like {@code PrintFormatProvider} and {@code ReviewerProvider}
    * provide default implementations for this method.
    *
    * @return the component type class

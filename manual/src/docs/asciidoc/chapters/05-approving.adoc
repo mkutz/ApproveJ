@@ -30,17 +30,19 @@ include::../../../test/kotlin/examples/kotlin/ApprovingDocTest.kt[tag=approve_in
 When you change the code under test, the inline value in `byValue()` will no longer match and the test fails.
 You then have to manually update the string literal in the test source file.
 
-To automate this, set the `autoUpdateInlineValues` property to `true`:
+To automate this, set the `defaultInlineValueReviewer` property to `automatic`:
 
 [source,properties]
 ----
 # src/test/resources/approvej.properties
-autoUpdateInlineValues = true
+defaultInlineValueReviewer = automatic
 ----
 
 With this enabled, a `byValue()` mismatch will automatically rewrite the string argument in the test source file with the received value.
 The test will then fail with a message to re-run the test.
 On re-run, the test passes because the values now match.
+
+Since this uses the same <<reviewing,reviewer>> mechanism as `byFile()`, you can also configure a `script` or `ai` reviewer to show a diff tool or have an AI review the change before applying it.
 
 [source,java,indent=0,role="primary"]
 .Java

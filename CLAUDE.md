@@ -34,7 +34,7 @@ It provides a fluent API to compare actual values against previously approved "g
 
 ## Module Structure
 
-- **modules/core** - Core framework with no external dependencies. Contains `ApprovalBuilder`, `Approver`, `Scrubber`, `PrintFormat`, and `FileReviewer` interfaces.
+- **modules/core** - Core framework with no external dependencies. Contains `ApprovalBuilder`, `Approver`, `Scrubber`, `PrintFormat`, and `Reviewer` interfaces.
 - **modules/database-jdbc** - JDBC adapter for database state snapshotting and SQL recording
 - **modules/image** - Image approval testing using perceptual hashing and pixel comparison
 - **modules/json-jackson** - JSON support using Jackson 2.x
@@ -62,7 +62,7 @@ The approval flow is:
 1. **Print** - Convert value to String via `PrintFormat` (e.g., `JsonPrintFormat`, `YamlPrintFormat`)
 2. **Scrub** - Remove dynamic data (timestamps, UUIDs) via `Scrubber` implementations
 3. **Approve** - Compare against approved value via `Approver` (file-based or inline)
-4. **Review** - On mismatch, optionally open diff tool via `FileReviewer`
+4. **Review** - On mismatch, optionally open diff tool via `Reviewer`
 
 Key entry point: `ApprovalBuilder.approve(value)` with fluent methods `.printedAs()`, `.scrubbedOf()`, `.byFile()`.
 

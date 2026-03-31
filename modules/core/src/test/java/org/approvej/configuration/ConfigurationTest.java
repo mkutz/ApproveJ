@@ -6,7 +6,9 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import java.util.Map;
 import java.util.Properties;
 import org.approvej.print.SingleLineStringPrintFormat;
-import org.approvej.review.FileReviewer;
+import org.approvej.review.AutomaticReviewer;
+import org.approvej.review.NoneReviewer;
+import org.approvej.review.Reviewer;
 import org.junit.jupiter.api.Test;
 
 class ConfigurationTest {
@@ -24,19 +26,19 @@ class ConfigurationTest {
     Configuration config = Configuration.loadConfiguration(loader);
 
     assertThat(config.defaultPrintFormat()).isInstanceOf(SingleLineStringPrintFormat.class);
-    assertThat(config.defaultFileReviewer()).isInstanceOf(FileReviewer.class);
-    assertThat(config.autoUpdateInlineValues()).isFalse();
+    assertThat(config.defaultFileReviewer()).isInstanceOf(Reviewer.class);
+    assertThat(config.defaultInlineValueReviewer()).isInstanceOf(NoneReviewer.class);
   }
 
   @Test
-  void loadConfiguration_autoUpdateInlineValues() {
+  void loadConfiguration_defaultInlineValueReviewer() {
     Properties properties = new Properties();
-    properties.setProperty("autoUpdateInlineValues", "true");
+    properties.setProperty("defaultInlineValueReviewer", "automatic");
     ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     Configuration config = Configuration.loadConfiguration(loader);
 
-    assertThat(config.autoUpdateInlineValues()).isTrue();
+    assertThat(config.defaultInlineValueReviewer()).isInstanceOf(AutomaticReviewer.class);
   }
 
   @Test
@@ -48,7 +50,7 @@ class ConfigurationTest {
     Configuration config = Configuration.loadConfiguration(loader);
 
     assertThat(config.defaultPrintFormat()).isInstanceOf(SingleLineStringPrintFormat.class);
-    assertThat(config.defaultFileReviewer()).isInstanceOf(FileReviewer.class);
+    assertThat(config.defaultFileReviewer()).isInstanceOf(Reviewer.class);
   }
 
   @Test
@@ -71,7 +73,7 @@ class ConfigurationTest {
   @Test
   void loadConfiguration_fileReviewerScript() {
     Properties properties = new Properties();
-    properties.setProperty("defaultFileReviewerScript", "diff {receivedFile} {approvedFile}");
+    properties.setProperty("defaultReviewerScript", "diff {receivedFile} {approvedFile}");
 
     ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
@@ -230,19 +232,19 @@ class ConfigurationTest {
 
     Configuration config = Configuration.loadConfiguration(loader);
 
-    assertThat(config.defaultFileReviewer().getClass().getSimpleName()).isEqualTo("AiFileReviewer");
+    assertThat(config.defaultFileReviewer().getClass().getSimpleName()).isEqualTo("AiReviewer");
   }
 
   @Test
   void loadConfiguration_aiReviewerCommand_takes_priority_over_fileReviewerScript() {
     Properties properties = new Properties();
     properties.setProperty("aiReviewerCommand", "claude -p");
-    properties.setProperty("defaultFileReviewerScript", "diff {receivedFile} {approvedFile}");
+    properties.setProperty("defaultReviewerScript", "diff {receivedFile} {approvedFile}");
     ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     Configuration config = Configuration.loadConfiguration(loader);
 
-    assertThat(config.defaultFileReviewer().getClass().getSimpleName()).isEqualTo("AiFileReviewer");
+    assertThat(config.defaultFileReviewer().getClass().getSimpleName()).isEqualTo("AiReviewer");
   }
 
   @Test

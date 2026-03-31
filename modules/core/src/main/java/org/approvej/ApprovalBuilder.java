@@ -1,6 +1,5 @@
 package org.approvej;
 
-import static org.approvej.approve.Approvers.autoUpdatingValue;
 import static org.approvej.approve.Approvers.file;
 import static org.approvej.approve.Approvers.value;
 import static org.approvej.approve.PathProviders.approvedPath;
@@ -9,18 +8,25 @@ import static org.approvej.configuration.Configuration.configuration;
 import static org.approvej.print.PrintFormat.DEFAULT_FILENAME_EXTENSION;
 import static org.approvej.review.Reviewers.script;
 
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import java.util.logging.Logger;
 import org.approvej.approve.ApprovedFileInventoryUpdater;
 import org.approvej.approve.Approver;
+import org.approvej.approve.InlineValueRewriter;
 import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviders;
+import org.approvej.approve.StackTraceTestFinderUtil;
 import org.approvej.print.PrintFormat;
 import org.approvej.print.Printer;
-import org.approvej.review.FileReviewer;
+import org.approvej.review.NoneReviewer;
 import org.approvej.review.ReviewResult;
+import org.approvej.review.Reviewer;
 import org.approvej.scrub.Scrubber;
 import org.jspecify.annotations.NullMarked;
 
@@ -61,17 +67,19 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class ApprovalBuilder<T> {
 
+  private static final Logger LOGGER = Logger.getLogger(ApprovalBuilder.class.getName());
+
   private final T value;
   private final String name;
   private final String filenameExtension;
-  private final FileReviewer fileReviewer;
+  private final Reviewer fileReviewer;
   private final AtomicBoolean concluded;
 
   private ApprovalBuilder(
       T value,
       String name,
       String filenameExtension,
-      FileReviewer fileReviewer,
+      Reviewer fileReviewer,
       AtomicBoolean concluded) {
     this.value = value;
     this.name = name;
@@ -154,21 +162,21 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Sets the given {@link FileReviewer} to trigger if the received value is not equal to the
-   * previously approved.
+   * Sets the given {@link Reviewer} to trigger if the received value is not equal to the previously
+   * approved.
    *
-   * @param fileReviewer the {@link FileReviewer} to be used
+   * @param fileReviewer the {@link Reviewer} to be used
    * @return a copy of this with the given {@link #fileReviewer}
    * @see org.approvej.configuration.Configuration#defaultFileReviewer()
    * @see org.approvej.review.Reviewers
    */
-  public ApprovalBuilder<T> reviewedBy(FileReviewer fileReviewer) {
+  public ApprovalBuilder<T> reviewedBy(Reviewer fileReviewer) {
     return new ApprovalBuilder<>(value, name, filenameExtension, fileReviewer, concluded);
   }
 
   /**
-   * Creates a {@link org.approvej.review.FileReviewer} from the given script {@link String} to
-   * trigger if the received value is not equal to the previously approved.
+   * Creates a {@link Reviewer} from the given script {@link String} to trigger if the received
+   * value is not equal to the previously approved.
    *
    * @param script the script {@link String} to be used as a {@link
    *     org.approvej.review.Reviewers#script(String) script}
@@ -204,18 +212,48 @@ public class ApprovalBuilder<T> {
   /**
    * Approves the value by the given previouslyApproved value.
    *
-   * <p>When {@link org.approvej.configuration.Configuration#autoUpdateInlineValues()} is enabled,
-   * this method will automatically update the string literal in the test source file with the
-   * received value on mismatch, then fail the test so the developer can verify the change and
-   * re-run.
+   * <p>When the {@link org.approvej.configuration.Configuration#defaultInlineValueReviewer()} is
+   * configured (e.g. as {@code automatic}), a mismatch will trigger the reviewer. The {@code
+   * automatic} reviewer rewrites the string literal in the test source file with the received value
+   * and fails the test so the developer can verify the change and re-run.
    *
    * @param previouslyApproved the approved value
    */
   public void byValue(final String previouslyApproved) {
-    if (configuration.autoUpdateInlineValues()) {
-      by(autoUpdatingValue(previouslyApproved));
-    } else {
-      by(value(previouslyApproved));
+    concluded.set(true);
+    if (!(value instanceof String)) {
+      printed().byValue(previouslyApproved);
+      return;
+    }
+    Approver approver = value(previouslyApproved);
+    ApprovalResult result = approver.apply(String.valueOf(value));
+    if (result.needsApproval()) {
+      Reviewer inlineValueReviewer = configuration.defaultInlineValueReviewer();
+      if (!(inlineValueReviewer instanceof NoneReviewer)) {
+        try {
+          Method testMethod = StackTraceTestFinderUtil.currentTestMethod().method();
+          Path sourcePath = StackTraceTestFinderUtil.findTestSourcePath(testMethod);
+          String received = String.valueOf(value).trim();
+          PathProvider pathProvider =
+              new PathProvider(
+                  sourcePath.getParent(), sourcePath.getFileName().toString(), "", "", "");
+          String content = Files.readString(sourcePath);
+          String rewritten =
+              InlineValueRewriter.rewriteContent(
+                  content, testMethod.getName(), received, sourcePath);
+          Files.writeString(pathProvider.receivedPath(), rewritten);
+          ReviewResult reviewResult = inlineValueReviewer.apply(pathProvider);
+          if (reviewResult.needsReapproval()) {
+            throw new ApprovalError("Inline value updated. Re-run the test.");
+          }
+          Files.deleteIfExists(pathProvider.receivedPath());
+        } catch (ApprovalError approvalError) {
+          throw approvalError;
+        } catch (RuntimeException | IOException error) {
+          LOGGER.warning("Could not auto-update inline value: " + error.getMessage());
+        }
+      }
+      throw new ApprovalError(result.received(), result.previouslyApproved());
     }
   }
 

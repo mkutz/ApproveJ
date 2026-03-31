@@ -13,13 +13,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
-import org.approvej.review.FileReviewer;
+import org.approvej.review.Reviewer;
 import org.jspecify.annotations.NullMarked;
 
 /**
  * Wraps a loaded approved file inventory and provides domain operations like {@link
  * #findLeftovers()}, {@link #removeLeftovers()}, {@link #approveAll()}, and {@link
- * #reviewUnapproved(FileReviewer)}.
+ * #reviewUnapproved(Reviewer)}.
  *
  * <p>Recording approved files during test execution is handled separately by {@link
  * ApprovedFileInventoryUpdater}.
@@ -175,12 +175,12 @@ public class ApprovedFileInventory {
 
   /**
    * Finds all unapproved files (those with a received file present) and reviews them using the
-   * given {@link FileReviewer}.
+   * given {@link Reviewer}.
    *
-   * @param reviewer the {@link FileReviewer} to use for reviewing each unapproved file
+   * @param reviewer the {@link Reviewer} to use for reviewing each unapproved file
    * @return the list of reviewed {@link PathProvider}s
    */
-  List<PathProvider> reviewUnapproved(FileReviewer reviewer) {
+  List<PathProvider> reviewUnapproved(Reviewer reviewer) {
     List<PathProvider> unapproved =
         inventory.stream()
             .map(entry -> PathProviders.approvedPath(entry.relativePath()))

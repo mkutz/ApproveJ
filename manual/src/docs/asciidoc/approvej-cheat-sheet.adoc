@@ -28,7 +28,7 @@ Quick reference for the public API, organized by the approval flow.
 |`.scrubbedOf(UnaryOperator<T> scrubber)`
 |Apply a scrubber to remove dynamic data
 
-|`.reviewedBy(FileReviewer)` / `.reviewedBy(String script)`
+|`.reviewedBy(Reviewer)` / `.reviewedBy(String script)`
 |Set the file reviewer or review script
 
 |`.byValue(String previouslyApproved)`

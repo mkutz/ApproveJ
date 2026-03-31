@@ -33,7 +33,7 @@ endif::[]
 |`.scrubbedOf(UnaryOperator<T> scrubber)`
 |Apply a scrubber to remove dynamic data
 
-|`.reviewedBy(FileReviewer fileReviewer)`
+|`.reviewedBy(Reviewer fileReviewer)`
 |Set the file reviewer for this approval
 
 |`.reviewedBy(String script)`
@@ -369,9 +369,9 @@ endif::[]
 |`APPROVEJ_INVENTORY_ENABLED`
 |`true` locally, `false` in CI
 
-|`autoUpdateInlineValues`
-|`APPROVEJ_AUTO_UPDATE_INLINE_VALUES`
-|`false`
+|`defaultInlineValueReviewer`
+|`APPROVEJ_DEFAULT_INLINE_VALUE_REVIEWER`
+|`none`
 |===
 
 Configuration is resolved in priority order: environment variables > project properties (`src/test/resources/approvej.properties`) > user home properties (`~/.config/approvej/approvej.properties`) > defaults.
