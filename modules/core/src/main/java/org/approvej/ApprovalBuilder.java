@@ -16,7 +16,6 @@ import java.util.function.UnaryOperator;
 import java.util.logging.Logger;
 import org.approvej.approve.ApprovedFileInventoryUpdater;
 import org.approvej.approve.Approver;
-import org.approvej.approve.InlineValueError;
 import org.approvej.approve.InlineValueRewriter;
 import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviders;
@@ -231,9 +230,11 @@ public class ApprovalBuilder<T> {
           Path sourcePath = StackTraceTestFinderUtil.findTestSourcePath(testMethod);
           InlineValueRewriter.rewrite(sourcePath, testMethod.getName(), received.trim());
           throw new ApprovalError("Inline value updated. Re-run the test.");
-        } catch (InlineValueError error) {
+        } catch (ApprovalError approvalError) {
+          throw approvalError;
+        } catch (RuntimeException error) {
           Logger.getLogger(ApprovalBuilder.class.getName())
-              .info("Could not auto-update inline value: " + error.getMessage());
+              .warning("Could not auto-update inline value: " + error.getMessage());
         }
       }
       throw new ApprovalError(result.received(), result.previouslyApproved());

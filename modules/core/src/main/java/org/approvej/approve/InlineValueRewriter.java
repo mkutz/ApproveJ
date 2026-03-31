@@ -341,7 +341,11 @@ public class InlineValueRewriter {
 
       @Override
       String escapeValue(String value) {
-        return value.replace("\\", "\\\\").replace("\"\"\"", "\\\"\"\"").replace("$", "${'$'}");
+        if (value.contains("\"\"\"")) {
+          throw new InlineValueError(
+              "Cannot rewrite inline value: Kotlin raw strings cannot contain \"\"\"");
+        }
+        return value.replace("\\", "\\\\").replace("$", "${'$'}");
       }
 
       @Override
@@ -395,7 +399,11 @@ public class InlineValueRewriter {
 
       @Override
       String escapeValue(String value) {
-        return value.replace("\"\"\"", "\\\"\"\"");
+        if (value.contains("\"\"\"")) {
+          throw new InlineValueError(
+              "Cannot rewrite inline value: Scala raw strings cannot contain \"\"\"");
+        }
+        return value;
       }
 
       @Override

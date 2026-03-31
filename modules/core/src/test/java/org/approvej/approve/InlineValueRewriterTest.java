@@ -380,22 +380,24 @@ class InlineValueRewriterTest {
 
     CountDownLatch startLatch = new CountDownLatch(1);
     try (ExecutorService executor = Executors.newFixedThreadPool(2)) {
-      executor.submit(
-          () -> {
-            startLatch.await();
-            InlineValueRewriter.rewrite(sourceFile, "test1", "new1");
-            return null;
-          });
-      executor.submit(
-          () -> {
-            startLatch.await();
-            InlineValueRewriter.rewrite(sourceFile, "test2", "new2");
-            return null;
-          });
+      var future1 =
+          executor.submit(
+              () -> {
+                startLatch.await();
+                InlineValueRewriter.rewrite(sourceFile, "test1", "new1");
+                return null;
+              });
+      var future2 =
+          executor.submit(
+              () -> {
+                startLatch.await();
+                InlineValueRewriter.rewrite(sourceFile, "test2", "new2");
+                return null;
+              });
 
       startLatch.countDown();
-      executor.shutdown();
-      assertThat(executor.awaitTermination(10, TimeUnit.SECONDS)).isTrue();
+      future1.get(10, TimeUnit.SECONDS);
+      future2.get(10, TimeUnit.SECONDS);
     }
 
     String content = Files.readString(sourceFile, StandardCharsets.UTF_8);
