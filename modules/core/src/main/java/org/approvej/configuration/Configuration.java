@@ -32,18 +32,22 @@ import org.jspecify.annotations.Nullable;
  *     otherwise
  * @param defaultFileReviewer the {@link FileReviewer} that will be used if none is specified
  * @param inventoryEnabled whether the approved file inventory is enabled
+ * @param autoUpdateInlineValues whether inline values in {@code byValue()} calls should be
+ *     automatically updated in the test source file on mismatch
  */
 @NullMarked
 public record Configuration(
     PrintFormat<Object> defaultPrintFormat,
     FileReviewer defaultFileReviewer,
-    boolean inventoryEnabled) {
+    boolean inventoryEnabled,
+    boolean autoUpdateInlineValues) {
 
   private static final String DEFAULT_PRINT_FORMAT_PROPERTY = "defaultPrintFormat";
   private static final String DEFAULT_FILE_REVIEWER_PROPERTY = "defaultFileReviewer";
   private static final String DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY = "defaultFileReviewerScript";
   private static final String AI_REVIEWER_COMMAND_PROPERTY = "aiReviewerCommand";
   private static final String INVENTORY_ENABLED_PROPERTY = "inventoryEnabled";
+  private static final String AUTO_UPDATE_INLINE_VALUES_PROPERTY = "autoUpdateInlineValues";
 
   /** The loaded {@link Configuration} object. */
   public static final Configuration configuration =
@@ -57,7 +61,10 @@ public record Configuration(
 
     boolean inventoryEnabled = resolveInventoryEnabled(loader);
 
-    return new Configuration(printFormat, fileReviewer, inventoryEnabled);
+    boolean autoUpdateInlineValues =
+        Boolean.parseBoolean(loader.get(AUTO_UPDATE_INLINE_VALUES_PROPERTY, "false"));
+
+    return new Configuration(printFormat, fileReviewer, inventoryEnabled, autoUpdateInlineValues);
   }
 
   @SuppressWarnings("unchecked")

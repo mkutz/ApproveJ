@@ -30,7 +30,7 @@ final class ConfigurationLoader {
     for (ConfigurationSource source : sources) {
       String value = source.getValue(key);
       if (value != null) {
-        return value;
+        return value.trim();
       }
     }
     return null;

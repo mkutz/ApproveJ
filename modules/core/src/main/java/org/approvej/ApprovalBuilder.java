@@ -23,7 +23,6 @@ import org.approvej.approve.PathProviders;
 import org.approvej.approve.StackTraceTestFinderUtil;
 import org.approvej.print.PrintFormat;
 import org.approvej.print.Printer;
-import org.approvej.review.AutomaticFileReviewer;
 import org.approvej.review.FileReviewer;
 import org.approvej.review.ReviewResult;
 import org.approvej.scrub.Scrubber;
@@ -209,10 +208,10 @@ public class ApprovalBuilder<T> {
   /**
    * Approves the value by the given previouslyApproved value.
    *
-   * <p>When the configured {@link org.approvej.review.FileReviewer} is {@link
-   * AutomaticFileReviewer}, this method will automatically update the string literal in the test
-   * source file with the received value on mismatch, then fail the test so the developer can verify
-   * the change and re-run.
+   * <p>When {@link org.approvej.configuration.Configuration#autoUpdateInlineValues()} is enabled,
+   * this method will automatically update the string literal in the test source file with the
+   * received value on mismatch, then fail the test so the developer can verify the change and
+   * re-run.
    *
    * @param previouslyApproved the approved value
    */
@@ -222,14 +221,15 @@ public class ApprovalBuilder<T> {
       printed().byValue(previouslyApproved);
       return;
     }
+    String received = String.valueOf(value);
     Approver approver = value(previouslyApproved);
-    ApprovalResult result = approver.apply(String.valueOf(value));
+    ApprovalResult result = approver.apply(received);
     if (result.needsApproval()) {
-      if (configuration.defaultFileReviewer() instanceof AutomaticFileReviewer) {
+      if (configuration.autoUpdateInlineValues()) {
         try {
           Method testMethod = StackTraceTestFinderUtil.currentTestMethod().method();
           Path sourcePath = StackTraceTestFinderUtil.findTestSourcePath(testMethod);
-          InlineValueRewriter.rewrite(sourcePath, testMethod.getName(), result.received());
+          InlineValueRewriter.rewrite(sourcePath, testMethod.getName(), received.trim());
           throw new ApprovalError("Inline value updated. Re-run the test.");
         } catch (InlineValueError error) {
           Logger.getLogger(ApprovalBuilder.class.getName())

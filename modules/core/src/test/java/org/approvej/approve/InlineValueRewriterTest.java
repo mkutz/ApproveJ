@@ -426,12 +426,14 @@ class InlineValueRewriterTest {
       })
   void rewrite_round_trip_four_space_indent(String originalValue) {
     String content =
-        "class MyTest {\n"
-            + "    @Test\n"
-            + "    void test() {\n"
-            + "        approve(person).byValue(\"placeholder\");\n"
-            + "    }\n"
-            + "}\n";
+        """
+        class MyTest {
+            @Test
+            void test() {
+                approve(person).byValue("placeholder");
+            }
+        }
+        """;
 
     String rewritten = InlineValueRewriter.rewriteContent(content, "test", originalValue);
     String textBlockContent = extractTextBlockContent(rewritten);

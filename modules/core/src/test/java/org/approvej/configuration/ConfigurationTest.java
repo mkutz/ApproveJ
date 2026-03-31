@@ -25,6 +25,18 @@ class ConfigurationTest {
 
     assertThat(config.defaultPrintFormat()).isInstanceOf(SingleLineStringPrintFormat.class);
     assertThat(config.defaultFileReviewer()).isInstanceOf(FileReviewer.class);
+    assertThat(config.autoUpdateInlineValues()).isFalse();
+  }
+
+  @Test
+  void loadConfiguration_autoUpdateInlineValues() {
+    Properties props = new Properties();
+    props.setProperty("autoUpdateInlineValues", "true");
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+
+    Configuration config = Configuration.loadConfiguration(loader);
+
+    assertThat(config.autoUpdateInlineValues()).isTrue();
   }
 
   @Test
