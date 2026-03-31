@@ -109,60 +109,27 @@ public class InlineValueRewriter {
   }
 
   private static int findMethodEnd(String content, int methodOffset) {
-    int depth = 0;
-    boolean inString = false;
-    boolean inTextBlock = false;
     int position = content.indexOf('{', methodOffset);
     if (position < 0) {
       return content.length();
     }
-    while (position < content.length()) {
-      char character = content.charAt(position);
-
-      if (inTextBlock) {
-        if (position + 3 <= content.length()
-            && (content.startsWith("\"\"\"", position) || content.startsWith("'''", position))) {
-          inTextBlock = false;
-          position += 3;
-          continue;
-        }
-        position++;
+    int depth = 0;
+    SourceScanner scanner = new SourceScanner(content, position);
+    while (scanner.hasMore()) {
+      if (scanner.isInString()) {
+        scanner.advance();
         continue;
       }
-
-      if (inString) {
-        if (character == '\\') {
-          position += 2;
-          continue;
-        }
-        if (character == '"' || character == '\'') {
-          inString = false;
-        }
-        position++;
-        continue;
-      }
-
-      if (character == '"' || character == '\'') {
-        if (position + 3 <= content.length()
-            && (content.startsWith("\"\"\"", position) || content.startsWith("'''", position))) {
-          inTextBlock = true;
-          position += 3;
-          continue;
-        }
-        inString = true;
-        position++;
-        continue;
-      }
-
+      char character = scanner.current();
       if (character == '{') {
         depth++;
       } else if (character == '}') {
         depth--;
         if (depth == 0) {
-          return position;
+          return scanner.position();
         }
       }
-      position++;
+      scanner.advance();
     }
     return content.length();
   }
@@ -177,73 +144,36 @@ public class InlineValueRewriter {
   }
 
   private static int findArgumentEnd(String content, int start, Language language) {
+    SourceScanner scanner = new SourceScanner(content, start);
+    scanner.tryEnterString();
+
     int depth = 1;
-    char stringQuoteChar = 0;
-    String textBlockDelimiter = null;
-    int position = start;
-
-    String delimiter = language.delimiter();
-
-    if (position + 3 <= content.length() && content.startsWith(delimiter, position)) {
-      textBlockDelimiter = delimiter;
-      position += 3;
-    } else if (position < content.length() && isQuoteChar(content.charAt(position))) {
-      stringQuoteChar = content.charAt(position);
-      position++;
-    }
-
-    while (position < content.length()) {
-      char character = content.charAt(position);
-
-      if (textBlockDelimiter != null) {
-        if (position + 3 <= content.length() && content.startsWith(textBlockDelimiter, position)) {
-          textBlockDelimiter = null;
-          position += 3;
+    while (scanner.hasMore()) {
+      if (scanner.isInString()) {
+        if (scanner.tryExitString()) {
           String suffix = language.suffix();
-          if (!suffix.isEmpty() && content.startsWith(suffix, position)) {
-            position += suffix.length();
+          if (!suffix.isEmpty() && content.startsWith(suffix, scanner.position())) {
+            scanner.skip(suffix.length());
           }
-          continue;
+        } else {
+          scanner.advance();
         }
-        position++;
         continue;
       }
 
-      if (stringQuoteChar != 0) {
-        if (character == '\\') {
-          position += 2;
-          continue;
-        }
-        if (character == stringQuoteChar) {
-          stringQuoteChar = 0;
-        }
-        position++;
+      char character = scanner.current();
+      if (scanner.tryEnterString()) {
         continue;
       }
-
-      if (isQuoteChar(character)) {
-        if (position + 3 <= content.length()) {
-          String tripleQuote = String.valueOf(character).repeat(3);
-          if (content.startsWith(tripleQuote, position)) {
-            textBlockDelimiter = tripleQuote;
-            position += 3;
-            continue;
-          }
-        }
-        stringQuoteChar = character;
-        position++;
-        continue;
-      }
-
       if (character == '(') {
         depth++;
       } else if (character == ')') {
         depth--;
         if (depth == 0) {
-          return position;
+          return scanner.position();
         }
       }
-      position++;
+      scanner.advance();
     }
 
     throw new InlineValueError("Could not find closing parenthesis for byValue(");
@@ -303,6 +233,88 @@ public class InlineValueRewriter {
       textBlock.append(suffix);
     }
     return textBlock.toString();
+  }
+
+  /**
+   * Tracks position in source content and handles skipping over string literals and text blocks.
+   */
+  private static final class SourceScanner {
+
+    private final String content;
+    private int position;
+    private char stringQuoteChar;
+    private String textBlockDelimiter;
+
+    SourceScanner(String content, int position) {
+      this.content = content;
+      this.position = position;
+    }
+
+    int position() {
+      return position;
+    }
+
+    char current() {
+      return content.charAt(position);
+    }
+
+    boolean hasMore() {
+      return position < content.length();
+    }
+
+    void advance() {
+      if (isInRegularString() && current() == '\\') {
+        position += 2;
+      } else {
+        position++;
+      }
+    }
+
+    void skip(int count) {
+      position += count;
+    }
+
+    boolean isInString() {
+      return stringQuoteChar != 0 || textBlockDelimiter != null;
+    }
+
+    boolean tryEnterString() {
+      if (!hasMore() || !isQuoteChar(current())) {
+        return false;
+      }
+      if (position + 3 <= content.length()) {
+        String tripleQuote = String.valueOf(current()).repeat(3);
+        if (content.startsWith(tripleQuote, position)) {
+          textBlockDelimiter = tripleQuote;
+          position += 3;
+          return true;
+        }
+      }
+      stringQuoteChar = current();
+      position++;
+      return true;
+    }
+
+    boolean tryExitString() {
+      if (textBlockDelimiter != null) {
+        if (position + 3 <= content.length() && content.startsWith(textBlockDelimiter, position)) {
+          textBlockDelimiter = null;
+          position += 3;
+          return true;
+        }
+        return false;
+      }
+      if (stringQuoteChar != 0 && current() != '\\' && current() == stringQuoteChar) {
+        stringQuoteChar = 0;
+        position++;
+        return true;
+      }
+      return false;
+    }
+
+    private boolean isInRegularString() {
+      return stringQuoteChar != 0;
+    }
   }
 
   /** Language-specific rules for text block delimiters, escaping, and suffixes. */
