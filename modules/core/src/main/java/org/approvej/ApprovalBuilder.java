@@ -8,16 +8,22 @@ import static org.approvej.configuration.Configuration.configuration;
 import static org.approvej.print.PrintFormat.DEFAULT_FILENAME_EXTENSION;
 import static org.approvej.review.Reviewers.script;
 
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import java.util.logging.Logger;
 import org.approvej.approve.ApprovedFileInventoryUpdater;
 import org.approvej.approve.Approver;
+import org.approvej.approve.InlineValueError;
+import org.approvej.approve.InlineValueRewriter;
 import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviders;
+import org.approvej.approve.StackTraceTestFinderUtil;
 import org.approvej.print.PrintFormat;
 import org.approvej.print.Printer;
+import org.approvej.review.AutomaticFileReviewer;
 import org.approvej.review.FileReviewer;
 import org.approvej.review.ReviewResult;
 import org.approvej.scrub.Scrubber;
@@ -203,10 +209,35 @@ public class ApprovalBuilder<T> {
   /**
    * Approves the value by the given previouslyApproved value.
    *
+   * <p>When the configured {@link org.approvej.review.FileReviewer} is {@link
+   * AutomaticFileReviewer}, this method will automatically update the string literal in the test
+   * source file with the received value on mismatch, then fail the test so the developer can verify
+   * the change and re-run.
+   *
    * @param previouslyApproved the approved value
    */
   public void byValue(final String previouslyApproved) {
-    by(value(previouslyApproved));
+    concluded.set(true);
+    if (!(value instanceof String)) {
+      printed().byValue(previouslyApproved);
+      return;
+    }
+    Approver approver = value(previouslyApproved);
+    ApprovalResult result = approver.apply(String.valueOf(value));
+    if (result.needsApproval()) {
+      if (configuration.defaultFileReviewer() instanceof AutomaticFileReviewer) {
+        try {
+          Method testMethod = StackTraceTestFinderUtil.currentTestMethod().method();
+          Path sourcePath = StackTraceTestFinderUtil.findTestSourcePath(testMethod);
+          InlineValueRewriter.rewrite(sourcePath, testMethod.getName(), result.received());
+          throw new ApprovalError("Inline value updated. Re-run the test.");
+        } catch (InlineValueError error) {
+          Logger.getLogger(ApprovalBuilder.class.getName())
+              .info("Could not auto-update inline value: " + error.getMessage());
+        }
+      }
+      throw new ApprovalError(result.received(), result.previouslyApproved());
+    }
   }
 
   /**
