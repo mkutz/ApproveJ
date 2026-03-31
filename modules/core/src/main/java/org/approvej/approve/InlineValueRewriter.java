@@ -258,10 +258,6 @@ public class InlineValueRewriter {
       }
     }
 
-    void skip(int count) {
-      position += count;
-    }
-
     boolean isInString() {
       return stringQuoteChar != 0 || textBlockDelimiter != null;
     }
