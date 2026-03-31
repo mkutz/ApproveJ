@@ -31,7 +31,7 @@ record AutoUpdatingInplaceApprover(String previouslyApproved) implements Approve
   public ApprovalResult apply(String received) {
     String trimmedReceived = received.trim();
     if (trimmedReceived.equals(previouslyApproved)) {
-      return new InplaceApprovalResult(trimmedReceived, previouslyApproved);
+      return new InplaceApprovalResult(previouslyApproved, trimmedReceived);
     }
     try {
       Method testMethod = StackTraceTestFinderUtil.currentTestMethod().method();
@@ -43,6 +43,6 @@ record AutoUpdatingInplaceApprover(String previouslyApproved) implements Approve
     } catch (RuntimeException error) {
       LOGGER.warning("Could not auto-update inline value: " + error.getMessage());
     }
-    return new InplaceApprovalResult(trimmedReceived, previouslyApproved);
+    return new InplaceApprovalResult(previouslyApproved, trimmedReceived);
   }
 }

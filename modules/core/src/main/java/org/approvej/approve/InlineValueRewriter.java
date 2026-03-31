@@ -53,8 +53,8 @@ public class InlineValueRewriter {
     } catch (IOException exception) {
       throw new InlineValueError("Failed to rewrite inline value in " + sourcePath, exception);
     } finally {
+      FILE_LOCKS.remove(absolutePath, lock);
       lock.unlock();
-      FILE_LOCKS.remove(absolutePath);
     }
   }
 
