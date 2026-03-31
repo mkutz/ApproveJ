@@ -9,11 +9,15 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * Rewrites {@code byValue()} string arguments in Java source files.
+ * Rewrites {@code byValue()} string arguments in test source files.
  *
- * <p>When the reviewer is configured as {@code automatic}, this class replaces the string argument
- * of a {@code byValue()} call with a text block containing the new received value. Only the
- * argument itself is replaced — the rest of the file is left untouched.
+ * <p>When {@link org.approvej.configuration.Configuration#autoUpdateInlineValues()} is enabled,
+ * this class replaces the string argument of a {@code byValue()} call with a text block containing
+ * the new received value. Only the argument itself is replaced — the rest of the file is left
+ * untouched.
+ *
+ * <p>Supports Java ({@code .java}), Kotlin ({@code .kt}), Groovy ({@code .groovy}), and Scala
+ * ({@code .scala}) source files.
  */
 @NullMarked
 public class InlineValueRewriter {
@@ -31,22 +35,19 @@ public class InlineValueRewriter {
    * that method is rewritten. This approach is robust even when earlier rewrites have shifted line
    * numbers in the same file.
    *
-   * @param sourcePath path to the Java source file
+   * @param sourcePath path to the source file
    * @param methodName the name of the test method containing the {@code byValue()} call
    * @param newValue the new value to write as a text block argument
    */
   public static void rewrite(Path sourcePath, String methodName, String newValue) {
-    if (!sourcePath.toString().endsWith(".java")) {
-      throw new InlineValueError(
-          "Inline value rewriting is only supported in Java source files: " + sourcePath);
-    }
+    Language language = Language.fromPath(sourcePath);
 
     ReentrantLock lock =
         FILE_LOCKS.computeIfAbsent(sourcePath.toAbsolutePath(), path -> new ReentrantLock());
     lock.lock();
     try {
       String content = Files.readString(sourcePath, StandardCharsets.UTF_8);
-      String rewritten = rewriteContent(content, methodName, newValue);
+      String rewritten = rewriteContent(content, methodName, newValue, language);
       Files.writeString(sourcePath, rewritten, StandardCharsets.UTF_8);
     } catch (IOException exception) {
       throw new InlineValueError("Failed to rewrite inline value in " + sourcePath, exception);
@@ -56,24 +57,34 @@ public class InlineValueRewriter {
   }
 
   static String rewriteContent(String content, String methodName, String newValue) {
-    int methodOffset = findMethodOffset(content, methodName);
+    return rewriteContent(content, methodName, newValue, Language.JAVA);
+  }
+
+  static String rewriteContent(
+      String content, String methodName, String newValue, Language language) {
+    int methodOffset = findMethodOffset(content, methodName, language);
     int methodEnd = findMethodEnd(content, methodOffset);
     int byValueOffset = findByValueOffset(content, methodOffset, methodEnd);
 
     int argumentStart = byValueOffset + "byValue(".length();
-    int argumentEnd = findArgumentEnd(content, argumentStart);
+    int argumentEnd = findArgumentEnd(content, argumentStart, language);
 
     String indent = detectIndent(content, byValueOffset);
     String indentUnit = detectIndentUnit(content);
     String bodyIndent = indent + indentUnit;
-    String textBlock = buildTextBlock(newValue, bodyIndent);
+    String textBlock = buildTextBlock(newValue, bodyIndent, language);
 
     return content.substring(0, argumentStart) + textBlock + content.substring(argumentEnd);
   }
 
-  private static int findMethodOffset(String content, String methodName) {
-    String pattern = methodName + "(";
-    int found = content.indexOf(pattern);
+  private static int findMethodOffset(String content, String methodName, Language language) {
+    if (language.supportsBacktickMethodNames()) {
+      int backtickForm = content.indexOf("`" + methodName + "`(");
+      if (backtickForm >= 0) {
+        return backtickForm;
+      }
+    }
+    int found = content.indexOf(methodName + "(");
     if (found < 0) {
       throw new InlineValueError("Could not find method " + methodName + " in source file");
     }
@@ -110,16 +121,19 @@ public class InlineValueRewriter {
     throw new InlineValueError("Could not find byValue( in the test method");
   }
 
-  private static int findArgumentEnd(String content, int start) {
+  private static int findArgumentEnd(String content, int start, Language language) {
     int depth = 1;
     boolean inString = false;
     boolean inTextBlock = false;
     int position = start;
 
-    if (position + 3 <= content.length() && content.startsWith("\"\"\"", position)) {
+    String delimiter = language.delimiter();
+    char stringQuote = delimiter.charAt(0);
+
+    if (position + 3 <= content.length() && content.startsWith(delimiter, position)) {
       inTextBlock = true;
       position += 3;
-    } else if (position < content.length() && content.charAt(position) == '"') {
+    } else if (position < content.length() && content.charAt(position) == stringQuote) {
       inString = true;
       position++;
     }
@@ -128,9 +142,13 @@ public class InlineValueRewriter {
       char character = content.charAt(position);
 
       if (inTextBlock) {
-        if (position + 3 <= content.length() && content.startsWith("\"\"\"", position)) {
+        if (position + 3 <= content.length() && content.startsWith(delimiter, position)) {
           inTextBlock = false;
           position += 3;
+          String suffix = language.suffix();
+          if (!suffix.isEmpty() && content.startsWith(suffix, position)) {
+            position += suffix.length();
+          }
           continue;
         }
         position++;
@@ -142,15 +160,15 @@ public class InlineValueRewriter {
           position += 2;
           continue;
         }
-        if (character == '"') {
+        if (character == stringQuote) {
           inString = false;
         }
         position++;
         continue;
       }
 
-      if (character == '"') {
-        if (position + 3 <= content.length() && content.startsWith("\"\"\"", position)) {
+      if (character == stringQuote) {
+        if (position + 3 <= content.length() && content.startsWith(delimiter, position)) {
           inTextBlock = true;
           position += 3;
           continue;
@@ -209,14 +227,161 @@ public class InlineValueRewriter {
     return indent.toString();
   }
 
-  private static String buildTextBlock(String value, String bodyIndent) {
-    String escaped = value.replace("\\", "\\\\").replace("\"\"\"", "\\\"\"\"");
+  private static String buildTextBlock(String value, String bodyIndent, Language language) {
+    String delimiter = language.delimiter();
+    String escaped = language.escapeValue(value);
     StringBuilder textBlock = new StringBuilder();
-    textBlock.append("\"\"\"\n");
+    textBlock.append(delimiter).append("\n");
+    String linePrefix = language.linePrefix();
     for (String valueLine : escaped.split("\n", -1)) {
-      textBlock.append(bodyIndent).append(valueLine).append("\n");
+      textBlock.append(bodyIndent).append(linePrefix).append(valueLine).append("\n");
     }
-    textBlock.append(bodyIndent).append("\"\"\"");
+    textBlock.append(bodyIndent).append(linePrefix).append(delimiter);
+    String suffix = language.suffix();
+    if (!suffix.isEmpty()) {
+      textBlock.append(suffix);
+    }
     return textBlock.toString();
+  }
+
+  /** Language-specific rules for text block delimiters, escaping, and suffixes. */
+  enum Language {
+    JAVA {
+      @Override
+      String delimiter() {
+        return "\"\"\"";
+      }
+
+      @Override
+      String escapeValue(String value) {
+        return value.replace("\\", "\\\\").replace("\"\"\"", "\\\"\"\"");
+      }
+
+      @Override
+      String suffix() {
+        return "";
+      }
+
+      @Override
+      String linePrefix() {
+        return "";
+      }
+
+      @Override
+      boolean supportsBacktickMethodNames() {
+        return false;
+      }
+    },
+
+    KOTLIN {
+      @Override
+      String delimiter() {
+        return "\"\"\"";
+      }
+
+      @Override
+      String escapeValue(String value) {
+        return value.replace("\\", "\\\\").replace("\"\"\"", "\\\"\"\"").replace("$", "${'$'}");
+      }
+
+      @Override
+      String suffix() {
+        return ".trimIndent()";
+      }
+
+      @Override
+      String linePrefix() {
+        return "";
+      }
+
+      @Override
+      boolean supportsBacktickMethodNames() {
+        return true;
+      }
+    },
+
+    GROOVY {
+      @Override
+      String delimiter() {
+        return "'''";
+      }
+
+      @Override
+      String escapeValue(String value) {
+        return value.replace("\\", "\\\\").replace("'''", "\\'\\'\\'");
+      }
+
+      @Override
+      String suffix() {
+        return ".stripIndent()";
+      }
+
+      @Override
+      String linePrefix() {
+        return "";
+      }
+
+      @Override
+      boolean supportsBacktickMethodNames() {
+        return false;
+      }
+    },
+
+    SCALA {
+      @Override
+      String delimiter() {
+        return "\"\"\"";
+      }
+
+      @Override
+      String escapeValue(String value) {
+        return value.replace("\"\"\"", "\\\"\"\"");
+      }
+
+      @Override
+      String suffix() {
+        return ".stripMargin";
+      }
+
+      @Override
+      String linePrefix() {
+        return "|";
+      }
+
+      @Override
+      boolean supportsBacktickMethodNames() {
+        return true;
+      }
+    };
+
+    abstract String delimiter();
+
+    abstract String escapeValue(String value);
+
+    abstract String suffix();
+
+    abstract String linePrefix();
+
+    abstract boolean supportsBacktickMethodNames();
+
+    static Language fromPath(Path path) {
+      String filename = path.getFileName().toString();
+      if (filename.endsWith(".kt")) {
+        return KOTLIN;
+      }
+      if (filename.endsWith(".java")) {
+        return JAVA;
+      }
+      if (filename.endsWith(".groovy")) {
+        return GROOVY;
+      }
+      if (filename.endsWith(".scala")) {
+        return SCALA;
+      }
+      throw new InlineValueError(
+          "Inline value rewriting is not supported for "
+              + filename
+              + ". Supported: .java, .kt, .groovy, .scala");
+    }
   }
 }

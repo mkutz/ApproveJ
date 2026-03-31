@@ -323,13 +323,13 @@ class InlineValueRewriterTest {
   }
 
   @Test
-  void rewrite_non_java_file(@TempDir Path directory) throws IOException {
-    Path sourceFile = directory.resolve("MyTest.kt");
+  void rewrite_unsupported_file_type(@TempDir Path directory) throws IOException {
+    Path sourceFile = directory.resolve("MyTest.rb");
     Files.writeString(sourceFile, "content", StandardCharsets.UTF_8);
 
     assertThatThrownBy(() -> InlineValueRewriter.rewrite(sourceFile, "test", "new"))
         .isInstanceOf(InlineValueError.class)
-        .hasMessageContaining("only supported in Java source files");
+        .hasMessageContaining("not supported");
   }
 
   @Test
@@ -389,6 +389,461 @@ class InlineValueRewriterTest {
               }
             }
             """);
+  }
+
+  @Test
+  void rewrite_kotlin_single_line_string() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          fun test() {
+            approve(person).byValue("old value")
+          }
+        }
+        """;
+
+    String result =
+        InlineValueRewriter.rewriteContent(
+            content, "test", "new value", InlineValueRewriter.Language.KOTLIN);
+
+    assertThat(result)
+        .isEqualTo(
+            """
+            class MyTest {
+              @Test
+              fun test() {
+                approve(person).byValue(\"""
+                  new value
+                  \""".trimIndent())
+              }
+            }
+            """);
+  }
+
+  @Test
+  void rewrite_kotlin_existing_raw_string() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          fun test() {
+            approve(person).byValue(\"""
+              old value
+              \""".trimIndent())
+          }
+        }
+        """;
+
+    String result =
+        InlineValueRewriter.rewriteContent(
+            content, "test", "new value", InlineValueRewriter.Language.KOTLIN);
+
+    assertThat(result)
+        .isEqualTo(
+            """
+            class MyTest {
+              @Test
+              fun test() {
+                approve(person).byValue(\"""
+                  new value
+                  \""".trimIndent())
+              }
+            }
+            """);
+  }
+
+  @Test
+  void rewrite_kotlin_backtick_method_name() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          fun `approve inplace`() {
+            approve(person).byValue("old value")
+          }
+        }
+        """;
+
+    String result =
+        InlineValueRewriter.rewriteContent(
+            content, "approve inplace", "new value", InlineValueRewriter.Language.KOTLIN);
+
+    assertThat(result)
+        .isEqualTo(
+            """
+            class MyTest {
+              @Test
+              fun `approve inplace`() {
+                approve(person).byValue(\"""
+                  new value
+                  \""".trimIndent())
+              }
+            }
+            """);
+  }
+
+  @Test
+  void rewrite_kotlin_escapes_dollar_signs() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          fun test() {
+            approve(person).byValue("old")
+          }
+        }
+        """;
+
+    String result =
+        InlineValueRewriter.rewriteContent(
+            content, "test", "price: $42", InlineValueRewriter.Language.KOTLIN);
+
+    assertThat(result).contains("price: ${'$'}42");
+  }
+
+  @Test
+  void rewrite_kotlin_file(@TempDir Path directory) throws IOException {
+    Path sourceFile = directory.resolve("MyTest.kt");
+    Files.writeString(
+        sourceFile,
+        """
+        class MyTest {
+          @Test
+          fun test() {
+            approve(person).byValue("old value")
+          }
+        }
+        """,
+        StandardCharsets.UTF_8);
+
+    InlineValueRewriter.rewrite(sourceFile, "test", "new value");
+
+    String content = Files.readString(sourceFile, StandardCharsets.UTF_8);
+    assertThat(content)
+        .isEqualTo(
+            """
+            class MyTest {
+              @Test
+              fun test() {
+                approve(person).byValue(\"""
+                  new value
+                  \""".trimIndent())
+              }
+            }
+            """);
+  }
+
+  @Test
+  void rewrite_scala_single_line_string() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          def test(): Unit = {
+            approve(person).byValue("old value")
+          }
+        }
+        """;
+
+    String result =
+        InlineValueRewriter.rewriteContent(
+            content, "test", "new value", InlineValueRewriter.Language.SCALA);
+
+    assertThat(result)
+        .isEqualTo(
+            """
+            class MyTest {
+              @Test
+              def test(): Unit = {
+                approve(person).byValue(\"""
+                  |new value
+                  |\""".stripMargin)
+              }
+            }
+            """);
+  }
+
+  @Test
+  void rewrite_scala_existing_strip_margin() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          def test(): Unit = {
+            approve(person).byValue(\"""
+              |old value
+              |\""".stripMargin)
+          }
+        }
+        """;
+
+    String result =
+        InlineValueRewriter.rewriteContent(
+            content, "test", "new value", InlineValueRewriter.Language.SCALA);
+
+    assertThat(result)
+        .isEqualTo(
+            """
+            class MyTest {
+              @Test
+              def test(): Unit = {
+                approve(person).byValue(\"""
+                  |new value
+                  |\""".stripMargin)
+              }
+            }
+            """);
+  }
+
+  @Test
+  void rewrite_scala_multiline_value() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          def test(): Unit = {
+            approve(person).byValue("old")
+          }
+        }
+        """;
+
+    String result =
+        InlineValueRewriter.rewriteContent(
+            content, "test", "line 1\nline 2", InlineValueRewriter.Language.SCALA);
+
+    assertThat(result)
+        .isEqualTo(
+            """
+            class MyTest {
+              @Test
+              def test(): Unit = {
+                approve(person).byValue(\"""
+                  |line 1
+                  |line 2
+                  |\""".stripMargin)
+              }
+            }
+            """);
+  }
+
+  @Test
+  void rewrite_scala_backtick_method_name() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          def `approve inplace`(): Unit = {
+            approve(person).byValue("old value")
+          }
+        }
+        """;
+
+    String result =
+        InlineValueRewriter.rewriteContent(
+            content, "approve inplace", "new value", InlineValueRewriter.Language.SCALA);
+
+    assertThat(result)
+        .isEqualTo(
+            """
+            class MyTest {
+              @Test
+              def `approve inplace`(): Unit = {
+                approve(person).byValue(\"""
+                  |new value
+                  |\""".stripMargin)
+              }
+            }
+            """);
+  }
+
+  @Test
+  void rewrite_scala_file(@TempDir Path directory) throws IOException {
+    Path sourceFile = directory.resolve("MyTest.scala");
+    Files.writeString(
+        sourceFile,
+        """
+        class MyTest {
+          @Test
+          def test(): Unit = {
+            approve(person).byValue("old value")
+          }
+        }
+        """,
+        StandardCharsets.UTF_8);
+
+    InlineValueRewriter.rewrite(sourceFile, "test", "new value");
+
+    String content = Files.readString(sourceFile, StandardCharsets.UTF_8);
+    assertThat(content)
+        .isEqualTo(
+            """
+            class MyTest {
+              @Test
+              def test(): Unit = {
+                approve(person).byValue(\"""
+                  |new value
+                  |\""".stripMargin)
+              }
+            }
+            """);
+  }
+
+  @Test
+  void rewrite_scala_round_trip() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          def test(): Unit = {
+            approve(person).byValue("placeholder")
+          }
+        }
+        """;
+    String originalValue = "line 1\nline 2\nline 3";
+
+    String rewritten =
+        InlineValueRewriter.rewriteContent(
+            content, "test", originalValue, InlineValueRewriter.Language.SCALA);
+    String textBlockContent = extractScalaTextBlockContent(rewritten);
+
+    assertThat(textBlockContent).isEqualTo(originalValue);
+  }
+
+  @Test
+  void rewrite_kotlin_round_trip() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          fun test() {
+            approve(person).byValue("placeholder")
+          }
+        }
+        """;
+    String originalValue = "line 1\nline 2\nline 3";
+
+    String rewritten =
+        InlineValueRewriter.rewriteContent(
+            content, "test", originalValue, InlineValueRewriter.Language.KOTLIN);
+    String textBlockContent = extractTextBlockContent(rewritten);
+
+    assertThat(textBlockContent).isEqualTo(originalValue);
+  }
+
+  @Test
+  void rewrite_groovy_single_line_string() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          void test() {
+            approve(person).byValue("old value")
+          }
+        }
+        """;
+
+    String result =
+        InlineValueRewriter.rewriteContent(
+            content, "test", "new value", InlineValueRewriter.Language.GROOVY);
+
+    assertThat(result)
+        .isEqualTo(
+            """
+            class MyTest {
+              @Test
+              void test() {
+                approve(person).byValue('''
+                  new value
+                  '''.stripIndent())
+              }
+            }
+            """);
+  }
+
+  @Test
+  void rewrite_groovy_existing_triple_single_quote() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          void test() {
+            approve(person).byValue('''
+              old value
+              '''.stripIndent())
+          }
+        }
+        """;
+
+    String result =
+        InlineValueRewriter.rewriteContent(
+            content, "test", "new value", InlineValueRewriter.Language.GROOVY);
+
+    assertThat(result)
+        .isEqualTo(
+            """
+            class MyTest {
+              @Test
+              void test() {
+                approve(person).byValue('''
+                  new value
+                  '''.stripIndent())
+              }
+            }
+            """);
+  }
+
+  @Test
+  void rewrite_groovy_file(@TempDir Path directory) throws IOException {
+    Path sourceFile = directory.resolve("MyTest.groovy");
+    Files.writeString(
+        sourceFile,
+        """
+        class MyTest {
+          @Test
+          void test() {
+            approve(person).byValue("old value")
+          }
+        }
+        """,
+        StandardCharsets.UTF_8);
+
+    InlineValueRewriter.rewrite(sourceFile, "test", "new value");
+
+    String content = Files.readString(sourceFile, StandardCharsets.UTF_8);
+    assertThat(content)
+        .isEqualTo(
+            """
+            class MyTest {
+              @Test
+              void test() {
+                approve(person).byValue('''
+                  new value
+                  '''.stripIndent())
+              }
+            }
+            """);
+  }
+
+  @Test
+  void rewrite_groovy_round_trip() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          void test() {
+            approve(person).byValue("placeholder")
+          }
+        }
+        """;
+    String originalValue = "line 1\nline 2\nline 3";
+
+    String rewritten =
+        InlineValueRewriter.rewriteContent(
+            content, "test", originalValue, InlineValueRewriter.Language.GROOVY);
+    String textBlockContent = extractTextBlockContent(rewritten);
+
+    assertThat(textBlockContent).isEqualTo(originalValue);
   }
 
   @ParameterizedTest
@@ -472,9 +927,23 @@ class InlineValueRewriterTest {
    */
   private static String extractTextBlockContent(String source) {
     Matcher matcher =
-        Pattern.compile("byValue\\(\"\"\"\\n(.*?)\"\"\"\\)", Pattern.DOTALL).matcher(source);
+        Pattern.compile("byValue\\((?:\"\"\"|\\'\\'\\')\n(.*?)(?:\"\"\"|\\'\\'\\')", Pattern.DOTALL)
+            .matcher(source);
     assertThat(matcher.find()).as("text block in rewritten source").isTrue();
     String rawContent = matcher.group(1);
     return rawContent.stripIndent().trim();
+  }
+
+  /** Simulates Scala's {@code .stripMargin} which strips leading whitespace up to {@code |}. */
+  private static String extractScalaTextBlockContent(String source) {
+    Matcher matcher =
+        Pattern.compile("byValue\\(\"\"\"\n(.*?)\"\"\"", Pattern.DOTALL).matcher(source);
+    assertThat(matcher.find()).as("text block in rewritten source").isTrue();
+    String rawContent = matcher.group(1);
+    return rawContent
+        .lines()
+        .map(line -> line.replaceFirst("^\\s*\\|", ""))
+        .filter(line -> !line.isBlank())
+        .collect(java.util.stream.Collectors.joining("\n"));
   }
 }
