@@ -949,6 +949,161 @@ class InlineValueRewriterTest {
     assertThat(textBlockContent).isEqualTo(originalValue);
   }
 
+  @Test
+  void rewrite_method_not_found() {
+    String content =
+        """
+        class MyTest {
+          void other() {
+            approve(person).byValue("old");
+          }
+        }
+        """;
+
+    assertThatThrownBy(() -> InlineValueRewriter.rewriteContent(content, "nonexistent", "new"))
+        .isInstanceOf(InlineValueError.class)
+        .hasMessageContaining("Could not find method nonexistent");
+  }
+
+  @Test
+  void rewrite_byValue_not_in_method() {
+    String content =
+        """
+        class MyTest {
+          void test() {
+            approve(person).byFile();
+          }
+        }
+        """;
+
+    assertThatThrownBy(() -> InlineValueRewriter.rewriteContent(content, "test", "new"))
+        .isInstanceOf(InlineValueError.class)
+        .hasMessageContaining("Could not find byValue(");
+  }
+
+  @Test
+  void rewrite_braces_inside_string() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          void test() {
+            String json = "{\\"key\\": \\"value\\"}";
+            approve(person).byValue("old");
+          }
+        }
+        """;
+
+    String result = InlineValueRewriter.rewriteContent(content, "test", "new value");
+
+    assertThat(result)
+        .contains("String json = \"{\\\"key\\\": \\\"value\\\"}\"")
+        .contains("new value")
+        .doesNotContain("\"old\"");
+  }
+
+  @Test
+  void rewrite_value_containing_backslashes() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          void test() {
+            approve(person).byValue("old");
+          }
+        }
+        """;
+
+    String result = InlineValueRewriter.rewriteContent(content, "test", "path\\to\\file");
+
+    assertThat(result).contains("path\\\\to\\\\file");
+  }
+
+  @Test
+  void rewrite_java_value_containing_triple_quotes() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          void test() {
+            approve(person).byValue("old");
+          }
+        }
+        """;
+
+    String result = InlineValueRewriter.rewriteContent(content, "test", "contains \"\"\" quotes");
+
+    assertThat(result).contains("\\\"\"\"");
+  }
+
+  @Test
+  void rewrite_kotlin_value_containing_triple_quotes() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          fun test() {
+            approve(person).byValue("old")
+          }
+        }
+        """;
+
+    assertThatThrownBy(
+            () ->
+                InlineValueRewriter.rewriteContent(
+                    content, "test", "contains \"\"\" quotes", InlineValueRewriter.Language.KOTLIN))
+        .isInstanceOf(InlineValueError.class)
+        .hasMessageContaining("Kotlin raw strings cannot contain");
+  }
+
+  @Test
+  void rewrite_scala_value_containing_triple_quotes() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          def test(): Unit = {
+            approve(person).byValue("old")
+          }
+        }
+        """;
+
+    assertThatThrownBy(
+            () ->
+                InlineValueRewriter.rewriteContent(
+                    content, "test", "contains \"\"\" quotes", InlineValueRewriter.Language.SCALA))
+        .isInstanceOf(InlineValueError.class)
+        .hasMessageContaining("Scala raw strings cannot contain");
+  }
+
+  @Test
+  void rewrite_groovy_value_containing_triple_single_quotes() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          void test() {
+            approve(person).byValue("old")
+          }
+        }
+        """;
+
+    String result =
+        InlineValueRewriter.rewriteContent(
+            content, "test", "contains ''' quotes", InlineValueRewriter.Language.GROOVY);
+
+    assertThat(result).contains("\\'\\'\\'");
+  }
+
+  @Test
+  void rewrite_no_indented_lines_uses_default_indent() {
+    String content = "void test() {\napprove(person).byValue(\"old\");\n}\n";
+
+    String result = InlineValueRewriter.rewriteContent(content, "test", "new value");
+
+    assertThat(result).contains("    new value");
+  }
+
   /**
    * Extracts the text block content from a rewritten source file and applies Java text block
    * semantics ({@link String#stripIndent()} + {@link String#trim()}) to simulate what the JVM would
