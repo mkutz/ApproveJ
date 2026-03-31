@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Rewrites {@code byValue()} string arguments in test source files.
@@ -118,18 +119,18 @@ public class InlineValueRewriter {
     while (scanner.hasMore()) {
       if (scanner.isInString()) {
         scanner.advance();
-        continue;
-      }
-      char character = scanner.current();
-      if (character == '{') {
+      } else if (scanner.current() == '{') {
         depth++;
-      } else if (character == '}') {
+        scanner.advance();
+      } else if (scanner.current() == '}') {
         depth--;
         if (depth == 0) {
           return scanner.position();
         }
+        scanner.advance();
+      } else {
+        scanner.advance();
       }
-      scanner.advance();
     }
     return content.length();
   }
@@ -150,37 +151,24 @@ public class InlineValueRewriter {
     int depth = 1;
     while (scanner.hasMore()) {
       if (scanner.isInString()) {
-        if (scanner.tryExitString()) {
-          String suffix = language.suffix();
-          if (!suffix.isEmpty() && content.startsWith(suffix, scanner.position())) {
-            scanner.skip(suffix.length());
-          }
-        } else {
-          scanner.advance();
-        }
-        continue;
-      }
-
-      char character = scanner.current();
-      if (scanner.tryEnterString()) {
-        continue;
-      }
-      if (character == '(') {
+        scanner.advanceOrExitString(language.suffix());
+      } else if (scanner.tryEnterString()) {
+        // entered a new string
+      } else if (scanner.current() == '(') {
         depth++;
-      } else if (character == ')') {
+        scanner.advance();
+      } else if (scanner.current() == ')') {
         depth--;
         if (depth == 0) {
           return scanner.position();
         }
+        scanner.advance();
+      } else {
+        scanner.advance();
       }
-      scanner.advance();
     }
 
     throw new InlineValueError("Could not find closing parenthesis for byValue(");
-  }
-
-  private static boolean isQuoteChar(char character) {
-    return character == '"' || character == '\'';
   }
 
   private static String detectIndentUnit(String content) {
@@ -238,12 +226,12 @@ public class InlineValueRewriter {
   /**
    * Tracks position in source content and handles skipping over string literals and text blocks.
    */
-  private static final class SourceScanner {
+  static final class SourceScanner {
 
     private final String content;
     private int position;
     private char stringQuoteChar;
-    private String textBlockDelimiter;
+    private @Nullable String textBlockDelimiter;
 
     SourceScanner(String content, int position) {
       this.content = content;
@@ -263,7 +251,7 @@ public class InlineValueRewriter {
     }
 
     void advance() {
-      if (isInRegularString() && current() == '\\') {
+      if (stringQuoteChar != 0 && current() == '\\') {
         position += 2;
       } else {
         position++;
@@ -295,39 +283,47 @@ public class InlineValueRewriter {
       return true;
     }
 
-    boolean tryExitString() {
+    void advanceOrExitString(String suffixToConsume) {
       if (textBlockDelimiter != null) {
         if (position + 3 <= content.length() && content.startsWith(textBlockDelimiter, position)) {
           textBlockDelimiter = null;
           position += 3;
-          return true;
+          if (!suffixToConsume.isEmpty() && content.startsWith(suffixToConsume, position)) {
+            position += suffixToConsume.length();
+          }
+        } else {
+          position++;
         }
-        return false;
+      } else if (stringQuoteChar != 0) {
+        if (current() == '\\') {
+          position += 2;
+        } else if (current() == stringQuoteChar) {
+          stringQuoteChar = 0;
+          position++;
+        } else {
+          position++;
+        }
       }
-      if (stringQuoteChar != 0 && current() != '\\' && current() == stringQuoteChar) {
-        stringQuoteChar = 0;
-        position++;
-        return true;
-      }
-      return false;
     }
 
-    private boolean isInRegularString() {
-      return stringQuoteChar != 0;
+    static boolean isQuoteChar(char character) {
+      return character == '"' || character == '\'';
     }
   }
 
   /** Language-specific rules for text block delimiters, escaping, and suffixes. */
   enum Language {
     JAVA {
+      private static final String DELIMITER = "\"\"\"";
+
       @Override
       String delimiter() {
-        return "\"\"\"";
+        return DELIMITER;
       }
 
       @Override
       String escapeValue(String value) {
-        return value.replace("\\", "\\\\").replace("\"\"\"", "\\\"\"\"");
+        return value.replace("\\", "\\\\").replace(DELIMITER, "\\" + DELIMITER);
       }
 
       @Override
@@ -347,16 +343,18 @@ public class InlineValueRewriter {
     },
 
     KOTLIN {
+      private static final String DELIMITER = "\"\"\"";
+
       @Override
       String delimiter() {
-        return "\"\"\"";
+        return DELIMITER;
       }
 
       @Override
       String escapeValue(String value) {
-        if (value.contains("\"\"\"")) {
+        if (value.contains(DELIMITER)) {
           throw new InlineValueError(
-              "Cannot rewrite inline value: Kotlin raw strings cannot contain \"\"\"");
+              "Cannot rewrite inline value: Kotlin raw strings cannot contain " + DELIMITER);
         }
         return value.replace("$", "${'$'}");
       }
@@ -378,14 +376,16 @@ public class InlineValueRewriter {
     },
 
     GROOVY {
+      private static final String DELIMITER = "'''";
+
       @Override
       String delimiter() {
-        return "'''";
+        return DELIMITER;
       }
 
       @Override
       String escapeValue(String value) {
-        return value.replace("\\", "\\\\").replace("'''", "\\'\\'\\'");
+        return value.replace("\\", "\\\\").replace(DELIMITER, "\\'\\'\\'");
       }
 
       @Override
@@ -405,16 +405,18 @@ public class InlineValueRewriter {
     },
 
     SCALA {
+      private static final String DELIMITER = "\"\"\"";
+
       @Override
       String delimiter() {
-        return "\"\"\"";
+        return DELIMITER;
       }
 
       @Override
       String escapeValue(String value) {
-        if (value.contains("\"\"\"")) {
+        if (value.contains(DELIMITER)) {
           throw new InlineValueError(
-              "Cannot rewrite inline value: Scala raw strings cannot contain \"\"\"");
+              "Cannot rewrite inline value: Scala raw strings cannot contain " + DELIMITER);
         }
         return value;
       }
