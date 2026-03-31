@@ -14,7 +14,7 @@ public class Approvers {
    * @param previouslyApproved the approved value
    * @return a new {@link InplaceApprover} for the given previouslyApproved value.
    */
-  public static InplaceApprover value(String previouslyApproved) {
+  public static Approver value(String previouslyApproved) {
     return new InplaceApprover(previouslyApproved);
   }
 

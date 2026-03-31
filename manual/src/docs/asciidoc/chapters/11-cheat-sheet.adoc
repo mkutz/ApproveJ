@@ -368,6 +368,10 @@ endif::[]
 |`inventoryEnabled`
 |`APPROVEJ_INVENTORY_ENABLED`
 |`true` locally, `false` in CI
+
+|`autoUpdateInlineValues`
+|`APPROVEJ_AUTO_UPDATE_INLINE_VALUES`
+|`false`
 |===
 
 Configuration is resolved in priority order: environment variables > project properties (`src/test/resources/approvej.properties`) > user home properties (`~/.config/approvej/approvej.properties`) > defaults.
