@@ -1,5 +1,6 @@
 package org.approvej;
 
+import static org.approvej.approve.Approvers.autoUpdatingValue;
 import static org.approvej.approve.Approvers.file;
 import static org.approvej.approve.Approvers.value;
 import static org.approvej.approve.PathProviders.approvedPath;
@@ -8,18 +9,14 @@ import static org.approvej.configuration.Configuration.configuration;
 import static org.approvej.print.PrintFormat.DEFAULT_FILENAME_EXTENSION;
 import static org.approvej.review.Reviewers.script;
 
-import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import java.util.logging.Logger;
 import org.approvej.approve.ApprovedFileInventoryUpdater;
 import org.approvej.approve.Approver;
-import org.approvej.approve.InlineValueRewriter;
 import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviders;
-import org.approvej.approve.StackTraceTestFinderUtil;
 import org.approvej.print.PrintFormat;
 import org.approvej.print.Printer;
 import org.approvej.review.FileReviewer;
@@ -215,29 +212,10 @@ public class ApprovalBuilder<T> {
    * @param previouslyApproved the approved value
    */
   public void byValue(final String previouslyApproved) {
-    concluded.set(true);
-    if (!(value instanceof String)) {
-      printed().byValue(previouslyApproved);
-      return;
-    }
-    String received = String.valueOf(value);
-    Approver approver = value(previouslyApproved);
-    ApprovalResult result = approver.apply(received);
-    if (result.needsApproval()) {
-      if (configuration.autoUpdateInlineValues()) {
-        try {
-          Method testMethod = StackTraceTestFinderUtil.currentTestMethod().method();
-          Path sourcePath = StackTraceTestFinderUtil.findTestSourcePath(testMethod);
-          InlineValueRewriter.rewrite(sourcePath, testMethod.getName(), received.trim());
-          throw new ApprovalError("Inline value updated. Re-run the test.");
-        } catch (ApprovalError approvalError) {
-          throw approvalError;
-        } catch (RuntimeException error) {
-          Logger.getLogger(ApprovalBuilder.class.getName())
-              .warning("Could not auto-update inline value: " + error.getMessage());
-        }
-      }
-      throw new ApprovalError(result.received(), result.previouslyApproved());
+    if (configuration.autoUpdateInlineValues()) {
+      by(autoUpdatingValue(previouslyApproved));
+    } else {
+      by(value(previouslyApproved));
     }
   }
 

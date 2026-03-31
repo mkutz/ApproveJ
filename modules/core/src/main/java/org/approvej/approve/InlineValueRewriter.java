@@ -42,8 +42,8 @@ public class InlineValueRewriter {
   public static void rewrite(Path sourcePath, String methodName, String newValue) {
     Language language = Language.fromPath(sourcePath);
 
-    ReentrantLock lock =
-        FILE_LOCKS.computeIfAbsent(sourcePath.toAbsolutePath(), path -> new ReentrantLock());
+    Path absolutePath = sourcePath.toAbsolutePath();
+    ReentrantLock lock = FILE_LOCKS.computeIfAbsent(absolutePath, path -> new ReentrantLock());
     lock.lock();
     try {
       String content = Files.readString(sourcePath, StandardCharsets.UTF_8);
@@ -53,6 +53,7 @@ public class InlineValueRewriter {
       throw new InlineValueError("Failed to rewrite inline value in " + sourcePath, exception);
     } finally {
       lock.unlock();
+      FILE_LOCKS.remove(absolutePath);
     }
   }
 
@@ -345,7 +346,7 @@ public class InlineValueRewriter {
           throw new InlineValueError(
               "Cannot rewrite inline value: Kotlin raw strings cannot contain \"\"\"");
         }
-        return value.replace("\\", "\\\\").replace("$", "${'$'}");
+        return value.replace("$", "${'$'}");
       }
 
       @Override
