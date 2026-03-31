@@ -30,9 +30,9 @@ class ConfigurationTest {
 
   @Test
   void loadConfiguration_autoUpdateInlineValues() {
-    Properties props = new Properties();
-    props.setProperty("autoUpdateInlineValues", "true");
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+    Properties properties = new Properties();
+    properties.setProperty("autoUpdateInlineValues", "true");
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     Configuration config = Configuration.loadConfiguration(loader);
 
@@ -41,9 +41,9 @@ class ConfigurationTest {
 
   @Test
   void loadConfiguration_customPrintFormat_from_properties() {
-    Properties props = new Properties();
-    props.setProperty("defaultPrintFormat", SingleLineStringPrintFormat.class.getName());
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+    Properties properties = new Properties();
+    properties.setProperty("defaultPrintFormat", SingleLineStringPrintFormat.class.getName());
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     Configuration config = Configuration.loadConfiguration(loader);
 
@@ -70,10 +70,10 @@ class ConfigurationTest {
 
   @Test
   void loadConfiguration_fileReviewerScript() {
-    Properties props = new Properties();
-    props.setProperty("defaultFileReviewerScript", "diff {receivedFile} {approvedFile}");
+    Properties properties = new Properties();
+    properties.setProperty("defaultFileReviewerScript", "diff {receivedFile} {approvedFile}");
 
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     Configuration config = Configuration.loadConfiguration(loader);
 
@@ -82,10 +82,10 @@ class ConfigurationTest {
 
   @Test
   void loadConfiguration_invalidPrintFormatThrowsError() {
-    Properties props = new Properties();
-    props.setProperty("defaultPrintFormat", "org.nonexistent.InvalidFormat");
+    Properties properties = new Properties();
+    properties.setProperty("defaultPrintFormat", "org.nonexistent.InvalidFormat");
 
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     assertThatExceptionOfType(ConfigurationError.class)
         .isThrownBy(() -> Configuration.loadConfiguration(loader))
@@ -115,9 +115,9 @@ class ConfigurationTest {
 
   @Test
   void loadConfiguration_inventoryEnabled_from_properties() {
-    Properties props = new Properties();
-    props.setProperty("inventoryEnabled", "false");
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+    Properties properties = new Properties();
+    properties.setProperty("inventoryEnabled", "false");
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     Configuration config = Configuration.loadConfiguration(loader);
 
@@ -127,12 +127,12 @@ class ConfigurationTest {
   @Test
   void loadConfiguration_inventoryEnabled_env_overrides_properties() {
     Map<String, String> env = Map.of("APPROVEJ_INVENTORY_ENABLED", "false");
-    Properties props = new Properties();
-    props.setProperty("inventoryEnabled", "true");
+    Properties properties = new Properties();
+    properties.setProperty("inventoryEnabled", "true");
     ConfigurationLoader loader =
         ConfigurationLoader.builder()
             .withEnvironmentVariables(env::get)
-            .withProperties(props)
+            .withProperties(properties)
             .build();
 
     Configuration config = Configuration.loadConfiguration(loader);
@@ -142,7 +142,7 @@ class ConfigurationTest {
 
   @Test
   void configurationLoader_priorityChain() {
-    // Simulate: env > project props > user home props
+    // Simulate: env > project properties > user home properties
     Map<String, String> env = Map.of(); // Empty - no env variable set
 
     Properties projectProps = new Properties();
@@ -197,20 +197,20 @@ class ConfigurationTest {
 
   @Test
   void configurationLoader_get_returnsDefaultWhenKeyNotFound() {
-    Properties props = new Properties();
-    props.setProperty("otherKey", "otherValue");
+    Properties properties = new Properties();
+    properties.setProperty("otherKey", "otherValue");
 
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     assertThat(loader.get("missingKey", "defaultValue")).isEqualTo("defaultValue");
   }
 
   @Test
   void configurationLoader_get_returnsValueFromProperties() {
-    Properties props = new Properties();
-    props.setProperty("myKey", "myValue");
+    Properties properties = new Properties();
+    properties.setProperty("myKey", "myValue");
 
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     assertThat(loader.get("myKey", "default")).isEqualTo("myValue");
   }
@@ -224,9 +224,9 @@ class ConfigurationTest {
 
   @Test
   void loadConfiguration_aiReviewerCommand() {
-    Properties props = new Properties();
-    props.setProperty("aiReviewerCommand", "claude -p");
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+    Properties properties = new Properties();
+    properties.setProperty("aiReviewerCommand", "claude -p");
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     Configuration config = Configuration.loadConfiguration(loader);
 
@@ -235,10 +235,10 @@ class ConfigurationTest {
 
   @Test
   void loadConfiguration_aiReviewerCommand_takes_priority_over_fileReviewerScript() {
-    Properties props = new Properties();
-    props.setProperty("aiReviewerCommand", "claude -p");
-    props.setProperty("defaultFileReviewerScript", "diff {receivedFile} {approvedFile}");
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+    Properties properties = new Properties();
+    properties.setProperty("aiReviewerCommand", "claude -p");
+    properties.setProperty("defaultFileReviewerScript", "diff {receivedFile} {approvedFile}");
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     Configuration config = Configuration.loadConfiguration(loader);
 
@@ -247,16 +247,19 @@ class ConfigurationTest {
 
   @Test
   void configurationLoader_chainedSources_firstNonNullWins() {
-    Properties props1 = new Properties();
-    props1.setProperty("key1", "value1");
-    props1.setProperty("shared", "fromFirst");
+    Properties properties1 = new Properties();
+    properties1.setProperty("key1", "value1");
+    properties1.setProperty("shared", "fromFirst");
 
-    Properties props2 = new Properties();
-    props2.setProperty("key2", "value2");
-    props2.setProperty("shared", "fromSecond");
+    Properties propertiess2 = new Properties();
+    propertiess2.setProperty("key2", "value2");
+    propertiess2.setProperty("shared", "fromSecond");
 
     ConfigurationLoader loader =
-        ConfigurationLoader.builder().withProperties(props1).withProperties(props2).build();
+        ConfigurationLoader.builder()
+            .withProperties(properties1)
+            .withProperties(propertiess2)
+            .build();
 
     assertThat(loader.get("key1", null)).isEqualTo("value1");
     assertThat(loader.get("key2", null)).isEqualTo("value2");
