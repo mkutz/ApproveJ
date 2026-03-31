@@ -201,6 +201,34 @@ class InlineValueRewriterTest {
   }
 
   @Test
+  void rewrite_matches_declaration_not_call() {
+    String content =
+        """
+        class MyTest {
+          @Test
+          void approve() {
+            approve(person).byValue("old");
+          }
+        }
+        """;
+
+    String result = InlineValueRewriter.rewriteContent(content, "approve", "new value");
+
+    assertThat(result)
+        .isEqualTo(
+            """
+            class MyTest {
+              @Test
+              void approve() {
+                approve(person).byValue(\"""
+                  new value
+                  \""");
+              }
+            }
+            """);
+  }
+
+  @Test
   void rewrite_preserves_surrounding_content() {
     String content =
         """
@@ -937,13 +965,13 @@ class InlineValueRewriterTest {
   /** Simulates Scala's {@code .stripMargin} which strips leading whitespace up to {@code |}. */
   private static String extractScalaTextBlockContent(String source) {
     Matcher matcher =
-        Pattern.compile("byValue\\(\"\"\"\n(.*?)\"\"\"", Pattern.DOTALL).matcher(source);
+        Pattern.compile("byValue\\(\"\"\"\n(.*?)\\|\"\"\"", Pattern.DOTALL).matcher(source);
     assertThat(matcher.find()).as("text block in rewritten source").isTrue();
     String rawContent = matcher.group(1);
     return rawContent
         .lines()
         .map(line -> line.replaceFirst("^\\s*\\|", ""))
-        .filter(line -> !line.isBlank())
-        .collect(java.util.stream.Collectors.joining("\n"));
+        .collect(java.util.stream.Collectors.joining("\n"))
+        .trim();
   }
 }

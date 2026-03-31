@@ -79,26 +79,80 @@ public class InlineValueRewriter {
 
   private static int findMethodOffset(String content, String methodName, Language language) {
     if (language.supportsBacktickMethodNames()) {
-      int backtickForm = content.indexOf("`" + methodName + "`(");
-      if (backtickForm >= 0) {
-        return backtickForm;
+      String backtickPattern = "`" + methodName + "`(";
+      int found = findDeclaration(content, backtickPattern);
+      if (found >= 0) {
+        return found;
       }
     }
-    int found = content.indexOf(methodName + "(");
+    int found = findDeclaration(content, methodName + "(");
     if (found < 0) {
       throw new InlineValueError("Could not find method " + methodName + " in source file");
     }
     return found;
   }
 
+  private static int findDeclaration(String content, String pattern) {
+    int position = 0;
+    while (position < content.length()) {
+      int found = content.indexOf(pattern, position);
+      if (found < 0) {
+        return -1;
+      }
+      if (found == 0 || Character.isWhitespace(content.charAt(found - 1))) {
+        return found;
+      }
+      position = found + 1;
+    }
+    return -1;
+  }
+
   private static int findMethodEnd(String content, int methodOffset) {
     int depth = 0;
+    boolean inString = false;
+    boolean inTextBlock = false;
     int position = content.indexOf('{', methodOffset);
     if (position < 0) {
       return content.length();
     }
     while (position < content.length()) {
       char character = content.charAt(position);
+
+      if (inTextBlock) {
+        if (position + 3 <= content.length()
+            && (content.startsWith("\"\"\"", position) || content.startsWith("'''", position))) {
+          inTextBlock = false;
+          position += 3;
+          continue;
+        }
+        position++;
+        continue;
+      }
+
+      if (inString) {
+        if (character == '\\') {
+          position += 2;
+          continue;
+        }
+        if (character == '"' || character == '\'') {
+          inString = false;
+        }
+        position++;
+        continue;
+      }
+
+      if (character == '"' || character == '\'') {
+        if (position + 3 <= content.length()
+            && (content.startsWith("\"\"\"", position) || content.startsWith("'''", position))) {
+          inTextBlock = true;
+          position += 3;
+          continue;
+        }
+        inString = true;
+        position++;
+        continue;
+      }
+
       if (character == '{') {
         depth++;
       } else if (character == '}') {
@@ -123,27 +177,26 @@ public class InlineValueRewriter {
 
   private static int findArgumentEnd(String content, int start, Language language) {
     int depth = 1;
-    boolean inString = false;
-    boolean inTextBlock = false;
+    char stringQuoteChar = 0;
+    String textBlockDelimiter = null;
     int position = start;
 
     String delimiter = language.delimiter();
-    char stringQuote = delimiter.charAt(0);
 
     if (position + 3 <= content.length() && content.startsWith(delimiter, position)) {
-      inTextBlock = true;
+      textBlockDelimiter = delimiter;
       position += 3;
-    } else if (position < content.length() && content.charAt(position) == stringQuote) {
-      inString = true;
+    } else if (position < content.length() && isQuoteChar(content.charAt(position))) {
+      stringQuoteChar = content.charAt(position);
       position++;
     }
 
     while (position < content.length()) {
       char character = content.charAt(position);
 
-      if (inTextBlock) {
-        if (position + 3 <= content.length() && content.startsWith(delimiter, position)) {
-          inTextBlock = false;
+      if (textBlockDelimiter != null) {
+        if (position + 3 <= content.length() && content.startsWith(textBlockDelimiter, position)) {
+          textBlockDelimiter = null;
           position += 3;
           String suffix = language.suffix();
           if (!suffix.isEmpty() && content.startsWith(suffix, position)) {
@@ -155,25 +208,28 @@ public class InlineValueRewriter {
         continue;
       }
 
-      if (inString) {
+      if (stringQuoteChar != 0) {
         if (character == '\\') {
           position += 2;
           continue;
         }
-        if (character == stringQuote) {
-          inString = false;
+        if (character == stringQuoteChar) {
+          stringQuoteChar = 0;
         }
         position++;
         continue;
       }
 
-      if (character == stringQuote) {
-        if (position + 3 <= content.length() && content.startsWith(delimiter, position)) {
-          inTextBlock = true;
-          position += 3;
-          continue;
+      if (isQuoteChar(character)) {
+        if (position + 3 <= content.length()) {
+          String tripleQuote = String.valueOf(character).repeat(3);
+          if (content.startsWith(tripleQuote, position)) {
+            textBlockDelimiter = tripleQuote;
+            position += 3;
+            continue;
+          }
         }
-        inString = true;
+        stringQuoteChar = character;
         position++;
         continue;
       }
@@ -190,6 +246,10 @@ public class InlineValueRewriter {
     }
 
     throw new InlineValueError("Could not find closing parenthesis for byValue(");
+  }
+
+  private static boolean isQuoteChar(char character) {
+    return character == '"' || character == '\'';
   }
 
   private static String detectIndentUnit(String content) {
