@@ -2,7 +2,7 @@ package org.approvej.review;
 
 import static java.nio.file.Files.writeString;
 import static org.approvej.approve.PathProviders.approvedPath;
-import static org.approvej.review.Reviewers.none;
+import static org.approvej.review.Reviewers.script;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -12,16 +12,28 @@ import org.approvej.approve.PathProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class NoneFileReviewerTest {
+class ScriptReviewerTest {
 
   @TempDir private Path tempDir;
 
   @Test
   void apply() throws IOException {
-    FileReviewer reviewer = none();
+    Reviewer reviewer = script("diff {receivedFile} {approvedFile}");
     PathProvider pathProvider = approvedPath(tempDir.resolve("apply-approved.txt"));
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
     writeString(pathProvider.receivedPath(), "Some approved text", StandardOpenOption.CREATE);
+
+    ReviewResult result = reviewer.apply(pathProvider);
+
+    assertThat(result.needsReapproval()).isTrue();
+  }
+
+  @Test
+  void apply_different() throws IOException {
+    Reviewer reviewer = script("diff {receivedFile} {approvedFile}");
+    PathProvider pathProvider = approvedPath(tempDir.resolve("apply_different-approved.txt"));
+    writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
+    writeString(pathProvider.receivedPath(), "Some received text", StandardOpenOption.CREATE);
 
     ReviewResult result = reviewer.apply(pathProvider);
 
@@ -29,11 +41,11 @@ class NoneFileReviewerTest {
   }
 
   @Test
-  void apply_different() throws IOException {
-    FileReviewer reviewer = none();
-    PathProvider pathProvider = approvedPath(tempDir.resolve("apply-approved.txt"));
+  void apply_unknown_command() throws IOException {
+    Reviewer reviewer = script("unknown-command {receivedFile} {approvedFile}");
+    PathProvider pathProvider = approvedPath(tempDir.resolve("apply_different-approved.txt"));
     writeString(pathProvider.approvedPath(), "Some approved text", StandardOpenOption.CREATE);
-    writeString(pathProvider.receivedPath(), "Some received text", StandardOpenOption.CREATE);
+    writeString(pathProvider.receivedPath(), "Some approved text", StandardOpenOption.CREATE);
 
     ReviewResult result = reviewer.apply(pathProvider);
 

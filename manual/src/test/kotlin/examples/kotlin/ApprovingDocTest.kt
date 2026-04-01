@@ -24,6 +24,21 @@ class ApprovingDocTest {
   }
 
   @Test
+  fun `approve inplace auto update`() {
+    // tag::approve_inplace_auto_update[]
+    val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))
+
+    approve(person)
+      .byValue(
+        """
+      Person[name=John Doe, birthDate=1990-01-01]
+    """
+          .trimIndent()
+      )
+    // end::approve_inplace_auto_update[]
+  }
+
+  @Test
   fun `approve file next to test`() {
     // tag::approve_file_next_to_test[]
     val person = createPerson("John Doe", LocalDate.of(1990, 1, 1))

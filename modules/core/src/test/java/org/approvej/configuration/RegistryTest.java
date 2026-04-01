@@ -8,7 +8,7 @@ import java.util.Map;
 import org.approvej.print.MultiLineStringPrintFormat;
 import org.approvej.print.PrintFormat;
 import org.approvej.print.SingleLineStringPrintFormat;
-import org.approvej.review.FileReviewer;
+import org.approvej.review.Reviewer;
 import org.junit.jupiter.api.Test;
 
 class RegistryTest {
@@ -37,14 +37,14 @@ class RegistryTest {
 
   @Test
   void resolve_fileReviewer_none() {
-    FileReviewer reviewer = Registry.resolve("none", FileReviewer.class);
+    Reviewer reviewer = Registry.resolve("none", Reviewer.class);
 
     assertThat(reviewer).isNotNull();
   }
 
   @Test
   void resolve_fileReviewer_automatic() {
-    FileReviewer reviewer = Registry.resolve("automatic", FileReviewer.class);
+    Reviewer reviewer = Registry.resolve("automatic", Reviewer.class);
 
     assertThat(reviewer).isNotNull();
   }

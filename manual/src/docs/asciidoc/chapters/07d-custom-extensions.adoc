@@ -130,24 +130,24 @@ defaultPrintFormat = screaming
 
 Similarly, you can create a custom file reviewer and register it via SPI to make it available as a global default.
 
-1. Implement `FileReviewer` and `FileReviewerProvider`
+1. Implement `Reviewer` and `ReviewerProvider`
 2. Register via `META-INF/services/org.approvej.configuration.Provider`
 
 [source,java,indent=0,role="primary"]
 .Java
 ----
-include::../../../test/java/examples/java/LoggingFileReviewer.java[]
+include::../../../test/java/examples/java/LoggingReviewer.java[]
 ----
 [source,kotlin,indent=0,role="secondary"]
 .Kotlin
 ----
-include::../../../test/kotlin/examples/kotlin/LoggingFileReviewer.kt[]
+include::../../../test/kotlin/examples/kotlin/LoggingReviewer.kt[]
 ----
 
 .`META-INF/services/org.approvej.configuration.Provider`
 [source]
 ----
-examples.java.LoggingFileReviewer
+examples.java.LoggingReviewer
 ----
 
 Now you can set it as the default in `approvej.properties`:

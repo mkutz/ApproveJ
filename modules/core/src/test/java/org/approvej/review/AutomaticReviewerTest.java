@@ -12,13 +12,13 @@ import org.approvej.approve.PathProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class AutomaticFileReviewerTest {
+class AutomaticReviewerTest {
 
   @TempDir private Path tempDir;
 
   @Test
   void apply() throws IOException {
-    FileReviewer reviewer = automatic();
+    Reviewer reviewer = automatic();
     PathProvider pathProvider = approvedPath(tempDir.resolve("apply-approved.txt"));
     writeString(
         pathProvider.approvedPath(),
@@ -40,7 +40,7 @@ class AutomaticFileReviewerTest {
 
   @Test
   void apply_cleans_up_diff_file() throws IOException {
-    FileReviewer reviewer = automatic();
+    Reviewer reviewer = automatic();
     PathProvider pathProvider = approvedPath(tempDir.resolve("apply_cleanup-approved.txt"));
     writeString(pathProvider.approvedPath(), "approved\n", StandardOpenOption.CREATE);
     writeString(pathProvider.receivedPath(), "received\n", StandardOpenOption.CREATE);
@@ -54,7 +54,7 @@ class AutomaticFileReviewerTest {
 
   @Test
   void apply_no_received_file() {
-    FileReviewer reviewer = automatic();
+    Reviewer reviewer = automatic();
     PathProvider pathProvider = approvedPath(tempDir.resolve("apply_missing-approved.txt"));
 
     ReviewResult result = reviewer.apply(pathProvider);
@@ -64,15 +64,15 @@ class AutomaticFileReviewerTest {
 
   @Test
   void alias() {
-    AutomaticFileReviewer reviewer = new AutomaticFileReviewer();
+    AutomaticReviewer reviewer = new AutomaticReviewer();
 
     assertThat(reviewer.alias()).isEqualTo("automatic");
   }
 
   @Test
   void create() {
-    AutomaticFileReviewer reviewer = new AutomaticFileReviewer();
+    AutomaticReviewer reviewer = new AutomaticReviewer();
 
-    assertThat(reviewer.create()).isInstanceOf(AutomaticFileReviewer.class);
+    assertThat(reviewer.create()).isInstanceOf(AutomaticReviewer.class);
   }
 }

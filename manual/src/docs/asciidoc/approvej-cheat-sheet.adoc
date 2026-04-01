@@ -28,7 +28,7 @@ Quick reference for the public API, organized by the approval flow.
 |`.scrubbedOf(UnaryOperator<T> scrubber)`
 |Apply a scrubber to remove dynamic data
 
-|`.reviewedBy(FileReviewer)` / `.reviewedBy(String script)`
+|`.reviewedBy(Reviewer)` / `.reviewedBy(String script)`
 |Set the file reviewer or review script
 
 |`.byValue(String previouslyApproved)`
@@ -217,8 +217,16 @@ a|`gradle approvejReviewUnapproved` +
 |`APPROVEJ_DEFAULT_FILE_REVIEWER`
 |`none`
 
-|`defaultFileReviewerScript`
-|`APPROVEJ_DEFAULT_FILE_REVIEWER_SCRIPT`
+|`defaultInlineValueReviewer`
+|`APPROVEJ_DEFAULT_INLINE_VALUE_REVIEWER`
+|`none`
+
+|`reviewerScript`
+|`APPROVEJ_REVIEWER_SCRIPT`
+|_(none)_
+
+|`reviewerAiCommand`
+|`APPROVEJ_REVIEWER_AI_COMMAND`
 |_(none)_
 |===
 

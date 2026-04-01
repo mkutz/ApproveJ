@@ -25,6 +25,19 @@ class ApprovingDocTest {
   }
 
   @Test
+  void approve_inplace_auto_update() {
+    // tag::approve_inplace_auto_update[]
+    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+
+    approve(person)
+        .byValue(
+            """
+            Person[name=John Doe, birthDate=1990-01-01]\
+            """);
+    // end::approve_inplace_auto_update[]
+  }
+
+  @Test
   void approve_file_next_to_test() {
     // tag::approve_file_next_to_test[]
     Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));

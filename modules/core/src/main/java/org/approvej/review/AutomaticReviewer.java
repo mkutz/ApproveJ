@@ -11,17 +11,16 @@ import org.approvej.approve.PathProvider;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * A {@link FileReviewer} that accepts any given received value, ignoring the previously approved
- * value.
+ * A {@link Reviewer} that accepts any given received value, ignoring the previously approved value.
  *
  * <p>This may be a good idea when you have a lot of tests with changed results, and you simply want
  * to update them all at once. You probably want to review the changed approved files before
  * committing them to version control!
  */
 @NullMarked
-public record AutomaticFileReviewer() implements FileReviewer, FileReviewerProvider {
+public record AutomaticReviewer() implements Reviewer, ReviewerProvider {
 
-  private static final Logger LOGGER = Logger.getLogger(AutomaticFileReviewer.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(AutomaticReviewer.class.getName());
 
   @Override
   public ReviewResult apply(PathProvider pathProvider) {
@@ -30,13 +29,13 @@ public record AutomaticFileReviewer() implements FileReviewer, FileReviewerProvi
     try {
       move(receivedPath, approvedPath, REPLACE_EXISTING);
       deleteIfExists(pathProvider.diffPath());
-      return new FileReviewResult(true);
+      return new ReviewResultRecord(true);
     } catch (IOException e) {
       LOGGER.info(
           "Automatic overwriting approved file at %s with received file at %s failed with exception %s."
               .formatted(approvedPath, receivedPath, e));
     }
-    return new FileReviewResult(false);
+    return new ReviewResultRecord(false);
   }
 
   @Override
@@ -45,7 +44,7 @@ public record AutomaticFileReviewer() implements FileReviewer, FileReviewerProvi
   }
 
   @Override
-  public FileReviewer create() {
-    return new AutomaticFileReviewer();
+  public Reviewer create() {
+    return new AutomaticReviewer();
   }
 }

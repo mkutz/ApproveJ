@@ -15,8 +15,8 @@ import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviders;
 import org.approvej.image.approve.ImageFileApprover;
 import org.approvej.image.compare.ImageComparator;
-import org.approvej.review.FileReviewer;
 import org.approvej.review.ReviewResult;
+import org.approvej.review.Reviewer;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -34,14 +34,14 @@ public class ImageApprovalBuilder {
   private final BufferedImage value;
   private final String name;
   private final String filenameExtension;
-  private final FileReviewer fileReviewer;
+  private final Reviewer fileReviewer;
   private final ImageComparator comparator;
 
   private ImageApprovalBuilder(
       BufferedImage image,
       String name,
       String filenameExtension,
-      FileReviewer fileReviewer,
+      Reviewer fileReviewer,
       ImageComparator comparator) {
     this.value = image;
     this.name = name;

@@ -8,20 +8,29 @@ import static org.approvej.configuration.Configuration.configuration;
 import static org.approvej.print.PrintFormat.DEFAULT_FILENAME_EXTENSION;
 import static org.approvej.review.Reviewers.script;
 
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import java.util.logging.Logger;
 import org.approvej.approve.ApprovedFileInventoryUpdater;
 import org.approvej.approve.Approver;
+import org.approvej.approve.InlineValueRewriter;
 import org.approvej.approve.PathProvider;
 import org.approvej.approve.PathProviders;
+import org.approvej.approve.StackTraceTestFinderUtil;
 import org.approvej.print.PrintFormat;
 import org.approvej.print.Printer;
-import org.approvej.review.FileReviewer;
+import org.approvej.review.NoneReviewer;
 import org.approvej.review.ReviewResult;
+import org.approvej.review.Reviewer;
 import org.approvej.scrub.Scrubber;
 import org.jspecify.annotations.NullMarked;
+import org.opentest4j.TestAbortedException;
 
 /**
  * A builder to configure an approval for a given value.
@@ -60,17 +69,19 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class ApprovalBuilder<T> {
 
+  private static final Logger LOGGER = Logger.getLogger(ApprovalBuilder.class.getName());
+
   private final T value;
   private final String name;
   private final String filenameExtension;
-  private final FileReviewer fileReviewer;
+  private final Reviewer fileReviewer;
   private final AtomicBoolean concluded;
 
   private ApprovalBuilder(
       T value,
       String name,
       String filenameExtension,
-      FileReviewer fileReviewer,
+      Reviewer fileReviewer,
       AtomicBoolean concluded) {
     this.value = value;
     this.name = name;
@@ -153,21 +164,21 @@ public class ApprovalBuilder<T> {
   }
 
   /**
-   * Sets the given {@link FileReviewer} to trigger if the received value is not equal to the
-   * previously approved.
+   * Sets the given {@link Reviewer} to trigger if the received value is not equal to the previously
+   * approved.
    *
-   * @param fileReviewer the {@link FileReviewer} to be used
+   * @param fileReviewer the {@link Reviewer} to be used
    * @return a copy of this with the given {@link #fileReviewer}
    * @see org.approvej.configuration.Configuration#defaultFileReviewer()
    * @see org.approvej.review.Reviewers
    */
-  public ApprovalBuilder<T> reviewedBy(FileReviewer fileReviewer) {
+  public ApprovalBuilder<T> reviewedBy(Reviewer fileReviewer) {
     return new ApprovalBuilder<>(value, name, filenameExtension, fileReviewer, concluded);
   }
 
   /**
-   * Creates a {@link org.approvej.review.FileReviewer} from the given script {@link String} to
-   * trigger if the received value is not equal to the previously approved.
+   * Creates a {@link Reviewer} from the given script {@link String} to trigger if the received
+   * value is not equal to the previously approved.
    *
    * @param script the script {@link String} to be used as a {@link
    *     org.approvej.review.Reviewers#script(String) script}
@@ -203,10 +214,66 @@ public class ApprovalBuilder<T> {
   /**
    * Approves the value by the given previouslyApproved value.
    *
+   * <p>When the {@link org.approvej.configuration.Configuration#defaultInlineValueReviewer()} is
+   * configured (e.g. as {@code automatic}), a mismatch will trigger the reviewer. The {@code
+   * automatic} reviewer rewrites the string literal in the test source file with the received value
+   * and aborts the test with a {@link TestAbortedException} so the developer can verify the change
+   * and re-run. The test is aborted rather than failed because the JVM is still running the old
+   * bytecode and a re-run is always necessary.
+   *
    * @param previouslyApproved the approved value
    */
   public void byValue(final String previouslyApproved) {
-    by(value(previouslyApproved));
+    concluded.set(true);
+    if (!(value instanceof String)) {
+      printed().byValue(previouslyApproved);
+      return;
+    }
+    Approver approver = value(previouslyApproved);
+    ApprovalResult result = approver.apply(String.valueOf(value));
+    if (result.needsApproval()) {
+      reviewInlineValue(String.valueOf(value).trim());
+      throw new ApprovalError(result.received(), result.previouslyApproved());
+    }
+  }
+
+  private void reviewInlineValue(String received) {
+    Reviewer inlineValueReviewer = configuration.defaultInlineValueReviewer();
+    if (inlineValueReviewer instanceof NoneReviewer) {
+      return;
+    }
+    Path receivedPath = null;
+    try {
+      Method testMethod = StackTraceTestFinderUtil.currentTestMethod().method();
+      Path sourcePath = StackTraceTestFinderUtil.findTestSourcePath(testMethod);
+      PathProvider pathProvider =
+          new PathProvider(sourcePath.getParent(), sourcePath.getFileName().toString(), "", "", "");
+      receivedPath = pathProvider.receivedPath();
+      String content = Files.readString(sourcePath, StandardCharsets.UTF_8);
+      String rewritten =
+          InlineValueRewriter.rewriteContent(content, testMethod.getName(), received, sourcePath);
+      Files.writeString(receivedPath, rewritten, StandardCharsets.UTF_8);
+      ReviewResult reviewResult = inlineValueReviewer.apply(pathProvider);
+      if (reviewResult.needsReapproval()) {
+        String updatedContent = Files.readString(sourcePath, StandardCharsets.UTF_8);
+        if (!updatedContent.equals(content)) {
+          throw new TestAbortedException(
+              "Inline value updated in source file. Re-run the test to verify.");
+        }
+      }
+    } catch (TestAbortedException aborted) {
+      throw aborted;
+    } catch (RuntimeException | IOException error) {
+      LOGGER.warning("Could not auto-update inline value: " + error.getMessage());
+    } finally {
+      if (receivedPath != null) {
+        try {
+          Files.deleteIfExists(receivedPath);
+        } catch (IOException ignored) {
+          // best effort cleanup
+        }
+      }
+    }
   }
 
   /**

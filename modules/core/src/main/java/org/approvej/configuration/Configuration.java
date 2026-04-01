@@ -1,8 +1,9 @@
 package org.approvej.configuration;
 
+import java.util.logging.Logger;
 import org.approvej.print.PrintFormat;
 import org.approvej.print.SingleLineStringPrintFormat;
-import org.approvej.review.FileReviewer;
+import org.approvej.review.Reviewer;
 import org.approvej.review.Reviewers;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -24,26 +25,38 @@ import org.jspecify.annotations.Nullable;
  *
  * <ul>
  *   <li>Aliases (e.g., "json", "yaml", "singleLineString", "multiLineString" for print formats;
- *       "none", "automatic" for reviewers)
+ *       "none", "automatic", "script", "ai" for reviewers)
  *   <li>Fully-qualified class names (for backward compatibility and custom implementations)
  * </ul>
  *
+ * <p>The "script" reviewer requires the {@code reviewerScript} property to be set. The "ai"
+ * reviewer requires the {@code reviewerAiCommand} property to be set.
+ *
  * @param defaultPrintFormat the {@link PrintFormat} that will be used if none is specified
  *     otherwise
- * @param defaultFileReviewer the {@link FileReviewer} that will be used if none is specified
+ * @param defaultFileReviewer the {@link Reviewer} that will be used for file-based approvals if
+ *     none is specified
  * @param inventoryEnabled whether the approved file inventory is enabled
+ * @param defaultInlineValueReviewer the {@link Reviewer} that will be used for inline value
+ *     approvals if none is specified
  */
 @NullMarked
 public record Configuration(
     PrintFormat<Object> defaultPrintFormat,
-    FileReviewer defaultFileReviewer,
-    boolean inventoryEnabled) {
+    Reviewer defaultFileReviewer,
+    boolean inventoryEnabled,
+    Reviewer defaultInlineValueReviewer) {
+
+  private static final Logger LOGGER = Logger.getLogger(Configuration.class.getName());
 
   private static final String DEFAULT_PRINT_FORMAT_PROPERTY = "defaultPrintFormat";
   private static final String DEFAULT_FILE_REVIEWER_PROPERTY = "defaultFileReviewer";
-  private static final String DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY = "defaultFileReviewerScript";
-  private static final String AI_REVIEWER_COMMAND_PROPERTY = "aiReviewerCommand";
+  private static final String REVIEWER_SCRIPT_PROPERTY = "reviewerScript";
+  private static final String REVIEWER_AI_COMMAND_PROPERTY = "reviewerAiCommand";
   private static final String INVENTORY_ENABLED_PROPERTY = "inventoryEnabled";
+  private static final String DEFAULT_INLINE_VALUE_REVIEWER_PROPERTY = "defaultInlineValueReviewer";
+
+  @Deprecated private static final String DEPRECATED_SCRIPT_PROPERTY = "defaultFileReviewerScript";
 
   /** The loaded {@link Configuration} object. */
   public static final Configuration configuration =
@@ -53,11 +66,15 @@ public record Configuration(
     String printFormatConfig = loader.get(DEFAULT_PRINT_FORMAT_PROPERTY, "singleLineString");
     PrintFormat<Object> printFormat = resolvePrintFormat(printFormatConfig);
 
-    FileReviewer fileReviewer = resolveFileReviewer(loader);
+    String fileReviewerAlias = resolveFileReviewerAlias(loader);
+    Reviewer fileReviewer = resolveReviewer(loader, fileReviewerAlias);
 
     boolean inventoryEnabled = resolveInventoryEnabled(loader);
 
-    return new Configuration(printFormat, fileReviewer, inventoryEnabled);
+    Reviewer inlineValueReviewer =
+        resolveReviewer(loader, loader.get(DEFAULT_INLINE_VALUE_REVIEWER_PROPERTY, "none"));
+
+    return new Configuration(printFormat, fileReviewer, inventoryEnabled, inlineValueReviewer);
   }
 
   @SuppressWarnings("unchecked")
@@ -68,18 +85,32 @@ public record Configuration(
     return Registry.resolve(aliasOrClassName, PrintFormat.class);
   }
 
-  private static FileReviewer resolveFileReviewer(ConfigurationLoader loader) {
-    String aiCommand = loader.get(AI_REVIEWER_COMMAND_PROPERTY);
-    if (aiCommand != null) {
+  @SuppressWarnings("deprecation")
+  private static Reviewer resolveReviewer(ConfigurationLoader loader, String aliasOrClassName) {
+    if ("script".equals(aliasOrClassName)) {
+      String script = loader.get(REVIEWER_SCRIPT_PROPERTY);
+      if (script == null) {
+        script = loader.get(DEPRECATED_SCRIPT_PROPERTY);
+      }
+      if (script == null) {
+        throw new ConfigurationError(
+            "Reviewer 'script' requires the '%s' property to be set"
+                .formatted(REVIEWER_SCRIPT_PROPERTY),
+            null);
+      }
+      return Reviewers.script(script);
+    }
+    if ("ai".equals(aliasOrClassName)) {
+      String aiCommand = loader.get(REVIEWER_AI_COMMAND_PROPERTY);
+      if (aiCommand == null) {
+        throw new ConfigurationError(
+            "Reviewer 'ai' requires the '%s' property to be set"
+                .formatted(REVIEWER_AI_COMMAND_PROPERTY),
+            null);
+      }
       return Reviewers.ai(aiCommand);
     }
-
-    String fileReviewerScript = loader.get(DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY);
-    if (fileReviewerScript != null) {
-      return Reviewers.script(fileReviewerScript);
-    }
-
-    return Registry.resolve(loader.get(DEFAULT_FILE_REVIEWER_PROPERTY, "none"), FileReviewer.class);
+    return Registry.resolve(aliasOrClassName, Reviewer.class);
   }
 
   private static boolean resolveInventoryEnabled(ConfigurationLoader loader) {
@@ -89,5 +120,21 @@ public record Configuration(
     }
     String ci = loader.getenv("CI");
     return ci == null || ci.isBlank();
+  }
+
+  @SuppressWarnings("deprecation")
+  private static String resolveFileReviewerAlias(ConfigurationLoader loader) {
+    String explicit = loader.get(DEFAULT_FILE_REVIEWER_PROPERTY);
+    if (explicit != null) {
+      return explicit;
+    }
+    String deprecatedScript = loader.get(DEPRECATED_SCRIPT_PROPERTY);
+    if (deprecatedScript != null) {
+      LOGGER.warning(
+          "'%s' is deprecated. Use 'defaultFileReviewer = script' with 'reviewerScript = ...' instead."
+              .formatted(DEPRECATED_SCRIPT_PROPERTY));
+      return "script";
+    }
+    return "none";
   }
 }

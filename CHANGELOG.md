@@ -1,6 +1,26 @@
 # Changelog
 
 
+## Unreleased
+
+### core
+
+* ✨ **Auto-update inline values**
+  `byValue()` can now automatically rewrite the string literal in the test source file when a mismatch is detected.
+  Configure `defaultInlineValueReviewer = automatic` in `approvej.properties` to enable.
+  Supports Java, Kotlin, Groovy, and Scala source files.
+  ([#283](https://github.com/mkutz/ApproveJ/issues/283))
+
+* 🛠️ **Rename `FileReviewer` to `Reviewer`**
+  All reviewer classes have been renamed to remove the "File" prefix, since reviewers are now used for both file-based and inline value approvals.
+  `FileReviewer` → `Reviewer`, `NoneFileReviewer` → `NoneReviewer`, `AutomaticFileReviewer` → `AutomaticReviewer`, `ScriptFileReviewer` → `ScriptReviewer`, `AiFileReviewer` → `AiReviewer`, `FileReviewResult` → `ReviewResultRecord`, `FileReviewerProvider` → `ReviewerProvider`.
+
+* ⚠️ **Deprecated: Reviewer configuration properties renamed**
+  `defaultFileReviewerScript` is deprecated in favor of `defaultFileReviewer = script` with `reviewerScript`.
+  The old property still works but logs a deprecation warning.
+  Reviewers can now be configured explicitly via `defaultFileReviewer` or `defaultInlineValueReviewer`.
+
+
 ## v1.5.2
 
 ### core
@@ -56,7 +76,7 @@
 
 ### core
 
-* ⚠️ **Remove deprecated `ScriptFileReviewer.script()`**
+* ⚠️ **Remove deprecated `ScriptReviewer.script()`**
   The static factory method deprecated since 1.1 has been removed.
   Use `Reviewers.script()` instead.
 

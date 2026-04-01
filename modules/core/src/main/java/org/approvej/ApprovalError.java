@@ -12,6 +12,15 @@ public class ApprovalError extends AssertionError {
   private static final String DELIMITER = "\n  ";
 
   /**
+   * Creates an {@link ApprovalError} with the given message.
+   *
+   * @param message the error message
+   */
+  public ApprovalError(String message) {
+    super(message);
+  }
+
+  /**
    * Creates an {@link ApprovalError} for when the given received value does not match the
    * previouslyApproved.
    *

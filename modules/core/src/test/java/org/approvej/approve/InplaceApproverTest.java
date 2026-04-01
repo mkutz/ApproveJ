@@ -10,7 +10,7 @@ class InplaceApproverTest {
   @Test
   void apply() {
     String previouslyApproved = "Some text";
-    InplaceApprover inplaceApprover = value(previouslyApproved);
+    Approver inplaceApprover = value(previouslyApproved);
 
     assertThat(inplaceApprover.apply(previouslyApproved).needsApproval()).isFalse();
   }
@@ -18,7 +18,7 @@ class InplaceApproverTest {
   @Test
   void apply_previously_approved_differs() {
     String previouslyApproved = "Some other text";
-    InplaceApprover inplaceApprover = value(previouslyApproved);
+    Approver inplaceApprover = value(previouslyApproved);
 
     assertThat(inplaceApprover.apply("Some text").needsApproval()).isTrue();
   }

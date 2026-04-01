@@ -6,7 +6,9 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import java.util.Map;
 import java.util.Properties;
 import org.approvej.print.SingleLineStringPrintFormat;
-import org.approvej.review.FileReviewer;
+import org.approvej.review.AutomaticReviewer;
+import org.approvej.review.NoneReviewer;
+import org.approvej.review.Reviewer;
 import org.junit.jupiter.api.Test;
 
 class ConfigurationTest {
@@ -24,19 +26,31 @@ class ConfigurationTest {
     Configuration config = Configuration.loadConfiguration(loader);
 
     assertThat(config.defaultPrintFormat()).isInstanceOf(SingleLineStringPrintFormat.class);
-    assertThat(config.defaultFileReviewer()).isInstanceOf(FileReviewer.class);
+    assertThat(config.defaultFileReviewer()).isInstanceOf(Reviewer.class);
+    assertThat(config.defaultInlineValueReviewer()).isInstanceOf(NoneReviewer.class);
+  }
+
+  @Test
+  void loadConfiguration_defaultInlineValueReviewer() {
+    Properties properties = new Properties();
+    properties.setProperty("defaultInlineValueReviewer", "automatic");
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
+
+    Configuration config = Configuration.loadConfiguration(loader);
+
+    assertThat(config.defaultInlineValueReviewer()).isInstanceOf(AutomaticReviewer.class);
   }
 
   @Test
   void loadConfiguration_customPrintFormat_from_properties() {
-    Properties props = new Properties();
-    props.setProperty("defaultPrintFormat", SingleLineStringPrintFormat.class.getName());
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+    Properties properties = new Properties();
+    properties.setProperty("defaultPrintFormat", SingleLineStringPrintFormat.class.getName());
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     Configuration config = Configuration.loadConfiguration(loader);
 
     assertThat(config.defaultPrintFormat()).isInstanceOf(SingleLineStringPrintFormat.class);
-    assertThat(config.defaultFileReviewer()).isInstanceOf(FileReviewer.class);
+    assertThat(config.defaultFileReviewer()).isInstanceOf(Reviewer.class);
   }
 
   @Test
@@ -57,11 +71,12 @@ class ConfigurationTest {
   }
 
   @Test
-  void loadConfiguration_fileReviewerScript() {
-    Properties props = new Properties();
-    props.setProperty("defaultFileReviewerScript", "diff {receivedFile} {approvedFile}");
+  void loadConfiguration_reviewerScript() {
+    Properties properties = new Properties();
+    properties.setProperty("defaultFileReviewer", "script");
+    properties.setProperty("reviewerScript", "diff {receivedFile} {approvedFile}");
 
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     Configuration config = Configuration.loadConfiguration(loader);
 
@@ -70,10 +85,10 @@ class ConfigurationTest {
 
   @Test
   void loadConfiguration_invalidPrintFormatThrowsError() {
-    Properties props = new Properties();
-    props.setProperty("defaultPrintFormat", "org.nonexistent.InvalidFormat");
+    Properties properties = new Properties();
+    properties.setProperty("defaultPrintFormat", "org.nonexistent.InvalidFormat");
 
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     assertThatExceptionOfType(ConfigurationError.class)
         .isThrownBy(() -> Configuration.loadConfiguration(loader))
@@ -103,9 +118,9 @@ class ConfigurationTest {
 
   @Test
   void loadConfiguration_inventoryEnabled_from_properties() {
-    Properties props = new Properties();
-    props.setProperty("inventoryEnabled", "false");
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+    Properties properties = new Properties();
+    properties.setProperty("inventoryEnabled", "false");
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     Configuration config = Configuration.loadConfiguration(loader);
 
@@ -115,12 +130,12 @@ class ConfigurationTest {
   @Test
   void loadConfiguration_inventoryEnabled_env_overrides_properties() {
     Map<String, String> env = Map.of("APPROVEJ_INVENTORY_ENABLED", "false");
-    Properties props = new Properties();
-    props.setProperty("inventoryEnabled", "true");
+    Properties properties = new Properties();
+    properties.setProperty("inventoryEnabled", "true");
     ConfigurationLoader loader =
         ConfigurationLoader.builder()
             .withEnvironmentVariables(env::get)
-            .withProperties(props)
+            .withProperties(properties)
             .build();
 
     Configuration config = Configuration.loadConfiguration(loader);
@@ -130,7 +145,7 @@ class ConfigurationTest {
 
   @Test
   void configurationLoader_priorityChain() {
-    // Simulate: env > project props > user home props
+    // Simulate: env > project properties > user home properties
     Map<String, String> env = Map.of(); // Empty - no env variable set
 
     Properties projectProps = new Properties();
@@ -185,20 +200,20 @@ class ConfigurationTest {
 
   @Test
   void configurationLoader_get_returnsDefaultWhenKeyNotFound() {
-    Properties props = new Properties();
-    props.setProperty("otherKey", "otherValue");
+    Properties properties = new Properties();
+    properties.setProperty("otherKey", "otherValue");
 
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     assertThat(loader.get("missingKey", "defaultValue")).isEqualTo("defaultValue");
   }
 
   @Test
   void configurationLoader_get_returnsValueFromProperties() {
-    Properties props = new Properties();
-    props.setProperty("myKey", "myValue");
+    Properties properties = new Properties();
+    properties.setProperty("myKey", "myValue");
 
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     assertThat(loader.get("myKey", "default")).isEqualTo("myValue");
   }
@@ -211,40 +226,54 @@ class ConfigurationTest {
   }
 
   @Test
-  void loadConfiguration_aiReviewerCommand() {
-    Properties props = new Properties();
-    props.setProperty("aiReviewerCommand", "claude -p");
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+  void loadConfiguration_reviewerAiCommand() {
+    Properties properties = new Properties();
+    properties.setProperty("defaultFileReviewer", "ai");
+    properties.setProperty("reviewerAiCommand", "claude -p");
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     Configuration config = Configuration.loadConfiguration(loader);
 
-    assertThat(config.defaultFileReviewer().getClass().getSimpleName()).isEqualTo("AiFileReviewer");
+    assertThat(config.defaultFileReviewer().getClass().getSimpleName()).isEqualTo("AiReviewer");
   }
 
   @Test
-  void loadConfiguration_aiReviewerCommand_takes_priority_over_fileReviewerScript() {
-    Properties props = new Properties();
-    props.setProperty("aiReviewerCommand", "claude -p");
-    props.setProperty("defaultFileReviewerScript", "diff {receivedFile} {approvedFile}");
-    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(props).build();
+  void loadConfiguration_reviewerScript_without_property_throws() {
+    Properties properties = new Properties();
+    properties.setProperty("defaultFileReviewer", "script");
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
-    Configuration config = Configuration.loadConfiguration(loader);
+    assertThatExceptionOfType(ConfigurationError.class)
+        .isThrownBy(() -> Configuration.loadConfiguration(loader))
+        .withMessageContaining("reviewerScript");
+  }
 
-    assertThat(config.defaultFileReviewer().getClass().getSimpleName()).isEqualTo("AiFileReviewer");
+  @Test
+  void loadConfiguration_reviewerAiCommand_without_property_throws() {
+    Properties properties = new Properties();
+    properties.setProperty("defaultFileReviewer", "ai");
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
+
+    assertThatExceptionOfType(ConfigurationError.class)
+        .isThrownBy(() -> Configuration.loadConfiguration(loader))
+        .withMessageContaining("reviewerAiCommand");
   }
 
   @Test
   void configurationLoader_chainedSources_firstNonNullWins() {
-    Properties props1 = new Properties();
-    props1.setProperty("key1", "value1");
-    props1.setProperty("shared", "fromFirst");
+    Properties properties1 = new Properties();
+    properties1.setProperty("key1", "value1");
+    properties1.setProperty("shared", "fromFirst");
 
-    Properties props2 = new Properties();
-    props2.setProperty("key2", "value2");
-    props2.setProperty("shared", "fromSecond");
+    Properties properties2 = new Properties();
+    properties2.setProperty("key2", "value2");
+    properties2.setProperty("shared", "fromSecond");
 
     ConfigurationLoader loader =
-        ConfigurationLoader.builder().withProperties(props1).withProperties(props2).build();
+        ConfigurationLoader.builder()
+            .withProperties(properties1)
+            .withProperties(properties2)
+            .build();
 
     assertThat(loader.get("key1", null)).isEqualTo("value1");
     assertThat(loader.get("key2", null)).isEqualTo("value2");
