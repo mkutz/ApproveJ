@@ -246,11 +246,14 @@ public class ApprovalBuilder<T> {
                   content, testMethod.getName(), received, sourcePath);
           Files.writeString(pathProvider.receivedPath(), rewritten);
           ReviewResult reviewResult = inlineValueReviewer.apply(pathProvider);
-          if (reviewResult.needsReapproval()) {
-            throw new TestAbortedException(
-                "Inline value updated in source file. Re-run the test to verify.");
-          }
           Files.deleteIfExists(pathProvider.receivedPath());
+          if (reviewResult.needsReapproval()) {
+            String updatedContent = Files.readString(sourcePath);
+            if (!updatedContent.equals(content)) {
+              throw new TestAbortedException(
+                  "Inline value updated in source file. Re-run the test to verify.");
+            }
+          }
         } catch (TestAbortedException aborted) {
           throw aborted;
         } catch (RuntimeException | IOException error) {
