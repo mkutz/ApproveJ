@@ -1,6 +1,23 @@
 # Changelog
 
 
+## v1.6.0
+
+* ✨ **`approvej.properties` editing support**
+  Autocompletion for property keys and values, warnings for unknown or deprecated keys,
+  and suppression of false "unused property" warnings.
+  ([#286](https://github.com/mkutz/ApproveJ/issues/286))
+
+* 🐛 **Fix IndexNotReadyException during startup**
+  Removed `DumbAware` from `ReceivedFileEditorNotificationProvider` to prevent
+  `IndexNotReadyException` when IntelliJ restores files during startup indexing.
+  ([#277](https://github.com/mkutz/ApproveJ/issues/277))
+
+* 🐛 **Clean up diff images alongside received files**
+  The approve and reject actions now also delete `.diff` image files left over from
+  AI-assisted reviews.
+
+
 ## v1.5.2
 
 * 🐛 **Fix nested test class resolution in Kotlin/JUnit 5**
