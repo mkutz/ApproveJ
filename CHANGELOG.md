@@ -234,7 +234,7 @@ Note that the Gradle plugin is still pending release on the Gradle Plugin portal
 
 * 👀 review all unapproved files
   The new task/goal allows to trigger a review on all remaining unapproved received files via `gradle approvejReviewUnapproved` or `mvn approvej:review-unapproved` without needing to re-run all other tests.
-  This uses the currently configured `defaultReviewerScript` or `defaultReviewer`.
+  This uses the currently configured `defaultFileReviewerScript` or `defaultFileReviewer`.
   See [manual](https://approvej.org/#cleanup_review_unapproved)
 
 * 🙈 auto-approve all received files

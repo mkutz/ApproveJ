@@ -12,7 +12,7 @@ public class Approvers {
    * Creates a {@link Approver} using the given previouslyApproved value.
    *
    * @param previouslyApproved the approved value
-   * @return a new {@link InplaceApprover} for the given previouslyApproved value.
+   * @return a new {@link Approver} for the given previouslyApproved value.
    */
   public static Approver value(String previouslyApproved) {
     return new InplaceApprover(previouslyApproved);

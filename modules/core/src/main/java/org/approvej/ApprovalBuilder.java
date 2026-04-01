@@ -10,6 +10,7 @@ import static org.approvej.review.Reviewers.script;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -241,19 +242,20 @@ public class ApprovalBuilder<T> {
     if (inlineValueReviewer instanceof NoneReviewer) {
       return;
     }
+    Path receivedPath = null;
     try {
       Method testMethod = StackTraceTestFinderUtil.currentTestMethod().method();
       Path sourcePath = StackTraceTestFinderUtil.findTestSourcePath(testMethod);
       PathProvider pathProvider =
           new PathProvider(sourcePath.getParent(), sourcePath.getFileName().toString(), "", "", "");
-      String content = Files.readString(sourcePath);
+      receivedPath = pathProvider.receivedPath();
+      String content = Files.readString(sourcePath, StandardCharsets.UTF_8);
       String rewritten =
           InlineValueRewriter.rewriteContent(content, testMethod.getName(), received, sourcePath);
-      Files.writeString(pathProvider.receivedPath(), rewritten);
+      Files.writeString(receivedPath, rewritten, StandardCharsets.UTF_8);
       ReviewResult reviewResult = inlineValueReviewer.apply(pathProvider);
-      Files.deleteIfExists(pathProvider.receivedPath());
       if (reviewResult.needsReapproval()) {
-        String updatedContent = Files.readString(sourcePath);
+        String updatedContent = Files.readString(sourcePath, StandardCharsets.UTF_8);
         if (!updatedContent.equals(content)) {
           throw new TestAbortedException(
               "Inline value updated in source file. Re-run the test to verify.");
@@ -263,6 +265,14 @@ public class ApprovalBuilder<T> {
       throw aborted;
     } catch (RuntimeException | IOException error) {
       LOGGER.warning("Could not auto-update inline value: " + error.getMessage());
+    } finally {
+      if (receivedPath != null) {
+        try {
+          Files.deleteIfExists(receivedPath);
+        } catch (IOException ignored) {
+          // best effort cleanup
+        }
+      }
     }
   }
 
