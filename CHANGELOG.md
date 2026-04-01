@@ -15,11 +15,10 @@
   All reviewer classes have been renamed to remove the "File" prefix, since reviewers are now used for both file-based and inline value approvals.
   `FileReviewer` → `Reviewer`, `NoneFileReviewer` → `NoneReviewer`, `AutomaticFileReviewer` → `AutomaticReviewer`, `ScriptFileReviewer` → `ScriptReviewer`, `AiFileReviewer` → `AiReviewer`, `FileReviewResult` → `ReviewResultRecord`, `FileReviewerProvider` → `ReviewerProvider`.
 
-* ⚠️ **Breaking: Reviewer configuration properties renamed**
-  `defaultFileReviewerScript` is replaced by `reviewerScript` (requires `defaultFileReviewer = script`).
-  `aiReviewerCommand` is replaced by `reviewerAiCommand` (requires `defaultFileReviewer = ai`).
-  The implicit override behavior where `aiReviewerCommand` took priority over `defaultFileReviewer` has been removed.
-  Reviewers must now be configured explicitly via `defaultFileReviewer` or `defaultInlineValueReviewer`.
+* ⚠️ **Deprecated: Reviewer configuration properties renamed**
+  `defaultFileReviewerScript` is deprecated in favor of `defaultFileReviewer = script` with `reviewerScript`.
+  The old property still works but logs a deprecation warning.
+  Reviewers can now be configured explicitly via `defaultFileReviewer` or `defaultInlineValueReviewer`.
 
 
 ## v1.5.2
