@@ -30,6 +30,8 @@ import org.jspecify.annotations.Nullable;
  * @param printer the printer implementing this format
  */
 @NullMarked
+@SuppressWarnings(
+    "java:S3457") // \n is intentional — approval values must use LF for cross-platform consistency
 public record MultiLineStringPrintFormat(Printer<Object> printer)
     implements PrintFormat<Object>, PrintFormatProvider<Object> {
 
