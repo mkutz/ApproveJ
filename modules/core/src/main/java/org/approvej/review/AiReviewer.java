@@ -35,6 +35,7 @@ import org.jspecify.annotations.NullMarked;
  * @param command the AI CLI command to execute (e.g., "claude -p --allowedTools Read")
  */
 @NullMarked
+@SuppressWarnings("java:S3457") // \n is intentional — AI responses and unified diffs always use LF
 record AiReviewer(String command) implements Reviewer {
 
   private static final Logger LOGGER = Logger.getLogger(AiReviewer.class.getName());
@@ -172,14 +173,14 @@ record AiReviewer(String command) implements Reviewer {
       return "";
     }
     StringBuilder result = new StringBuilder();
-    result.append("--- %s%n".formatted(approvedLabel));
-    result.append("+++ %s%n".formatted(receivedLabel));
+    result.append("--- %s\n".formatted(approvedLabel));
+    result.append("+++ %s\n".formatted(receivedLabel));
     for (DiffLine line : diffLines) {
       result.append(
           switch (line.type) {
-            case CONTEXT -> " %s%n".formatted(line.content);
-            case REMOVED -> "-%s%n".formatted(line.content);
-            case ADDED -> "+%s%n".formatted(line.content);
+            case CONTEXT -> " %s\n".formatted(line.content);
+            case REMOVED -> "-%s\n".formatted(line.content);
+            case ADDED -> "+%s\n".formatted(line.content);
           });
     }
     return result.toString();
@@ -309,7 +310,7 @@ record AiReviewer(String command) implements Reviewer {
   }
 
   private static String firstLine(String response) {
-    int newlineIndex = response.indexOf("%n".formatted());
+    int newlineIndex = response.indexOf('\n');
     if (newlineIndex >= 0) {
       return response.substring(0, newlineIndex);
     }
