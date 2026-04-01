@@ -172,14 +172,14 @@ record AiReviewer(String command) implements Reviewer {
       return "";
     }
     StringBuilder result = new StringBuilder();
-    result.append("--- %s\n".formatted(approvedLabel));
-    result.append("+++ %s\n".formatted(receivedLabel));
+    result.append("--- %s%n".formatted(approvedLabel));
+    result.append("+++ %s%n".formatted(receivedLabel));
     for (DiffLine line : diffLines) {
       result.append(
           switch (line.type) {
-            case CONTEXT -> " %s\n".formatted(line.content);
-            case REMOVED -> "-%s\n".formatted(line.content);
-            case ADDED -> "+%s\n".formatted(line.content);
+            case CONTEXT -> " %s%n".formatted(line.content);
+            case REMOVED -> "-%s%n".formatted(line.content);
+            case ADDED -> "+%s%n".formatted(line.content);
           });
     }
     return result.toString();
@@ -309,7 +309,7 @@ record AiReviewer(String command) implements Reviewer {
   }
 
   private static String firstLine(String response) {
-    int newlineIndex = response.indexOf('\n');
+    int newlineIndex = response.indexOf("%n".formatted());
     if (newlineIndex >= 0) {
       return response.substring(0, newlineIndex);
     }
