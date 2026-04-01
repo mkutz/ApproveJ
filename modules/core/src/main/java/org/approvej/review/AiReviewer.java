@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.approvej.approve.PathProvider;
 import org.jspecify.annotations.NullMarked;
@@ -116,7 +117,9 @@ record AiReviewer(String command) implements Reviewer {
       String resolvedCommand = Reviewer.resolveCommand(command, approvedPath, receivedPath);
       String response = executeAiCommand(resolvedCommand, prompt);
 
-      LOGGER.info("AI review result:\n%s".formatted(response));
+      if (LOGGER.isLoggable(Level.INFO)) {
+        LOGGER.info("AI review result:%n%s".formatted(response));
+      }
 
       if (isApproved(response)) {
         move(receivedPath, approvedPath, REPLACE_EXISTING);
@@ -250,14 +253,18 @@ record AiReviewer(String command) implements Reviewer {
     String response = new String(process.getInputStream().readAllBytes(), UTF_8);
     boolean finished = process.waitFor(TIMEOUT_MINUTES, TimeUnit.MINUTES);
     if (!finished) {
-      LOGGER.info(
-          "AI command timed out after %d minutes, destroying process".formatted(TIMEOUT_MINUTES));
+      if (LOGGER.isLoggable(Level.INFO)) {
+        LOGGER.info(
+            "AI command timed out after %d minutes, destroying process".formatted(TIMEOUT_MINUTES));
+      }
       process.destroyForcibly();
       return "";
     }
     int exitCode = process.exitValue();
     if (exitCode != 0) {
-      LOGGER.info("AI command exited with code %d, response: %s".formatted(exitCode, response));
+      if (LOGGER.isLoggable(Level.INFO)) {
+        LOGGER.info("AI command exited with code %d, response: %s".formatted(exitCode, response));
+      }
       return "";
     }
     return response;

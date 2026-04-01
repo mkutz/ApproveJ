@@ -231,36 +231,38 @@ public class ApprovalBuilder<T> {
     Approver approver = value(previouslyApproved);
     ApprovalResult result = approver.apply(String.valueOf(value));
     if (result.needsApproval()) {
-      Reviewer inlineValueReviewer = configuration.defaultInlineValueReviewer();
-      if (!(inlineValueReviewer instanceof NoneReviewer)) {
-        try {
-          Method testMethod = StackTraceTestFinderUtil.currentTestMethod().method();
-          Path sourcePath = StackTraceTestFinderUtil.findTestSourcePath(testMethod);
-          String received = String.valueOf(value).trim();
-          PathProvider pathProvider =
-              new PathProvider(
-                  sourcePath.getParent(), sourcePath.getFileName().toString(), "", "", "");
-          String content = Files.readString(sourcePath);
-          String rewritten =
-              InlineValueRewriter.rewriteContent(
-                  content, testMethod.getName(), received, sourcePath);
-          Files.writeString(pathProvider.receivedPath(), rewritten);
-          ReviewResult reviewResult = inlineValueReviewer.apply(pathProvider);
-          Files.deleteIfExists(pathProvider.receivedPath());
-          if (reviewResult.needsReapproval()) {
-            String updatedContent = Files.readString(sourcePath);
-            if (!updatedContent.equals(content)) {
-              throw new TestAbortedException(
-                  "Inline value updated in source file. Re-run the test to verify.");
-            }
-          }
-        } catch (TestAbortedException aborted) {
-          throw aborted;
-        } catch (RuntimeException | IOException error) {
-          LOGGER.warning("Could not auto-update inline value: " + error.getMessage());
+      reviewInlineValue(String.valueOf(value).trim());
+      throw new ApprovalError(result.received(), result.previouslyApproved());
+    }
+  }
+
+  private void reviewInlineValue(String received) {
+    Reviewer inlineValueReviewer = configuration.defaultInlineValueReviewer();
+    if (inlineValueReviewer instanceof NoneReviewer) {
+      return;
+    }
+    try {
+      Method testMethod = StackTraceTestFinderUtil.currentTestMethod().method();
+      Path sourcePath = StackTraceTestFinderUtil.findTestSourcePath(testMethod);
+      PathProvider pathProvider =
+          new PathProvider(sourcePath.getParent(), sourcePath.getFileName().toString(), "", "", "");
+      String content = Files.readString(sourcePath);
+      String rewritten =
+          InlineValueRewriter.rewriteContent(content, testMethod.getName(), received, sourcePath);
+      Files.writeString(pathProvider.receivedPath(), rewritten);
+      ReviewResult reviewResult = inlineValueReviewer.apply(pathProvider);
+      Files.deleteIfExists(pathProvider.receivedPath());
+      if (reviewResult.needsReapproval()) {
+        String updatedContent = Files.readString(sourcePath);
+        if (!updatedContent.equals(content)) {
+          throw new TestAbortedException(
+              "Inline value updated in source file. Re-run the test to verify.");
         }
       }
-      throw new ApprovalError(result.received(), result.previouslyApproved());
+    } catch (TestAbortedException aborted) {
+      throw aborted;
+    } catch (RuntimeException | IOException error) {
+      LOGGER.warning("Could not auto-update inline value: " + error.getMessage());
     }
   }
 

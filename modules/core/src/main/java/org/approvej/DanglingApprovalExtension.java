@@ -21,7 +21,9 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 public class DanglingApprovalExtension implements AfterEachCallback {
 
   /** Creates a new {@link DanglingApprovalExtension}. */
-  public DanglingApprovalExtension() {}
+  public DanglingApprovalExtension() {
+    // required for JUnit Jupiter extension discovery
+  }
 
   @Override
   public void afterEach(ExtensionContext context) {
