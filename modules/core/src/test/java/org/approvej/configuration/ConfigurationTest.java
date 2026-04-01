@@ -71,9 +71,10 @@ class ConfigurationTest {
   }
 
   @Test
-  void loadConfiguration_fileReviewerScript() {
+  void loadConfiguration_reviewerScript() {
     Properties properties = new Properties();
-    properties.setProperty("defaultReviewerScript", "diff {receivedFile} {approvedFile}");
+    properties.setProperty("defaultFileReviewer", "script");
+    properties.setProperty("reviewerScript", "diff {receivedFile} {approvedFile}");
 
     ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
@@ -225,9 +226,10 @@ class ConfigurationTest {
   }
 
   @Test
-  void loadConfiguration_aiReviewerCommand() {
+  void loadConfiguration_reviewerAiCommand() {
     Properties properties = new Properties();
-    properties.setProperty("aiReviewerCommand", "claude -p");
+    properties.setProperty("defaultFileReviewer", "ai");
+    properties.setProperty("reviewerAiCommand", "claude -p");
     ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
     Configuration config = Configuration.loadConfiguration(loader);
@@ -236,15 +238,25 @@ class ConfigurationTest {
   }
 
   @Test
-  void loadConfiguration_aiReviewerCommand_takes_priority_over_fileReviewerScript() {
+  void loadConfiguration_reviewerScript_without_property_throws() {
     Properties properties = new Properties();
-    properties.setProperty("aiReviewerCommand", "claude -p");
-    properties.setProperty("defaultReviewerScript", "diff {receivedFile} {approvedFile}");
+    properties.setProperty("defaultFileReviewer", "script");
     ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
 
-    Configuration config = Configuration.loadConfiguration(loader);
+    assertThatExceptionOfType(ConfigurationError.class)
+        .isThrownBy(() -> Configuration.loadConfiguration(loader))
+        .withMessageContaining("reviewerScript");
+  }
 
-    assertThat(config.defaultFileReviewer().getClass().getSimpleName()).isEqualTo("AiReviewer");
+  @Test
+  void loadConfiguration_reviewerAiCommand_without_property_throws() {
+    Properties properties = new Properties();
+    properties.setProperty("defaultFileReviewer", "ai");
+    ConfigurationLoader loader = ConfigurationLoader.builder().withProperties(properties).build();
+
+    assertThatExceptionOfType(ConfigurationError.class)
+        .isThrownBy(() -> Configuration.loadConfiguration(loader))
+        .withMessageContaining("reviewerAiCommand");
   }
 
   @Test

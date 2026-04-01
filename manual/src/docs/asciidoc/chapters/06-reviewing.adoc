@@ -29,7 +29,8 @@ Since each developer on a team may prefer a different diff tool, the best place 
 .`~/.config/approvej/approvej.properties`
 [source,properties]
 ----
-defaultFileReviewerScript = idea diff --wait "{receivedFile}" "{approvedFile}"
+defaultFileReviewer = script
+reviewerScript = idea diff --wait "{receivedFile}" "{approvedFile}"
 ----
 
 The script can contain the following placeholders:
@@ -137,15 +138,14 @@ This is especially useful for image approvals, where multimodal AI can visually 
 NOTE: AI-assisted review targets local development.
 It requires an AI CLI tool (e.g., `claude`, `gemini`, `codex`) installed locally.
 
-To enable AI-assisted review, configure the `aiReviewerCommand` property in your `approvej.properties`:
+To enable AI-assisted review, set `defaultFileReviewer` to `ai` and configure the `reviewerAiCommand` property:
 
 .`~/.config/approvej/approvej.properties`
 [source,properties]
 ----
-aiReviewerCommand = claude -p --allowedTools Read
+defaultFileReviewer = ai
+reviewerAiCommand = claude -p --allowedTools Read
 ----
-
-This property takes priority over `defaultFileReviewer` and `defaultFileReviewerScript`.
 
 The command can contain `\{receivedFile}` and `\{approvedFile}` placeholders, which will be replaced with the actual file paths.
 

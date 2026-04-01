@@ -24,9 +24,12 @@ import org.jspecify.annotations.Nullable;
  *
  * <ul>
  *   <li>Aliases (e.g., "json", "yaml", "singleLineString", "multiLineString" for print formats;
- *       "none", "automatic" for reviewers)
+ *       "none", "automatic", "script", "ai" for reviewers)
  *   <li>Fully-qualified class names (for backward compatibility and custom implementations)
  * </ul>
+ *
+ * <p>The "script" reviewer requires the {@code reviewerScript} property to be set. The "ai"
+ * reviewer requires the {@code reviewerAiCommand} property to be set.
  *
  * @param defaultPrintFormat the {@link PrintFormat} that will be used if none is specified
  *     otherwise
@@ -45,8 +48,8 @@ public record Configuration(
 
   private static final String DEFAULT_PRINT_FORMAT_PROPERTY = "defaultPrintFormat";
   private static final String DEFAULT_FILE_REVIEWER_PROPERTY = "defaultFileReviewer";
-  private static final String DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY = "defaultFileReviewerScript";
-  private static final String AI_REVIEWER_COMMAND_PROPERTY = "aiReviewerCommand";
+  private static final String REVIEWER_SCRIPT_PROPERTY = "reviewerScript";
+  private static final String REVIEWER_AI_COMMAND_PROPERTY = "reviewerAiCommand";
   private static final String INVENTORY_ENABLED_PROPERTY = "inventoryEnabled";
   private static final String DEFAULT_INLINE_VALUE_REVIEWER_PROPERTY = "defaultInlineValueReviewer";
 
@@ -58,11 +61,13 @@ public record Configuration(
     String printFormatConfig = loader.get(DEFAULT_PRINT_FORMAT_PROPERTY, "singleLineString");
     PrintFormat<Object> printFormat = resolvePrintFormat(printFormatConfig);
 
-    Reviewer fileReviewer = resolveReviewer(loader, DEFAULT_FILE_REVIEWER_PROPERTY);
+    Reviewer fileReviewer =
+        resolveReviewer(loader, loader.get(DEFAULT_FILE_REVIEWER_PROPERTY, "none"));
 
     boolean inventoryEnabled = resolveInventoryEnabled(loader);
 
-    Reviewer inlineValueReviewer = resolveReviewer(loader, DEFAULT_INLINE_VALUE_REVIEWER_PROPERTY);
+    Reviewer inlineValueReviewer =
+        resolveReviewer(loader, loader.get(DEFAULT_INLINE_VALUE_REVIEWER_PROPERTY, "none"));
 
     return new Configuration(printFormat, fileReviewer, inventoryEnabled, inlineValueReviewer);
   }
@@ -75,23 +80,28 @@ public record Configuration(
     return Registry.resolve(aliasOrClassName, PrintFormat.class);
   }
 
-  private static Reviewer resolveReviewer(ConfigurationLoader loader, String reviewerProperty) {
-    String explicit = loader.get(reviewerProperty);
-    if (explicit != null) {
-      return Registry.resolve(explicit, Reviewer.class);
+  private static Reviewer resolveReviewer(ConfigurationLoader loader, String aliasOrClassName) {
+    if ("script".equals(aliasOrClassName)) {
+      String script = loader.get(REVIEWER_SCRIPT_PROPERTY);
+      if (script == null) {
+        throw new ConfigurationError(
+            "Reviewer 'script' requires the '%s' property to be set"
+                .formatted(REVIEWER_SCRIPT_PROPERTY),
+            null);
+      }
+      return Reviewers.script(script);
     }
-
-    String aiCommand = loader.get(AI_REVIEWER_COMMAND_PROPERTY);
-    if (aiCommand != null) {
+    if ("ai".equals(aliasOrClassName)) {
+      String aiCommand = loader.get(REVIEWER_AI_COMMAND_PROPERTY);
+      if (aiCommand == null) {
+        throw new ConfigurationError(
+            "Reviewer 'ai' requires the '%s' property to be set"
+                .formatted(REVIEWER_AI_COMMAND_PROPERTY),
+            null);
+      }
       return Reviewers.ai(aiCommand);
     }
-
-    String reviewerScript = loader.get(DEFAULT_FILE_REVIEWER_SCRIPT_PROPERTY);
-    if (reviewerScript != null) {
-      return Reviewers.script(reviewerScript);
-    }
-
-    return Registry.resolve("none", Reviewer.class);
+    return Registry.resolve(aliasOrClassName, Reviewer.class);
   }
 
   private static boolean resolveInventoryEnabled(ConfigurationLoader loader) {
