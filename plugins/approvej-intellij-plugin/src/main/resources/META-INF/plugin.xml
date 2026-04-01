@@ -6,12 +6,14 @@
   <description><![CDATA[
     Approval testing support for ApproveJ.
     Provides diff viewing, one-click approval, bidirectional navigation between
-    test code and approved files, dangling approval detection, and duplicate
-    unnamed approval detection.
+    test code and approved files, dangling approval detection, duplicate
+    unnamed approval detection, and approvej.properties editing support
+    with autocompletion and validation.
   ]]></description>
 
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.java</depends>
+  <depends>com.intellij.properties</depends>
 
   <extensions defaultExtensionNs="com.intellij">
     <dependencySupport kind="java" coordinate="org.approvej:core" displayName="ApproveJ"/>
@@ -52,6 +54,19 @@
         implementation="org.approvej.intellij.ApproveJRenamePsiElementProcessor"/>
     <refactoring.elementListenerProvider
         implementation="org.approvej.intellij.ApproveJRefactoringListenerProvider"/>
+    <localInspection
+        language="Properties"
+        groupName="ApproveJ"
+        shortName="ApproveJUnknownProperty"
+        displayName="Unknown or deprecated ApproveJ property key"
+        enabledByDefault="true"
+        level="WARNING"
+        implementationClass="org.approvej.intellij.ApproveJPropertiesInspection"/>
+    <completion.contributor
+        language="Properties"
+        implementationClass="org.approvej.intellij.ApproveJPropertiesCompletionContributor"/>
+    <properties.implicitPropertyUsageProvider
+        implementation="org.approvej.intellij.ApproveJImplicitPropertyUsageProvider"/>
   </extensions>
 
   <actions>

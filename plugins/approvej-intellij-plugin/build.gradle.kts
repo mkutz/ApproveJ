@@ -45,6 +45,8 @@ intellijPlatform {
             to the test method.</li>
         <li><b>Dangling approval inspection</b> — highlights <code>approve()</code> calls missing a
             terminal method and offers quick fixes.</li>
+        <li><b>Properties file support</b> — autocompletion, unknown key warnings, and deprecation
+            hints for <code>approvej.properties</code> files.</li>
       </ul>
 
       <p>See the <a href="https://approvej.org/#intellij_plugin">documentation</a> for details.</p>
@@ -79,6 +81,7 @@ dependencies {
   intellijPlatform {
     intellijIdeaCommunity(libs.versions.intellij.ide)
     bundledPlugin("com.intellij.java")
+    bundledPlugin("com.intellij.properties")
     testFramework(TestFrameworkType.Platform)
     testFramework(TestFrameworkType.Plugin.Java)
   }
