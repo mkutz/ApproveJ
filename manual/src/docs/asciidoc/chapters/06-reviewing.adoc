@@ -46,7 +46,7 @@ Here are configuration examples for common diff tools:
 [source,properties]
 .IntelliJ IDEA (blocking)
 ----
-defaultFileReviewerScript = idea diff --wait "{receivedFile}" "{approvedFile}"
+reviewerScript = idea diff --wait "{receivedFile}" "{approvedFile}"
 ----
 
 TIP: The <<intellij_plugin,ApproveJ IntelliJ plugin>> lets you view diffs and approve received files directly in the IDE — handy when you want to review changes without re-running the test to trigger the reviewer script.
@@ -54,26 +54,29 @@ TIP: The <<intellij_plugin,ApproveJ IntelliJ plugin>> lets you view diffs and ap
 [source,properties]
 .VS Code (blocking)
 ----
-defaultFileReviewerScript = code --wait --diff "{receivedFile}" "{approvedFile}"
+reviewerScript = code --wait --diff "{receivedFile}" "{approvedFile}"
 ----
 
 [source,properties]
 .Beyond Compare (blocking, macOS)
 ----
-defaultFileReviewerScript = bcomp -wait "{receivedFile}" "{approvedFile}"
+reviewerScript = bcomp -wait "{receivedFile}" "{approvedFile}"
 ----
 
 [source,properties]
 .Meld (blocking)
 ----
-defaultFileReviewerScript = meld "{receivedFile}" "{approvedFile}"
+reviewerScript = meld "{receivedFile}" "{approvedFile}"
 ----
 
 [source,properties]
 .vimdiff (blocking)
 ----
-defaultFileReviewerScript = vimdiff "{receivedFile}" "{approvedFile}"
+reviewerScript = vimdiff "{receivedFile}" "{approvedFile}"
 ----
+
+NOTE: The deprecated `defaultFileReviewerScript` property still works but logs a warning.
+Migrate to `defaultFileReviewer = script` with `reviewerScript` instead.
 
 You can also set this per project in `src/test/resources/approvej.properties` or via an environment variable (see <<configuration>>).
 
@@ -154,19 +157,19 @@ Here are configuration examples for common AI CLI tools:
 [source,properties]
 .Claude (with image support via Read tool)
 ----
-aiReviewerCommand = claude -p --allowedTools Read
+reviewerAiCommand = claude -p --allowedTools Read
 ----
 
 [source,properties]
 .Gemini
 ----
-aiReviewerCommand = gemini
+reviewerAiCommand = gemini
 ----
 
 [source,properties]
 .Codex
 ----
-aiReviewerCommand = codex
+reviewerAiCommand = codex
 ----
 
 For **text files**, ApproveJ generates a unified diff and sends it to the AI as part of the prompt.

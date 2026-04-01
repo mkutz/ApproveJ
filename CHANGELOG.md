@@ -1,24 +1,34 @@
 # Changelog
 
 
-## Unreleased
+## v1.6.0
 
 ### core
+
+* ✨ **AI-assisted file reviewer**
+  A new `ai` reviewer that calls an AI CLI tool (e.g., Claude, Gemini, Codex) to review differences between received and approved files.
+  Configure with `defaultFileReviewer = ai` and `reviewerAiCommand = claude -p --allowedTools Read`.
+  Supports text diffs and image comparisons.
+  ([#275](https://github.com/mkutz/ApproveJ/issues/275))
 
 * ✨ **Auto-update inline values**
   `byValue()` can now automatically rewrite the string literal in the test source file when a mismatch is detected.
   Configure `defaultInlineValueReviewer = automatic` in `approvej.properties` to enable.
+  You can also use `script` or `ai` to review changes via a diff tool or AI before applying them.
   Supports Java, Kotlin, Groovy, and Scala source files.
   ([#283](https://github.com/mkutz/ApproveJ/issues/283))
+
+* 🛠️ **Explicit reviewer configuration**
+  Reviewer configuration is now explicit: set `defaultFileReviewer` (or `defaultInlineValueReviewer`) to `none`, `automatic`, `script`, or `ai`.
+  The `script` reviewer reads its command from the new `reviewerScript` property.
+  The `ai` reviewer reads its command from the new `reviewerAiCommand` property.
+  The old `defaultFileReviewerScript` property still works but is deprecated and logs a warning.
 
 * 🛠️ **Rename `FileReviewer` to `Reviewer`**
   All reviewer classes have been renamed to remove the "File" prefix, since reviewers are now used for both file-based and inline value approvals.
   `FileReviewer` → `Reviewer`, `NoneFileReviewer` → `NoneReviewer`, `AutomaticFileReviewer` → `AutomaticReviewer`, `ScriptFileReviewer` → `ScriptReviewer`, `AiFileReviewer` → `AiReviewer`, `FileReviewResult` → `ReviewResultRecord`, `FileReviewerProvider` → `ReviewerProvider`.
 
-* ⚠️ **Deprecated: Reviewer configuration properties renamed**
-  `defaultFileReviewerScript` is deprecated in favor of `defaultFileReviewer = script` with `reviewerScript`.
-  The old property still works but logs a deprecation warning.
-  Reviewers can now be configured explicitly via `defaultFileReviewer` or `defaultInlineValueReviewer`.
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.5.2...v1.6.0
 
 
 ## v1.5.2

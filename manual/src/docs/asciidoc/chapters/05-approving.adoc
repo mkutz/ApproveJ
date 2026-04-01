@@ -10,7 +10,7 @@ You conclude the link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html[`Appr
 The link:{javadoc-url}/core/org/approvej/ApprovalBuilder.html#byValue(java.lang.String)[`ApprovalBuilder.byValue()`] method will use an link:{javadoc-url}/core/org/approvej/approve/InplaceApprover.html[`InplaceApprover`] to approve the received value by comparison with a directly provided previously approved value.
 That way, the approved value is plainly visible in the test code.
 However, this might not be practical for large objects.
-It also does not allow to use a diff tool to compare the result with the previously approved value.
+For automated updating and diff tool support, see <<approve_by_value_auto_update>>.
 
 [source,java,indent=0,role="primary"]
 .Java
