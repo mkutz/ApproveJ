@@ -38,11 +38,26 @@ To automate this, set the `defaultInlineValueReviewer` property to `automatic`:
 defaultInlineValueReviewer = automatic
 ----
 
-With this enabled, a `byValue()` mismatch will automatically rewrite the string argument in the test source file with the received value.
-The test will then fail with a message to re-run the test.
-On re-run, the test passes because the values now match.
+With this enabled, a `byValue()` mismatch will:
 
-Since this uses the same <<reviewing,reviewer>> mechanism as `byFile()`, you can also configure a `script` or `ai` reviewer to show a diff tool or have an AI review the change before applying it.
+1. Rewrite the string argument in the test source file with the received value.
+2. **Abort** the test (not fail it) with the message "Inline value updated in source file. Re-run the test to verify."
+3. On re-run, the test passes because the source code and the received value now match.
+
+The test is marked as _aborted_ (not _failed_) in the test runner because the source file was updated but the JVM is still running the old bytecode.
+A re-run is always necessary to verify the updated value — unlike <<approve_by_file,file-based approvals>>, where the reviewer can update the approved file and the test re-checks it in the same run.
+
+Since this uses the same <<reviewing,reviewer>> mechanism as `byFile()`, you can also configure a `script` reviewer to show a diff tool or an `ai` reviewer to have an AI review the change:
+
+[source,properties]
+----
+# show a diff tool for inline value changes
+defaultInlineValueReviewer = script
+reviewerScript = idea diff --wait "{receivedFile}" "{approvedFile}"
+----
+
+With a `script` or `ai` reviewer, the reviewer is invoked with the original source file as the "approved" file and a temporary rewritten copy as the "received" file.
+If the reviewer approves the change (e.g. the user saves the changes in the diff tool), the test source is updated and the test is aborted for re-run.
 
 [source,java,indent=0,role="primary"]
 .Java

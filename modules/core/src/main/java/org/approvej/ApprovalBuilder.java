@@ -29,6 +29,7 @@ import org.approvej.review.ReviewResult;
 import org.approvej.review.Reviewer;
 import org.approvej.scrub.Scrubber;
 import org.jspecify.annotations.NullMarked;
+import org.opentest4j.TestAbortedException;
 
 /**
  * A builder to configure an approval for a given value.
@@ -215,7 +216,9 @@ public class ApprovalBuilder<T> {
    * <p>When the {@link org.approvej.configuration.Configuration#defaultInlineValueReviewer()} is
    * configured (e.g. as {@code automatic}), a mismatch will trigger the reviewer. The {@code
    * automatic} reviewer rewrites the string literal in the test source file with the received value
-   * and fails the test so the developer can verify the change and re-run.
+   * and aborts the test with a {@link TestAbortedException} so the developer can verify the change
+   * and re-run. The test is aborted rather than failed because the JVM is still running the old
+   * bytecode and a re-run is always necessary.
    *
    * @param previouslyApproved the approved value
    */
@@ -244,11 +247,12 @@ public class ApprovalBuilder<T> {
           Files.writeString(pathProvider.receivedPath(), rewritten);
           ReviewResult reviewResult = inlineValueReviewer.apply(pathProvider);
           if (reviewResult.needsReapproval()) {
-            throw new ApprovalError("Inline value updated. Re-run the test.");
+            throw new TestAbortedException(
+                "Inline value updated in source file. Re-run the test to verify.");
           }
           Files.deleteIfExists(pathProvider.receivedPath());
-        } catch (ApprovalError approvalError) {
-          throw approvalError;
+        } catch (TestAbortedException aborted) {
+          throw aborted;
         } catch (RuntimeException | IOException error) {
           LOGGER.warning("Could not auto-update inline value: " + error.getMessage());
         }
