@@ -118,7 +118,7 @@ record AiReviewer(String command) implements Reviewer {
       String response = executeAiCommand(resolvedCommand, prompt);
 
       if (LOGGER.isLoggable(Level.INFO)) {
-        LOGGER.info("AI review result:%n%s".formatted(response));
+        LOGGER.info("AI review result:\n%s".formatted(response));
       }
 
       if (isApproved(response)) {
