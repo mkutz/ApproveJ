@@ -41,14 +41,12 @@ public class InlineValueRewriter {
    * @param newValue the new value to write as a text block argument
    */
   public static void rewrite(Path sourcePath, String methodName, String newValue) {
-    Language language = Language.fromPath(sourcePath);
-
     Path absolutePath = sourcePath.toAbsolutePath();
     ReentrantLock lock = FILE_LOCKS.computeIfAbsent(absolutePath, path -> new ReentrantLock());
     lock.lock();
     try {
       String content = Files.readString(sourcePath, StandardCharsets.UTF_8);
-      String rewritten = rewriteContent(content, methodName, newValue, language);
+      String rewritten = rewriteContent(content, methodName, newValue, sourcePath);
       Files.writeString(sourcePath, rewritten, StandardCharsets.UTF_8);
     } catch (IOException exception) {
       throw new InlineValueError("Failed to rewrite inline value in " + sourcePath, exception);
@@ -324,139 +322,74 @@ public class InlineValueRewriter {
 
   /** Language-specific rules for text block delimiters, escaping, and suffixes. */
   enum Language {
-    JAVA {
-      private static final String DELIMITER = "\"\"\"";
-
-      @Override
-      String delimiter() {
-        return DELIMITER;
-      }
-
+    JAVA("\"\"\"", "", "", false) {
       @Override
       String escapeValue(String value) {
-        return value.replace("\\", "\\\\").replace(DELIMITER, "\\" + DELIMITER);
-      }
-
-      @Override
-      String suffix() {
-        return "";
-      }
-
-      @Override
-      String linePrefix() {
-        return "";
-      }
-
-      @Override
-      boolean supportsBacktickMethodNames() {
-        return false;
+        return value.replace("\\", "\\\\").replace(delimiter(), "\\" + delimiter());
       }
     },
 
-    KOTLIN {
-      private static final String DELIMITER = "\"\"\"";
-
-      @Override
-      String delimiter() {
-        return DELIMITER;
-      }
-
+    KOTLIN("\"\"\"", ".trimIndent()", "", true) {
       @Override
       String escapeValue(String value) {
-        if (value.contains(DELIMITER)) {
-          throw new InlineValueError(
-              "Cannot rewrite inline value: Kotlin raw strings cannot contain " + DELIMITER);
-        }
+        rejectDelimiterInValue(value);
         return value.replace("$", "${'$'}");
       }
+    },
 
+    GROOVY("'''", ".stripIndent()", "", false) {
       @Override
-      String suffix() {
-        return ".trimIndent()";
-      }
-
-      @Override
-      String linePrefix() {
-        return "";
-      }
-
-      @Override
-      boolean supportsBacktickMethodNames() {
-        return true;
+      String escapeValue(String value) {
+        return value.replace("\\", "\\\\").replace(delimiter(), "\\'\\'\\'");
       }
     },
 
-    GROOVY {
-      private static final String DELIMITER = "'''";
-
-      @Override
-      String delimiter() {
-        return DELIMITER;
-      }
-
+    SCALA("\"\"\"", ".stripMargin", "|", true) {
       @Override
       String escapeValue(String value) {
-        return value.replace("\\", "\\\\").replace(DELIMITER, "\\'\\'\\'");
-      }
-
-      @Override
-      String suffix() {
-        return ".stripIndent()";
-      }
-
-      @Override
-      String linePrefix() {
-        return "";
-      }
-
-      @Override
-      boolean supportsBacktickMethodNames() {
-        return false;
-      }
-    },
-
-    SCALA {
-      private static final String DELIMITER = "\"\"\"";
-
-      @Override
-      String delimiter() {
-        return DELIMITER;
-      }
-
-      @Override
-      String escapeValue(String value) {
-        if (value.contains(DELIMITER)) {
-          throw new InlineValueError(
-              "Cannot rewrite inline value: Scala raw strings cannot contain " + DELIMITER);
-        }
+        rejectDelimiterInValue(value);
         return value;
-      }
-
-      @Override
-      String suffix() {
-        return ".stripMargin";
-      }
-
-      @Override
-      String linePrefix() {
-        return "|";
-      }
-
-      @Override
-      boolean supportsBacktickMethodNames() {
-        return true;
       }
     };
 
-    abstract String delimiter();
+    private final String delimiter;
+    private final String suffix;
+    private final String linePrefix;
+    private final boolean supportsBacktickMethodNames;
+
+    Language(
+        String delimiter, String suffix, String linePrefix, boolean supportsBacktickMethodNames) {
+      this.delimiter = delimiter;
+      this.suffix = suffix;
+      this.linePrefix = linePrefix;
+      this.supportsBacktickMethodNames = supportsBacktickMethodNames;
+    }
+
+    String delimiter() {
+      return delimiter;
+    }
 
     abstract String escapeValue(String value);
 
-    abstract String suffix();
+    String suffix() {
+      return suffix;
+    }
 
-    abstract String linePrefix();
+    String linePrefix() {
+      return linePrefix;
+    }
 
-    abstract boolean supportsBacktickMethodNames();
+    boolean supportsBacktickMethodNames() {
+      return supportsBacktickMethodNames;
+    }
+
+    void rejectDelimiterInValue(String value) {
+      if (value.contains(delimiter)) {
+        throw new InlineValueError(
+            "Cannot rewrite inline value: %s raw strings cannot contain %s"
+                .formatted(name(), delimiter));
+      }
+    }
 
     static Language fromPath(Path path) {
       String filename = path.getFileName().toString();

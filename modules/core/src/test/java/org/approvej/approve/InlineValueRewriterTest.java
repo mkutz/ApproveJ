@@ -1053,7 +1053,8 @@ class InlineValueRewriterTest {
                 InlineValueRewriter.rewriteContent(
                     content, "test", "contains \"\"\" quotes", InlineValueRewriter.Language.KOTLIN))
         .isInstanceOf(InlineValueError.class)
-        .hasMessageContaining("Kotlin raw strings cannot contain");
+        .hasMessageContaining("KOTLIN")
+        .hasMessageContaining("raw strings cannot contain");
   }
 
   @Test
@@ -1073,7 +1074,8 @@ class InlineValueRewriterTest {
                 InlineValueRewriter.rewriteContent(
                     content, "test", "contains \"\"\" quotes", InlineValueRewriter.Language.SCALA))
         .isInstanceOf(InlineValueError.class)
-        .hasMessageContaining("Scala raw strings cannot contain");
+        .hasMessageContaining("SCALA")
+        .hasMessageContaining("raw strings cannot contain");
   }
 
   @Test
