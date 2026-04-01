@@ -265,14 +265,14 @@ class ConfigurationTest {
     properties1.setProperty("key1", "value1");
     properties1.setProperty("shared", "fromFirst");
 
-    Properties propertiess2 = new Properties();
-    propertiess2.setProperty("key2", "value2");
-    propertiess2.setProperty("shared", "fromSecond");
+    Properties properties2 = new Properties();
+    properties2.setProperty("key2", "value2");
+    properties2.setProperty("shared", "fromSecond");
 
     ConfigurationLoader loader =
         ConfigurationLoader.builder()
             .withProperties(properties1)
-            .withProperties(propertiess2)
+            .withProperties(properties2)
             .build();
 
     assertThat(loader.get("key1", null)).isEqualTo("value1");
