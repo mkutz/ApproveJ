@@ -12,13 +12,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 class CompareTestAction : AnAction() {
 
   override fun update(event: AnActionEvent) {
-    val project = event.project
-    val proxy = event.getData(AbstractTestProxy.DATA_KEY)
-    event.presentation.isEnabledAndVisible =
-      project != null &&
-        proxy != null &&
-        proxy.isLeaf &&
-        TestProxyUtil.findReceivedFiles(proxy, project).isNotEmpty()
+    event.presentation.isEnabledAndVisible = TestProxyUtil.isActionAvailable(event)
   }
 
   override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
