@@ -83,7 +83,8 @@
           text="Approve Received"
           description="Copy received file content to approved file and delete received file"/>
     </group>
-    <group id="ApproveJ.TestTree" text="ApproveJ" popup="true">
+    <group id="ApproveJ.TestTree" text="ApproveJ" popup="true"
+        icon="/icons/approvej.svg">
       <add-to-group group-id="TestTreePopupMenu"
           anchor="before" relative-to-action="EditSource"/>
       <action id="ApproveJ.ApproveTest"
