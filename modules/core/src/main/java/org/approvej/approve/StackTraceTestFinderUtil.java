@@ -32,10 +32,17 @@ public class StackTraceTestFinderUtil {
         .flatMap(
             element -> {
               try {
+                Class<?> clazz = Class.forName(element.getClassName());
                 String methodName =
-                    element.getMethodName().replaceAll("^lambda\\$([^$]+)\\$\\d$", "$1");
-                return stream(Class.forName(element.getClassName()).getDeclaredMethods())
-                    .filter(method -> method.getName().equals(methodName));
+                    element.getMethodName().replaceAll("^lambda\\$([^$]+)\\$\\d+$", "$1");
+                Stream<Method> directMethods =
+                    stream(clazz.getDeclaredMethods())
+                        .filter(method -> method.getName().equals(methodName));
+                Method enclosingMethod = clazz.getEnclosingMethod();
+                if (enclosingMethod != null) {
+                  return Stream.concat(directMethods, Stream.of(enclosingMethod));
+                }
+                return directMethods;
               } catch (NoClassDefFoundError | ClassNotFoundException e) {
                 return Stream.empty();
               }

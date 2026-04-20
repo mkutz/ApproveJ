@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -51,6 +52,34 @@ class StackTraceTestFinderUtilTest {
     assertThat(currentTestMethod.method()).isEqualTo(thisMethod);
     assertThat(currentTestMethod.testClass()).isEqualTo(thisMethod.getDeclaringClass());
     assertThat(currentTestMethod.testCaseName()).isEqualTo(thisMethod.getName());
+  }
+
+  @Test
+  void currentTestMethod_called_from_kotlin_like_lambda_on_separate_thread() throws Exception {
+    // Simulates Awaitility's untilAsserted with a Kotlin lambda:
+    // - Awaitility runs the assertion on a polling thread (test method not in stack trace)
+    // - Kotlin lambda compiles to anonymous class (no lambda$ method name pattern)
+    AtomicReference<TestMethod> result = new AtomicReference<>();
+    AtomicReference<Throwable> error = new AtomicReference<>();
+
+    Thread thread =
+        new Thread(
+            new Runnable() {
+              @Override
+              public void run() {
+                try {
+                  result.set(StackTraceTestFinderUtil.currentTestMethod());
+                } catch (Throwable throwable) {
+                  error.set(throwable);
+                }
+              }
+            });
+    thread.start();
+    thread.join();
+
+    assertThat(error.get()).isNull();
+    assertThat(result.get().testCaseName())
+        .isEqualTo("currentTestMethod_called_from_kotlin_like_lambda_on_separate_thread");
   }
 
   @Test
