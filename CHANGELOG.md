@@ -1,6 +1,21 @@
 # Changelog
 
 
+## v1.6.1
+
+### core
+
+* 🐛 **Fix test method detection in Kotlin lambdas on separate threads**
+  `StackTraceTestFinderUtil` failed to find the test method when `approve().byFile()` was called
+  from a Kotlin lambda running on a separate thread (e.g. Awaitility's `untilAsserted`).
+  The utility now falls back to `Class.getEnclosingMethod()` to resolve the test method
+  from anonymous inner classes.
+  Also fixed the lambda name regex to support multi-digit indices.
+  ([#98](https://github.com/mkutz/ApproveJ/issues/98))
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.6.0...v1.6.1
+
+
 ## v1.6.0
 
 ### core
