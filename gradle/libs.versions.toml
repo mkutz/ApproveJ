@@ -65,7 +65,7 @@ asciidoctor-pdf = { id = "org.asciidoctor.jvm.pdf", version = "4.0.5" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-platform" }
 jreleaser = { id = "org.jreleaser", version = "1.23.0" }
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.3.20" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.3.21" }
 maven-plugin-development = { id = "org.gradlex.maven-plugin-development", version = "1.0.3" }
 plugin-publish = { id = "com.gradle.plugin-publish", version = "2.1.1" }
 sonar = { id = "org.sonarqube", version = "7.2.3.7755" }
