@@ -31,8 +31,8 @@ class ApprovingDocTest {
     approve(person)
       .byValue(
         """
-      Person[name=John Doe, birthDate=1990-01-01]
-    """
+        Person[name=John Doe, birthDate=1990-01-01]
+        """
           .trimIndent()
       )
     // end::approve_inplace_auto_update[]

@@ -41,13 +41,13 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     val element =
       configureAndFindApproveIdentifier(
         """
-      import static org.approvej.ApprovalBuilder.approve;
-      class Test {
-          void test() {
-              appr<caret>ove("hello").byFile();
-          }
-      }
-      """
+        import static org.approvej.ApprovalBuilder.approve;
+        class Test {
+            void test() {
+                appr<caret>ove("hello").byFile();
+            }
+        }
+        """
           .trimIndent()
       )
 
@@ -58,13 +58,13 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     val element =
       configureAndFindApproveIdentifier(
         """
-      import static org.approvej.image.ImageApprovalBuilder.approveImage;
-      class Test {
-          void test() {
-              appr<caret>oveImage(null).byFile();
-          }
-      }
-      """
+        import static org.approvej.image.ImageApprovalBuilder.approveImage;
+        class Test {
+            void test() {
+                appr<caret>oveImage(null).byFile();
+            }
+        }
+        """
           .trimIndent()
       )
 
@@ -75,10 +75,10 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     val element =
       configureAndFindApproveIdentifier(
         """
-      class Test {
-          void appr<caret>ove(String s) {}
-      }
-      """
+        class Test {
+            void appr<caret>ove(String s) {}
+        }
+        """
           .trimIndent()
       )
 
@@ -89,13 +89,13 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     val call =
       configureAndFindApproveCallExpression(
         """
-      import static org.approvej.ApprovalBuilder.approve;
-      class Test {
-          void test() {
-              appr<caret>ove("hello").byFile();
-          }
-      }
-      """
+        import static org.approvej.ApprovalBuilder.approve;
+        class Test {
+            void test() {
+                appr<caret>ove("hello").byFile();
+            }
+        }
+        """
           .trimIndent()
       )
 
@@ -106,13 +106,13 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     val call =
       configureAndFindApproveCallExpression(
         """
-      import static org.approvej.image.ImageApprovalBuilder.approveImage;
-      class Test {
-          void test() {
-              appr<caret>oveImage(null).byFile();
-          }
-      }
-      """
+        import static org.approvej.image.ImageApprovalBuilder.approveImage;
+        class Test {
+            void test() {
+                appr<caret>oveImage(null).byFile();
+            }
+        }
+        """
           .trimIndent()
       )
 
@@ -123,13 +123,13 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     val call =
       configureAndFindApproveCallExpression(
         """
-      import static org.approvej.ApprovalBuilder.approve;
-      class Test {
-          void test() {
-              appr<caret>ove("hello").byFile();
-          }
-      }
-      """
+        import static org.approvej.ApprovalBuilder.approve;
+        class Test {
+            void test() {
+                appr<caret>ove("hello").byFile();
+            }
+        }
+        """
           .trimIndent()
       )
 
@@ -140,13 +140,13 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     val call =
       configureAndFindApproveCallExpression(
         """
-      import static org.approvej.ApprovalBuilder.approve;
-      class Test {
-          void test() {
-              appr<caret>ove("hello").byValue("expected");
-          }
-      }
-      """
+        import static org.approvej.ApprovalBuilder.approve;
+        class Test {
+            void test() {
+                appr<caret>ove("hello").byValue("expected");
+            }
+        }
+        """
           .trimIndent()
       )
 
@@ -157,13 +157,13 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     val call =
       configureAndFindApproveCallExpression(
         """
-      import static org.approvej.ApprovalBuilder.approve;
-      class Test {
-          void test() {
-              appr<caret>ove("hello").printedAs(null).byFile();
-          }
-      }
-      """
+        import static org.approvej.ApprovalBuilder.approve;
+        class Test {
+            void test() {
+                appr<caret>ove("hello").printedAs(null).byFile();
+            }
+        }
+        """
           .trimIndent()
       )
 
@@ -174,13 +174,13 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     val call =
       configureAndFindApproveCallExpression(
         """
-      import static org.approvej.ApprovalBuilder.approve;
-      class Test {
-          void test() {
-              appr<caret>ove("hello");
-          }
-      }
-      """
+        import static org.approvej.ApprovalBuilder.approve;
+        class Test {
+            void test() {
+                appr<caret>ove("hello");
+            }
+        }
+        """
           .trimIndent()
       )
 
@@ -191,13 +191,13 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     val call =
       configureAndFindApproveCallExpression(
         """
-      import static org.approvej.image.ImageApprovalBuilder.approveImage;
-      class Test {
-          void test() {
-              appr<caret>oveImage(null);
-          }
-      }
-      """
+        import static org.approvej.image.ImageApprovalBuilder.approveImage;
+        class Test {
+            void test() {
+                appr<caret>oveImage(null);
+            }
+        }
+        """
           .trimIndent()
       )
 
@@ -208,13 +208,13 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     val call =
       configureAndFindApproveCallExpression(
         """
-      import static org.approvej.ApprovalBuilder.approve;
-      class Test {
-          void test() {
-              appr<caret>ove("hello").printedAs(null);
-          }
-      }
-      """
+        import static org.approvej.ApprovalBuilder.approve;
+        class Test {
+            void test() {
+                appr<caret>ove("hello").printedAs(null);
+            }
+        }
+        """
           .trimIndent()
       )
 
@@ -225,13 +225,13 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     val call =
       configureAndFindApproveCallExpression(
         """
-      import static org.approvej.ApprovalBuilder.approve;
-      class Test {
-          void test() {
-              appr<caret>ove("hello").named("first").byFile();
-          }
-      }
-      """
+        import static org.approvej.ApprovalBuilder.approve;
+        class Test {
+            void test() {
+                appr<caret>ove("hello").named("first").byFile();
+            }
+        }
+        """
           .trimIndent()
       )
 
@@ -242,13 +242,13 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     val call =
       configureAndFindApproveCallExpression(
         """
-      import static org.approvej.ApprovalBuilder.approve;
-      class Test {
-          void test() {
-              appr<caret>ove("hello").printedAs(null).named("second").byFile();
-          }
-      }
-      """
+        import static org.approvej.ApprovalBuilder.approve;
+        class Test {
+            void test() {
+                appr<caret>ove("hello").printedAs(null).named("second").byFile();
+            }
+        }
+        """
           .trimIndent()
       )
 
@@ -259,13 +259,13 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     val call =
       configureAndFindApproveCallExpression(
         """
-      import static org.approvej.ApprovalBuilder.approve;
-      class Test {
-          void test() {
-              appr<caret>ove("hello").named("first").byFile();
-          }
-      }
-      """
+        import static org.approvej.ApprovalBuilder.approve;
+        class Test {
+            void test() {
+                appr<caret>ove("hello").named("first").byFile();
+            }
+        }
+        """
           .trimIndent()
       )
 
@@ -276,13 +276,13 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     val call =
       configureAndFindApproveCallExpression(
         """
-      import static org.approvej.ApprovalBuilder.approve;
-      class Test {
-          void test() {
-              appr<caret>ove("hello").byFile();
-          }
-      }
-      """
+        import static org.approvej.ApprovalBuilder.approve;
+        class Test {
+            void test() {
+                appr<caret>ove("hello").byFile();
+            }
+        }
+        """
           .trimIndent()
       )
 
@@ -293,13 +293,13 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
     val call =
       configureAndFindApproveCallExpression(
         """
-      import static org.approvej.ApprovalBuilder.approve;
-      class Test {
-          void test() {
-              appr<caret>ove("hello").byFile();
-          }
-      }
-      """
+        import static org.approvej.ApprovalBuilder.approve;
+        class Test {
+            void test() {
+                appr<caret>ove("hello").byFile();
+            }
+        }
+        """
           .trimIndent()
       )
 
