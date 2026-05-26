@@ -94,6 +94,7 @@ dependencies {
 
   testRuntimeOnly(libs.junit5.platform.launcher)
   testRuntimeOnly(libs.junit5.jupiter.engine)
+  testRuntimeOnly(libs.junit5.vintage.engine)
 }
 
 // Force JUnit 5 versions over JUnit 6 from BOM
@@ -104,6 +105,7 @@ configurations.testRuntimeClasspath {
   resolutionStrategy.eachDependency {
     if (requested.group == "org.junit.platform") useVersion(junit5PlatformVersion)
     if (requested.group == "org.junit.jupiter") useVersion(junit5Version)
+    if (requested.group == "org.junit.vintage") useVersion(junit5Version)
   }
 }
 

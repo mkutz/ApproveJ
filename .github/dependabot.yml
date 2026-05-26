@@ -6,12 +6,19 @@ updates:
       interval: weekly
     open-pull-requests-limit: 10
     ignore:
-      # JUnit 5 is pinned for IntelliJ platform test compatibility.
-      # Blocking major updates prevents Dependabot from bumping JUnit 5 to 6.
+      # JUnit 5 and JUnit 4 are pinned for IntelliJ platform test compatibility.
+      # IntelliJ's test framework extends junit.framework.TestCase (JUnit 4)
+      # and uses JUnit 3 method naming conventions requiring the vintage engine.
       - dependency-name: org.junit.jupiter:*
         update-types:
         - version-update:semver-major
       - dependency-name: org.junit.platform:*
+        update-types:
+        - version-update:semver-major
+      - dependency-name: org.junit.vintage:*
+        update-types:
+        - version-update:semver-major
+      - dependency-name: junit:junit
         update-types:
         - version-update:semver-major
   - package-ecosystem: github-actions
