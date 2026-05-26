@@ -75,8 +75,8 @@ fun extractChangeNotes(version: String): String {
   return HtmlRenderer.builder().build().render(document).trim()
 }
 
-/* Use JUnit 5.11 for IntelliJ platform tests to avoid version conflicts with IntelliJ's test
-framework */
+/* Use JUnit 5 for IntelliJ platform tests to avoid version conflicts with IntelliJ's test
+framework, which still extends junit.framework.TestCase (JUnit 4). */
 dependencies {
   intellijPlatform {
     intellijIdeaCommunity(libs.versions.intellij.ide)
@@ -94,10 +94,9 @@ dependencies {
 
   testRuntimeOnly(libs.junit5.platform.launcher)
   testRuntimeOnly(libs.junit5.jupiter.engine)
-  testRuntimeOnly(libs.junit5.vintage.engine)
 }
 
-// Force JUnit 5.11 versions over JUnit 6 from BOM
+// Force JUnit 5 versions over JUnit 6 from BOM
 val junit5Version = libs.versions.junit5.get()
 val junit5PlatformVersion = libs.versions.junitPlatform5.get()
 
@@ -105,7 +104,6 @@ configurations.testRuntimeClasspath {
   resolutionStrategy.eachDependency {
     if (requested.group == "org.junit.platform") useVersion(junit5PlatformVersion)
     if (requested.group == "org.junit.jupiter") useVersion(junit5Version)
-    if (requested.group == "org.junit.vintage") useVersion(junit5Version)
   }
 }
 
