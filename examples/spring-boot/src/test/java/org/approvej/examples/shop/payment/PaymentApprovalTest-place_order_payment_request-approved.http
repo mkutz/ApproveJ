@@ -7,6 +7,6 @@ Host: {{Host}}
 Http2-settings: AAEAAEAAAAIAAAAAAAMAAAAAAAQBAAAAAAUAAEAAAAYABgAA
 Transfer-encoding: chunked
 Upgrade: h2c
-User-agent: Java-http-client/21.0.10
+User-agent: {{User-agent}}
 
 {"orderId":"[uuid 1]","amount":299.99,"currency":"EUR","customerEmail":"eve@example.com"}

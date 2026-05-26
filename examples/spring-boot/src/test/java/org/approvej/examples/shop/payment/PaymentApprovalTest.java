@@ -3,6 +3,7 @@ package org.approvej.examples.shop.payment;
 import static org.approvej.ApprovalBuilder.approve;
 import static org.approvej.http.HttpScrubbers.headerValue;
 import static org.approvej.http.HttpScrubbers.hostHeaderValue;
+import static org.approvej.http.HttpScrubbers.userAgentHeaderValue;
 import static org.approvej.http.ReceivedHttpRequestPrintFormat.httpRequest;
 import static org.approvej.http.StubbedHttpResponse.response;
 import static org.approvej.scrub.Scrubbers.uuids;
@@ -69,6 +70,7 @@ class PaymentApprovalTest {
 
     approve(paymentServer.lastReceivedRequest()) // <3>
         .scrubbedOf(hostHeaderValue())
+        .scrubbedOf(userAgentHeaderValue())
         .printedAs(httpRequest())
         .scrubbedOf(uuids())
         .byFile();
@@ -86,6 +88,7 @@ class PaymentApprovalTest {
 
     approve(paymentServer.lastReceivedRequest())
         .scrubbedOf(hostHeaderValue())
+        .scrubbedOf(userAgentHeaderValue())
         .scrubbedOf(headerValue("Authorization"))
         .printedAs(httpRequest())
         .scrubbedOf(uuids())
