@@ -18,10 +18,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
-      JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
-      JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     steps:
@@ -38,9 +34,6 @@ jobs:
       - uses: gradle/actions/setup-gradle@39e147cb9de83bb9910b8ef8bd7fff0ee20fcd6f
 
       - run: ./gradlew check
-
-      - run: ./gradlew jreleaserConfig -Pversion=0.0.1-SNAPSHOT --git-root-search
-        if: ${{ env.JRELEASER_GPG_PUBLIC_KEY != '' }}
 
       - name: cache SonarCloud packages
         uses: actions/cache@v5
