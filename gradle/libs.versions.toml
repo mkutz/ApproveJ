@@ -17,9 +17,9 @@ wiremock = "3.13.2"
 [libraries]
 asciidoctor-block-switch = { module = "io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch", version = "0.6.3" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
-commonmark = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
 awaitility = { module = "org.awaitility:awaitility", version = "4.3.0" }
-groovy = { module = "org.apache.groovy:groovy" , version = "5.0.6" }
+commonmark = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
+groovy = { module = "org.apache.groovy:groovy", version = "5.0.6" }
 h2 = { module = "com.h2database:h2", version = "2.4.240" }
 jackson2-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson2" }
 jackson2-databind = { module = "com.fasterxml.jackson.core:jackson-databind" }
@@ -46,13 +46,13 @@ opentest4j = { module = "org.opentest4j:opentest4j", version = "1.3.0" }
 playwright = { module = "com.microsoft.playwright:playwright", version = "1.60.0" }
 postgresql = { module = "org.postgresql:postgresql", version = "42.7.11" }
 selenium = { module = "org.seleniumhq.selenium:selenium-java", version = "4.44.0" }
+spock = { module = "org.spockframework:spock-core", version = "2.4-M7-groovy-5.0" }
 spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "spring-boot" }
 spring-boot-starter-data-jpa-test = { module = "org.springframework.boot:spring-boot-starter-data-jpa-test", version.ref = "spring-boot" }
 spring-boot-starter-thymeleaf = { module = "org.springframework.boot:spring-boot-starter-thymeleaf", version.ref = "spring-boot" }
 spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc", version.ref = "spring-boot" }
 spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test", version.ref = "spring-boot" }
 spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers", version.ref = "spring-boot" }
-spock = { module = "org.spockframework:spock-core", version = "2.4-M7-groovy-5.0" }
 testcontainers-junit-jupiter = { module = "org.testcontainers:testcontainers-junit-jupiter", version.ref = "testcontainers" }
 testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql", version.ref = "testcontainers" }
 testng = { module = "org.testng:testng", version = "7.12.0" }
@@ -68,6 +68,6 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.3.21" }
 maven-plugin-development = { id = "org.gradlex.maven-plugin-development", version = "1.0.3" }
 plugin-publish = { id = "com.gradle.plugin-publish", version = "2.1.1" }
 sonar = { id = "org.sonarqube", version = "7.3.0.8198" }
+spotless = { id = "com.diffplug.spotless", version = "8.5.1" }
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version = "1.1.7" }
-spotless = { id = "com.diffplug.spotless", version = "8.5.1" }

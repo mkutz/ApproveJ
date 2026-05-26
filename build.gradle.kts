@@ -157,6 +157,11 @@ spotless {
     ktfmt().googleStyle()
   }
 
+  toml {
+    target("gradle/libs.versions.toml")
+    versionCatalog().maxLineLength(0)
+  }
+
   groovy {
     target("**/*.groovy")
     targetExclude("**/build/**/*", "**/idea-sandbox/**")
