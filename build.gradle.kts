@@ -159,7 +159,7 @@ spotless {
 
   toml {
     target("gradle/libs.versions.toml")
-    versionCatalog().maxLineLength(0)
+    versionCatalog()
   }
 
   groovy {
