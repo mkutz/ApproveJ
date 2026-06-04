@@ -69,7 +69,17 @@ public class StackTraceTestFinderUtil {
    * @return the {@link Path} to the source file containing the given testMethod
    */
   public static Path findTestSourcePath(Method testMethod) {
-    Class<?> declaringClass = testMethod.getDeclaringClass();
+    return findTestSourcePath(testMethod.getDeclaringClass());
+  }
+
+  /**
+   * Finds the source path of the given test class, making the same assumptions as {@link
+   * #findTestSourcePath(Method)}.
+   *
+   * @param declaringClass the class containing the test case
+   * @return the {@link Path} to the source file containing the given class
+   */
+  public static Path findTestSourcePath(Class<?> declaringClass) {
     int packageDepth = declaringClass.getPackageName().split("\\.").length;
     String sourceSetName;
     try {

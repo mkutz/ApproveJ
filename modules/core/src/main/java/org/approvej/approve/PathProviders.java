@@ -7,13 +7,40 @@ import static org.approvej.approve.StackTraceTestFinderUtil.findTestSourcePath;
 import static org.approvej.print.PrintFormat.DEFAULT_FILENAME_EXTENSION;
 
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jspecify.annotations.NullMarked;
 
 /** Collection of static methods to create {@link PathProvider} instances. */
+@NullMarked
 public final class PathProviders {
 
+  private static final List<CurrentTestLocator> TEST_LOCATORS =
+      ServiceLoader.load(CurrentTestLocator.class).stream()
+          .map(ServiceLoader.Provider::get)
+          .toList();
+
   private PathProviders() {}
+
+  private static Optional<TestLocation> currentTestLocation() {
+    return TEST_LOCATORS.stream()
+        .map(CurrentTestLocator::currentTest)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .findFirst();
+  }
+
+  /**
+   * Replaces characters that are illegal in filenames on common file systems with an underscore.
+   * Test names of frameworks like Kotest are arbitrary strings (e.g. {@code "GET /article"}), as
+   * opposed to identifier-safe method names.
+   */
+  private static String sanitizeFilename(String name) {
+    return name.replaceAll("[\\\\/:*?\"<>|\\x00-\\x1F]", "_").strip();
+  }
 
   private static String nestedSimpleName(Class<?> clazz) {
     java.util.ArrayDeque<String> parts = new java.util.ArrayDeque<>();
@@ -64,6 +91,18 @@ public final class PathProviders {
    * @return a new {@link PathProvider}
    */
   public static PathProvider nextToTest() {
+    Optional<TestLocation> currentTestLocation = currentTestLocation();
+    if (currentTestLocation.isPresent()) {
+      TestLocation testLocation = currentTestLocation.get();
+      Path directory = findTestSourcePath(testLocation.testClass()).getParent();
+      String baseFilename =
+          "%s-%s"
+              .formatted(
+                  nestedSimpleName(testLocation.testClass()),
+                  sanitizeFilename(testLocation.testCaseName()));
+      return new PathProvider(directory, baseFilename, "", APPROVED, DEFAULT_FILENAME_EXTENSION);
+    }
+
     TestMethod testMethod = currentTestMethod();
 
     Path directory = findTestSourcePath(testMethod.method()).getParent();
@@ -82,6 +121,17 @@ public final class PathProviders {
    * @return a new {@link PathProvider}
    */
   public static PathProvider nextToTestInSubdirectory() {
+    Optional<TestLocation> currentTestLocation = currentTestLocation();
+    if (currentTestLocation.isPresent()) {
+      TestLocation testLocation = currentTestLocation.get();
+      Path directory =
+          findTestSourcePath(testLocation.testClass())
+              .getParent()
+              .resolve(nestedSimpleName(testLocation.testClass()));
+      String baseFilename = sanitizeFilename(testLocation.testCaseName());
+      return new PathProvider(directory, baseFilename, "", APPROVED, DEFAULT_FILENAME_EXTENSION);
+    }
+
     TestMethod testMethod = currentTestMethod();
 
     Path directory =
