@@ -1,5 +1,7 @@
 package org.approvej.scrub;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Generic {@link Scrubber} to set the value of a certain field via reflection.
  *
@@ -8,4 +10,5 @@ package org.approvej.scrub;
  *
  * @param <T> the type of value to scrub
  */
+@NullMarked
 public interface FieldScrubber<T> extends Scrubber<FieldScrubber<T>, T, Object> {}

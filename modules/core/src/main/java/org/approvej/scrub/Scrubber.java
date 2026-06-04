@@ -1,6 +1,7 @@
 package org.approvej.scrub;
 
 import java.util.function.UnaryOperator;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * An {@link UnaryOperator} that scrubs certain information from a value. This might be useful
@@ -10,6 +11,7 @@ import java.util.function.UnaryOperator;
  * @param <T> the type of value to scrub
  * @param <R> the type of the replacement
  */
+@NullMarked
 public interface Scrubber<I extends Scrubber<I, T, R>, T, R> extends UnaryOperator<T> {
 
   /**

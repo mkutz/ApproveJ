@@ -1,10 +1,14 @@
 package org.approvej.configuration;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * An error that occurs when there is an issue with loading the configuration.
  *
  * @see Configuration
  */
+@NullMarked
 public class ConfigurationError extends RuntimeException {
 
   /**
@@ -13,7 +17,7 @@ public class ConfigurationError extends RuntimeException {
    * @param message a message describing the error
    * @param cause the cause of the error
    */
-  public ConfigurationError(String message, Throwable cause) {
+  public ConfigurationError(String message, @Nullable Throwable cause) {
     super(message, cause);
   }
 }

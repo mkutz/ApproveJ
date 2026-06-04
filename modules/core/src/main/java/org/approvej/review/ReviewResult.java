@@ -1,6 +1,9 @@
 package org.approvej.review;
 
+import org.jspecify.annotations.NullMarked;
+
 /** Interface for results of reviews. */
+@NullMarked
 public interface ReviewResult {
 
   /**

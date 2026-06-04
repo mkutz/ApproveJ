@@ -2,6 +2,7 @@ package org.approvej.scrub;
 
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Replaces each match of the given dateTimePattern (as defined by {@link DateTimeFormatter}) with a
@@ -10,6 +11,7 @@ import java.time.format.DateTimeFormatter;
  * <p>To avoid flaky results, the value is always rounded to a certain {@link Duration} (e.g. 1s).
  * This duration can be adjusted via {@link #roundedTo(Duration)}.
  */
+@NullMarked
 public interface RelativeDateTimeReplacement extends Replacement<String> {
 
   /**

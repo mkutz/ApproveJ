@@ -1,6 +1,9 @@
 package org.approvej.image;
 
+import org.jspecify.annotations.NullMarked;
+
 /** Result of evaluating an image approval. */
+@NullMarked
 public interface ImageApprovalResult {
 
   /**

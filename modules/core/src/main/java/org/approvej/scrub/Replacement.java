@@ -1,6 +1,7 @@
 package org.approvej.scrub;
 
 import java.util.function.BiFunction;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -8,6 +9,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @param <R> the type of the replaced value
  */
+@NullMarked
 public interface Replacement<R> extends BiFunction<R, Integer, R> {
 
   /**

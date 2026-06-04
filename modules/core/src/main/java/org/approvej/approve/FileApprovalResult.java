@@ -1,6 +1,7 @@
 package org.approvej.approve;
 
 import org.approvej.ApprovalResult;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * {@link ApprovalResult} for files.
@@ -10,6 +11,7 @@ import org.approvej.ApprovalResult;
  * @param pathProvider the {@link PathProvider} providing the paths to the received an approved
  *     files
  */
+@NullMarked
 public record FileApprovalResult(
     String previouslyApproved, String received, PathProvider pathProvider)
     implements ApprovalResult {}
