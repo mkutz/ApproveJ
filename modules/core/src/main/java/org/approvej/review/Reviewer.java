@@ -3,6 +3,7 @@ package org.approvej.review;
 import java.nio.file.Path;
 import java.util.function.Function;
 import org.approvej.approve.PathProvider;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Interface for triggering a review by the user.
@@ -10,6 +11,7 @@ import org.approvej.approve.PathProvider;
  * <p>This usually means that a diff/merge tool is opened, which presents the difference between the
  * received and the previously approved value to users in case they differ.
  */
+@NullMarked
 public interface Reviewer extends Function<PathProvider, ReviewResult> {
 
   /** Placeholder in commands that is replaced with the received file path. */

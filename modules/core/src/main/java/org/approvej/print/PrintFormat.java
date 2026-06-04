@@ -1,11 +1,14 @@
 package org.approvej.print;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A format to print values of type T, as defined by a {@link Printer} and a suggested {@link
  * #filenameExtension()}.
  *
  * @param <T> the type of the object to print
  */
+@NullMarked
 public interface PrintFormat<T> {
 
   /** The default filename extension for files that the printed value is written to. */

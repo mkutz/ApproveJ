@@ -1,11 +1,13 @@
 package org.approvej.scrub;
 
 import java.time.format.DateTimeFormatter;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Replaces each match of the given dateTimePattern (as defined by {@link DateTimeFormatter}) with a
  * relative description, like {@code [today]}, {@code [yesterday]}, {@code [13 days from now]}.
  */
+@NullMarked
 public interface RelativeDateReplacement extends Replacement<String> {
 
   /**

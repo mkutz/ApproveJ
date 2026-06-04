@@ -1,8 +1,11 @@
 package org.approvej.yaml.jackson;
 
 import com.fasterxml.jackson.core.JacksonException;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /** Exception thrown when pretty printing a value as YAML fails. */
+@NullMarked
 public class YamlPrinterException extends RuntimeException {
 
   /**
@@ -11,7 +14,7 @@ public class YamlPrinterException extends RuntimeException {
    * @param value the value that failed to be pretty printed
    * @param cause the cause of the failure
    */
-  public YamlPrinterException(Object value, JacksonException cause) {
+  public YamlPrinterException(Object value, @Nullable JacksonException cause) {
     super("Failed to print %s".formatted(value), cause);
   }
 }

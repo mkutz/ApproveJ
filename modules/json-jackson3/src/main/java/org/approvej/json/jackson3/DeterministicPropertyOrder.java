@@ -2,6 +2,7 @@ package org.approvej.json.jackson3;
 
 import java.util.List;
 import org.approvej.print.PropertyOrdering;
+import org.jspecify.annotations.NullMarked;
 import tools.jackson.databind.BeanDescription;
 import tools.jackson.databind.SerializationConfig;
 import tools.jackson.databind.ser.BeanPropertyWriter;
@@ -13,6 +14,7 @@ import tools.jackson.databind.ser.ValueSerializerModifier;
  * <p>Field-backed properties are serialized first in their declaration order, followed by any
  * additional properties (e.g. from getters) in alphabetical order.
  */
+@NullMarked
 final class DeterministicPropertyOrder extends ValueSerializerModifier {
 
   @Override

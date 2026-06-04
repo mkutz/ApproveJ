@@ -1,6 +1,9 @@
 package org.approvej.scrub;
 
+import org.jspecify.annotations.NullMarked;
+
 /** Exception thrown when scrubbing fails. */
+@NullMarked
 public class ScrubbingError extends RuntimeException {
 
   /**

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import java.util.List;
 import org.approvej.print.PropertyOrdering;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A {@link BeanSerializerModifier} that ensures deterministic property ordering.
@@ -13,6 +14,7 @@ import org.approvej.print.PropertyOrdering;
  * <p>Field-backed properties are serialized first in their declaration order, followed by any
  * additional properties (e.g. from getters) in alphabetical order.
  */
+@NullMarked
 final class DeterministicPropertyOrder extends BeanSerializerModifier {
 
   @Override

@@ -1,11 +1,13 @@
 package org.approvej.scrub;
 
 import java.time.format.DateTimeFormatter;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Scrubs a {@link String} of date/time strings described by a {@link DateTimeFormatter} pattern
  * like "yyyy-MM-dd" for local dates using the wrapped {@link StringScrubber}.
  */
+@NullMarked
 public interface DateTimeScrubber extends Scrubber<DateTimeScrubber, String, String> {
 
   /**

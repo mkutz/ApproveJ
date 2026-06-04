@@ -4,6 +4,7 @@ import org.approvej.approve.PathProvider;
 import org.approvej.image.ImageApprovalError;
 import org.approvej.image.ImageApprovalResult;
 import org.approvej.image.compare.ImageComparisonResult;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * {@link ImageApprovalResult} for image files.
@@ -12,6 +13,7 @@ import org.approvej.image.compare.ImageComparisonResult;
  * @param pathProvider the {@link PathProvider} providing the paths to the received and approved
  *     files
  */
+@NullMarked
 public record ImageFileApprovalResult(
     ImageComparisonResult comparisonResult, PathProvider pathProvider)
     implements ImageApprovalResult {

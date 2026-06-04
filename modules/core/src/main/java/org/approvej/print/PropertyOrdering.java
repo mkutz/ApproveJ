@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Utility for deterministic property ordering during serialization.
@@ -17,6 +18,7 @@ import java.util.function.Function;
  * <p>Field-backed properties are ordered first in their declaration order, followed by any
  * additional properties (e.g. from getters) in alphabetical order.
  */
+@NullMarked
 public final class PropertyOrdering {
 
   private PropertyOrdering() {}

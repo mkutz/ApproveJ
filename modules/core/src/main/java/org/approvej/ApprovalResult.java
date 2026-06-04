@@ -1,6 +1,9 @@
 package org.approvej;
 
+import org.jspecify.annotations.NullMarked;
+
 /** Interface for results of approvals. */
+@NullMarked
 public interface ApprovalResult {
 
   /**
