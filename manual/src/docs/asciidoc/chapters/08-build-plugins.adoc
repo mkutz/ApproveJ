@@ -32,6 +32,9 @@ plugins {
 
 NOTE: The plugin requires the Java plugin to be applied in the same project.
 
+The tasks run against the combined classpath of all of the project's test tasks, so they work no matter which source set holds your approval tests -- for example a dedicated `integrationTest` `JvmTestSuite`.
+No extra configuration is needed.
+
 
 [id=build_plugins_setup_maven]
 === Maven Plugin

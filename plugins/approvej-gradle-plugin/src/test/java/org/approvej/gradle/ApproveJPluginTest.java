@@ -78,6 +78,27 @@ class ApproveJPluginTest {
   }
 
   @Test
+  void apply_classpath_unions_all_test_tasks() {
+    Project project = ProjectBuilder.builder().build();
+    project.getPluginManager().apply("java");
+    project.getPluginManager().apply(ApproveJPlugin.class);
+    var testTask = (org.gradle.api.tasks.testing.Test) project.getTasks().getByName("test");
+    var integrationTest =
+        project
+            .getTasks()
+            .create(
+                "integrationTest",
+                org.gradle.api.tasks.testing.Test.class,
+                task -> task.setClasspath(project.files("integration-classes")));
+
+    var task = (JavaExec) project.getTasks().getByName("approvejFindLeftovers");
+
+    assertThat(task.getClasspath().getFiles())
+        .containsAll(testTask.getClasspath().getFiles())
+        .containsAll(integrationTest.getClasspath().getFiles());
+  }
+
+  @Test
   void apply_functional() throws IOException {
     Files.writeString(
         tempProjectDir.resolve("build.gradle"),
@@ -100,6 +121,31 @@ class ApproveJPluginTest {
         .contains("approvejCleanup - Detect and remove leftover approved files")
         .contains("approvejApproveAll - Approve all unapproved files")
         .contains("approvejReviewUnapproved - Review all unapproved files");
+  }
+
+  @Test
+  void apply_functional_missing_core_dependency() throws IOException {
+    Files.writeString(
+        tempProjectDir.resolve("build.gradle"),
+        """
+        plugins {
+          id 'java'
+          id 'org.approvej'
+        }
+        repositories { mavenCentral() }
+        """);
+
+    var result =
+        GradleRunner.create()
+            .withProjectDir(tempProjectDir.toFile())
+            .withPluginClasspath()
+            .withArguments("approvejFindLeftovers")
+            .buildAndFail();
+
+    assertThat(result.getOutput())
+        .contains("was not found on the classpath of any Test task")
+        .contains("org.approvej:core")
+        .doesNotContain("ClassNotFoundException");
   }
 
   @Test
