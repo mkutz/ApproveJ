@@ -4,7 +4,7 @@ buildscript {
   // latest 6.x so both plugins work. The build does not use Spotless's git ratchet, so its JGit
   // usage is unaffected.
   configurations.classpath {
-    resolutionStrategy.force("org.eclipse.jgit:org.eclipse.jgit:6.10.1.202505221210-r")
+    resolutionStrategy.force("org.eclipse.jgit:org.eclipse.jgit:7.6.0.202603022253-r")
   }
 }
 
