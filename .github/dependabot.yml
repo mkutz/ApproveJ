@@ -21,12 +21,6 @@ updates:
       - dependency-name: junit:junit
         update-types:
         - version-update:semver-major
-      # JReleaser 1.24.0 breaks the publish workflow with
-      # NoClassDefFoundError: org/eclipse/jgit/lib/GpgObjectSigner (JGit incompatibility).
-      # Pinned to 1.23.x until the upstream 1.24 line is fixed.
-      - dependency-name: org.jreleaser:*
-        versions:
-        - 1.24.x
   - package-ecosystem: github-actions
     directory: /
     schedule:
