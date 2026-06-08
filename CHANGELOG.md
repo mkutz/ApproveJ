@@ -1,6 +1,20 @@
 # Changelog
 
 
+## v1.6.2
+
+### plugins
+
+* 🐛 **Run Gradle tasks against all test task classpaths**
+  The Gradle plugin hardcoded the `test` source set when building the inventory CLI classpath.
+  Projects whose approval tests live in another source set (e.g. a custom `integrationTest` `JvmTestSuite`) failed with `ClassNotFoundException`, and `approvejCleanup` could delete valid approved files it was unable to resolve.
+  The `approvej*` tasks now run against the combined classpath of all `Test` tasks, so they work regardless of which source set holds the approval tests, with no extra configuration.
+  They also fail fast with an actionable message when the inventory CLI is missing from the classpath instead of surfacing a raw `ClassNotFoundException`.
+  ([#325](https://github.com/mkutz/ApproveJ/issues/325))
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.6.1...v1.6.2
+
+
 ## v1.6.1
 
 ### core
