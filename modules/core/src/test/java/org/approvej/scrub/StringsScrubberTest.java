@@ -11,7 +11,7 @@ class StringsScrubberTest {
   @Test
   void apply() {
     String randomId = randomUUID().toString();
-    String randomTimestamp = Instant.now().toString();
+    String randomTimestamp = Instant.parse("2024-01-15T13:45:30.123Z").toString();
     String template =
         """
         {
