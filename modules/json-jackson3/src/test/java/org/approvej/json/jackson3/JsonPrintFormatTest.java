@@ -60,7 +60,7 @@ class JsonPrintFormatTest {
       public boolean isBirthdayToday() {
         LocalDate today = LocalDate.now();
         return birthday.getDayOfMonth() == today.getDayOfMonth()
-            && birthday.getMonth() == today.getMonth();
+            && birthday.getMonth().equals(today.getMonth());
       }
 
       public int getAge() {
@@ -73,7 +73,7 @@ class JsonPrintFormatTest {
     LocalDate today = LocalDate.now();
     boolean birthdayToday =
         birthday.getDayOfMonth() == today.getDayOfMonth()
-            && birthday.getMonth() == today.getMonth();
+            && birthday.getMonth().equals(today.getMonth());
 
     assertThat(json().printer().apply(new PersonWithGetters("Micha", birthday)))
         .isEqualTo(
