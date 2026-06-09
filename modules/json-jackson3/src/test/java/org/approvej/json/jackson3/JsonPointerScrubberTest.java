@@ -5,6 +5,7 @@ import static org.approvej.json.jackson3.JsonPointerScrubber.jsonPointer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 import org.junit.jupiter.api.Test;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
@@ -25,7 +26,8 @@ class JsonPointerScrubberTest {
         ]
       }
       """
-          .formatted(randomUUID(), LocalDateTime.now(), randomUUID());
+          .formatted(
+              randomUUID(), LocalDateTime.of(2024, Month.JANUARY, 15, 13, 45, 30), randomUUID());
 
   @Test
   void apply() throws JacksonException {
