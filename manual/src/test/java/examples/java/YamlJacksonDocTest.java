@@ -6,6 +6,7 @@ import static org.approvej.yaml.jackson.YamlPrintFormat.yaml;
 
 import examples.ExampleClass.Person;
 import java.time.LocalDate;
+import java.time.Month;
 import org.junit.jupiter.api.Test;
 
 class YamlJacksonDocTest {
@@ -13,7 +14,7 @@ class YamlJacksonDocTest {
   @Test
   void print_yaml() {
     // tag::print_yaml[]
-    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+    Person person = createPerson("John Doe", LocalDate.of(1990, Month.JANUARY, 1));
 
     approve(person)
         .printedAs(yaml()) // <1>

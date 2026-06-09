@@ -191,8 +191,9 @@ public class ImageFileApprover implements ImageApprover {
       writeSucceeded = ImageIO.write(diffImage, format, outputStream);
       if (!writeSucceeded) {
         LOGGER.fine(
-            "No ImageIO writer found for format \"%s\" when writing diff image to %s"
-                .formatted(format, diffPath));
+            () ->
+                "No ImageIO writer found for format \"%s\" when writing diff image to %s"
+                    .formatted(format, diffPath));
       }
     } catch (IOException e) {
       LOGGER.fine("Writing diff image to %s failed: %s".formatted(diffPath, e.getMessage()));

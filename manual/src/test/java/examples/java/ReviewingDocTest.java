@@ -8,6 +8,7 @@ import examples.ExampleClass.Person;
 import examples.PersonYamlPrintFormat;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.Month;
 import org.approvej.review.Reviewers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
@@ -21,7 +22,7 @@ class ReviewingDocTest {
   void approve_reviewedBy_fileReviewer() throws IOException, InterruptedException {
     assumeThat(new ProcessBuilder("which", "idea").start().waitFor()).isEqualTo(0);
     // tag::approve_reviewedBy_fileReviewer[]
-    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+    Person person = createPerson("John Doe", LocalDate.of(1990, Month.JANUARY, 1));
 
     approve(person)
         .printedAs(new PersonYamlPrintFormat())
@@ -35,7 +36,7 @@ class ReviewingDocTest {
   void approve_reviewedBy_ai() throws IOException, InterruptedException {
     assumeThat(new ProcessBuilder("which", "claude").start().waitFor()).isEqualTo(0);
     // tag::approve_reviewedBy_ai[]
-    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+    Person person = createPerson("John Doe", LocalDate.of(1990, Month.JANUARY, 1));
 
     approve(person)
         .printedAs(new PersonYamlPrintFormat())
@@ -47,7 +48,7 @@ class ReviewingDocTest {
   @Test
   void approve_reviewedBy_automatic() {
     // tag::approve_reviewedBy_automatic[]
-    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+    Person person = createPerson("John Doe", LocalDate.of(1990, Month.JANUARY, 1));
 
     approve(person)
         .printedAs(new PersonYamlPrintFormat())

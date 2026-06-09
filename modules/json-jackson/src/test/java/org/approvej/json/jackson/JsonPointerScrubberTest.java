@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.time.LocalDateTime;
+import java.time.Month;
 import org.junit.jupiter.api.Test;
 
 class JsonPointerScrubberTest {
@@ -25,7 +26,8 @@ class JsonPointerScrubberTest {
         ]
       }
       """
-          .formatted(randomUUID(), LocalDateTime.now(), randomUUID());
+          .formatted(
+              randomUUID(), LocalDateTime.of(2024, Month.JANUARY, 15, 13, 45, 30), randomUUID());
 
   @Test
   void apply() throws JsonProcessingException {
