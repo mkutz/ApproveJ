@@ -72,8 +72,7 @@ class DiffImageRendererTest {
     int red = (pixel >> 16) & 0xFF;
     int green = (pixel >> 8) & 0xFF;
     int blue = pixel & 0xFF;
-    assertThat(red).isEqualTo(green).isEqualTo(blue);
-    assertThat(red).isLessThan(255);
+    assertThat(red).isEqualTo(green).isEqualTo(blue).isLessThan(255);
   }
 
   @Test
