@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import examples.ExampleClass.Person;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +28,7 @@ class JsonJacksonDocTest {
   @Test
   void print_json() {
     // tag::print_json[]
-    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+    Person person = createPerson("John Doe", LocalDate.of(1990, Month.JANUARY, 1));
 
     approve(person)
         .printedAs(json()) // <1>

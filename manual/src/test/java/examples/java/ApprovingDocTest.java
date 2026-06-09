@@ -8,6 +8,7 @@ import static org.approvej.approve.PathProviders.nextToTestInSubdirectory;
 import examples.ExampleClass.Person;
 import examples.PersonYamlPrintFormat;
 import java.time.LocalDate;
+import java.time.Month;
 import org.junit.jupiter.api.Test;
 
 // tag::approval_test_annotation[]
@@ -18,7 +19,7 @@ class ApprovingDocTest {
   @Test
   void approve_inplace() {
     // tag::approve_inplace[]
-    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+    Person person = createPerson("John Doe", LocalDate.of(1990, Month.JANUARY, 1));
 
     approve(person).byValue("Person[name=John Doe, birthDate=1990-01-01]");
     // end::approve_inplace[]
@@ -27,7 +28,7 @@ class ApprovingDocTest {
   @Test
   void approve_inplace_auto_update() {
     // tag::approve_inplace_auto_update[]
-    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+    Person person = createPerson("John Doe", LocalDate.of(1990, Month.JANUARY, 1));
 
     approve(person)
         .byValue(
@@ -40,7 +41,7 @@ class ApprovingDocTest {
   @Test
   void approve_file_next_to_test() {
     // tag::approve_file_next_to_test[]
-    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+    Person person = createPerson("John Doe", LocalDate.of(1990, Month.JANUARY, 1));
 
     approve(person).byFile(nextToTest()); // <1>
     // end::approve_file_next_to_test[]
@@ -49,7 +50,7 @@ class ApprovingDocTest {
   @Test
   void approve_file_custom_extension() {
     // tag::approve_file_custom_extension[]
-    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+    Person person = createPerson("John Doe", LocalDate.of(1990, Month.JANUARY, 1));
 
     approve(person)
         .printedBy(
@@ -67,7 +68,7 @@ class ApprovingDocTest {
   @Test
   void approve_file_nextToTestInSubdirectory() {
     // tag::approve_file_nextToTestInSubdirectory[]
-    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+    Person person = createPerson("John Doe", LocalDate.of(1990, Month.JANUARY, 1));
 
     approve(person).printedAs(new PersonYamlPrintFormat()).byFile(nextToTestInSubdirectory());
     // end::approve_file_nextToTestInSubdirectory[]
@@ -76,7 +77,7 @@ class ApprovingDocTest {
   @Test
   void approve_file_approved_path() {
     // tag::approve_file_approved_path[]
-    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+    Person person = createPerson("John Doe", LocalDate.of(1990, Month.JANUARY, 1));
 
     approve(person)
         .printedAs(new PersonYamlPrintFormat())

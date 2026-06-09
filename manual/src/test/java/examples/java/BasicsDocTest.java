@@ -6,6 +6,7 @@ import static org.approvej.ApprovalBuilder.approve;
 
 import examples.ExampleClass.Person;
 import java.time.LocalDate;
+import java.time.Month;
 import org.junit.jupiter.api.Test;
 
 @org.approvej.ApprovalTest
@@ -24,7 +25,7 @@ class BasicsDocTest {
   @Test
   void approve_pojos() {
     // tag::approve_pojos[]
-    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+    Person person = createPerson("John Doe", LocalDate.of(1990, Month.JANUARY, 1));
 
     approve(person) // <1>
         .byFile();
@@ -34,8 +35,8 @@ class BasicsDocTest {
   @Test
   void approve_named() {
     // tag::approve_named[]
-    Person jane = createPerson("Jane Doe", LocalDate.of(1990, 1, 1));
-    Person john = createPerson("John Doe", LocalDate.of(2012, 6, 2));
+    Person jane = createPerson("Jane Doe", LocalDate.of(1990, Month.JANUARY, 1));
+    Person john = createPerson("John Doe", LocalDate.of(2012, Month.JUNE, 2));
 
     approve(jane).named("jane").byFile();
     approve(john).named("john").byFile();

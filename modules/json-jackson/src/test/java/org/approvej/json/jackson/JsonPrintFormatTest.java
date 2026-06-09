@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.Period;
 import org.approvej.print.PersonPojo;
 import org.approvej.print.Pet;
@@ -29,7 +30,7 @@ class JsonPrintFormatTest {
   void printer() {
     record Person(String name, LocalDate birthday) {}
 
-    assertThat(json().printer().apply(new Person("Micha", LocalDate.of(1982, 2, 19))))
+    assertThat(json().printer().apply(new Person("Micha", LocalDate.of(1982, Month.FEBRUARY, 19))))
         .isEqualTo(
             """
             {
@@ -70,7 +71,7 @@ class JsonPrintFormatTest {
       }
     }
 
-    LocalDate birthday = LocalDate.of(1982, 2, 19);
+    LocalDate birthday = LocalDate.of(1982, Month.FEBRUARY, 19);
     int age = Period.between(birthday, LocalDate.now()).getYears();
     LocalDate today = LocalDate.now();
     boolean birthdayToday =
