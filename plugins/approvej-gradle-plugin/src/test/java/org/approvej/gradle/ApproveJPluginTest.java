@@ -86,10 +86,11 @@ class ApproveJPluginTest {
     var integrationTest =
         project
             .getTasks()
-            .create(
+            .register(
                 "integrationTest",
                 org.gradle.api.tasks.testing.Test.class,
-                task -> task.setClasspath(project.files("integration-classes")));
+                task -> task.setClasspath(project.files("integration-classes")))
+            .get();
 
     var task = (JavaExec) project.getTasks().getByName("approvejFindLeftovers");
 
