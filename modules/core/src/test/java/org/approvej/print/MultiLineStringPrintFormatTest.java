@@ -9,6 +9,8 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +45,9 @@ class MultiLineStringPrintFormatTest {
         (byte) 1,
         (short) 1,
         UUID.randomUUID(),
-        Instant.now(),
-        LocalDateTime.now(),
-        ZonedDateTime.now(),
+        Instant.parse("2024-01-15T13:45:30.123Z"),
+        LocalDateTime.of(2024, Month.JANUARY, 15, 13, 45, 30),
+        ZonedDateTime.of(2024, Month.JANUARY.getValue(), 15, 13, 45, 30, 0, ZoneOffset.UTC),
         Duration.ofDays(1).plusHours(2).plusMinutes(3).plusSeconds(4),
         DayOfWeek.MONDAY,
         String.class,
