@@ -17,6 +17,7 @@ import static org.awaitility.Awaitility.await;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.UUID;
 import java.util.function.Function;
 import org.approvej.approve.PathProvider;
@@ -31,7 +32,9 @@ class ApprovalBuilderTest {
   @Test
   void named() {
     approve("Some text").named("first").byFile();
-    approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
+    approve(
+            new Person(
+                "000000-0000-0000-00000001", "Micha", LocalDate.of(1982, Month.FEBRUARY, 19)))
         .named("second")
         .byFile();
 
@@ -45,14 +48,18 @@ class ApprovalBuilderTest {
   void printedBy() {
     Function<Person, String> personPrinter =
         person -> "id=" + person.id + "\nname=" + person.name + "\nbirthday=" + person.birthday;
-    approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
+    approve(
+            new Person(
+                "000000-0000-0000-00000001", "Micha", LocalDate.of(1982, Month.FEBRUARY, 19)))
         .printedBy(personPrinter)
         .byValue("id=000000-0000-0000-00000001\nname=Micha\nbirthday=1982-02-19");
   }
 
   @Test
   void printedAs() {
-    approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
+    approve(
+            new Person(
+                "000000-0000-0000-00000001", "Micha", LocalDate.of(1982, Month.FEBRUARY, 19)))
         .printedAs(multiLineString())
         .byValue(
             """
@@ -89,7 +96,7 @@ class ApprovalBuilderTest {
 
   @Test
   void scrubbedOf_pre_and_post_printed() {
-    approve(new Person("Micha", LocalDate.of(1982, 2, 19)))
+    approve(new Person("Micha", LocalDate.of(1982, Month.FEBRUARY, 19)))
         .scrubbedOf(person -> new Person("[scrubbed id]", person.name, person.birthday))
         .printedBy(Object::toString)
         .scrubbedOf(dateTimeFormat("yyyy-MM-dd"))
@@ -135,7 +142,9 @@ class ApprovalBuilderTest {
 
   @Test
   void byValue_pojo() {
-    approve(new Person("000000-0000-0000-00000001", "Micha", LocalDate.of(1982, 2, 19)))
+    approve(
+            new Person(
+                "000000-0000-0000-00000001", "Micha", LocalDate.of(1982, Month.FEBRUARY, 19)))
         .byValue("Person[id=000000-0000-0000-00000001, name=Micha, birthday=1982-02-19]");
   }
 
@@ -186,7 +195,7 @@ class ApprovalBuilderTest {
     await()
         .untilAsserted(
             () ->
-                approve(new Person("Micha", LocalDate.of(1982, 2, 19)))
+                approve(new Person("Micha", LocalDate.of(1982, Month.FEBRUARY, 19)))
                     .scrubbedOf(person -> new Person("[scrubbed id]", person.name, person.birthday))
                     .printedBy(Object::toString)
                     .scrubbedOf(dateTimeFormat("yyyy-MM-dd"))

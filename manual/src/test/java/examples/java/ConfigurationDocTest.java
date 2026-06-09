@@ -5,6 +5,7 @@ import static org.approvej.ApprovalBuilder.approve;
 
 import examples.ExampleClass.Person;
 import java.time.LocalDate;
+import java.time.Month;
 import org.junit.jupiter.api.Test;
 
 @org.approvej.ApprovalTest
@@ -12,7 +13,7 @@ class ConfigurationDocTest {
 
   @Test
   void screaming_print_format() {
-    Person person = createPerson("John Doe", LocalDate.of(1990, 1, 1));
+    Person person = createPerson("John Doe", LocalDate.of(1990, Month.JANUARY, 1));
 
     approve(person)
         .printedAs(new ScreamingPrintFormat())

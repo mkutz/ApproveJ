@@ -4,6 +4,7 @@ import static org.approvej.yaml.jackson3.YamlPrintFormat.yaml;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.Period;
 import org.approvej.print.PersonPojo;
 import org.approvej.print.Pet;
@@ -26,7 +27,7 @@ class YamlPrintFormatTest {
 
   @Test
   void printer() {
-    assertThat(yaml().printer().apply(new Person("Micha", LocalDate.of(1982, 2, 19))))
+    assertThat(yaml().printer().apply(new Person("Micha", LocalDate.of(1982, Month.FEBRUARY, 19))))
         .isEqualTo(
             """
             ---
@@ -54,7 +55,7 @@ class YamlPrintFormatTest {
       }
     }
 
-    LocalDate birthday = LocalDate.of(1982, 2, 19);
+    LocalDate birthday = LocalDate.of(1982, Month.FEBRUARY, 19);
     int age = Period.between(birthday, LocalDate.now()).getYears();
     LocalDate today = LocalDate.now();
     boolean birthdayToday =
