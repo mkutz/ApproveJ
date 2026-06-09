@@ -42,6 +42,8 @@ public record PathProvider(
   /** The infix of the file containing a visual diff between received and approved. */
   public static final String DIFF = "diff";
 
+  private static final String FILENAME_FORMAT = "%s%s%s%s";
+
   /**
    * Set the {@link #directory} where the approved and received files are stored.
    *
@@ -90,12 +92,11 @@ public record PathProvider(
   public Path approvedPath() {
     return directory
         .resolve(
-            "%s%s%s%s"
-                .formatted(
-                    baseFilename,
-                    filenameAffix.isBlank() ? "" : "-%s".formatted(filenameAffix),
-                    approvedLabel.isBlank() ? "" : "-%s".formatted(approvedLabel),
-                    filenameExtension.isBlank() ? "" : ".%s".formatted(filenameExtension)))
+            FILENAME_FORMAT.formatted(
+                baseFilename,
+                filenameAffix.isBlank() ? "" : "-%s".formatted(filenameAffix),
+                approvedLabel.isBlank() ? "" : "-%s".formatted(approvedLabel),
+                filenameExtension.isBlank() ? "" : ".%s".formatted(filenameExtension)))
         .normalize();
   }
 
@@ -109,12 +110,11 @@ public record PathProvider(
   public Path receivedPath() {
     return directory
         .resolve(
-            "%s%s%s%s"
-                .formatted(
-                    baseFilename,
-                    filenameAffix.isBlank() ? "" : "-%s".formatted(filenameAffix),
-                    "-%s".formatted(RECEIVED),
-                    filenameExtension.isBlank() ? "" : ".%s".formatted(filenameExtension)))
+            FILENAME_FORMAT.formatted(
+                baseFilename,
+                filenameAffix.isBlank() ? "" : "-%s".formatted(filenameAffix),
+                "-%s".formatted(RECEIVED),
+                filenameExtension.isBlank() ? "" : ".%s".formatted(filenameExtension)))
         .normalize();
   }
 
@@ -128,12 +128,11 @@ public record PathProvider(
   public Path diffPath() {
     return directory
         .resolve(
-            "%s%s%s%s"
-                .formatted(
-                    baseFilename,
-                    filenameAffix.isBlank() ? "" : "-%s".formatted(filenameAffix),
-                    "-%s".formatted(DIFF),
-                    filenameExtension.isBlank() ? "" : ".%s".formatted(filenameExtension)))
+            FILENAME_FORMAT.formatted(
+                baseFilename,
+                filenameAffix.isBlank() ? "" : "-%s".formatted(filenameAffix),
+                "-%s".formatted(DIFF),
+                filenameExtension.isBlank() ? "" : ".%s".formatted(filenameExtension)))
         .normalize();
   }
 }
