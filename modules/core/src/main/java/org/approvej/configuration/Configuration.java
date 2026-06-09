@@ -56,7 +56,12 @@ public record Configuration(
   private static final String INVENTORY_ENABLED_PROPERTY = "inventoryEnabled";
   private static final String DEFAULT_INLINE_VALUE_REVIEWER_PROPERTY = "defaultInlineValueReviewer";
 
-  @Deprecated private static final String DEPRECATED_SCRIPT_PROPERTY = "defaultFileReviewerScript";
+  /**
+   * @deprecated Use {@code defaultFileReviewer = script} together with {@code reviewerScript = ...}
+   *     instead.
+   */
+  @Deprecated(since = "1.1", forRemoval = true)
+  private static final String DEPRECATED_SCRIPT_PROPERTY = "defaultFileReviewerScript";
 
   /** The loaded {@link Configuration} object. */
   public static final Configuration configuration =
@@ -131,8 +136,9 @@ public record Configuration(
     String deprecatedScript = loader.get(DEPRECATED_SCRIPT_PROPERTY);
     if (deprecatedScript != null) {
       LOGGER.warning(
-          "'%s' is deprecated. Use 'defaultFileReviewer = script' with 'reviewerScript = ...' instead."
-              .formatted(DEPRECATED_SCRIPT_PROPERTY));
+          () ->
+              "'%s' is deprecated. Use 'defaultFileReviewer = script' with 'reviewerScript = ...' instead."
+                  .formatted(DEPRECATED_SCRIPT_PROPERTY));
       return "script";
     }
     return "none";
