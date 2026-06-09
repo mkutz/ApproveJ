@@ -2,7 +2,8 @@ buildscript {
   // Spotless 8.x pulls JGit 7.x onto the shared plugin classpath, but JReleaser still
   // requires org.eclipse.jgit.lib.GpgObjectSigner, which JGit removed in 7.0. Hold JGit at the
   // latest 6.x so both plugins work. The build does not use Spotless's git ratchet, so its JGit
-  // usage is unaffected.
+  // usage is unaffected. Remove this once JReleaser upgrades to JGit 7.x (gated behind its 2.x
+  // major release / Java 17 baseline): https://github.com/jreleaser/jreleaser/issues/1846
   configurations.classpath {
     resolutionStrategy.force("org.eclipse.jgit:org.eclipse.jgit:6.10.1.202505221210-r")
   }

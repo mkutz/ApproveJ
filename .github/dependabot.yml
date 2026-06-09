@@ -21,6 +21,12 @@ updates:
       - dependency-name: junit:junit
         update-types:
         - version-update:semver-major
+      # JGit is pinned to 6.x on the buildscript classpath because JReleaser still requires
+      # org.eclipse.jgit.lib.GpgObjectSigner, which JGit removed in 7.0. Ignore 7.x until
+      # JReleaser upgrades: https://github.com/jreleaser/jreleaser/issues/1846
+      - dependency-name: org.eclipse.jgit:*
+        update-types:
+        - version-update:semver-major
   - package-ecosystem: github-actions
     directory: /
     schedule:
