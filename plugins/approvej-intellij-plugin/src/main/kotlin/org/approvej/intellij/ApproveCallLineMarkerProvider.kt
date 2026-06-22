@@ -63,10 +63,9 @@ class ApproveCallLineMarkerProvider : LineMarkerProviderDescriptor() {
 
     data class ReceivedApprovedPair(val received: VirtualFile, val approved: VirtualFile)
 
-    val receivedApprovedPair =
-      approvedFiles.firstNotNullOfOrNull { approved ->
-        ApprovedFileUtil.findReceivedFile(approved)?.let { ReceivedApprovedPair(it, approved) }
-      }
+    val receivedApprovedPair = approvedFiles.firstNotNullOfOrNull { approved ->
+      ApprovedFileUtil.findReceivedFile(approved)?.let { ReceivedApprovedPair(it, approved) }
+    }
 
     if (receivedApprovedPair == null) {
       val builder =

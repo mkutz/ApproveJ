@@ -72,7 +72,8 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
     addInventory(
       "src/com/example/MyTest-approve_named-jane-approved.txt" to
         "com.example.MyTest#approve_named",
-      "src/com/example/MyTest-approve_named-john-approved.txt" to "com.example.MyTest#approve_named",
+      "src/com/example/MyTest-approve_named-john-approved.txt" to
+        "com.example.MyTest#approve_named",
     )
     myFixture.addFileToProject("src/com/example/MyTest-approve_named-jane-approved.txt", "jane")
     myFixture.addFileToProject("src/com/example/MyTest-approve_named-john-approved.txt", "john")
