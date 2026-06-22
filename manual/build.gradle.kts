@@ -13,7 +13,7 @@ java { toolchain { languageVersion.set(JavaLanguageVersion.of(21)) } }
 
 repositories { mavenCentral() }
 
-val asciidoctorExt: Configuration by configurations.creating
+val asciidoctorExt: Configuration = configurations.create("asciidoctorExt")
 
 dependencies {
   asciidoctorExt(libs.asciidoctor.block.switch)
@@ -22,35 +22,34 @@ dependencies {
 
 testing {
   suites {
-    val test by
-      getting(JvmTestSuite::class) {
-        useJUnitJupiter()
-        dependencies {
-          implementation(project(":modules:core"))
-          implementation(project(":modules:image"))
-          implementation(project(":modules:json-jackson"))
-          implementation(project(":modules:yaml-jackson"))
-          implementation(project(":modules:http"))
-          implementation(project(":modules:database-jdbc"))
+    getByName<JvmTestSuite>("test") {
+      useJUnitJupiter()
+      dependencies {
+        implementation(project(":modules:core"))
+        implementation(project(":modules:image"))
+        implementation(project(":modules:json-jackson"))
+        implementation(project(":modules:yaml-jackson"))
+        implementation(project(":modules:http"))
+        implementation(project(":modules:database-jdbc"))
 
-          implementation(platform(libs.jackson2.bom))
-          implementation(libs.playwright)
-          implementation(libs.selenium)
+        implementation(platform(libs.jackson2.bom))
+        implementation(libs.playwright)
+        implementation(libs.selenium)
 
-          implementation(libs.jackson2.databind)
-          implementation(libs.h2)
-          implementation(libs.jackson2.dataformat.yaml)
-          implementation(libs.jackson2.jsr310)
+        implementation(libs.jackson2.databind)
+        implementation(libs.h2)
+        implementation(libs.jackson2.dataformat.yaml)
+        implementation(libs.jackson2.jsr310)
 
-          implementation(platform(libs.junit.bom))
-          implementation(libs.junit.jupiter.api)
-          implementation(libs.junit.jupiter.params)
-          implementation(libs.assertj.core)
+        implementation(platform(libs.junit.bom))
+        implementation(libs.junit.jupiter.api)
+        implementation(libs.junit.jupiter.params)
+        implementation(libs.assertj.core)
 
-          runtimeOnly(libs.junit.platform.launcher)
-          runtimeOnly(libs.junit.jupiter.engine)
-        }
+        runtimeOnly(libs.junit.platform.launcher)
+        runtimeOnly(libs.junit.jupiter.engine)
       }
+    }
   }
 }
 

@@ -27,26 +27,25 @@ dependencies {
 
 testing {
   suites {
-    val test by
-      getting(JvmTestSuite::class) {
-        useJUnitJupiter()
-        dependencies {
-          implementation(testFixtures(project(":modules:core")))
+    getByName<JvmTestSuite>("test") {
+      useJUnitJupiter()
+      dependencies {
+        implementation(testFixtures(project(":modules:core")))
 
-          // Tests need Jackson
-          implementation(platform(libs.jackson3.bom))
-          implementation(libs.jackson3.databind)
-          implementation(libs.jackson3.dataformat.yaml)
+        // Tests need Jackson
+        implementation(platform(libs.jackson3.bom))
+        implementation(libs.jackson3.databind)
+        implementation(libs.jackson3.dataformat.yaml)
 
-          implementation(platform(libs.junit.bom))
-          implementation(libs.junit.jupiter.api)
-          implementation(libs.junit.jupiter.params)
-          implementation(libs.assertj.core)
+        implementation(platform(libs.junit.bom))
+        implementation(libs.junit.jupiter.api)
+        implementation(libs.junit.jupiter.params)
+        implementation(libs.assertj.core)
 
-          runtimeOnly(libs.junit.platform.launcher)
-          runtimeOnly(libs.junit.jupiter.engine)
-        }
+        runtimeOnly(libs.junit.platform.launcher)
+        runtimeOnly(libs.junit.jupiter.engine)
       }
+    }
   }
 }
 
