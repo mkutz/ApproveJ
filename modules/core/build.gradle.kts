@@ -26,37 +26,34 @@ dependencies {
 
 testing {
   suites {
-    val test by
-      getting(JvmTestSuite::class) {
-        useJUnitJupiter()
-        dependencies {
-          implementation(platform(libs.junit.bom))
-          implementation(libs.junit.jupiter.api)
-          implementation(libs.junit.jupiter.params)
-          implementation(libs.assertj.core)
-          implementation(libs.awaitility)
+    getByName<JvmTestSuite>("test") {
+      useJUnitJupiter()
+      dependencies {
+        implementation(platform(libs.junit.bom))
+        implementation(libs.junit.jupiter.api)
+        implementation(libs.junit.jupiter.params)
+        implementation(libs.assertj.core)
+        implementation(libs.awaitility)
 
-          runtimeOnly(libs.junit.platform.launcher)
-          runtimeOnly(libs.junit.jupiter.engine)
-        }
+        runtimeOnly(libs.junit.platform.launcher)
+        runtimeOnly(libs.junit.jupiter.engine)
       }
-    val testng by
-      registering(JvmTestSuite::class) {
-        useTestNG()
-        dependencies {
-          implementation(libs.testng)
-          implementation(project())
-        }
+    }
+    register<JvmTestSuite>("testng") {
+      useTestNG()
+      dependencies {
+        implementation(libs.testng)
+        implementation(project())
       }
-    val spock by
-      registering(JvmTestSuite::class) {
-        useSpock()
-        dependencies {
-          implementation(libs.spock)
-          implementation(libs.groovy)
-          implementation(project())
-        }
+    }
+    register<JvmTestSuite>("spock") {
+      useSpock()
+      dependencies {
+        implementation(libs.spock)
+        implementation(libs.groovy)
+        implementation(project())
       }
+    }
   }
 }
 

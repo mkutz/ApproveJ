@@ -28,8 +28,8 @@ subprojects {
           create<MavenPublication>(name) {
             from(components.findByName("java") ?: components.getByName("javaPlatform"))
             pom {
-              project.properties["mavenPomName"]?.let { name = "$it" }
-              project.properties["mavenPomDescription"]?.let { description = "$it" }
+              project.findProperty("mavenPomName")?.let { name = "$it" }
+              project.findProperty("mavenPomDescription")?.let { description = "$it" }
               url = "https://approvej.org"
               inceptionYear = "2025"
               licenses {
@@ -183,25 +183,24 @@ spotless {
   freshmark { target("*.md") }
 }
 
-val updatePages by
-  tasks.registering(Sync::class) {
-    group = "documentation"
-    description = "Assembles the website with manual and Javadoc"
+tasks.register<Sync>("updatePages") {
+  group = "documentation"
+  description = "Assembles the website with manual and Javadoc"
 
-    into(layout.buildDirectory.dir("pages"))
+  into(layout.buildDirectory.dir("pages"))
 
-    // Favicon and logo
-    from("favicon.png") { into("img") }
-    from("logo.svg") { into("img") }
+  // Favicon and logo
+  from("favicon.png") { into("img") }
+  from("logo.svg") { into("img") }
 
-    // AsciiDoc manual
-    from(project(":manual").tasks.named("asciidoctor"))
+  // AsciiDoc manual
+  from(project(":manual").tasks.named("asciidoctor"))
 
-    // Cheat sheet PDF
-    from(project(":manual").tasks.named("cheatSheetPdf")) { into("pdf") }
+  // Cheat sheet PDF
+  from(project(":manual").tasks.named("cheatSheetPdf")) { into("pdf") }
 
-    // Javadoc for each module
-    project(":modules").subprojects.forEach { module ->
-      from(module.tasks.named("javadoc")) { into("javadoc/${module.name}") }
-    }
+  // Javadoc for each module
+  project(":modules").subprojects.forEach { module ->
+    from(module.tasks.named("javadoc")) { into("javadoc/${module.name}") }
   }
+}
