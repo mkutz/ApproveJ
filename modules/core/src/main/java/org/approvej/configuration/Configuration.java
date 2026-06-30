@@ -60,7 +60,7 @@ public record Configuration(
    * @deprecated Use {@code defaultFileReviewer = script} together with {@code reviewerScript = ...}
    *     instead.
    */
-  @Deprecated(since = "1.1", forRemoval = true)
+  @Deprecated(since = "1.1")
   private static final String DEPRECATED_SCRIPT_PROPERTY = "defaultFileReviewerScript";
 
   /** The loaded {@link Configuration} object. */
