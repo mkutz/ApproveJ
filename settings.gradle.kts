@@ -22,6 +22,8 @@ include("modules:http-wiremock")
 
 include("modules:database-jdbc")
 
+include("modules:database-spring-boot")
+
 include("plugins:approvej-gradle-plugin")
 
 include("plugins:approvej-maven-plugin")

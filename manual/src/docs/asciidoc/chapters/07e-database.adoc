@@ -100,18 +100,40 @@ Since `RecordingDataSource` implements `DataSource`, it can be passed anywhere a
 With **plain JDBC**, simply wrap your `DataSource` before passing it to the code under test, as shown in the <<database_approve_sql,basic example>> above.
 
 In a **Spring Boot** test, the `DataSource` is managed by the container and injected into your services automatically.
-The following example from the Spring Boot example project shows a complete test class that wraps the `DataSource` with a `RecordingDataSource` and approves the recorded SQL:
+The `database-spring-boot` module provides an auto-configuration that wraps the Spring-managed `DataSource` with a `RecordingDataSource` for you — no `BeanPostProcessor` or `@TestConfiguration` boilerplate required.
+
+.Gradle
+[source,groovy,subs=attributes+,role="primary"]
+----
+testImplementation 'org.approvej:database-spring-boot:{revnumber}'
+----
+.Gradle.kts
+[source,kotlin,subs=attributes+,role="secondary"]
+----
+testImplementation("org.approvej:database-spring-boot:{revnumber}")
+----
+.Maven
+[source,xml,subs=attributes+,role="secondary"]
+----
+<dependency>
+  <groupId>org.approvej</groupId>
+  <artifactId>database-spring-boot</artifactId>
+  <version>{revnumber}</version>
+  <scope>test</scope>
+</dependency>
+----
+
+With the module on the test classpath, the injected `DataSource` is already a `RecordingDataSource` — inject it, cast it, and approve the recorded SQL:
 
 [source,java,indent=0]
 ----
 include::../../../../../examples/spring-boot/src/test/java/org/approvej/examples/shop/order/OrderSqlApprovalTest.java[tag=spring_boot_database]
 ----
-<1> `@Import` activates the `@TestConfiguration`.
-Without it, the inner class is ignored.
-<2> The injected `DataSource` is now the `RecordingDataSource` wrapper.
-<3> A `BeanPostProcessor` intercepts the `DataSource` bean and wraps it with `RecordingDataSource`.
-This ensures all beans — including your services and JPA — use the recording wrapper transparently.
-<4> Approve the last recorded SQL query using the <<database_sql_print_format,SQL print format>>.
+<1> The injected `DataSource` is the `RecordingDataSource` wrapper, so your services and JPA all record transparently.
+<2> Approve the last recorded SQL query using the <<database_sql_print_format,SQL print format>>.
+
+Recording is enabled by default.
+Set `approvej.database.recording.enabled=false` to disable it for contexts that need the plain `DataSource`.
 
 TIP: Call `resetRecordedQueries()` before exercising the code under test to ensure you only capture the SQL you care about.
 

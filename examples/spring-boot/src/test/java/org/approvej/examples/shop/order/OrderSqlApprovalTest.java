@@ -17,19 +17,14 @@ import org.junit.jupiter.api.AutoClose;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 // tag::spring_boot_database[]
 @SpringBootTest
-@Import(OrderSqlApprovalTest.RecordingDataSourceConfiguration.class) // <1>
 class OrderSqlApprovalTest {
 
   @ServiceConnection
@@ -46,24 +41,7 @@ class OrderSqlApprovalTest {
 
   @Autowired private OrderService orderService;
   @Autowired private ProductRepository productRepository;
-  @Autowired private DataSource dataSource; // <2>
-
-  @TestConfiguration
-  static class RecordingDataSourceConfiguration {
-
-    @Bean
-    static BeanPostProcessor recordingDataSourceWrapper() { // <3>
-      return new BeanPostProcessor() {
-        @Override
-        public Object postProcessAfterInitialization(Object bean, String beanName) {
-          if (bean instanceof DataSource dataSource && !(bean instanceof RecordingDataSource)) {
-            return new RecordingDataSource(dataSource);
-          }
-          return bean;
-        }
-      };
-    }
-  }
+  @Autowired private DataSource dataSource; // <1>
 
   @BeforeEach
   void resetPaymentStub() {
@@ -88,7 +66,7 @@ class OrderSqlApprovalTest {
 
     orderService.placeOrder("Dave", "dave@example.com", List.of(product.getId()));
 
-    approve(recordingDataSource.lastRecordedQuery()) // <4>
+    approve(recordingDataSource.lastRecordedQuery()) // <2>
         .printedAs(sql())
         .scrubbedOf(uuids())
         .byFile();

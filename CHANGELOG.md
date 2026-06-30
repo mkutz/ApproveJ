@@ -9,6 +9,14 @@
   The configuration property deprecated since 1.1 has been removed.
   Use `defaultFileReviewer = script` with `reviewerScript` instead.
 
+### database-spring-boot
+
+* ✨ **New module for Spring Boot database testing**
+  Add `database-spring-boot` module providing a Spring Boot auto-configuration that wraps the Spring-managed `DataSource` with a `RecordingDataSource` automatically.
+  Add the dependency and the injected `DataSource` records SQL out of the box — no `BeanPostProcessor` boilerplate.
+  Recording can be disabled with `approvej.database.recording.enabled=false`.
+  ([#256](https://github.com/mkutz/ApproveJ/issues/256))
+
 
 ## v1.6.2
 
