@@ -36,8 +36,7 @@ import org.springframework.context.annotation.Bean;
     matchIfMissing = true)
 public class ApprovejDatabaseAutoConfiguration {
 
-  /** Creates a new {@link ApprovejDatabaseAutoConfiguration}. */
-  public ApprovejDatabaseAutoConfiguration() {}
+  ApprovejDatabaseAutoConfiguration() {}
 
   /**
    * A {@link BeanPostProcessor} that wraps each {@link DataSource} bean with a {@link
