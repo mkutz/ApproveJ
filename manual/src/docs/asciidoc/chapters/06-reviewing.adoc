@@ -75,9 +75,6 @@ reviewerScript = meld "{receivedFile}" "{approvedFile}"
 reviewerScript = vimdiff "{receivedFile}" "{approvedFile}"
 ----
 
-NOTE: The deprecated `defaultFileReviewerScript` property still works but logs a warning.
-Migrate to `defaultFileReviewer = script` with `reviewerScript` instead.
-
 You can also set this per project in `src/test/resources/approvej.properties` or via an environment variable (see <<configuration>>).
 
 

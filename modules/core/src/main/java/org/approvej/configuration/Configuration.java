@@ -1,6 +1,5 @@
 package org.approvej.configuration;
 
-import java.util.logging.Logger;
 import org.approvej.print.PrintFormat;
 import org.approvej.print.SingleLineStringPrintFormat;
 import org.approvej.review.Reviewer;
@@ -47,21 +46,12 @@ public record Configuration(
     boolean inventoryEnabled,
     Reviewer defaultInlineValueReviewer) {
 
-  private static final Logger LOGGER = Logger.getLogger(Configuration.class.getName());
-
   private static final String DEFAULT_PRINT_FORMAT_PROPERTY = "defaultPrintFormat";
   private static final String DEFAULT_FILE_REVIEWER_PROPERTY = "defaultFileReviewer";
   private static final String REVIEWER_SCRIPT_PROPERTY = "reviewerScript";
   private static final String REVIEWER_AI_COMMAND_PROPERTY = "reviewerAiCommand";
   private static final String INVENTORY_ENABLED_PROPERTY = "inventoryEnabled";
   private static final String DEFAULT_INLINE_VALUE_REVIEWER_PROPERTY = "defaultInlineValueReviewer";
-
-  /**
-   * @deprecated Use {@code defaultFileReviewer = script} together with {@code reviewerScript = ...}
-   *     instead.
-   */
-  @Deprecated(since = "1.1")
-  private static final String DEPRECATED_SCRIPT_PROPERTY = "defaultFileReviewerScript";
 
   /** The loaded {@link Configuration} object. */
   public static final Configuration configuration =
@@ -90,13 +80,9 @@ public record Configuration(
     return Registry.resolve(aliasOrClassName, PrintFormat.class);
   }
 
-  @SuppressWarnings("deprecation")
   private static Reviewer resolveReviewer(ConfigurationLoader loader, String aliasOrClassName) {
     if ("script".equals(aliasOrClassName)) {
       String script = loader.get(REVIEWER_SCRIPT_PROPERTY);
-      if (script == null) {
-        script = loader.get(DEPRECATED_SCRIPT_PROPERTY);
-      }
       if (script == null) {
         throw new ConfigurationError(
             "Reviewer 'script' requires the '%s' property to be set"
@@ -127,19 +113,10 @@ public record Configuration(
     return ci == null || ci.isBlank();
   }
 
-  @SuppressWarnings("deprecation")
   private static String resolveFileReviewerAlias(ConfigurationLoader loader) {
     String explicit = loader.get(DEFAULT_FILE_REVIEWER_PROPERTY);
     if (explicit != null) {
       return explicit;
-    }
-    String deprecatedScript = loader.get(DEPRECATED_SCRIPT_PROPERTY);
-    if (deprecatedScript != null) {
-      LOGGER.warning(
-          () ->
-              "'%s' is deprecated. Use 'defaultFileReviewer = script' with 'reviewerScript = ...' instead."
-                  .formatted(DEPRECATED_SCRIPT_PROPERTY));
-      return "script";
     }
     return "none";
   }

@@ -1,6 +1,15 @@
 # Changelog
 
 
+## v1.7.0
+
+### core
+
+* ⚠️ **Remove deprecated `defaultFileReviewerScript` property**
+  The configuration property deprecated since 1.1 has been removed.
+  Use `defaultFileReviewer = script` with `reviewerScript` instead.
+
+
 ## v1.6.2
 
 ### plugins
