@@ -115,6 +115,7 @@ It is structured in four main directories:
 - The [modules](modules) directory contains all the published library modules:
   - [core](modules/core) contains the code for the core framework and should not have any dependencies to other modules and only very few (if any) to external libraries,
   - [database-jdbc](modules/database-jdbc) contains the JDBC adapter for database testing,
+  - [database-spring-boot](modules/database-spring-boot) contains the Spring Boot auto-configuration for database testing,
   - [http](modules/http) contains code to create an HTTP server for approving requests,
   - [http-wiremock](modules/http-wiremock) contains the WireMock adapter for HTTP testing,
   - [image](modules/image) contains the image approval and comparison utilities,
