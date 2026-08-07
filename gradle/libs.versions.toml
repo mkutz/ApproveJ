@@ -28,7 +28,7 @@ jackson2-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-js
 jackson3-bom = { module = "tools.jackson:jackson-bom", version.ref = "jackson3" }
 jackson3-databind = { module = "tools.jackson.core:jackson-databind" }
 jackson3-dataformat-yaml = { module = "tools.jackson.dataformat:jackson-dataformat-yaml" }
-jspecify = { module = "org.jspecify:jspecify", version = "1.0.0" }
+jspecify = { module = "org.jspecify:jspecify", version = "1.0.1" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }
 junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
