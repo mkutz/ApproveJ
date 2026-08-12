@@ -118,6 +118,9 @@ configurations.testCompileClasspath {
 
 tasks.test {
   useJUnitPlatform()
+  /* Since IntelliJ Platform Gradle Plugin 2.18, tests load all bundled IDE plugins instead of only
+  the declared ones. Restrict them again so foreign plugins cannot interfere with our tests. */
+  systemProperty("idea.load.plugins.id", "com.intellij.java,com.intellij.properties,org.approvej")
   configure<JacocoTaskExtension> {
     includes = listOf("org.approvej.*")
     isIncludeNoLocationClasses = true
