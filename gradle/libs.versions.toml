@@ -1,6 +1,6 @@
 [versions]
 assertj = "3.27.7"
-commonmark = "0.29.0"
+commonmark = "0.30.0"
 detekt = "1.23.8"
 intellij-ide = "2025.1"
 intellij-platform = "2.17.0"
