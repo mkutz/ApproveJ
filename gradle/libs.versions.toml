@@ -70,7 +70,7 @@ jreleaser = { id = "org.jreleaser", version = "1.25.0" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.4.10" }
 maven-plugin-development = { id = "org.gradlex.maven-plugin-development", version = "1.0.3" }
 plugin-publish = { id = "com.gradle.plugin-publish", version = "2.1.1" }
-sonar = { id = "org.sonarqube", version = "7.3.1.8318" }
+sonar = { id = "org.sonarqube", version = "7.4.0.8496" }
 spotless = { id = "com.diffplug.spotless", version = "8.9.0" }
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version = "1.1.7" }
