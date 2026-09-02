@@ -7,8 +7,9 @@
     Approval testing support for ApproveJ.
     Provides diff viewing, one-click approval, bidirectional navigation between
     test code and approved files, dangling approval detection, duplicate
-    unnamed approval detection, and approvej.properties editing support
-    with autocompletion and validation.
+    unnamed approval detection, approvej.properties editing support
+    with autocompletion and validation, and test runner integration for
+    approving or comparing test output directly from the test results tree.
   ]]></description>
 
   <depends>com.intellij.modules.platform</depends>
@@ -81,6 +82,19 @@
           class="org.approvej.intellij.ApproveReceivedAction"
           text="Approve Received"
           description="Copy received file content to approved file and delete received file"/>
+    </group>
+    <group id="ApproveJ.TestTree" text="ApproveJ" popup="true"
+        icon="/icons/approvej.svg">
+      <add-to-group group-id="TestTreePopupMenu"
+          anchor="before" relative-to-action="EditSource"/>
+      <action id="ApproveJ.ApproveTest"
+          class="org.approvej.intellij.ApproveTestAction"
+          text="Approve Test"
+          description="Approve the received file for this test"/>
+      <action id="ApproveJ.CompareTest"
+          class="org.approvej.intellij.CompareTestAction"
+          text="Compare Received with Approved"
+          description="Open diff for this test's received and approved files"/>
     </group>
   </actions>
 </idea-plugin>
