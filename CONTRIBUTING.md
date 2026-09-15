@@ -119,6 +119,7 @@ It is structured in four main directories:
   - [http](modules/http) contains code to create an HTTP server for approving requests,
   - [http-wiremock](modules/http-wiremock) contains the WireMock adapter for HTTP testing,
   - [image](modules/image) contains the image approval and comparison utilities,
+  - [kotest](modules/kotest) contains the Kotest adapter so approvals work inside Kotlin specs,
   - [json-jackson](modules/json-jackson) contains JSON-related code using Jackson 2.x,
   - [json-jackson3](modules/json-jackson3) contains JSON-related code using Jackson 3.x,
   - [yaml-jackson](modules/yaml-jackson) contains YAML-related code using Jackson 2.x,
