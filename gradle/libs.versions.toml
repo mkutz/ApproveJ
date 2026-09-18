@@ -69,7 +69,7 @@ intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "int
 jreleaser = { id = "org.jreleaser", version = "1.26.0" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.4.20" }
 maven-plugin-development = { id = "org.gradlex.maven-plugin-development", version = "1.0.3" }
-plugin-publish = { id = "com.gradle.plugin-publish", version = "2.2.0" }
+plugin-publish = { id = "com.gradle.plugin-publish", version = "2.2.1" }
 sonar = { id = "org.sonarqube", version = "7.5.0.8588" }
 spotless = { id = "com.diffplug.spotless", version = "8.10.2" }
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
