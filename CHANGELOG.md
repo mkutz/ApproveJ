@@ -17,6 +17,14 @@
   Recording can be disabled with `approvej.database.recording.enabled=false`.
   ([#256](https://github.com/mkutz/ApproveJ/issues/256))
 
+### kotest
+
+* ✨ **New module for Kotest support**
+  Add `kotest` module so `approve(...).byFile()` works inside [Kotest](https://kotest.io/) specs, where tests are runtime lambdas rather than methods.
+  Register `ApprovejKotestExtension` in your `ProjectConfig` and approved files are named after the spec class and test name, with enclosing context names for nested styles.
+  Targets Kotest 6.x.
+  ([#162](https://github.com/mkutz/ApproveJ/issues/162))
+
 
 ## v1.6.2
 

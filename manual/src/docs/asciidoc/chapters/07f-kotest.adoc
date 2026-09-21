@@ -1,0 +1,88 @@
+[id=kotest]
+= Kotest -- Approve in Kotlin Specs
+
+ApproveJ derives the approved and received file names from the currently running test.
+For JUnit, TestNG, and Spock it finds the test method on the call stack.
+https://kotest.io/[Kotest] tests are different: they are lambdas registered in a spec, not methods, and the test name only exists at runtime.
+The `kotest` module bridges this gap so that `byFile()` works inside a Kotest spec, naming files after the spec class and the test name.
+
+
+[id=kotest_dependencies]
+== Dependencies
+
+Add the `kotest` module to your test dependencies, alongside your Kotest runner.
+
+.Gradle
+[source,groovy,subs=attributes+,role="primary"]
+----
+testImplementation 'org.approvej:kotest:{revnumber}'
+----
+.Gradle.kts
+[source,kotlin,subs=attributes+,role="secondary"]
+----
+testImplementation("org.approvej:kotest:{revnumber}")
+----
+.Maven
+[source,xml,subs=attributes+,role="secondary"]
+----
+<dependency>
+  <groupId>org.approvej</groupId>
+  <artifactId>kotest</artifactId>
+  <version>{revnumber}</version>
+  <scope>test</scope>
+</dependency>
+----
+
+NOTE: The `kotest` module targets Kotest 6.x.
+
+
+[id=kotest_setup]
+== Register the Extension
+
+ApproveJ needs to know which test is currently running.
+The `ApprovejKotestExtension` captures it.
+Register it once for your project in a Kotest `ProjectConfig`:
+
+[source,kotlin,indent=0]
+.io/kotest/provided/ProjectConfig.kt
+----
+package io.kotest.provided
+
+import io.kotest.core.config.AbstractProjectConfig
+import org.approvej.kotest.ApprovejKotestExtension
+
+class ProjectConfig : AbstractProjectConfig() {
+  override val extensions = listOf(ApprovejKotestExtension())
+}
+----
+
+Kotest discovers this class by its fully-qualified name `io.kotest.provided.ProjectConfig` and applies the extension to every spec.
+
+
+[id=kotest_usage]
+== Approve in a Spec
+
+With the extension registered, call `approve(...).byFile()` from any test, in any spec style:
+
+[source,kotlin,indent=0]
+.FunSpec
+----
+package com.example
+
+import io.kotest.core.spec.style.FunSpec
+import org.approvej.ApprovalBuilder.approve
+
+class GreetingTest :
+  FunSpec({
+    test("greets the user") { approve(greeting("World")).byFile() }
+  })
+----
+
+On the first run this creates `GreetingTest-greets the user-received.txt` next to the spec.
+Review it, rename it to `GreetingTest-greets the user-approved.txt`, and re-run — the test passes.
+
+For nested styles such as `DescribeSpec` or `BehaviorSpec`, the enclosing context names become part of the file name, so leaves with the same name in different contexts do not collide.
+Characters that are illegal in file names (for example `/` in `"GET /article"`) are replaced with `_`.
+
+NOTE: Kotest runs tests on coroutines and, by default, a multi-threaded dispatcher.
+The extension installs the current test as a coroutine context element, so it stays available even when the test body resumes on a different thread.
