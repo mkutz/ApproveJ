@@ -24,6 +24,8 @@ include("modules:database-jdbc")
 
 include("modules:database-spring-boot")
 
+include("modules:spring-test")
+
 include("plugins:approvej-gradle-plugin")
 
 include("plugins:approvej-maven-plugin")
