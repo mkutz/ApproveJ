@@ -1,0 +1,145 @@
+[id=spring_test]
+= Spring Test -- Catch New Test Application Contexts
+
+Spring's TestContext framework caches the application context of a test class and reuses it for every other test class with the same configuration.
+But a test class with a slightly different configuration -- an additional `@MockitoBean`, another active profile, a `@TestPropertySource`, a different web environment -- silently causes another context to be started.
+Each context can take seconds to start, so the build time creeps up without anyone noticing.
+
+The `spring-test` extension makes this visible: it prints all distinct test application contexts of your project, so you can approve them.
+Whenever someone introduces a new context, the approval fails, and the diff shows exactly which new context was added.
+
+[plantuml,spring-test-contexts,svg]
+....
+skinparam style strictuml
+skinparam defaultFontSize 13
+skinparam backgroundColor transparent
+
+participant "Test" as test
+participant "SpringTestContexts" as contexts
+participant "Spring TestContext" as spring
+participant "ApproveJ" as approvej
+
+test -> contexts : springTestContexts(packages)
+contexts -> contexts : scan for Spring test classes
+contexts -> spring : determine context configuration
+contexts -> contexts : group by configuration
+test -> approvej : approve(contexts)
+approvej -> approvej : print, compare
+....
+
+The contexts are determined statically: no test is run and no context is started.
+So the approval is fast and works without any infrastructure like Docker, even if your contexts need it.
+
+
+[id=spring_test_dependencies]
+== Dependencies
+
+The `spring-test` module requires Spring Framework's `spring-test` and JUnit Jupiter, which your Spring tests already use.
+
+.Gradle
+[source,groovy,subs=attributes+,role="primary"]
+----
+testImplementation 'org.approvej:spring-test:{revnumber}'
+----
+.Gradle.kts
+[source,kotlin,subs=attributes+,role="secondary"]
+----
+testImplementation("org.approvej:spring-test:{revnumber}")
+----
+.Maven
+[source,xml,subs=attributes+,role="secondary"]
+----
+<dependency>
+  <groupId>org.approvej</groupId>
+  <artifactId>spring-test</artifactId>
+  <version>{revnumber}</version>
+  <scope>test</scope>
+</dependency>
+----
+
+
+[id=spring_test_approve_contexts]
+== Approve the Test Contexts
+
+Add a plain test (no Spring annotations needed) that approves the contexts of all Spring test classes in your project:
+
+[source,java,indent=0]
+----
+include::../../../../../examples/spring-boot/src/test/java/org/approvej/examples/shop/SpringTestContextsApprovalTest.java[tag=spring_test_contexts]
+----
+<1> link:{javadoc-url}/spring-test/org/approvej/spring/SpringTestContexts.html[`springTestContexts`] scans the given packages and their sub-packages for JUnit Jupiter test classes using the `SpringExtension` (e.g. via `@SpringBootTest`, `@WebMvcTest`, or `@SpringJUnitConfig`) and groups them by their context configuration.
+<2> link:{javadoc-url}/spring-test/org/approvej/spring/SpringTestContextsPrintFormat.html[`contextConfigurations()`] prints each distinct context.
+
+For the example application, this creates the following approved file:
+
+[source,yaml]
+.Approved file
+----
+include::../../../../../examples/spring-boot/src/test/java/org/approvej/examples/shop/SpringTestContextsApprovalTest-spring_test_contexts-approved.txt[]
+----
+
+The four entries show that the example application starts four contexts.
+Three of them only differ in their `@DynamicPropertySource` methods: each test class declares its own, so Spring cannot reuse the context.
+Moving the shared setup into a common base class would allow them to share one context.
+
+TIP: The first run creates a `-received.txt` file next to the test.
+Review it, rename it to `-approved.txt`, and re-run -- the test passes.
+
+
+[id=spring_test_output]
+=== What Is Printed
+
+Spring caches contexts by their `MergedContextConfiguration`.
+The print format shows everything that is relevant to whether two test classes can share a context:
+
+* The context loader, configuration classes and locations, initializers, active profiles, property sources, and inlined properties.
+* The context customizers added by Spring and Spring Boot, e.g. the `@SpringBootTest` web environment, properties mapped from slice and `@AutoConfigure...` annotations, `@Import` s, `@MockitoBean` and `@MockitoSpyBean` fields, and `@DynamicPropertySource` methods.
+* The parent context of a `@ContextHierarchy`.
+
+Details Spring does not take into account are omitted, so a context is always printed the same way.
+The contexts are sorted by their printed form, so adding a test class to an existing context does not change the approved file at all.
+
+Unknown context customizers are printed by their class name.
+If two distinct contexts are printed identically because they only differ in such details, both are marked with a note.
+
+
+[id=spring_test_dirties_context]
+=== `@DirtiesContext`
+
+`@DirtiesContext` does not create a new context, but it closes a cached one, so the next test class using it has to start it again.
+Each usage is listed with the context it affects:
+
+[source,yaml]
+----
+- loader: SpringBootContextLoader
+  classes:
+    - com.example.Application
+  customizers:
+    - @SpringBootTest(webEnvironment=MOCK)
+  dirtied by:
+    - @DirtiesContext(AFTER_CLASS) com.example.OrderTest
+    - @DirtiesContext(BEFORE_METHOD) com.example.PaymentTest.refund
+----
+
+
+[id=spring_test_test_classes]
+=== List the Test Classes
+
+By default, the test classes are not printed, so adding a test class only fails the approval if it introduces a new context.
+To find out which test classes use which context, list them with `withTestClasses()`:
+
+[source,java,indent=0]
+----
+include::../../../../../examples/spring-boot/src/test/java/org/approvej/examples/shop/SpringTestContextsApprovalTest.java[tag=spring_test_contexts_with_test_classes]
+----
+
+Note that this changes the approved file whenever a test class is added, removed, or renamed.
+
+
+[id=spring_test_limitations]
+=== Limitations
+
+* Only JUnit Jupiter test classes are found.
+  Tests using JUnit 4's `SpringRunner` or TestNG's `AbstractTestNGSpringContextTests` are not considered.
+* The packages are scanned on the test runtime classpath.
+  In a multi-module build, add the approval test to each module with Spring tests.
