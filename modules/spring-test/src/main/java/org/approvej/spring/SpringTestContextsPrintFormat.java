@@ -7,7 +7,6 @@ import static java.util.stream.Collectors.joining;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import org.approvej.print.PrintFormat;
@@ -21,7 +20,8 @@ import org.springframework.test.annotation.DirtiesContext.HierarchyMode;
  * details relevant to Spring's context caching.
  *
  * <p>The contexts are sorted by their printed form, so adding or removing test classes does not
- * reorder the output. For example:
+ * reorder the output. The parent contexts of context hierarchies are printed as contexts of their
+ * own, as Spring caches them as well. For example:
  *
  * <pre>
  * - loader: SpringBootContextLoader
@@ -78,7 +78,6 @@ public record SpringTestContextsPrintFormat(boolean includeTestClasses)
                           ContextConfigurationPrinter.print(context.configuration()),
                           context.dirtiesContextUsages(),
                           context.testClasses()))
-              .sorted(Comparator.comparing(PrintedContext::configuration))
               .toList();
       Map<String, Long> occurrences =
           printedContexts.stream()
@@ -88,6 +87,7 @@ public record SpringTestContextsPrintFormat(boolean includeTestClasses)
           .map(
               printedContext ->
                   print(printedContext, occurrences.get(printedContext.configuration()) > 1))
+          .sorted()
           .collect(joining("\n\n"));
     };
   }
@@ -104,7 +104,7 @@ public record SpringTestContextsPrintFormat(boolean includeTestClasses)
     if (ambiguous) {
       lines.add("note: differs from an identically printed context in details not printed");
     }
-    if (includeTestClasses) {
+    if (includeTestClasses && !printedContext.testClasses().isEmpty()) {
       lines.add("test classes:");
       printedContext.testClasses().forEach(testClass -> lines.add("  - " + testClass.getName()));
     }
