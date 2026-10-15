@@ -29,6 +29,7 @@ dependencies {
   testImplementation(project(":modules:http"))
   testImplementation(project(":modules:database-jdbc"))
   testImplementation(project(":modules:database-spring-boot"))
+  testImplementation(project(":modules:spring-test"))
   testImplementation(platform(libs.jackson3.bom))
   testImplementation(libs.jackson3.dataformat.yaml)
   testImplementation(libs.playwright)

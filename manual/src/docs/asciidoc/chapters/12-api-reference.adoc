@@ -11,3 +11,4 @@ Javadoc for each module is available here:
 - link:{javadoc-url}/yaml-jackson/index.html[yaml-jackson] -- YAML support (Jackson 2.x)
 - link:{javadoc-url}/yaml-jackson3/index.html[yaml-jackson3] -- YAML support (Jackson 3.x)
 - link:{javadoc-url}/database/index.html[database] -- database state snapshotting
+- link:{javadoc-url}/spring-test/index.html[spring-test] -- Spring test application contexts

@@ -1,0 +1,40 @@
+- loader: SpringBootContextLoader
+  type: WebMergedContextConfiguration
+  resource base path: src/main/webapp
+  classes:
+    - org.approvej.examples.shop.ShopApplication
+  customizers:
+    - @DynamicPropertySource org.approvej.examples.shop.order.OrderQueryApprovalTest.configurePayment
+    - @SpringBootTest(webEnvironment=MOCK)
+    - org.springframework.boot.testcontainers.service.connection.ServiceConnectionContextCustomizer
+
+- loader: SpringBootContextLoader
+  type: WebMergedContextConfiguration
+  resource base path: src/main/webapp
+  classes:
+    - org.approvej.examples.shop.ShopApplication
+  customizers:
+    - @DynamicPropertySource org.approvej.examples.shop.order.OrderSqlApprovalTest.configurePayment
+    - @SpringBootTest(webEnvironment=MOCK)
+    - org.springframework.boot.testcontainers.service.connection.ServiceConnectionContextCustomizer
+
+- loader: SpringBootContextLoader
+  type: WebMergedContextConfiguration
+  resource base path: src/main/webapp
+  classes:
+    - org.approvej.examples.shop.ShopApplication
+  customizers:
+    - @DynamicPropertySource org.approvej.examples.shop.payment.PaymentApprovalTest.configurePayment
+    - @SpringBootTest(webEnvironment=MOCK)
+    - org.springframework.boot.testcontainers.service.connection.ServiceConnectionContextCustomizer
+
+- loader: SpringBootContextLoader
+  type: WebMergedContextConfiguration
+  resource base path: src/main/webapp
+  classes:
+    - org.approvej.examples.shop.ShopApplication
+  properties:
+    - server.port=0
+  customizers:
+    - @SpringBootTest(webEnvironment=RANDOM_PORT)
+    - org.springframework.boot.testcontainers.service.connection.ServiceConnectionContextCustomizer

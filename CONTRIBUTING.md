@@ -121,6 +121,7 @@ It is structured in four main directories:
   - [image](modules/image) contains the image approval and comparison utilities,
   - [json-jackson](modules/json-jackson) contains JSON-related code using Jackson 2.x,
   - [json-jackson3](modules/json-jackson3) contains JSON-related code using Jackson 3.x,
+  - [spring-test](modules/spring-test) contains the approval of Spring test application contexts,
   - [yaml-jackson](modules/yaml-jackson) contains YAML-related code using Jackson 2.x,
   - [yaml-jackson3](modules/yaml-jackson3) contains YAML-related code using Jackson 3.x,
 - The [plugins](plugins) directory contains build tool plugins:
