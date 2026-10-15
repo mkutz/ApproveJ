@@ -95,6 +95,7 @@ The print format shows everything that is relevant to whether two test classes c
 * The context loader, configuration classes and locations, initializers, active profiles, property sources, and inlined properties.
 * The context customizers added by Spring and Spring Boot, e.g. the `@SpringBootTest` web environment, properties mapped from slice and `@AutoConfigure...` annotations, `@Import` s, `@MockitoBean` and `@MockitoSpyBean` fields, and `@DynamicPropertySource` methods.
 * The parent context of a `@ContextHierarchy`.
+  As Spring caches parent contexts as well, they are also listed as contexts of their own.
 
 Details Spring does not take into account are omitted, so a context is always printed the same way.
 The contexts are sorted by their printed form, so adding a test class to an existing context does not change the approved file at all.
@@ -107,7 +108,8 @@ If two distinct contexts are printed identically because they only differ in suc
 === `@DirtiesContext`
 
 `@DirtiesContext` does not create a new context, but it closes a cached one, so the next test class using it has to start it again.
-Each usage is listed with the context it affects:
+Each usage is listed with the contexts it affects.
+In a `@ContextHierarchy`, this includes the child contexts and, unless the `hierarchyMode` is `CURRENT_LEVEL`, all contexts of the hierarchy:
 
 [source,yaml]
 ----

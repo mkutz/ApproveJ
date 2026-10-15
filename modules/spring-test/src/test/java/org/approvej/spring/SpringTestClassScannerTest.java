@@ -17,6 +17,7 @@ class SpringTestClassScannerTest {
             "org.approvej.spring.fixtures.ConfigTest",
             "org.approvej.spring.fixtures.CustomizedConfigTest",
             "org.approvej.spring.fixtures.DirtiesContextBootTest",
+            "org.approvej.spring.fixtures.DirtiesContextHierarchyTest",
             "org.approvej.spring.fixtures.DirtiesContextMethodBootTest",
             "org.approvej.spring.fixtures.DynamicPropertyBootTest",
             "org.approvej.spring.fixtures.HierarchyTest",
@@ -30,6 +31,8 @@ class SpringTestClassScannerTest {
             "org.approvej.spring.fixtures.ProfileBootTest",
             "org.approvej.spring.fixtures.PropertyBootTest",
             "org.approvej.spring.fixtures.PropertyMappingBootTest",
+            "org.approvej.spring.fixtures.RecordConfigTest",
+            "org.approvej.spring.fixtures.ReversedHierarchyTest",
             "org.approvej.spring.fixtures.nested.NestedBootTest",
             "org.approvej.spring.fixtures.nested.NestedBootTest$Inner");
   }

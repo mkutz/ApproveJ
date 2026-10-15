@@ -12,7 +12,7 @@ class SpringTestContextsTest {
     assertThat(SpringTestContexts.springTestContexts("org.approvej.spring.fixtures").contexts())
         .extracting(context -> context.testClasses().stream().map(Class::getSimpleName).toList())
         .containsExactly(
-            List.of("ConfigTest"),
+            List.of("ConfigTest", "RecordConfigTest"),
             List.of("CustomizedConfigTest"),
             List.of(
                 "DirtiesContextBootTest",
@@ -22,15 +22,17 @@ class SpringTestContextsTest {
                 "PlainBootTest",
                 "NestedBootTest",
                 "Inner"),
+            List.of("DirtiesContextHierarchyTest", "HierarchyTest"),
             List.of("DynamicPropertyBootTest"),
-            List.of("HierarchyTest"),
             List.of("ImportBootTest"),
             List.of("MockitoBeanBootTest"),
             List.of("NoWebEnvironmentBootTest"),
             List.of("OtherCustomizedConfigTest"),
             List.of("ProfileBootTest"),
             List.of("PropertyBootTest"),
-            List.of("PropertyMappingBootTest"));
+            List.of("PropertyMappingBootTest"),
+            List.of("ReversedHierarchyTest"),
+            List.of());
   }
 
   @Test
@@ -40,7 +42,7 @@ class SpringTestContextsTest {
                     "org.approvej.spring.fixtures.nested", "org.approvej.spring.fixtures")
                 .contexts())
         .flatExtracting(SpringTestContext::testClasses)
-        .hasSize(18)
+        .hasSize(21)
         .doesNotHaveDuplicates();
   }
 

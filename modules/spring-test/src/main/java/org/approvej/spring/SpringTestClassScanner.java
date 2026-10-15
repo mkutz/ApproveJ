@@ -94,7 +94,6 @@ final class SpringTestClassScanner {
     if (type.isInterface()
         || type.isAnnotation()
         || type.isEnum()
-        || type.isRecord()
         || type.isLocalClass()
         || type.isAnonymousClass()
         || Modifier.isAbstract(type.getModifiers())

@@ -2,13 +2,11 @@ package org.approvej.spring;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.test.context.ContextCustomizer;
 import org.springframework.util.ObjectUtils;
@@ -19,19 +17,21 @@ import org.springframework.util.ReflectionUtils;
  *
  * <p>Most {@link ContextCustomizer}s do not implement a meaningful {@link Object#toString()}, so
  * the relevant state of well-known ones is read reflectively. Spring Boot's customizers are matched
- * by name, so Spring Boot is not required. Customizers without any state (apart from loggers) are
- * omitted, as their presence is implied by other details. Other customizers are printed by their
- * class name.
+ * by name, so Spring Boot is not required. Customizers known to be added to every context are
+ * omitted. Other customizers are printed by their class name.
  */
 @NullMarked
 final class ContextCustomizerPrinter {
 
-  private static final Set<String> LOGGER_TYPES =
+  private static final Set<String> OMITTED_CUSTOMIZERS =
       Set.of(
-          "org.apache.commons.logging.Log",
-          "org.slf4j.Logger",
-          "java.lang.System$Logger",
-          "java.util.logging.Logger");
+          "org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory"
+              + "$OnFailureConditionReportContextCustomizer",
+          "org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer",
+          "org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory"
+              + "$DuplicateJsonObjectContextCustomizer",
+          "org.springframework.boot.web.server.context.SpringBootTestRandomPortContextCustomizer",
+          "org.springframework.boot.webmvc.test.autoconfigure.WebDriverContextCustomizer");
 
   private ContextCustomizerPrinter() {}
 
@@ -111,20 +111,9 @@ final class ContextCustomizerPrinter {
   }
 
   private static Stream<String> other(ContextCustomizer customizer) {
-    return hasState(customizer.getClass())
-        ? Stream.of(customizer.getClass().getName())
-        : Stream.empty();
-  }
-
-  private static boolean hasState(Class<?> type) {
-    return Stream.<@Nullable Class<?>>iterate(
-            type, current -> current != null && current != Object.class, Class::getSuperclass)
-        .flatMap(current -> Arrays.stream(current.getDeclaredFields()))
-        .anyMatch(
-            field ->
-                !Modifier.isStatic(field.getModifiers())
-                    && !field.isSynthetic()
-                    && !LOGGER_TYPES.contains(field.getType().getName()));
+    return OMITTED_CUSTOMIZERS.contains(customizer.getClass().getName())
+        ? Stream.empty()
+        : Stream.of(customizer.getClass().getName());
   }
 
   static <T> T fieldValue(Object target, String name, Class<T> type) {
