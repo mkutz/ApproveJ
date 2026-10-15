@@ -1,5 +1,6 @@
 package org.approvej.spring;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -7,9 +8,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.BootstrapUtils;
 import org.springframework.test.context.MergedContextConfiguration;
+import org.springframework.test.context.TestContextAnnotationUtils;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -52,8 +57,32 @@ public final class SpringTestContexts {
                     .add(testClass));
     return new SpringTestContexts(
         testClassesByConfiguration.entrySet().stream()
-            .map(entry -> new SpringTestContext(entry.getKey(), entry.getValue()))
+            .map(
+                entry ->
+                    new SpringTestContext(
+                        entry.getKey(),
+                        entry.getValue(),
+                        entry.getValue().stream()
+                            .flatMap(SpringTestContexts::dirtiesContextUsages)
+                            .toList()))
             .toList());
+  }
+
+  private static Stream<DirtiesContextUsage> dirtiesContextUsages(Class<?> testClass) {
+    DirtiesContext classAnnotation =
+        TestContextAnnotationUtils.findMergedAnnotation(testClass, DirtiesContext.class);
+    return Stream.concat(
+        Stream.ofNullable(classAnnotation)
+            .map(annotation -> new DirtiesContextUsage(testClass, null, annotation)),
+        SpringTestClassScanner.testMethods(testClass)
+            .sorted(Comparator.comparing(Method::getName))
+            .flatMap(
+                method ->
+                    Stream.ofNullable(
+                            AnnotatedElementUtils.findMergedAnnotation(
+                                method, DirtiesContext.class))
+                        .map(
+                            annotation -> new DirtiesContextUsage(testClass, method, annotation))));
   }
 
   private static MergedContextConfiguration configuration(Class<?> testClass) {

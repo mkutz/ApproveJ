@@ -13,18 +13,24 @@ import org.springframework.test.context.MergedContextConfiguration;
  *
  * @param configuration the {@link MergedContextConfiguration} identifying the context
  * @param testClasses the test classes using the context, sorted by name
+ * @param dirtiesContextUsages the {@link DirtiesContextUsage}s of the test classes, which cause the
+ *     context to be started again
  */
 @NullMarked
 public record SpringTestContext(
-    MergedContextConfiguration configuration, List<Class<?>> testClasses) {
+    MergedContextConfiguration configuration,
+    List<Class<?>> testClasses,
+    List<DirtiesContextUsage> dirtiesContextUsages) {
 
   /**
    * Creates a new {@link SpringTestContext}.
    *
    * @param configuration the {@link MergedContextConfiguration} identifying the context
    * @param testClasses the test classes using the context
+   * @param dirtiesContextUsages the {@link DirtiesContextUsage}s of the test classes
    */
   public SpringTestContext {
     testClasses = List.copyOf(testClasses);
+    dirtiesContextUsages = List.copyOf(dirtiesContextUsages);
   }
 }
