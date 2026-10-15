@@ -16,6 +16,8 @@ class SpringTestClassScannerTest {
         .containsExactly(
             "org.approvej.spring.fixtures.ConfigTest",
             "org.approvej.spring.fixtures.CustomizedConfigTest",
+            "org.approvej.spring.fixtures.DirtiesContextBootTest",
+            "org.approvej.spring.fixtures.DirtiesContextMethodBootTest",
             "org.approvej.spring.fixtures.DynamicPropertyBootTest",
             "org.approvej.spring.fixtures.HierarchyTest",
             "org.approvej.spring.fixtures.ImportBootTest",

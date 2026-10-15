@@ -5,6 +5,7 @@ import static org.springframework.core.io.support.ResourcePatternResolver.CLASSP
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -118,9 +119,13 @@ final class SpringTestClassScanner {
                     .anyMatch(SpringExtension.class::isAssignableFrom));
   }
 
-  private static boolean containsTests(Class<?> type) {
+  static Stream<Method> testMethods(Class<?> type) {
     return Arrays.stream(ReflectionUtils.getUniqueDeclaredMethods(type))
-            .anyMatch(method -> MergedAnnotations.from(method).isPresent(Testable.class))
+        .filter(method -> MergedAnnotations.from(method).isPresent(Testable.class));
+  }
+
+  private static boolean containsTests(Class<?> type) {
+    return testMethods(type).findAny().isPresent()
         || Arrays.stream(type.getDeclaredClasses())
             .filter(nested -> nested.isAnnotationPresent(Nested.class))
             .anyMatch(SpringTestClassScanner::containsTests);

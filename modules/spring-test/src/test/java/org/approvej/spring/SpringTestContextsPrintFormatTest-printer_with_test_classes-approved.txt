@@ -64,7 +64,12 @@
     - org.approvej.spring.fixtures.FixtureApplication
   customizers:
     - @SpringBootTest(webEnvironment=MOCK)
+  dirtied by:
+    - @DirtiesContext(AFTER_CLASS) org.approvej.spring.fixtures.DirtiesContextBootTest
+    - @DirtiesContext(BEFORE_METHOD) org.approvej.spring.fixtures.DirtiesContextMethodBootTest.context_dirty
   test classes:
+    - org.approvej.spring.fixtures.DirtiesContextBootTest
+    - org.approvej.spring.fixtures.DirtiesContextMethodBootTest
     - org.approvej.spring.fixtures.InheritedBootTest
     - org.approvej.spring.fixtures.OtherPlainBootTest
     - org.approvej.spring.fixtures.PlainBootTest

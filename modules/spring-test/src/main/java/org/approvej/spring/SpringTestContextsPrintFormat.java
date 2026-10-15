@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -12,6 +13,8 @@ import java.util.Map;
 import org.approvej.print.PrintFormat;
 import org.approvej.print.Printer;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.HierarchyMode;
 
 /**
  * {@link PrintFormat} for {@link SpringTestContexts} that prints each distinct context with all
@@ -30,6 +33,9 @@ import org.jspecify.annotations.NullMarked;
  *     - &#64;MockitoBean com.example.PaymentClient field=paymentClient
  *     - &#64;SpringBootTest(webEnvironment=MOCK)
  * </pre>
+ *
+ * <p>Usages of {@code @DirtiesContext} are listed with each context they cause to be started again,
+ * as they slow down the test suite just like additional contexts.
  *
  * <p>Some details of unknown context customizers cannot be printed. If two distinct contexts are
  * printed identically, both are marked with a note.
@@ -70,6 +76,7 @@ public record SpringTestContextsPrintFormat(boolean includeTestClasses)
                   context ->
                       new PrintedContext(
                           ContextConfigurationPrinter.print(context.configuration()),
+                          context.dirtiesContextUsages(),
                           context.testClasses()))
               .sorted(Comparator.comparing(PrintedContext::configuration))
               .toList();
@@ -87,6 +94,13 @@ public record SpringTestContextsPrintFormat(boolean includeTestClasses)
 
   private String print(PrintedContext printedContext, boolean ambiguous) {
     List<String> lines = new ArrayList<>(printedContext.lines());
+    if (!printedContext.dirtiesContextUsages().isEmpty()) {
+      lines.add("dirtied by:");
+      printedContext.dirtiesContextUsages().stream()
+          .map(SpringTestContextsPrintFormat::print)
+          .sorted()
+          .forEach(usage -> lines.add("  - " + usage));
+    }
     if (ambiguous) {
       lines.add("note: differs from an identically printed context in details not printed");
     }
@@ -97,7 +111,25 @@ public record SpringTestContextsPrintFormat(boolean includeTestClasses)
     return "- " + String.join("\n  ", lines);
   }
 
-  private record PrintedContext(List<String> lines, List<Class<?>> testClasses) {
+  private static String print(DirtiesContextUsage usage) {
+    DirtiesContext annotation = usage.annotation();
+    Method testMethod = usage.testMethod();
+    String mode =
+        testMethod == null ? annotation.classMode().name() : annotation.methodMode().name();
+    if (annotation.hierarchyMode() != HierarchyMode.EXHAUSTIVE) {
+      mode += ", hierarchyMode=%s".formatted(annotation.hierarchyMode());
+    }
+    String target =
+        testMethod == null
+            ? usage.testClass().getName()
+            : "%s.%s".formatted(usage.testClass().getName(), testMethod.getName());
+    return "@DirtiesContext(%s) %s".formatted(mode, target);
+  }
+
+  private record PrintedContext(
+      List<String> lines,
+      List<DirtiesContextUsage> dirtiesContextUsages,
+      List<Class<?>> testClasses) {
 
     String configuration() {
       return String.join("\n", lines);
