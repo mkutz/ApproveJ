@@ -36,6 +36,7 @@ It provides a fluent API to compare actual values against previously approved "g
 
 - **modules/core** - Core framework with no external dependencies. Contains `ApprovalBuilder`, `Approver`, `Scrubber`, `PrintFormat`, and `Reviewer` interfaces.
 - **modules/database-jdbc** - JDBC adapter for database state snapshotting and SQL recording
+- **modules/spring-test** - Approval of the distinct Spring test application contexts of a project
 - **modules/image** - Image approval testing using perceptual hashing and pixel comparison
 - **modules/json-jackson** - JSON support using Jackson 2.x
 - **modules/json-jackson3** - JSON support using Jackson 3.x

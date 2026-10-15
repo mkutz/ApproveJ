@@ -11,6 +11,7 @@ junit5 = "5.14.4"
 junitPlatform5 = "1.14.4"
 maven = "3.10.0"
 spring-boot = "4.1.1"
+spring-framework = "7.0.9"
 testcontainers = "2.0.5"
 wiremock = "3.13.2"
 
@@ -56,6 +57,7 @@ spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-st
 spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test", version.ref = "spring-boot" }
 spring-boot-test = { module = "org.springframework.boot:spring-boot-test", version.ref = "spring-boot" }
 spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers", version.ref = "spring-boot" }
+spring-test = { module = "org.springframework:spring-test", version.ref = "spring-framework" }
 testcontainers-junit-jupiter = { module = "org.testcontainers:testcontainers-junit-jupiter", version.ref = "testcontainers" }
 testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql", version.ref = "testcontainers" }
 testng = { module = "org.testng:testng", version = "7.12.0" }
