@@ -19,6 +19,7 @@ dependencies {
   api(project(":modules:core"))
   api(libs.jspecify)
 
+  compileOnly(libs.spring.context)
   compileOnly(libs.spring.test)
 }
 
@@ -29,6 +30,7 @@ testing {
       dependencies {
         implementation(libs.spring.test)
         implementation(libs.spring.boot.test)
+        implementation(libs.mockito.core)
 
         implementation(platform(libs.junit.bom))
         implementation(libs.junit.jupiter.api)

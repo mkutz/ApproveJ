@@ -1,0 +1,83 @@
+- loader: DelegatingSmartContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  parent:
+    loader: DelegatingSmartContextLoader
+    classes:
+      - org.approvej.spring.fixtures.FixtureConfiguration
+
+- loader: DelegatingSmartContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureConfiguration
+
+- loader: DelegatingSmartContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureConfiguration
+  customizers:
+    - org.approvej.spring.fixtures.FixtureContextCustomizerFactory$FixtureContextCustomizer
+  note: differs from an identically printed context in details not printed
+
+- loader: DelegatingSmartContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureConfiguration
+  customizers:
+    - org.approvej.spring.fixtures.FixtureContextCustomizerFactory$FixtureContextCustomizer
+  note: differs from an identically printed context in details not printed
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  customizers:
+    - @DynamicPropertySource org.approvej.spring.fixtures.DynamicPropertyBootTest.fixtureProperties
+    - @SpringBootTest(webEnvironment=MOCK)
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  customizers:
+    - @Import org.approvej.spring.fixtures.FixtureConfiguration
+    - @SpringBootTest(webEnvironment=MOCK)
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  customizers:
+    - @MockitoBean org.approvej.spring.fixtures.FixtureService field=fixtureService
+    - @SpringBootTest(webEnvironment=MOCK)
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  customizers:
+    - @SpringBootTest(webEnvironment=MOCK)
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  customizers:
+    - @SpringBootTest(webEnvironment=MOCK)
+    - property mapping fixture.enabled=true
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  profiles:
+    - fixture
+  customizers:
+    - @SpringBootTest(webEnvironment=MOCK)
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  properties:
+    - fixture.flag=true
+  customizers:
+    - @SpringBootTest(webEnvironment=MOCK)
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  properties:
+    - spring.main.web-application-type=none
+  customizers:
+    - @SpringBootTest(webEnvironment=NONE)
