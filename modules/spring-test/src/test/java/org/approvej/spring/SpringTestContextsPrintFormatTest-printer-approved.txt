@@ -1,0 +1,103 @@
+- loader: DelegatingSmartContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+
+- loader: DelegatingSmartContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  parent:
+    loader: DelegatingSmartContextLoader
+    classes:
+      - org.approvej.spring.fixtures.FixtureConfiguration
+  dirtied by:
+    - @DirtiesContext(AFTER_METHOD) org.approvej.spring.fixtures.DirtiesContextHierarchyTest.context_exhaustive
+    - @DirtiesContext(AFTER_METHOD, hierarchyMode=CURRENT_LEVEL) org.approvej.spring.fixtures.DirtiesContextHierarchyTest.context_current_level
+
+- loader: DelegatingSmartContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureConfiguration
+  customizers:
+    - org.approvej.spring.fixtures.FixtureContextCustomizerFactory$FixtureContextCustomizer
+  note: differs from an identically printed context in details not printed
+
+- loader: DelegatingSmartContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureConfiguration
+  customizers:
+    - org.approvej.spring.fixtures.FixtureContextCustomizerFactory$FixtureContextCustomizer
+  note: differs from an identically printed context in details not printed
+
+- loader: DelegatingSmartContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureConfiguration
+  dirtied by:
+    - @DirtiesContext(AFTER_METHOD) org.approvej.spring.fixtures.DirtiesContextHierarchyTest.context_exhaustive
+
+- loader: DelegatingSmartContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureConfiguration
+  parent:
+    loader: DelegatingSmartContextLoader
+    classes:
+      - org.approvej.spring.fixtures.FixtureApplication
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  customizers:
+    - @DynamicPropertySource org.approvej.spring.fixtures.DynamicPropertyBootTest.fixtureProperties
+    - @SpringBootTest(webEnvironment=MOCK)
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  customizers:
+    - @Import org.approvej.spring.fixtures.FixtureConfiguration
+    - @SpringBootTest(webEnvironment=MOCK)
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  customizers:
+    - @MockitoBean org.approvej.spring.fixtures.FixtureService field=fixtureService
+    - @SpringBootTest(webEnvironment=MOCK)
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  customizers:
+    - @SpringBootTest(webEnvironment=MOCK)
+    - property mapping fixture.enabled=true
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  customizers:
+    - @SpringBootTest(webEnvironment=MOCK)
+  dirtied by:
+    - @DirtiesContext(AFTER_CLASS) org.approvej.spring.fixtures.DirtiesContextBootTest
+    - @DirtiesContext(BEFORE_METHOD) org.approvej.spring.fixtures.DirtiesContextMethodBootTest.context_dirty
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  profiles:
+    - fixture
+  customizers:
+    - @SpringBootTest(webEnvironment=MOCK)
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  properties:
+    - fixture.flag=true
+  customizers:
+    - @SpringBootTest(webEnvironment=MOCK)
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  properties:
+    - spring.main.web-application-type=none
+  customizers:
+    - @SpringBootTest(webEnvironment=NONE)

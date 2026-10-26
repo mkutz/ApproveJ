@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v1.8.0
+
+### spring-test
+
+* ✨ **New module to approve Spring test application contexts**
+  Add `spring-test` module that prints all distinct Spring test application contexts of a project, so new contexts slowing down the test suite show up as a failed approval.
+  Use `approve(springTestContexts("com.example")).printedAs(contextConfigurations()).byFile()` to approve them.
+  The contexts are determined statically from Spring's context cache key, without starting any context.
+  Usages of `@DirtiesContext` are listed with the context they cause to be restarted.
+  ([#405](https://github.com/mkutz/ApproveJ/issues/405))
+
+
 ## v1.7.0
 
 ### core
