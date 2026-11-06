@@ -95,6 +95,9 @@ endif::[]
 
 |`SqlPrintFormat.sql()`
 |Pretty-print SQL with line breaks (requires `database-jdbc`)
+
+|`SpringTestContextsPrintFormat.contextConfigurations()`
+|Print distinct Spring test application contexts (requires `spring-test`)
 |===
 
 
