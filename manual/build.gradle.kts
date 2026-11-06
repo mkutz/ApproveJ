@@ -17,6 +17,7 @@ val asciidoctorExt: Configuration = configurations.create("asciidoctorExt")
 
 dependencies {
   asciidoctorExt(libs.asciidoctor.block.switch)
+  asciidoctorExt(libs.asciidoctorj.diagram.plantuml)
   testFixturesImplementation(project(":modules:core"))
 }
 
@@ -68,10 +69,8 @@ tasks.register<org.asciidoctor.gradle.jvm.pdf.AsciidoctorPdfTask>("cheatSheetPdf
 }
 
 asciidoctorj {
-  setVersion("3.0.0")
   logLevel = LogLevel.WARN
   modules {
     diagram.use()
-    pdf.version("2.3.19")
   }
 }
