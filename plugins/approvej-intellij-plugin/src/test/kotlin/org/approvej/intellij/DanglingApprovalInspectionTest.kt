@@ -19,7 +19,7 @@ class DanglingApprovalInspectionTest : LightJavaCodeInsightFixtureTestCase() {
           public Object by(Object approver) { return null; }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
     myFixture.addClass(
       """
@@ -32,7 +32,7 @@ class DanglingApprovalInspectionTest : LightJavaCodeInsightFixtureTestCase() {
 
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -46,7 +46,7 @@ class DanglingApprovalInspectionTest : LightJavaCodeInsightFixtureTestCase() {
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -60,7 +60,7 @@ class DanglingApprovalInspectionTest : LightJavaCodeInsightFixtureTestCase() {
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -74,7 +74,7 @@ class DanglingApprovalInspectionTest : LightJavaCodeInsightFixtureTestCase() {
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -88,7 +88,7 @@ class DanglingApprovalInspectionTest : LightJavaCodeInsightFixtureTestCase() {
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -102,7 +102,7 @@ class DanglingApprovalInspectionTest : LightJavaCodeInsightFixtureTestCase() {
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -116,7 +116,7 @@ class DanglingApprovalInspectionTest : LightJavaCodeInsightFixtureTestCase() {
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -130,7 +130,7 @@ class DanglingApprovalInspectionTest : LightJavaCodeInsightFixtureTestCase() {
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -144,7 +144,7 @@ class DanglingApprovalInspectionTest : LightJavaCodeInsightFixtureTestCase() {
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -158,7 +158,7 @@ class DanglingApprovalInspectionTest : LightJavaCodeInsightFixtureTestCase() {
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -172,7 +172,7 @@ class DanglingApprovalInspectionTest : LightJavaCodeInsightFixtureTestCase() {
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 

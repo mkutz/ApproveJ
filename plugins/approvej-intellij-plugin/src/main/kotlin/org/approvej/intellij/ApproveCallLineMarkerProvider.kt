@@ -73,7 +73,7 @@ class ApproveCallLineMarkerProvider : LineMarkerProviderDescriptor() {
           .setTargets(targets)
           .setTooltipText(
             if (targets.size == 1) "Navigate to ${approvedFiles.first().name}"
-            else "Navigate to approved file"
+            else "Navigate to approved file",
           )
       result.add(builder.createLineMarkerInfo(element))
     } else {

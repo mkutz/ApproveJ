@@ -16,7 +16,7 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
           public void byFile() {}
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -51,18 +51,19 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
   fun testRenameMethod_with_affix() {
     val testClass = addTestClassWithMethod("com.example", "MyTest", "approve_named")
     addInventory(
-      "src/com/example/MyTest-approve_named-jane-approved.txt" to "com.example.MyTest#approve_named"
+      "src/com/example/MyTest-approve_named-jane-approved.txt" to
+        "com.example.MyTest#approve_named",
     )
     myFixture.addFileToProject("src/com/example/MyTest-approve_named-jane-approved.txt", "approved")
 
     renameMethod(testClass, "approve_named", "approve_person")
 
     assertThat(
-        myFixture.findFileInTempDir("src/com/example/MyTest-approve_person-jane-approved.txt")
+        myFixture.findFileInTempDir("src/com/example/MyTest-approve_person-jane-approved.txt"),
       )
       .isNotNull()
     assertThat(
-        myFixture.findFileInTempDir("src/com/example/MyTest-approve_named-jane-approved.txt")
+        myFixture.findFileInTempDir("src/com/example/MyTest-approve_named-jane-approved.txt"),
       )
       .isNull()
   }
@@ -81,11 +82,11 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
     renameMethod(testClass, "approve_named", "approve_person")
 
     assertThat(
-        myFixture.findFileInTempDir("src/com/example/MyTest-approve_person-jane-approved.txt")
+        myFixture.findFileInTempDir("src/com/example/MyTest-approve_person-jane-approved.txt"),
       )
       .isNotNull()
     assertThat(
-        myFixture.findFileInTempDir("src/com/example/MyTest-approve_person-john-approved.txt")
+        myFixture.findFileInTempDir("src/com/example/MyTest-approve_person-john-approved.txt"),
       )
       .isNotNull()
   }
@@ -93,7 +94,7 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
   fun testRenameMethod_subdirectory_pattern() {
     val testClass = addTestClassWithMethod("com.example", "MyTest", "subdir_test")
     addInventory(
-      "src/com/example/MyTest/subdir_test-approved.txt" to "com.example.MyTest#subdir_test"
+      "src/com/example/MyTest/subdir_test-approved.txt" to "com.example.MyTest#subdir_test",
     )
     myFixture.addFileToProject("src/com/example/MyTest/subdir_test-approved.txt", "approved")
 
@@ -142,7 +143,7 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
   fun testRenameMethod_no_approved_files() {
     val testClass = addTestClassWithMethod("com.example", "MyTest", "byValue")
     addInventory(
-      "src/com/example/Other-otherMethod-approved.txt" to "com.example.Other#otherMethod"
+      "src/com/example/Other-otherMethod-approved.txt" to "com.example.Other#otherMethod",
     )
 
     renameMethod(testClass, "byValue", "byContent")
@@ -165,7 +166,7 @@ class ApproveJRenamePsiElementProcessorPlatformTest : LightJavaCodeInsightFixtur
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 

@@ -27,19 +27,19 @@ class ApproveJPropertiesInspectionTest : LightJavaCodeInsightFixtureTestCase() {
       inventoryEnabled = false
       defaultInlineValueReviewer = automatic
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
   fun testUnknownKey() {
     doHighlightTest(
-      "<warning descr=\"Unknown ApproveJ property key 'misspelledKey'\">misspelledKey</warning> = json"
+      "<warning descr=\"Unknown ApproveJ property key 'misspelledKey'\">misspelledKey</warning> = json",
     )
   }
 
   fun testUnknownKey_similar_to_valid() {
     doHighlightTest(
-      "<warning descr=\"Unknown ApproveJ property key 'defaultprintformat'\">defaultprintformat</warning> = json"
+      "<warning descr=\"Unknown ApproveJ property key 'defaultprintformat'\">defaultprintformat</warning> = json",
     )
   }
 
@@ -47,7 +47,7 @@ class ApproveJPropertiesInspectionTest : LightJavaCodeInsightFixtureTestCase() {
     doHighlightTest(
       "<warning descr=\"'defaultFileReviewerScript' is deprecated." +
         " Use 'defaultFileReviewer = script' and 'reviewerScript = ...' instead.\">" +
-        "defaultFileReviewerScript</warning> = someScript.sh"
+        "defaultFileReviewerScript</warning> = someScript.sh",
     )
   }
 
@@ -58,7 +58,7 @@ class ApproveJPropertiesInspectionTest : LightJavaCodeInsightFixtureTestCase() {
       <warning descr="Unknown ApproveJ property key 'typo'">typo</warning> = value
       <warning descr="'defaultFileReviewerScript' is deprecated. Use 'defaultFileReviewer = script' and 'reviewerScript = ...' instead.">defaultFileReviewerScript</warning> = script.sh
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 

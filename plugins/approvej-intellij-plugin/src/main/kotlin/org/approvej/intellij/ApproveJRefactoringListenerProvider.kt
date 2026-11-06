@@ -48,7 +48,7 @@ class ApproveJRefactoringListenerProvider : RefactoringElementListenerProvider {
         override fun elementRenamed(newElement: PsiElement) {
           val newMethodName =
             ApproveJRenamePsiElementProcessor.stripBackticks(
-              (newElement as PsiNamedElement).name ?: return
+              (newElement as PsiNamedElement).name ?: return,
             )
 
           val pathRenames =

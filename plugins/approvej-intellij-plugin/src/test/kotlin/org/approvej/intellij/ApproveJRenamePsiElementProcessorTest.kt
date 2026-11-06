@@ -42,7 +42,7 @@ class ApproveJRenamePsiElementProcessorTest {
             "MyTest",
             "oldMethod",
             "newMethod",
-          )
+          ),
         )
         .isEqualTo("MyTest-newMethod-approved.txt")
     }
@@ -55,7 +55,7 @@ class ApproveJRenamePsiElementProcessorTest {
             "MyTest",
             "oldMethod",
             "newMethod",
-          )
+          ),
         )
         .isEqualTo("MyTest-newMethod-jane-approved.txt")
     }
@@ -68,7 +68,7 @@ class ApproveJRenamePsiElementProcessorTest {
             "MyTest",
             "oldMethod",
             "newMethod",
-          )
+          ),
         )
         .isEqualTo("newMethod-approved.txt")
     }
@@ -81,7 +81,7 @@ class ApproveJRenamePsiElementProcessorTest {
             "MyTest",
             "oldMethod",
             "newMethod",
-          )
+          ),
         )
         .isNull()
     }

@@ -24,7 +24,7 @@ class InventoryUtilTest {
     @Test
     fun `doubly nested class`() {
       assertThat(
-          InventoryUtil.normalizeClassName("com.example.OuterTest\$InnerTest\$DoublyNestedTest")
+          InventoryUtil.normalizeClassName("com.example.OuterTest\$InnerTest\$DoublyNestedTest"),
         )
         .isEqualTo("com.example.OuterTest.InnerTest.DoublyNestedTest")
     }

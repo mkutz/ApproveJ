@@ -21,7 +21,7 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
           public Object by(Object approver) { return null; }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -90,7 +90,7 @@ class ApproveCallLineMarkerProviderTest : LightJavaCodeInsightFixtureTestCase() 
 
   fun testMarker_present_for_byFile_nested_class() {
     addInventory(
-      "src/com/example/OuterTest-myTest-approved.txt" to "com.example.OuterTest\$InnerTest#myTest"
+      "src/com/example/OuterTest-myTest-approved.txt" to "com.example.OuterTest\$InnerTest#myTest",
     )
     myFixture.addFileToProject("src/com/example/OuterTest-myTest-approved.txt", "approved content")
 
