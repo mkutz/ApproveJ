@@ -1,0 +1,22 @@
+package org.approvej.spring.fixtures.template;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+
+@SpringBootTest(properties = "fixture=nested-template")
+abstract class NestedTemplate {
+
+  @Nested
+  class Inner {
+
+    @Test
+    void context(@Autowired ApplicationContext context) {
+      assertThat(context).isNotNull();
+    }
+  }
+}

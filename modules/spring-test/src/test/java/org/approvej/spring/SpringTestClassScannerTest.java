@@ -23,6 +23,7 @@ class SpringTestClassScannerTest {
             "org.approvej.spring.fixtures.HierarchyTest",
             "org.approvej.spring.fixtures.ImportBootTest",
             "org.approvej.spring.fixtures.InheritedBootTest",
+            "org.approvej.spring.fixtures.MethodExtensionConfigTest",
             "org.approvej.spring.fixtures.MockitoBeanBootTest",
             "org.approvej.spring.fixtures.NoWebEnvironmentBootTest",
             "org.approvej.spring.fixtures.OtherCustomizedConfigTest",
@@ -31,10 +32,14 @@ class SpringTestClassScannerTest {
             "org.approvej.spring.fixtures.ProfileBootTest",
             "org.approvej.spring.fixtures.PropertyBootTest",
             "org.approvej.spring.fixtures.PropertyMappingBootTest",
+            "org.approvej.spring.fixtures.QualifiedMockitoBeanBootTest",
             "org.approvej.spring.fixtures.RecordConfigTest",
             "org.approvej.spring.fixtures.ReversedHierarchyTest",
+            "org.approvej.spring.fixtures.inherited.sub.ShadowingBootTest",
             "org.approvej.spring.fixtures.nested.NestedBootTest",
-            "org.approvej.spring.fixtures.nested.NestedBootTest$Inner");
+            "org.approvej.spring.fixtures.nested.NestedBootTest$Inner",
+            "org.approvej.spring.fixtures.template.ConcreteNestedTemplateTest",
+            "org.approvej.spring.fixtures.template.NestedTemplate$Inner");
   }
 
   @Test

@@ -28,7 +28,10 @@ approvej -> approvej : print, compare
 ....
 
 The contexts are determined statically: no test is run and no context is started.
-So the approval is fast and works without any infrastructure like Docker, even if your contexts need it.
+So the approval is fast and usually works without the infrastructure your contexts need.
+
+NOTE: Testcontainers fields annotated with `@ServiceConnection` are an exception.
+Spring Boot resolves their Docker image while determining the context configuration, so the approval needs Docker if any of your test classes use them.
 
 
 [id=spring_test_dependencies]

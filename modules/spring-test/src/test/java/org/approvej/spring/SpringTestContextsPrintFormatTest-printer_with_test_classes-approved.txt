@@ -41,6 +41,7 @@
     - @DirtiesContext(AFTER_METHOD) org.approvej.spring.fixtures.DirtiesContextHierarchyTest.context_exhaustive
   test classes:
     - org.approvej.spring.fixtures.ConfigTest
+    - org.approvej.spring.fixtures.MethodExtensionConfigTest
     - org.approvej.spring.fixtures.RecordConfigTest
 
 - loader: DelegatingSmartContextLoader
@@ -75,7 +76,16 @@
   classes:
     - org.approvej.spring.fixtures.FixtureApplication
   customizers:
-    - @MockitoBean org.approvej.spring.fixtures.FixtureService field=fixtureService
+    - @MockitoBean org.approvej.spring.fixtures.FixtureService field=fixtureService @org.springframework.beans.factory.annotation.Qualifier("fixtureService") strategy=REPLACE_OR_CREATE reset=BEFORE
+    - @SpringBootTest(webEnvironment=MOCK)
+  test classes:
+    - org.approvej.spring.fixtures.QualifiedMockitoBeanBootTest
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  customizers:
+    - @MockitoBean org.approvej.spring.fixtures.FixtureService field=fixtureService strategy=REPLACE_OR_CREATE
     - @SpringBootTest(webEnvironment=MOCK)
   test classes:
     - org.approvej.spring.fixtures.MockitoBeanBootTest
@@ -125,6 +135,27 @@
     - @SpringBootTest(webEnvironment=MOCK)
   test classes:
     - org.approvej.spring.fixtures.PropertyBootTest
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  properties:
+    - fixture=nested-template
+  customizers:
+    - @SpringBootTest(webEnvironment=MOCK)
+  test classes:
+    - org.approvej.spring.fixtures.template.ConcreteNestedTemplateTest
+    - org.approvej.spring.fixtures.template.NestedTemplate$Inner
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  properties:
+    - fixture=package-private-test
+  customizers:
+    - @SpringBootTest(webEnvironment=MOCK)
+  test classes:
+    - org.approvej.spring.fixtures.inherited.sub.ShadowingBootTest
 
 - loader: SpringBootContextLoader
   classes:

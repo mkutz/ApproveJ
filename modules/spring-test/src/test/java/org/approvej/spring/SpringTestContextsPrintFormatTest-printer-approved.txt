@@ -59,7 +59,14 @@
   classes:
     - org.approvej.spring.fixtures.FixtureApplication
   customizers:
-    - @MockitoBean org.approvej.spring.fixtures.FixtureService field=fixtureService
+    - @MockitoBean org.approvej.spring.fixtures.FixtureService field=fixtureService @org.springframework.beans.factory.annotation.Qualifier("fixtureService") strategy=REPLACE_OR_CREATE reset=BEFORE
+    - @SpringBootTest(webEnvironment=MOCK)
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  customizers:
+    - @MockitoBean org.approvej.spring.fixtures.FixtureService field=fixtureService strategy=REPLACE_OR_CREATE
     - @SpringBootTest(webEnvironment=MOCK)
 
 - loader: SpringBootContextLoader
@@ -91,6 +98,22 @@
     - org.approvej.spring.fixtures.FixtureApplication
   properties:
     - fixture.flag=true
+  customizers:
+    - @SpringBootTest(webEnvironment=MOCK)
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  properties:
+    - fixture=nested-template
+  customizers:
+    - @SpringBootTest(webEnvironment=MOCK)
+
+- loader: SpringBootContextLoader
+  classes:
+    - org.approvej.spring.fixtures.FixtureApplication
+  properties:
+    - fixture=package-private-test
   customizers:
     - @SpringBootTest(webEnvironment=MOCK)
 
