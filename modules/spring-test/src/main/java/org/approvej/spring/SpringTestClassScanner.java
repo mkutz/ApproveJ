@@ -92,9 +92,25 @@ final class SpringTestClassScanner {
    *
    * <p>Like JUnit Jupiter, nested test classes are discovered through their runnable enclosing
    * classes, including nested classes inherited from superclasses.
+   *
+   * <p>Inspecting a class's methods fails if their signatures reference a class missing at runtime,
+   * e.g. from an optional dependency. JUnit Jupiter cannot run such a class either, so it is
+   * skipped, unless it registers the {@link SpringExtension} itself and so is obviously meant to be
+   * a Spring test.
    */
   static Stream<Class<?>> springTestClasses(Class<?> type) {
-    return isRunnable(type) ? springTestClasses(type, false) : Stream.empty();
+    if (!isRunnable(type)) {
+      return Stream.empty();
+    }
+    try {
+      return springTestClasses(type, false).toList().stream();
+    } catch (LinkageError e) {
+      if (registersSpringExtension(type)) {
+        throw new IllegalStateException(
+            "Failed to inspect Spring test class %s".formatted(type.getName()), e);
+      }
+      return Stream.empty();
+    }
   }
 
   private static Stream<Class<?>> springTestClasses(

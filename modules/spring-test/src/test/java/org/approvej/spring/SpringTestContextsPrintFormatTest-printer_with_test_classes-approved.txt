@@ -113,6 +113,7 @@
     - org.approvej.spring.fixtures.InheritedBootTest
     - org.approvej.spring.fixtures.OtherPlainBootTest
     - org.approvej.spring.fixtures.PlainBootTest
+    - org.approvej.spring.fixtures.linkage.test.OptionalDependencyBootTest
     - org.approvej.spring.fixtures.nested.NestedBootTest
     - org.approvej.spring.fixtures.nested.NestedBootTest$Inner
 

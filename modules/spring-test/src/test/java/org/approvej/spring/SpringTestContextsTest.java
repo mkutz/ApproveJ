@@ -20,6 +20,7 @@ class SpringTestContextsTest {
                 "InheritedBootTest",
                 "OtherPlainBootTest",
                 "PlainBootTest",
+                "OptionalDependencyBootTest",
                 "NestedBootTest",
                 "Inner"),
             List.of("DirtiesContextHierarchyTest", "HierarchyTest"),
@@ -45,7 +46,7 @@ class SpringTestContextsTest {
                     "org.approvej.spring.fixtures.nested", "org.approvej.spring.fixtures")
                 .contexts())
         .flatExtracting(SpringTestContext::testClasses)
-        .hasSize(26)
+        .hasSize(27)
         .doesNotHaveDuplicates();
   }
 
