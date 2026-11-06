@@ -16,6 +16,7 @@ wiremock = "3.13.2"
 
 [libraries]
 asciidoctor-block-switch = { module = "io.spring.asciidoctor:spring-asciidoctor-extensions-block-switch", version = "0.6.3" }
+asciidoctorj-diagram-plantuml = { module = "org.asciidoctor:asciidoctorj-diagram-plantuml", version = "1.2026.2" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 awaitility = { module = "org.awaitility:awaitility", version = "4.3.0" }
 commonmark = { module = "org.commonmark:commonmark", version.ref = "commonmark" }
@@ -62,8 +63,8 @@ testng = { module = "org.testng:testng", version = "7.12.0" }
 wiremock = { module = "org.wiremock:wiremock", version.ref = "wiremock" }
 
 [plugins]
-asciidoctor = { id = "org.asciidoctor.jvm.convert", version = "4.0.5" }
-asciidoctor-pdf = { id = "org.asciidoctor.jvm.pdf", version = "5.1.0" }
+asciidoctor = { id = "org.asciidoctor.jvm.convert.classic", version = "5.1.0" }
+asciidoctor-pdf = { id = "org.asciidoctor.jvm.pdf.classic", version = "5.1.0" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-platform" }
 jreleaser = { id = "org.jreleaser", version = "1.26.0" }
