@@ -71,7 +71,7 @@ asciidoctor = { id = "org.asciidoctor.jvm.convert.classic", version = "5.1.0" }
 asciidoctor-pdf = { id = "org.asciidoctor.jvm.pdf.classic", version = "5.1.0" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-platform" }
-jreleaser = { id = "org.jreleaser", version = "1.26.0" }
+jreleaser = { id = "org.jreleaser", version = "1.27.0" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.4.21" }
 maven-plugin-development = { id = "org.gradlex.maven-plugin-development", version = "1.0.3" }
 plugin-publish = { id = "com.gradle.plugin-publish", version = "2.2.1" }
