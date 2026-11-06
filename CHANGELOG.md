@@ -12,6 +12,19 @@
   Usages of `@DirtiesContext` are listed with the context they cause to be restarted.
   ([#405](https://github.com/mkutz/ApproveJ/issues/405))
 
+### core, image, json-jackson, json-jackson3, yaml-jackson & yaml-jackson3
+
+* ✨ **Complete JSpecify nullability annotations**
+  All classes of the library modules are now `@NullMarked`, so the whole public API declares its nullability.
+  Kotlin and null-checking tools see precise types instead of platform types.
+
+### bom
+
+* 🐛 **Only manage published artifacts**
+  The BOM no longer lists the IntelliJ plugin and the Spring Boot example, which are not published to Maven Central.
+
+**Full Changelog**: https://github.com/mkutz/ApproveJ/compare/v1.7.0...v1.8.0
+
 
 ## v1.7.0
 
