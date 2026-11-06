@@ -55,18 +55,20 @@ class SpringTestClassScannerTest {
 
   @Test
   void scan_optional_dependency_missing() {
-    SpringTestClassScanner scanner =
+    SpringTestClassScanner missingDependencyScanner =
         new SpringTestClassScanner(new MissingOptionalDependencyClassLoader());
 
-    assertThat(scanner.scan("org.approvej.spring.fixtures.linkage.production")).isEmpty();
+    assertThat(missingDependencyScanner.scan("org.approvej.spring.fixtures.linkage.production"))
+        .isEmpty();
   }
 
   @Test
   void scan_optional_dependency_missing_spring_test() {
-    SpringTestClassScanner scanner =
+    SpringTestClassScanner missingDependencyScanner =
         new SpringTestClassScanner(new MissingOptionalDependencyClassLoader());
 
-    assertThatThrownBy(() -> scanner.scan("org.approvej.spring.fixtures.linkage.test"))
+    assertThatThrownBy(
+            () -> missingDependencyScanner.scan("org.approvej.spring.fixtures.linkage.test"))
         .isInstanceOf(IllegalStateException.class)
         .hasMessageContaining(
             "org.approvej.spring.fixtures.linkage.test.OptionalDependencyBootTest")
