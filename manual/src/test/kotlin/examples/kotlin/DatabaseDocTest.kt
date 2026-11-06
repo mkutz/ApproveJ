@@ -23,7 +23,7 @@ class DatabaseDocTest {
     dataSource.connection.use { connection: Connection ->
       connection.createStatement().use { statement ->
         statement.execute(
-          "CREATE TABLE users (id INT PRIMARY KEY, name VARCHAR(100), email VARCHAR(200))"
+          "CREATE TABLE users (id INT PRIMARY KEY, name VARCHAR(100), email VARCHAR(200))",
         )
         statement.execute("INSERT INTO users VALUES (1, 'Alice', 'alice@test.com')")
         statement.execute("INSERT INTO users VALUES (2, 'Bob', 'bob@test.com')")

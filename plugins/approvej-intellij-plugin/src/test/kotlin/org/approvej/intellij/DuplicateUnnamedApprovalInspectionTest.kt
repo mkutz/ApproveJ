@@ -21,7 +21,7 @@ class DuplicateUnnamedApprovalInspectionTest : LightJavaCodeInsightFixtureTestCa
           public Object by(Object approver) { return null; }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
     myFixture.addClass(
       """
@@ -34,7 +34,7 @@ class DuplicateUnnamedApprovalInspectionTest : LightJavaCodeInsightFixtureTestCa
 
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -49,7 +49,7 @@ class DuplicateUnnamedApprovalInspectionTest : LightJavaCodeInsightFixtureTestCa
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -64,7 +64,7 @@ class DuplicateUnnamedApprovalInspectionTest : LightJavaCodeInsightFixtureTestCa
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -80,7 +80,7 @@ class DuplicateUnnamedApprovalInspectionTest : LightJavaCodeInsightFixtureTestCa
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -94,7 +94,7 @@ class DuplicateUnnamedApprovalInspectionTest : LightJavaCodeInsightFixtureTestCa
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -109,7 +109,7 @@ class DuplicateUnnamedApprovalInspectionTest : LightJavaCodeInsightFixtureTestCa
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -124,7 +124,7 @@ class DuplicateUnnamedApprovalInspectionTest : LightJavaCodeInsightFixtureTestCa
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -142,7 +142,7 @@ class DuplicateUnnamedApprovalInspectionTest : LightJavaCodeInsightFixtureTestCa
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -154,7 +154,7 @@ class DuplicateUnnamedApprovalInspectionTest : LightJavaCodeInsightFixtureTestCa
           public static String get() { return "dynamic"; }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
     doHighlightTest(
       """
@@ -166,7 +166,7 @@ class DuplicateUnnamedApprovalInspectionTest : LightJavaCodeInsightFixtureTestCa
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -181,7 +181,7 @@ class DuplicateUnnamedApprovalInspectionTest : LightJavaCodeInsightFixtureTestCa
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -196,7 +196,7 @@ class DuplicateUnnamedApprovalInspectionTest : LightJavaCodeInsightFixtureTestCa
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -211,7 +211,7 @@ class DuplicateUnnamedApprovalInspectionTest : LightJavaCodeInsightFixtureTestCa
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -241,7 +241,7 @@ class DuplicateUnnamedApprovalInspectionTest : LightJavaCodeInsightFixtureTestCa
           }
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 

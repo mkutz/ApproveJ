@@ -21,7 +21,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
           public void byValue(java.lang.String expected) {}
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
     myFixture.addClass(
       """
@@ -33,7 +33,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
           public void byFile() {}
       }
       """
-        .trimIndent()
+        .trimIndent(),
     )
   }
 
@@ -48,7 +48,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
             }
         }
         """
-          .trimIndent()
+          .trimIndent(),
       )
 
     assertThat(ApproveCallUtil.asApproveCall(element)).isNotNull()
@@ -65,7 +65,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
             }
         }
         """
-          .trimIndent()
+          .trimIndent(),
       )
 
     assertThat(ApproveCallUtil.asApproveCall(element)).isNotNull()
@@ -79,7 +79,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
             void appr<caret>ove(String s) {}
         }
         """
-          .trimIndent()
+          .trimIndent(),
       )
 
     assertThat(ApproveCallUtil.asApproveCall(element)).isNull()
@@ -96,7 +96,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
             }
         }
         """
-          .trimIndent()
+          .trimIndent(),
       )
 
     assertThat(ApproveCallUtil.isApproveCall(call)).isTrue()
@@ -113,7 +113,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
             }
         }
         """
-          .trimIndent()
+          .trimIndent(),
       )
 
     assertThat(ApproveCallUtil.isApproveCall(call)).isTrue()
@@ -130,7 +130,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
             }
         }
         """
-          .trimIndent()
+          .trimIndent(),
       )
 
     assertThat(ApproveCallUtil.findTerminalCall(call).lastMethodName).isEqualTo("byFile")
@@ -147,7 +147,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
             }
         }
         """
-          .trimIndent()
+          .trimIndent(),
       )
 
     assertThat(ApproveCallUtil.findTerminalCall(call).lastMethodName).isEqualTo("byValue")
@@ -164,7 +164,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
             }
         }
         """
-          .trimIndent()
+          .trimIndent(),
       )
 
     assertThat(ApproveCallUtil.findTerminalCall(call).lastMethodName).isEqualTo("byFile")
@@ -181,7 +181,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
             }
         }
         """
-          .trimIndent()
+          .trimIndent(),
       )
 
     assertThat(ApproveCallUtil.findTerminalCall(call).lastMethodName).isEqualTo("approve")
@@ -198,7 +198,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
             }
         }
         """
-          .trimIndent()
+          .trimIndent(),
       )
 
     assertThat(ApproveCallUtil.findTerminalCall(call).lastMethodName).isEqualTo("approveImage")
@@ -215,7 +215,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
             }
         }
         """
-          .trimIndent()
+          .trimIndent(),
       )
 
     assertThat(ApproveCallUtil.findTerminalCall(call).lastMethodName).isEqualTo("printedAs")
@@ -232,7 +232,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
             }
         }
         """
-          .trimIndent()
+          .trimIndent(),
       )
 
     assertThat(ApproveCallUtil.findNamedArgument(call)).isEqualTo("first")
@@ -249,7 +249,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
             }
         }
         """
-          .trimIndent()
+          .trimIndent(),
       )
 
     assertThat(ApproveCallUtil.findNamedArgument(call)).isEqualTo("second")
@@ -266,7 +266,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
             }
         }
         """
-          .trimIndent()
+          .trimIndent(),
       )
 
     assertThat(ApproveCallUtil.hasNamedCall(call)).isTrue()
@@ -283,7 +283,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
             }
         }
         """
-          .trimIndent()
+          .trimIndent(),
       )
 
     assertThat(ApproveCallUtil.hasNamedCall(call)).isFalse()
@@ -300,7 +300,7 @@ class ApproveCallUtilTest : LightJavaCodeInsightFixtureTestCase() {
             }
         }
         """
-          .trimIndent()
+          .trimIndent(),
       )
 
     assertThat(ApproveCallUtil.findNamedArgument(call)).isNull()

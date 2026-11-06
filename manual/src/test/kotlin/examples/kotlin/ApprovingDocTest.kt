@@ -33,7 +33,7 @@ class ApprovingDocTest {
         """
         Person[name=John Doe, birthDate=1990-01-01]
         """
-          .trimIndent()
+          .trimIndent(),
       )
     // end::approve_inplace_auto_update[]
   }
