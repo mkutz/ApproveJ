@@ -26,6 +26,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check line endings
+        run: |
+          git add --renormalize .
+          if ! git diff --cached --quiet; then
+            echo "::error::Files are not normalized according to .gitattributes. Run 'git add --renormalize .' and commit the result."
+            git diff --cached --stat
+            exit 1
+          fi
+
       - uses: actions/setup-java@v6
         with:
           java-version: 21
