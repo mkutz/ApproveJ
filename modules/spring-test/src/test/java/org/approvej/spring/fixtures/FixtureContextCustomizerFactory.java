@@ -23,6 +23,8 @@ public class FixtureContextCustomizerFactory implements ContextCustomizerFactory
 
     @Override
     public void customizeContext(
-        ConfigurableApplicationContext context, MergedContextConfiguration configuration) {}
+        ConfigurableApplicationContext context, MergedContextConfiguration configuration) {
+      // Intentionally empty: the customizer only needs to be part of the context cache key.
+    }
   }
 }

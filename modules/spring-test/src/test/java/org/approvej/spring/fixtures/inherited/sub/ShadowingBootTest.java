@@ -5,6 +5,8 @@ import org.springframework.context.ApplicationContext;
 
 class ShadowingBootTest extends PackagePrivateTestTemplate {
 
-  /** Does not override the package-private test method of the other package's superclass. */
-  void context(ApplicationContext context) {}
+  void context(ApplicationContext context) {
+    // Intentionally empty: shadows the signature of the superclass's package-private test method
+    // from another package without overriding it, so JUnit still runs the inherited test.
+  }
 }
