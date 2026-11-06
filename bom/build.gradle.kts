@@ -15,7 +15,14 @@ dependencies {
     rootProject.subprojects
       .filter {
         it != project &&
-          it.name !in listOf("approvej-gradle-plugin", "approvej-maven-plugin", "manual") &&
+          it.name !in
+            listOf(
+              "approvej-gradle-plugin",
+              "approvej-intellij-plugin",
+              "approvej-maven-plugin",
+              "manual",
+            ) &&
+          !it.path.startsWith(":examples") &&
           it.subprojects.isEmpty()
       }
       .sortedBy { it.name }
