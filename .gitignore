@@ -4,8 +4,8 @@ out
 gradle-app.setting
 !gradle-wrapper.jar
 .gradletasknamecache
-.idea
-!.idea/icon.png
+.idea/*
+!.idea/icon.svg
 docs/**
 .jqwik-database
 *.key
