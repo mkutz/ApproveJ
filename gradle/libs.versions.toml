@@ -68,7 +68,7 @@ wiremock = { module = "org.wiremock:wiremock", version.ref = "wiremock" }
 
 [plugins]
 asciidoctor = { id = "org.asciidoctor.jvm.convert.classic", version = "5.2.0" }
-asciidoctor-pdf = { id = "org.asciidoctor.jvm.pdf.classic", version = "5.1.0" }
+asciidoctor-pdf = { id = "org.asciidoctor.jvm.pdf.classic", version = "5.2.0" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-platform" }
 jreleaser = { id = "org.jreleaser", version = "1.27.0" }
