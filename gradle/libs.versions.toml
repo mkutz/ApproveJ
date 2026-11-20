@@ -67,7 +67,7 @@ testng = { module = "org.testng:testng", version = "7.12.0" }
 wiremock = { module = "org.wiremock:wiremock", version.ref = "wiremock" }
 
 [plugins]
-asciidoctor = { id = "org.asciidoctor.jvm.convert.classic", version = "5.1.0" }
+asciidoctor = { id = "org.asciidoctor.jvm.convert.classic", version = "5.2.0" }
 asciidoctor-pdf = { id = "org.asciidoctor.jvm.pdf.classic", version = "5.1.0" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-platform" }
